@@ -1,25 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { invoke, router, view } from "@forge/bridge";
+import { HomePage } from "./pages/HomePage";
 
 function App() {
   // Enable auto change theme Dark/light mode within Jira
   view.theme.enable();
-
-  const [data, setData] = useState("");
-
   useEffect(() => {
-
-    invoke("setContextToGlobal").then();
-    invoke("getText", { example: "my-invoke-variable" }).then((res) => {
-      setData(JSON.stringify(res));
-    });
+    invoke("setContextToGlobal").then().catch();
   }, []);
 
   return (
     <div>
-      <div>
-        <h1>{data ? data : "Loading..."}</h1>
-      </div>
+      <HomePage></HomePage>
     </div>
   );
 }

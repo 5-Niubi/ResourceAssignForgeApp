@@ -11,12 +11,8 @@ import { FullContext } from "@forge/bridge/out/types";
  */
 async function authenBECallbackTrigger(request: WebTriggerResponseModel) {
   console.log("Triggered by web trigger: ");
-
-//   let context: FullContext = await storage.get(CONTEXT);
-
-  console.log(await storage.get("demoText"));
-  return;
-  // await generateOAuthURL();
+  let context: FullContext = await storage.get(CONTEXT);
+  console.log(context);
 }
 
 export { authenBECallbackTrigger };
