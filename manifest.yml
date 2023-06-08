@@ -1,0 +1,31 @@
+modules:
+  jira:globalPage:
+    - key: forgecustomuidemo-hello-world-page
+      resource: main
+      resolver:
+        function: resolver
+      title: ForgeCustomUIDemo
+
+  # Khai báo webtrigger cho server callback lúc grant quyền
+  webtrigger:
+    - key: authen-app-web-trigger-key
+      function: authen-trigger-function
+
+  function:
+    - key: resolver
+      handler: index.handler
+    - key: authen-trigger-function
+      handler: trigger.authenBECallbackTrigger
+
+resources:
+  - key: main
+    path: static/hello-world/build
+app:
+  id: ari:cloud:ecosystem::app/c0232203-0228-46e3-9533-52a556e7ccbd
+permissions:
+  external:
+    fetch:
+      backend:
+        - "*.ngrok-free.app"
+  scopes:
+    - storage:app
