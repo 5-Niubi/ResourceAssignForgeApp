@@ -1,11 +1,11 @@
 import { storage, webTrigger } from "@forge/api";
-import { CONTEXT, EMPTY_STRING } from "../../common/constants";
+import { STORAGE } from "../../common/constants";
 import { Base64 } from "../../common/utils";
 
-class AuthenWithBE{
+class AuthenWithBE {
   async generateOAuthURL() {
     let urlTrigger = await webTrigger.getUrl("authen-app-web-trigger-key");
-    let context = await storage.getSecret(CONTEXT);
+    let context = await storage.getSecret(STORAGE.CONTEXT);
     let stateOAuthURLModel = {
       triggerUrl: urlTrigger,
       accountId: context.accountId,
@@ -22,6 +22,19 @@ class AuthenWithBE{
       `&response_type=code` +
       `&prompt=consent`;
     return grantAccessUrl;
+  }
+
+  async handleUnauthorizedStatus() {
+    storage.delete(STORAGE.IS_AUTHENTICATED);
+    storage.deleteSecret(STORAGE.TOKEN);
+  }
+
+  /**
+   * @param {Object} data
+   */
+  async handleAuthenCallbackFromNET(data) {
+    await storage.setSecret(STORAGE.TOKEN, data.token);
+    await storage.set(STORAGE.IS_AUTHENTICATED, true);
   }
 }
 

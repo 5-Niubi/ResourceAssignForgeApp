@@ -9,30 +9,24 @@ import { useNavigate } from "react-router";
  * @returns {import("react").ReactElement}
  */
 function HomePage() {
-  let [url, setUrl] = useState("");
   let navigate = useNavigate();
-
-  async function handleBtnAuthen() {
-    let context = view.getContext();
-    let response = await invoke("getAuthenUrl", { context });
-    let authenUrl = response.authenUrl;
-    setUrl(JSON.stringify(response));
-    await router.open(authenUrl);
-  }
 
   return (
     <>
-      <div>URL: {url}</div>
-      <Button onClick={handleBtnAuthen} appearance="primary">
-        Grant Access
-      </Button>
+      <h3>Three type of link</h3>
       <div>
-        {" "}
         <Link to="/projects">Get Project From Jira Throught .Net</Link>
       </div>
-      <Button onClick={() => navigate("/projects")}>
-        Link to Get Project (Same to URL above)
-      </Button>
+      <div>
+        <Button appearance="link" onClick={() => navigate("/projects")}>
+          Link to Get Project (Same to URL above)
+        </Button>
+      </div>
+      <div>
+        <Button onClick={() => navigate("/projects")}>
+          Link to Get Project (Same to URL above)
+        </Button>
+      </div>
     </>
   );
 }

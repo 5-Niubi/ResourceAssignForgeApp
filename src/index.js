@@ -1,7 +1,5 @@
 import Resolver from "@forge/resolver";
-import { resolver } from "./resolvers";
-
-
+import resolver from "./resolvers";
 
 const forgeResolver = new Resolver();
 

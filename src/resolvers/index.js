@@ -9,4 +9,4 @@ function resolver(resolver){
     projectResolver(resolver);
 }
 
-export {resolver};
+export default resolver;

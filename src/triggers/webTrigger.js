@@ -1,7 +1,6 @@
-import { storage } from "@forge/api";
-import { CONTEXT, TOKEN } from "../common/constants";
 import { createWebTriggerResponse } from "../common/utils";
 import { HttpStatus } from "../common/httpStatus";
+import AuthenWithBE from "../services/authens/AuthenWithBE";
 
 /**
  * Callback from .net server after OAuth return code, to make a contract with Forge app
@@ -11,12 +10,9 @@ import { HttpStatus } from "../common/httpStatus";
 async function authenBECallbackTrigger(request) {
   try {
     // do the things
-    console.log("Triggered by web trigger: ");
-    let body = JSON.parse(request.body);
-    console.log(body.token);
-    await storage.setSecret(TOKEN, body.token);
+    await AuthenWithBE.handleAuthenCallbackFromNET(JSON.parse(request.body));
+    
     let response = createWebTriggerResponse({}, HttpStatus.OK);
-    await storage.set("isAuthenticated", true);
     return response;
   } catch (err) {
     console.log("Error in webtrigger: ", err);
