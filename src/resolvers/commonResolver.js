@@ -1,8 +1,6 @@
 import { storage } from "@forge/api";
-import Resolver from "@forge/resolver";
-import { CONTEXT } from "../common/constants";
-import { router } from "@forge/bridge";
 import AuthenWithBE from "../services/authens/AuthenWithBE";
+import { STORAGE } from "../common/constants";
 
 /**
  * @param {{ define: (arg0: string, arg1: { (req: any): Promise<any>; (req: any): Promise<any>; }) => void; }} resolver
@@ -11,7 +9,7 @@ function commonResolver(resolver) {
   resolver.define(
     "setContextToGlobal",
     async (/** @type {{ context: any; }} */ req) => {
-      await storage.set(CONTEXT, req.context);
+      await storage.set(STORAGE.CONTEXT, req.context);
       return req.context;
     }
   );
