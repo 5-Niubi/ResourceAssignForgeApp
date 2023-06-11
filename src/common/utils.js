@@ -1,9 +1,29 @@
+import { HttpStatus } from "./httpStatus";
+
+/**
+ * @param {any} body
+ * @param {{ code: any; text: any; }} status
+ */
+function createWebTriggerResponse(body, status) {
+  let response = {
+    headers: {
+      "Content-Type": ["application/json"],
+      "X-Request-Id": [`rnd-${Math.random()}`],
+    },
+    body: JSON.stringify(body),
+    statusCode: status.code,
+    statusText: status.text,
+  };
+
+  return response;
+}
+
 var Base64 = {
   // private property
   _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
 
   // public method for encoding
-  encode: function (input: string) {
+  encode: function (input) {
     var output = "";
     var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
     var i = 0;
@@ -37,7 +57,7 @@ var Base64 = {
   },
 
   // public method for decoding
-  decode: function (input: string) {
+  decode: function (input) {
     var output = "";
     var chr1, chr2, chr3;
     var enc1, enc2, enc3, enc4;
@@ -71,7 +91,7 @@ var Base64 = {
   },
 
   // private method for UTF-8 encoding
-  _utf8_encode: function (string: string) {
+  _utf8_encode: function (string) {
     string = string.replace(/\r\n/g, "\n");
     var utftext = "";
 
@@ -93,7 +113,7 @@ var Base64 = {
   },
 
   // private method for UTF-8 decoding
-  _utf8_decode: function (utftext : string) {
+  _utf8_decode: function (utftext) {
     var string = "";
     var i = 0;
     var c = 0,
@@ -122,4 +142,5 @@ var Base64 = {
     return string;
   },
 };
- export {Base64};
+
+export { Base64, createWebTriggerResponse };

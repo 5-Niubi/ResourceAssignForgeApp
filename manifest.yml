@@ -6,6 +6,13 @@ modules:
         function: resolver
       title: ForgeCustomUIDemo
 
+  # Khai báo các trigger theo các key event
+  trigger:
+  - key: provide-oauth-url
+    function: provide-oauth-function
+    events:
+      - avi:forge:upgraded:app
+
   # Khai báo webtrigger cho server callback lúc grant quyền
   webtrigger:
     - key: authen-app-web-trigger-key
@@ -14,12 +21,14 @@ modules:
   function:
     - key: resolver
       handler: index.handler
+    - key: provide-oauth-function
+      handler: trigger.provideOAuthUrlForUser
     - key: authen-trigger-function
       handler: trigger.authenBECallbackTrigger
 
 resources:
   - key: main
-    path: static/hello-world/build
+    path: static/view/build
 app:
   id: ari:cloud:ecosystem::app/c0232203-0228-46e3-9533-52a556e7ccbd
 permissions:
@@ -27,5 +36,8 @@ permissions:
     fetch:
       backend:
         - "*.ngrok-free.app"
+  content:
+    styles:
+      - 'unsafe-inline'
   scopes:
     - storage:app
