@@ -14,8 +14,8 @@ function commonResolver(resolver) {
     }
   );
 
-  resolver.define("getAuthenUrl", async function (/** @type {any} */ req) {
-    let authenUrl = await AuthenWithBE.generateOAuthURL();
+  resolver.define("getAuthenUrl", async function (req) {
+    let authenUrl = await AuthenWithBE.generateOAuthURL(req.context);
     let isAuthenticated = await storage.get("isAuthenticated");
     console.log(isAuthenticated);
     return Promise.resolve({
