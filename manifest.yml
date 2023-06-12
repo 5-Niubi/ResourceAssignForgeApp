@@ -1,10 +1,10 @@
 modules:
   jira:globalPage:
-    - key: forgecustomuidemo-hello-world-page
+    - key: resource-assign-demo-app
       resource: main
       resolver:
         function: resolver
-      title: ForgeCustomUIDemo
+      title: Resource Assign Demo
 
   # Khai báo các trigger theo các key event
   trigger:
