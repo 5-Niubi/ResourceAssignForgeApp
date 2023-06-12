@@ -3,9 +3,9 @@ import { STORAGE } from "../../common/constants";
 import { Base64 } from "../../common/utils";
 
 class AuthenWithBE {
-  async generateOAuthURL() {
+  async generateOAuthURL(context) {
     let urlTrigger = await webTrigger.getUrl("authen-app-web-trigger-key");
-    let context = await storage.getSecret(STORAGE.CONTEXT);
+    // let context = await storage.getSecret(STORAGE.CONTEXT);
     let stateOAuthURLModel = {
       triggerUrl: urlTrigger,
       accountId: context.accountId,
