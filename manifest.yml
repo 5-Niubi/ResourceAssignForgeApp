@@ -4,7 +4,7 @@ modules:
       resource: main
       resolver:
         function: resolver
-      title: Resource Assign Demo
+      title: ResourceAssignDemo
 
   # Khai báo các trigger theo các key event
   trigger:
@@ -30,7 +30,7 @@ resources:
   - key: main
     path: static/view/build
 app:
-  id: ari:cloud:ecosystem::app/c0232203-0228-46e3-9533-52a556e7ccbd
+  id: ari:cloud:ecosystem::app/87284dfd-9947-4a51-a7bb-20a3c938db04
 permissions:
   external:
     fetch:
