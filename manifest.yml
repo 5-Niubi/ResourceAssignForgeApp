@@ -31,6 +31,8 @@ resources:
     path: static/view/build
 app:
   id: ari:cloud:ecosystem::app/87284dfd-9947-4a51-a7bb-20a3c938db04
+  licensing:
+    enabled: true
 permissions:
   external:
     fetch:
