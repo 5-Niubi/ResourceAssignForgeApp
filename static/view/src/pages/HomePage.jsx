@@ -9,26 +9,26 @@ import { useNavigate } from "react-router";
  * @returns {import("react").ReactElement}
  */
 function HomePage() {
-  let navigate = useNavigate();
+	let navigate = useNavigate();
 
-  return (
-    <>
-      <h3>Three type of link</h3>
-      <div>
-        <Link to="/projects">Get Project From Jira Throught .Net</Link>
-      </div>
-      <div>
-        <Button appearance="link" onClick={() => navigate("/projects")}>
-          Link to Get Project (Same to URL above)
-        </Button>
-      </div>
-      <div>
-        <Button onClick={() => navigate("/projects")}>
-          Link to Get Project (Same to URL above)
-        </Button>
-      </div>
-    </>
-  );
+	return (
+		<>
+			<h3>Three type of link</h3>
+			<div>
+				<Link to="/projects">Get Project From Jira Throught .Net</Link>
+			</div>
+			<div>
+				<Button appearance="link" onClick={() => navigate("/projects")}>
+					Link to Get Project (Same to URL above)
+				</Button>
+			</div>
+			<div>
+				<Button onClick={() => navigate("/projects")}>
+					Link to Get Project (Same to URL above)
+				</Button>
+			</div>
+		</>
+	);
 }
 
 export default HomePage;
