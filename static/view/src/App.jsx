@@ -6,7 +6,9 @@ import { Route, Router, Routes } from "react-router";
 import ProjectFromNetPage from "./pages/ProjectFromNetPage";
 
 import { LeftSidebar, Main, PageLayout, Content } from "@atlaskit/page-layout";
-import HomeSideBar from "./components/HomeSideBar";
+import HomeSideBar from "./components/side-nav/HomeSideBar";
+import ProjectListHome from "./pages/projects/ProjectsListHome";
+import AppFrame from "./components/common/AppFrame";
 
 function App() {
   // Enable auto change theme Dark/light mode within Jira
@@ -84,19 +86,21 @@ function App() {
           </LeftSidebar>
 
           <Main testId="main" id="main">
-            <Router
-              navigator={history}
-              navigationType={historyState.action}
-              location={historyState.location}
-            >
-              <Routes>
-                <Route path="/" element={<HomePage />}></Route>
-                <Route
-                  path="/projects"
-                  element={<ProjectFromNetPage />}
-                ></Route>
-              </Routes>
-            </Router>
+            <AppFrame>
+              <Router
+                navigator={history}
+                navigationType={historyState.action}
+                location={historyState.location}
+              >
+                <Routes>
+                  <Route path="/" element={<ProjectListHome />}></Route>
+                  <Route
+                    path="/projects"
+                    element={<ProjectFromNetPage />}
+                  ></Route>
+                </Routes>
+              </Router>
+            </AppFrame>
           </Main>
         </Content>
       ) : (
