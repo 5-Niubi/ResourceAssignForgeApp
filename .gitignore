@@ -48,3 +48,6 @@ Thumbs.db
 *.mov
 *.wmv
 
+# Private file for note something.
+private.txt
+
