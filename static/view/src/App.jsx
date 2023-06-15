@@ -4,6 +4,7 @@ import { invoke, router, view } from "@forge/bridge";
 import HomePage from "./pages/HomePage";
 import { Route, Router, Routes, useNavigate } from "react-router";
 import ProjectFromNetPage from "./pages/ProjectFromNetPage";
+import Resources from "./pages/resources";
 
 function App() {
   // Enable auto change theme Dark/light mode within Jira
@@ -72,7 +73,9 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />}></Route>
             <Route path="/projects" element={<ProjectFromNetPage />}></Route>
+            <Route path="/resources" element={<Resources />}></Route>
           </Routes>
+          
         </Router>
       ) : (
         "Loading..."
