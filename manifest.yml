@@ -29,6 +29,8 @@ modules:
 resources:
   - key: main
     path: static/view/build
+    tunnel:
+        port: 3000
 app:
   id: ari:cloud:ecosystem::app/cd7a95c9-5661-4973-b002-bdf61e1603f6
   licensing:
