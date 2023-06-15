@@ -5,6 +5,7 @@ modules:
       resolver:
         function: resolver
       title: ResourceAssignDemo
+      layout: blank
 
   # Khai báo các trigger theo các key event
   trigger:
