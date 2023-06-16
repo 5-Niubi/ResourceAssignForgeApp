@@ -8,6 +8,8 @@ import CustomerIcon from "@atlaskit/icon/glyph/person";
 import QueueIcon from "@atlaskit/icon/glyph/queues";
 import SettingsIcon from "@atlaskit/icon/glyph/settings";
 import LanguageIcon from "@atlaskit/icon/glyph/world";
+import ActivityIcon from "@atlaskit/icon/glyph/activity";
+import PeopleGroupIcon from "@atlaskit/icon/glyph/people-group";
 
 import {
   ButtonItem,
@@ -20,103 +22,53 @@ import {
   Section,
   SideNavigation,
 } from "@atlaskit/side-navigation";
+import { useLocation, useNavigate } from "react-router";
 
 function HomeSideBar() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const ButtonItemCustom = ({ path, text, iconBefore }) => (
+    <ButtonItem
+      isSelected={location.pathname === path}
+      iconBefore={iconBefore}
+      onClick={() => {
+        navigate("/projects");
+      }}
+    >
+      {text}
+    </ButtonItem>
+  );
+
   return (
     <SideNavigation label="project" testId="side-navigation">
       <NavigationHeader>
         <Header description="Sidebar header description">Sidebar Header</Header>
       </NavigationHeader>
+
       <NestableNavigationContent
         initialStack={[]}
         testId="nestable-navigation-content"
       >
-        <Section>
-          <NestingItem
-            id="2"
-            testId="filter-nesting-item"
-            title="Filters"
-            iconBefore={<FilterIcon label="" />}
-            iconAfter={<LightbulbIcon label="" />}
-          >
-            <Section>
-              <ButtonItem>Search issues</ButtonItem>
-            </Section>
-            <Section title="Starred">
-              <ButtonItem>Everything me</ButtonItem>
-              <ButtonItem>My open issues</ButtonItem>
-              <ButtonItem>Reported by me</ButtonItem>
-            </Section>
-            <Section hasSeparator title="Other">
-              <ButtonItem>All issues</ButtonItem>
-              <ButtonItem>Open issues</ButtonItem>
-              <ButtonItem>Created recently</ButtonItem>
-              <ButtonItem>Resolved recently</ButtonItem>
-            </Section>
-            <Section hasSeparator>
-              <ButtonItem>View all filters</ButtonItem>
-            </Section>
-          </NestingItem>
-          <NestingItem
-            id="1"
-            isSelected
-            title="Queues view"
-            iconBefore={<QueueIcon label="" />}
-          >
-            <Section title="Queues">
-              <ButtonItem>Untriaged</ButtonItem>
-              <ButtonItem>My feature work</ButtonItem>
-              <ButtonItem>My bugfix work</ButtonItem>
-              <ButtonItem>Signals</ButtonItem>
-              <ButtonItem>Assigned to me</ButtonItem>
-            </Section>
-            <Section hasSeparator>
-              <ButtonItem>New queue</ButtonItem>
-            </Section>
-          </NestingItem>
-          <NestingItem
-            id="3"
+        <Section hasSeparator>
+          <ButtonItemCustom
+            text={"Project Lists"}
+            path={"/projects"}
+            iconBefore={<ActivityIcon label="" />}
+          />
+          <ButtonItemCustom
+            text={"Resources"}
+            path={"/resources"}
+            iconBefore={<PeopleGroupIcon label="" />}
+          />
+          <ButtonItemCustom
+            text={"Settings"}
+            path={"/settings"}
             iconBefore={<SettingsIcon label="" />}
-            title="Settings"
-            testId="settings-nesting-item"
-          >
-            <Section>
-              <NestingItem
-                iconBefore={<LanguageIcon label="" />}
-                id="3-1"
-                title="Language settings"
-              >
-                <Section>
-                  <ButtonItem>Customize</ButtonItem>
-                  <NestingItem id="3-1-1" title="German Settings">
-                    <Section>
-                      <ButtonItem>Hallo Welt!</ButtonItem>
-                    </Section>
-                  </NestingItem>
-                  <NestingItem id="3-1-2" title="English Settings">
-                    <Section>
-                      <ButtonItem>Hello World!</ButtonItem>
-                    </Section>
-                  </NestingItem>
-                </Section>
-              </NestingItem>
-            </Section>
-          </NestingItem>
-          <NestingItem
-            id="4"
-            iconBefore={<DropboxIcon label="" />}
-            title="Dropbox"
-            testId="dropbox-nesting-item"
-            isDisabled
-          >
-            <span />
-          </NestingItem>
-          <ButtonItem iconBefore={<WorkIcon label="" />}>Your work</ButtonItem>
-          <LinkItem href="#" iconBefore={<CustomerIcon label="" />}>
-            Your customers
-          </LinkItem>
+          />
         </Section>
       </NestableNavigationContent>
+
       <NavigationFooter>
         <div></div>
       </NavigationFooter>

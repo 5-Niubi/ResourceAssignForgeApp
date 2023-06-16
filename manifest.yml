@@ -9,10 +9,10 @@ modules:
 
   # Khai báo các trigger theo các key event
   trigger:
-  - key: provide-oauth-url
-    function: provide-oauth-function
-    events:
-      - avi:forge:upgraded:app
+    - key: provide-oauth-url
+      function: provide-oauth-function
+      events:
+        - avi:forge:upgraded:app
 
   # Khai báo webtrigger cho server callback lúc grant quyền
   webtrigger:
@@ -31,9 +31,11 @@ resources:
   - key: main
     path: static/view/build
     tunnel:
-        port: 3000
+      port: 3000
 app:
-  id: ari:cloud:ecosystem::app/cd7a95c9-5661-4973-b002-bdf61e1603f6
+  # Replace app id here
+  id: ari:cloud:ecosystem::app/87284dfd-9947-4a51-a7bb-20a3c938db04
+  #----#
   licensing:
     enabled: true
 permissions:
@@ -43,6 +45,6 @@ permissions:
         - "*.ngrok-free.app"
   content:
     styles:
-      - 'unsafe-inline'
+      - "unsafe-inline"
   scopes:
     - storage:app
