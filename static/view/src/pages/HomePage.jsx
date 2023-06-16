@@ -1,7 +1,6 @@
 import { events, invoke, router, view } from "@forge/bridge";
 import React, { useEffect, useState } from "react";
 import Button from "@atlaskit/button";
-import Link from "../components/Link";
 import { useNavigate } from "react-router";
 
 /**
