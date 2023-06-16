@@ -22,8 +22,24 @@ import {
   Section,
   SideNavigation,
 } from "@atlaskit/side-navigation";
+import { useLocation, useNavigate } from "react-router";
 
 function HomeSideBar() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const ButtonItemCustom = ({ path, text, iconBefore }) => (
+    <ButtonItem
+      isSelected={location.pathname === path}
+      iconBefore={iconBefore}
+      onClick={() => {
+        navigate("/projects");
+      }}
+    >
+      {text}
+    </ButtonItem>
+  );
+
   return (
     <SideNavigation label="project" testId="side-navigation">
       <NavigationHeader>
@@ -35,15 +51,21 @@ function HomeSideBar() {
         testId="nestable-navigation-content"
       >
         <Section hasSeparator>
-          <ButtonItem iconBefore={<ActivityIcon label="" />}>
-            Project Lists
-          </ButtonItem>
-          <ButtonItem iconBefore={<PeopleGroupIcon label="" />}>
-            Resources
-          </ButtonItem>
-          <ButtonItem iconBefore={<SettingsIcon label="" />}>
-            Settings
-          </ButtonItem>
+          <ButtonItemCustom
+            text={"Project Lists"}
+            path={"/projects"}
+            iconBefore={<ActivityIcon label="" />}
+          />
+          <ButtonItemCustom
+            text={"Resources"}
+            path={"/resources"}
+            iconBefore={<PeopleGroupIcon label="" />}
+          />
+          <ButtonItemCustom
+            text={"Settings"}
+            path={"/settings"}
+            iconBefore={<SettingsIcon label="" />}
+          />
         </Section>
       </NestableNavigationContent>
 
