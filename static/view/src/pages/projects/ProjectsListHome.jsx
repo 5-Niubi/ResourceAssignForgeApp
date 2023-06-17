@@ -3,7 +3,7 @@ import ProjecstListHomePageHeader from "../../components/page-header/ProjectsLis
 import ProjectsListHomeTable from "../../components/table/ProjectsListHomeTable";
 import Pagination from "@atlaskit/pagination";
 import { useMediaQuery } from "react-responsive";
-import Page, { Grid, GridColumn } from "@atlaskit/page";
+import { Grid, GridColumn } from "@atlaskit/page";
 import { Desktop } from "../../components/common/responsesive";
 import { MEDIA_QUERY } from "./../../common/contants";
 
@@ -52,33 +52,31 @@ function ProjectListHome() {
 
   return (
     <>
-      <Page>
-        <Grid layout="fluid" spacing="comfortable" columns={columns}>
-          <GridColumn medium={columns}>
-            <ProjecstListHomePageHeader />
+      <Grid layout="fluid" spacing="comfortable" columns={columns}>
+        <GridColumn medium={columns}>
+          <ProjecstListHomePageHeader />
+        </GridColumn>
+        <GridColumn medium={isDesktopOrLaptop ? 7 : columns}>
+          <div style={{ marginBottom: "1rem" }}>
+            <ProjectsListHomeTable items={items} />
+          </div>
+          <div style={{ marginTop: "3rem" }}>
+            <Pagination
+              pages={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+              nextLabel="Next"
+              label="Page"
+              pageLabel="Page"
+              previousLabel="Previous"
+              selectedIndex={0}
+            />
+          </div>
+        </GridColumn>
+        <Desktop>
+          <GridColumn medium={3}>
+            <div>Hover panel</div>
           </GridColumn>
-          <GridColumn medium={isDesktopOrLaptop ? 7 : columns}>
-            <div style={{ marginBottom: "1rem" }}>
-              <ProjectsListHomeTable items={items} />
-            </div>
-            <div style={{ marginTop: "3rem" }}>
-              <Pagination
-                pages={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
-                nextLabel="Next"
-                label="Page"
-                pageLabel="Page"
-                previousLabel="Previous"
-                selectedIndex={0}
-              />
-            </div>
-          </GridColumn>
-          <Desktop>
-            <GridColumn medium={3}>
-              <div>Hover panel</div>
-            </GridColumn>
-          </Desktop>
-        </Grid>
-      </Page>
+        </Desktop>
+      </Grid>
     </>
   );
 }
