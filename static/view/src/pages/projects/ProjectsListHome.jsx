@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import ProjecstListHomePageHeader from "../../components/page-header/ProjectsListHomePageHeader";
 import ProjectsListHomeTable from "../../components/table/ProjectsListHomeTable";
 import Pagination from "@atlaskit/pagination";
@@ -6,55 +6,27 @@ import { useMediaQuery } from "react-responsive";
 import { Grid, GridColumn } from "@atlaskit/page";
 import { Desktop } from "../../components/common/responsesive";
 import { MEDIA_QUERY } from "./../../common/contants";
+import Modal, { ModalTransition } from "@atlaskit/modal-dialog";
+import CreateProjectModal from "../../components/modal/CreateProjectModal";
 
 function ProjectListHome() {
   const columns = 10;
   const isDesktopOrLaptop = useMediaQuery({
     query: `(min-width: ${MEDIA_QUERY.DESKTOP_LAPTOP.MIN}px)`,
   });
-  const items = [
-    {
-      id: "item1",
-      content: {
-        no: "1",
-        projectName: "First top-level item",
-        projectImage:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREabvR30BJaXiYN2Azwc8fPUWJmv1nzMatw9YIxxrygA&s",
-        startDate: "11/10/11",
-        amount: 10,
-      },
-      hasChildren: false,
-      children: [],
-    },
-    {
-      id: "item1",
-      content: {
-        no: "1",
-        projectName: "First top-level item",
-        startDate: "11/10/11",
-        amount: 10,
-      },
-      hasChildren: false,
-      children: [],
-    },
-    {
-      id: "item1",
-      content: {
-        no: "1",
-        projectName: "First top-level item",
-        startDate: "11/10/11",
-        amount: 10,
-      },
-      hasChildren: false,
-      children: [],
-    },
-  ];
 
+  const [isOpen, setIsOpen] = useState(false);
+  const closeModal = useCallback(function () {
+    setIsOpen(false);
+  }, []);
+  const openModal = useCallback(function (){
+    setIsOpen(true);
+  }, []);
   return (
     <>
       <Grid layout="fluid" spacing="comfortable" columns={columns}>
         <GridColumn medium={columns}>
-          <ProjecstListHomePageHeader />
+          <ProjecstListHomePageHeader createProjectButtonOnClick={openModal}/>
         </GridColumn>
         <GridColumn medium={isDesktopOrLaptop ? 7 : columns}>
           <div style={{ marginBottom: "1rem" }}>
@@ -77,8 +49,55 @@ function ProjectListHome() {
           </GridColumn>
         </Desktop>
       </Grid>
+
+      {
+        <ModalTransition>
+          {isOpen && (
+            <Modal onClose={closeModal}>
+              <CreateProjectModal />
+            </Modal>
+          )}
+        </ModalTransition>
+      }
     </>
   );
 }
 
 export default ProjectListHome;
+const items = [
+  {
+    id: "item1",
+    content: {
+      no: "1",
+      projectName: "First top-level item",
+      projectImage:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREabvR30BJaXiYN2Azwc8fPUWJmv1nzMatw9YIxxrygA&s",
+      startDate: "11/10/11",
+      amount: 10,
+    },
+    hasChildren: false,
+    children: [],
+  },
+  {
+    id: "item1",
+    content: {
+      no: "1",
+      projectName: "First top-level item",
+      startDate: "11/10/11",
+      amount: 10,
+    },
+    hasChildren: false,
+    children: [],
+  },
+  {
+    id: "item1",
+    content: {
+      no: "1",
+      projectName: "First top-level item",
+      startDate: "11/10/11",
+      amount: 10,
+    },
+    hasChildren: false,
+    children: [],
+  },
+];
