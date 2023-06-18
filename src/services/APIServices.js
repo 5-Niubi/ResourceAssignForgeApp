@@ -14,7 +14,6 @@ class APIServices {
    */
   async get(url) {
     try {
-      console.log("TOKEN: ", await storage.getSecret(STORAGE.TOKEN));
       let response = await API.fetch(`${this.DOMAIN}${url}`, {
         method: "GET",
         headers: {
@@ -23,6 +22,8 @@ class APIServices {
       });
       if (response.ok) {
         return await response.json();
+      } else if (response.status === HttpStatus.UNAUTHORIZED.code) {
+        AuthenWithBE.handleUnauthorizedStatus();
       }
       return Promise.reject(response);
     } catch (err) {
@@ -70,6 +71,8 @@ class APIServices {
       });
       if (response.ok) {
         return await response.json();
+      } else if (response.status === HttpStatus.UNAUTHORIZED.code) {
+        AuthenWithBE.handleUnauthorizedStatus();
       }
       return Promise.reject(response);
     } catch (err) {
@@ -87,10 +90,12 @@ class APIServices {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${await storage.getSecret(STORAGE.TOKEN)}`,
-        }
+        },
       });
       if (response.ok) {
         return await response.json();
+      } else if (response.status === HttpStatus.UNAUTHORIZED.code) {
+        AuthenWithBE.handleUnauthorizedStatus();
       }
       return Promise.reject(response);
     } catch (err) {

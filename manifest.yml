@@ -5,13 +5,14 @@ modules:
       resolver:
         function: resolver
       title: ResourceAssignDemo
+      layout: blank
 
   # Khai báo các trigger theo các key event
   trigger:
-  - key: provide-oauth-url
-    function: provide-oauth-function
-    events:
-      - avi:forge:upgraded:app
+    - key: provide-oauth-url
+      function: provide-oauth-function
+      events:
+        - avi:forge:upgraded:app
 
   # Khai báo webtrigger cho server callback lúc grant quyền
   webtrigger:
@@ -30,9 +31,11 @@ resources:
   - key: main
     path: static/view/build
     tunnel:
-        port: 3000
+      port: 3000
 app:
-  id: ari:cloud:ecosystem::app/7b4bc712-696a-4789-a9cd-224d641c583a
+  # Replace app id here
+  id: ari:cloud:ecosystem::app/87284dfd-9947-4a51-a7bb-20a3c938db04
+  #----#
   licensing:
     enabled: true
 permissions:
@@ -42,6 +45,6 @@ permissions:
         - "*.ngrok-free.app"
   content:
     styles:
-      - 'unsafe-inline'
+      - "unsafe-inline"
   scopes:
     - storage:app
