@@ -47,22 +47,23 @@ export const createHead = (withWidth) => {
       {
         key: 'no',
         content: 'No',
-        width: withWidth ? 25 : undefined,
+        width: 2,
       },
       {
         key: 'id',
         content: 'ID',
-        width: withWidth ? 25 : undefined,
+        width: withWidth ? 15 : undefined,
       },
       {
         key: 'name',
         content: 'Name',
-        width: withWidth ? 80 : undefined,
+        width: withWidth ? 25 : undefined,
       },
       {
         key: 'skill',
         content: 'Skills',
         shouldTruncate: false,
+        width: withWidth ? 300 : undefined,
       },
       {
         key: 'salary',
@@ -78,13 +79,13 @@ export const createHead = (withWidth) => {
         key: 'type',
         content: 'Type',
         shouldTruncate: true,
-        width: withWidth ? 80 : undefined,
+        width: withWidth ? 20 : undefined,
       },
       {
         key: 'action',
         content: 'Action',
         shouldTruncate: true,
-        width: withWidth ? 80 : undefined,
+        width: withWidth ? 10 : undefined,
       },
     ],
   };
@@ -105,6 +106,7 @@ export const rows = workforces.map((president, index) => ({
     {
       key: president.no,
       content: president.no,
+      width: 15,
     },
     {
       key: president.id,
@@ -115,9 +117,8 @@ export const rows = workforces.map((president, index) => ({
       content: (
         <NameWrapper>
           <AvatarWrapper>
-            <Avatar name={president.name} size="medium" />
+            <Avatar name={president.name} size="medium" /> <a href="https://atlassian.design">{president.name}</a>
           </AvatarWrapper>
-          <a href="https://atlassian.design">{president.name}</a>
         </NameWrapper>
       ),
     },
@@ -143,8 +144,7 @@ export const rows = workforces.map((president, index) => ({
       key: 'action',
       content: (
         <div>
-          <EditIcon></EditIcon>
-          <TrashIcon></TrashIcon>
+          <EditIcon></EditIcon><TrashIcon></TrashIcon>
         </div>
       ),
     },

@@ -133,7 +133,7 @@ export const workforces = [{
   ],
   "salary": "$999.98",
   "avaiable": "100 %",
-  "type": "Violet"
+  "type": "Part-time"
 }, {
   "no": 5,
   "id": "JIRA-RST-5",
