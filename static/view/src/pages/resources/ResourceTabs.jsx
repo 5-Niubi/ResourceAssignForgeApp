@@ -37,7 +37,7 @@ export const Panel = ({
   </div>
 );
 
-export default function TabsDefaultExample() {
+export default function ResourceTabs() {
   return (
     <Tabs
       onChange={(index) => console.log('Selected Tab', index + 1)}
