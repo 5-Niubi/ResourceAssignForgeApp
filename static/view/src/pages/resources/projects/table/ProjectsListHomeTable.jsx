@@ -2,7 +2,7 @@ import Avatar from "@atlaskit/avatar";
 import Image from "@atlaskit/image";
 import TableTree from "@atlaskit/table-tree";
 import React from "react";
-import Link from "../../../components/common/Link";
+import Link from "../../../../components/common/Link";
 
 function ProjectsListHomeTable({ items }) {
   const No = (props) => <span>{props.no}</span>;
