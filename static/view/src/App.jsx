@@ -10,6 +10,7 @@ import { LeftSidebar, Main, PageLayout, Content } from "@atlaskit/page-layout";
 import HomeSideBar from "./components/side-nav/HomeSideBar";
 import ProjectListHome from "./pages/projects/ProjectsListHome";
 import AppFrame from "./components/common/AppFrame";
+import ResourcesPage from "./pages/resources";
 
 function App() {
   // Enable auto change theme Dark/light mode within Jira
@@ -27,11 +28,11 @@ function App() {
 
   // Check authenticate every time reload page
   useEffect(function () {
-    invoke("getAuthenUrl").then(function (res) {
-      if (!res.isAuthenticated) {
-        handleAuthenOAuth(res.authenUrl);
-      }
-    });
+    // invoke("getAuthenUrl").then(function (res) {
+    //   if (!res.isAuthenticated) {
+    //     handleAuthenOAuth(res.authenUrl);
+    //   }
+    // });
   }, []);
 
   // // Set this app context to storage
@@ -98,6 +99,10 @@ function App() {
                   <Route
                     path="/projects"
                     element={<ProjectFromNetPage />}
+                  ></Route>
+                  <Route
+                    path="/resources"
+                    element={<ResourcesPage />}
                   ></Route>
                 </Routes>
               </Router>

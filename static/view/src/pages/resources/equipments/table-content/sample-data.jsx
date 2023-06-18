@@ -15,6 +15,7 @@ import { lorem } from './lorem';
 import { equipments } from './equipments';
 import WorkforceLozenge from '../../workforces/WorkforceLozenge';
 import EquipmentLozenge from '../EquipmentLozenge';
+import EquipmentModal from '../EquipmentModal';
 
 
 function createKey(input) {
@@ -136,7 +137,7 @@ export const rows = equipments.map((equipment, index) => ({
       key: 'available',
       content: (
         <div>
-          <EditIcon></EditIcon><TrashIcon></TrashIcon>
+          <EquipmentModal></EquipmentModal>
         </div>
       ),
     },
