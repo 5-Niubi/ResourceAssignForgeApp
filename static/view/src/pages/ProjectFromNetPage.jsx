@@ -18,6 +18,7 @@ function ProjectFromNetPage() {
     <>
       <h1>Project: </h1>
       <div>
+        
         <pre>{project ? project : "Loading..."}</pre>
       </div>
     </>

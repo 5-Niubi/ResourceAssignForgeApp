@@ -2,6 +2,8 @@ import { events, invoke, router, view } from "@forge/bridge";
 import React, { useEffect, useState } from "react";
 import Button from "@atlaskit/button";
 import { useNavigate } from "react-router";
+import TableTree from "../components/TableTree";
+import TextArea from "../components/TextArea";
 
 /**
  * Using as Demo Homepage
