@@ -14,6 +14,8 @@ import { token } from '@atlaskit/tokens';
 import { lorem } from './lorem';
 import { workforces } from './workforces';
 import WorkforceLozenge from '../WorkforceLozenge';
+import Button from '@atlaskit/button';
+import WorkforceModal from '../WorkforceModal';
 
 
 function createKey(input) {
@@ -148,8 +150,7 @@ export const rows = workforces.map((workforce, index) => ({
       key: 'action',
       content: (
         <div>
-          <EditIcon></EditIcon>
-          <TrashIcon></TrashIcon>
+          <WorkforceModal></WorkforceModal>
         </div>
       ),
     },

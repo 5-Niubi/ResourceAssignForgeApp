@@ -15,6 +15,7 @@
     "@atlaskit/icon": "^21.12.4",
     "@atlaskit/image": "^1.1.4",
     "@atlaskit/lozenge": "^11.4.2",
+    "@atlaskit/modal-dialog": "^12.6.2",
     "@atlaskit/page": "^12.3.4",
     "@atlaskit/page-header": "^10.4.4",
     "@atlaskit/page-layout": "^1.6.5",
