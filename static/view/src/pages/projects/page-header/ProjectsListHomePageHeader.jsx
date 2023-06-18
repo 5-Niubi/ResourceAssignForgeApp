@@ -8,7 +8,6 @@ import Heading from "@atlaskit/heading";
 import EditorSearchIcon from "@atlaskit/icon/glyph/editor/search";
 
 function ProjecstListHomePageHeader({createProjectButtonOnClick}) {
-
   const actionsContent = (
     <ButtonGroup>
       <Button appearance="primary" onClick={createProjectButtonOnClick}>Create project</Button>
