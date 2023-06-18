@@ -13,7 +13,7 @@ function ResourcesPage() {
 
 	return (
 		<>
-			<h3>Three type of link</h3>
+			<h3>This is resource page</h3>
 			<ResourceTabs></ResourceTabs>
 		</>
 	);

@@ -49,11 +49,11 @@ export default function ResourceTabs() {
       </TabList>
       <TabPanel>
         <PageHeaderComplexExample></PageHeaderComplexExample>
-        <DynamicTableWorkforce row={'workforece lise'}></DynamicTableWorkforce>
+        <DynamicTableWorkforce></DynamicTableWorkforce>
       </TabPanel>
       <TabPanel>
         <Panel>
-          <DynamicTableWorkforce row ={'equipment list'}></DynamicTableWorkforce>
+          <DynamicTableWorkforce></DynamicTableWorkforce>
         </Panel>
 
       </TabPanel>
