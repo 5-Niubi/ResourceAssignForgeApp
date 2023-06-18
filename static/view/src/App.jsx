@@ -1,7 +1,6 @@
 // @ts-nocheck
 import React, { useEffect, useState } from "react";
 import { invoke, router, view } from "@forge/bridge";
-import HomePage from "./pages/HomePage";
 import { Route, Router, Routes } from "react-router";
 import ProjectFromNetPage from "./pages/ProjectFromNetPage";
 
