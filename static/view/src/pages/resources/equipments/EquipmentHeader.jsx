@@ -10,7 +10,7 @@ import Button from "@atlaskit/button";
 const barContent = (
   <div style={{ display: 'flex' }}>
     <div style={{ flex: '0 0 200px' }}>
-      <TextField isCompact placeholder="Search Human Name/Key" aria-label="Filter" />
+      <TextField isCompact placeholder="Search Equipment Name/Key" aria-label="Filter" />
     </div>
     <div style={{ flex: '0 0 200px', marginLeft: token('space.100', '8px') }}>
       <Select

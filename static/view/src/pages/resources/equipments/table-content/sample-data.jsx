@@ -2,7 +2,8 @@
 import { FC, ReactNode } from 'react';
 
 import { css, jsx } from '@emotion/react';
-
+import TrashIcon from '@atlaskit/icon/glyph/trash';
+import EditIcon from '@atlaskit/icon/glyph/edit';
 import Avatar from '@atlaskit/avatar';
 import DropdownMenu, {
   DropdownItem,
@@ -11,7 +12,9 @@ import DropdownMenu, {
 import { token } from '@atlaskit/tokens';
 
 import { lorem } from './lorem';
-import { presidents } from './president';
+import { equipments } from './equipments';
+import WorkforceLozenge from '../../workforces/WorkforceLozenge';
+import EquipmentLozenge from '../EquipmentLozenge';
 
 
 function createKey(input) {
@@ -45,7 +48,7 @@ export const createHead = (withWidth) => {
       {
         key: 'no',
         content: 'No',
-        width: withWidth ? 25 : undefined,
+        width: 2,
       },
       {
         key: 'id',
@@ -55,28 +58,35 @@ export const createHead = (withWidth) => {
       {
         key: 'name',
         content: 'Name',
-        width: withWidth ? 80 : undefined,
+        width: withWidth ? 45 : undefined,
       },
       {
-        key: 'skill',
-        content: 'Skills',
-        shouldTruncate: true,
-        width: withWidth ? 15 : undefined,
+        key: 'functions',
+        content: 'Function',
+        shouldTruncate: false,
+        width: withWidth ? 400 : undefined,
       },
       {
-        key: 'salary',
-        content: 'Salary',
-        shouldTruncate: true,
-      },
-      {
-        key: 'avaiable',
-        content: 'Available',
+        key: 'amount',
+        content: 'Amount',
         shouldTruncate: true,
       },
       {
-        key: 'type',
-        content: 'Type',
+        key: 'price',
+        content: 'Price (Hour)',
         shouldTruncate: true,
+      },
+      {
+        key: 'available',
+        content: 'Availabel',
+        shouldTruncate: true,
+        width: withWidth ? 20 : undefined,
+      },
+      {
+        key: 'action',
+        content: 'Action',
+        shouldTruncate: true,
+        width: withWidth ? 10 : undefined,
       },
     ],
   };
@@ -84,53 +94,50 @@ export const createHead = (withWidth) => {
 
 export const head = createHead(true);
 
-export const rows = presidents.map((president, index) => ({
-  key: `row-${index}-${president.name}`,
+export const rows = equipments.map((equipment, index) => ({
+  key: `row-${index}-${equipment.name}`,
   isHighlighted: false,
   cells: [
     {
-      key: president.no,
-      content: president.no,
+      key: equipment.no,
+      content: equipment.no,
     },
     {
-      key: president.id,
-      content: president.id,
-    },
-    {
-      key: createKey(president.name),
+      key: equipment.id,
       content: (
         <NameWrapper>
-          <AvatarWrapper>
-            <Avatar name={president.name} size="medium" />
-          </AvatarWrapper>
-          <a href="https://imgtr.ee/images/2023/06/16/YnrSM.png">{president.name}</a>
+          <a href="">{equipment.id}</a>
         </NameWrapper>
       ),
     },
     {
-      key: president.skills,
-      content: president.skills,
+      key: createKey(equipment.name),
+      content: equipment.name,
     },
     {
-      key: president.salary,
-      content: president.salary,
-    },
-    {
-      key: president.avaiable,
-      content: president.avaiable,
-    },
-    {
-      key: president.type,
-      content: president.type,
-    },
-    {
-      key: 'MoreDropdown',
+      key: equipment.functions,
       content: (
-        <DropdownMenu trigger="More">
-          <DropdownItemGroup>
-            <DropdownItem>{president.name}</DropdownItem>
-          </DropdownItemGroup>
-        </DropdownMenu>
+        <EquipmentLozenge arrays={equipment.functions}></EquipmentLozenge>
+      ),
+    },
+    {
+      key: equipment.amount,
+      content: equipment.amount,
+    },
+    {
+      key: equipment.price,
+      content: equipment.price,
+    },
+    {
+      key: equipment.available,
+      content: equipment.available,
+    },
+    {
+      key: 'available',
+      content: (
+        <div>
+          <EditIcon></EditIcon><TrashIcon></TrashIcon>
+        </div>
       ),
     },
   ],

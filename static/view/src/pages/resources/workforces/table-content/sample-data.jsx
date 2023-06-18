@@ -85,7 +85,7 @@ export const createHead = (withWidth) => {
         key: 'action',
         content: 'Action',
         shouldTruncate: true,
-        width: withWidth ? 10 : undefined,
+        width: withWidth ?  10: undefined,
       },
     ],
   };
@@ -99,52 +99,57 @@ export const head = createHead(true);
   }
 
 
-export const rows = workforces.map((president, index) => ({
-  key: `row-${index}-${president.name}`,
+export const rows = workforces.map((workforce, index) => ({
+  key: `row-${index}-${workforce.name}`,
   isHighlighted: false,
   cells: [
     {
-      key: president.no,
-      content: president.no,
+      key: workforce.no,
+      content: workforce.no,
       width: 15,
     },
     {
-      key: president.id,
-      content: president.id,
+      key: workforce.id,
+      content: (
+        <NameWrapper>
+          <a href="">{workforce.id}</a>
+        </NameWrapper>
+      ),
     },
     {
-      key: createKey(president.name),
+      key: createKey(workforce.name),
       content: (
         <NameWrapper>
           <AvatarWrapper>
-            <Avatar name={president.name} size="medium" /> <a href="https://atlassian.design">{president.name}</a>
+            <Avatar name={workforce.name} size="medium" /> <a href="https://atlassian.design">{workforce.name}</a>
           </AvatarWrapper>
         </NameWrapper>
       ),
     },
     {
-      key: president.skills,
+      key: workforce.skills,
       content: (
-        <WorkforceLozenge arrays={president.skills}></WorkforceLozenge>
+        <WorkforceLozenge arrays={workforce.skills}></WorkforceLozenge>
       ),
     },
     {
-      key: president.salary,
-      content: president.salary,
+      key: workforce.salary,
+      content: workforce.salary,
     },
     {
-      key: president.avaiable,
-      content: president.avaiable,
+      key: workforce.avaiable,
+      content: workforce.avaiable,
     },
     {
-      key: president.type,
-      content: president.type,
+      key: workforce.type,
+      content: workforce.type,
     },
     {
       key: 'action',
       content: (
         <div>
-          <EditIcon></EditIcon><TrashIcon></TrashIcon>
+          <EditIcon></EditIcon>
+          <TrashIcon></TrashIcon>
         </div>
       ),
     },
