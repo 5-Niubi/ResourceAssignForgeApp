@@ -1,5 +1,5 @@
 import React from 'react';
-
+import StarIcon from '@atlaskit/icon/glyph/star';
 import Breadcrumbs, { BreadcrumbsItem } from '@atlaskit/breadcrumbs';
 import ButtonGroup from '@atlaskit/button/button-group';
 import Button from '@atlaskit/button/standard-button';
@@ -8,6 +8,7 @@ import Select from '@atlaskit/select';
 import TextField from '@atlaskit/textfield';
 import { token } from '@atlaskit/tokens';
 import PageHeader from '@atlaskit/page-header';
+import WorkforceLozenge from './WorkforceLozenge';
 
 const barContent = (
   <div style={{ display: 'flex' }}>
@@ -24,7 +25,7 @@ const barContent = (
   </div>
 );
 
-const PageHeaderComplexExample = () => {
+const WorkforcePageHeader = () => {
   return (
     <PageHeader
       bottomBar={barContent}
@@ -34,4 +35,4 @@ const PageHeaderComplexExample = () => {
   );
 };
 
-export default PageHeaderComplexExample;
+export default WorkforcePageHeader;

@@ -1,8 +1,4 @@
 import React from 'react';
-
-import Breadcrumbs, { BreadcrumbsItem } from '@atlaskit/breadcrumbs';
-import ButtonGroup from '@atlaskit/button/button-group';
-import Button from '@atlaskit/button/standard-button';
 import __noop from '@atlaskit/ds-lib/noop';
 import Select from '@atlaskit/select';
 import TextField from '@atlaskit/textfield';
@@ -26,14 +22,14 @@ const barContent = (
   </div>
 );
 
-const EquipmentHeader = () => {
+const EquipmentPageHeader = () => {
   return (
     <PageHeader
       bottomBar={barContent}
     >
-        Eqipment
+        Equipment
     </PageHeader>
   );
 };
 
-export default EquipmentHeader;
+export default EquipmentPageHeader;

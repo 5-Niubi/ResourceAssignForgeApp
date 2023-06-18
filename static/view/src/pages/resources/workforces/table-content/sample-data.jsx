@@ -2,7 +2,8 @@
 import { FC, ReactNode } from 'react';
 
 import { css, jsx } from '@emotion/react';
-
+import TrashIcon from '@atlaskit/icon/glyph/trash';
+import EditIcon from '@atlaskit/icon/glyph/edit';
 import Avatar from '@atlaskit/avatar';
 import DropdownMenu, {
   DropdownItem,
@@ -11,7 +12,8 @@ import DropdownMenu, {
 import { token } from '@atlaskit/tokens';
 
 import { lorem } from './lorem';
-import { presidents } from './president';
+import { workforces } from './workforces';
+import WorkforceLozenge from '../WorkforceLozenge';
 
 
 function createKey(input) {
@@ -60,12 +62,11 @@ export const createHead = (withWidth) => {
       {
         key: 'skill',
         content: 'Skills',
-        shouldTruncate: true,
-        width: withWidth ? 15 : undefined,
+        shouldTruncate: false,
       },
       {
         key: 'salary',
-        content: 'Salary',
+        content: 'Salary (Hour)',
         shouldTruncate: true,
       },
       {
@@ -77,6 +78,13 @@ export const createHead = (withWidth) => {
         key: 'type',
         content: 'Type',
         shouldTruncate: true,
+        width: withWidth ? 80 : undefined,
+      },
+      {
+        key: 'action',
+        content: 'Action',
+        shouldTruncate: true,
+        width: withWidth ? 80 : undefined,
       },
     ],
   };
@@ -84,7 +92,13 @@ export const createHead = (withWidth) => {
 
 export const head = createHead(true);
 
-export const rows = presidents.map((president, index) => ({
+  // Custom cell component
+  function CustomCell({ cell }) {
+    return <div><WorkforceLozenge name="C#"></WorkforceLozenge></div>; 
+  }
+
+
+export const rows = workforces.map((president, index) => ({
   key: `row-${index}-${president.name}`,
   isHighlighted: false,
   cells: [
@@ -109,7 +123,9 @@ export const rows = presidents.map((president, index) => ({
     },
     {
       key: president.skills,
-      content: president.skills,
+      content: (
+        <WorkforceLozenge arrays={president.skills}></WorkforceLozenge>
+      ),
     },
     {
       key: president.salary,
@@ -124,14 +140,14 @@ export const rows = presidents.map((president, index) => ({
       content: president.type,
     },
     {
-      key: 'MoreDropdown',
+      key: 'action',
       content: (
-        <DropdownMenu trigger="More">
-          <DropdownItemGroup>
-            <DropdownItem>{president.name}</DropdownItem>
-          </DropdownItemGroup>
-        </DropdownMenu>
+        <div>
+          <EditIcon></EditIcon>
+          <TrashIcon></TrashIcon>
+        </div>
       ),
     },
   ],
 }));
+ 

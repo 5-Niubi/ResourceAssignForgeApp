@@ -7,8 +7,10 @@ import { borderRadius as getBorderRadius } from '@atlaskit/theme/constants';
 import { token } from '@atlaskit/tokens';
 
 import Tabs, { Tab, TabList, TabPanel } from '@atlaskit/tabs';
-import PageHeaderComplexExample from './workforces/WorkforceHeader';
-import DynamicTableWorkforce from './workforces/table-content/WorkforceTable';
+import WorkforcePageHeader from './workforces/WorkforcePageHeader';
+import WorkforceDynamicTable from './workforces/WorkforceDynamicTable';
+import EquipmentPageHeader from './equipments/EquipmentHeader';
+import EquipmentDynamicTable from './equipments/EquipmentDynamicTable';
 
 const borderRadius = getBorderRadius();
 
@@ -48,14 +50,16 @@ export default function ResourceTabs() {
         <Tab>Equipments</Tab>
       </TabList>
       <TabPanel>
-        <PageHeaderComplexExample></PageHeaderComplexExample>
-        <DynamicTableWorkforce></DynamicTableWorkforce>
+        <Panel>
+          <WorkforcePageHeader></WorkforcePageHeader>
+          <WorkforceDynamicTable></WorkforceDynamicTable>
+        </Panel>
       </TabPanel>
       <TabPanel>
         <Panel>
-          <DynamicTableWorkforce></DynamicTableWorkforce>
+          <EquipmentPageHeader></EquipmentPageHeader>
+          <EquipmentDynamicTable></EquipmentDynamicTable>
         </Panel>
-
       </TabPanel>
     </Tabs>
   );

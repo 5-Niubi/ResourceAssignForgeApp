@@ -4,7 +4,7 @@ import { token } from '@atlaskit/tokens';
 
 import DynamicTable from '@atlaskit/dynamic-table';
 
-import { head, rows } from './sample-data';
+import { head, rows } from './table-content/sample-data';
 
 const wrapperStyles = css({
   position: 'relative',
@@ -30,7 +30,7 @@ const overflow = css({
   },
 });
 
-const DynamicTableWorkforce = () => (
+const WorkforceDynamicTable = () => (
   <div css={wrapperStyles}>
     <div css={overflow}>
       <DynamicTable head={head} rows={rows} />
@@ -38,4 +38,4 @@ const DynamicTableWorkforce = () => (
   </div>
 );
 
-export default DynamicTableWorkforce;
+export default WorkforceDynamicTable;

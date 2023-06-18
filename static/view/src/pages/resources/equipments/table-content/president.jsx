@@ -4,7 +4,7 @@ export const presidents = [{
   "name": "Urbanus Cartlidge",
   "skills": "MBOX",
   "salary": "$912.11",
-  "avaiable": 100,
+  "avaiable": "100 %",
   "type": "Turquoise"
 }, {
   "no": 2,
@@ -12,7 +12,7 @@ export const presidents = [{
   "name": "Rudd Howcroft",
   "skills": "HDS",
   "salary": "$83.32",
-  "avaiable": 100,
+  "avaiable": "100 %",
   "type": "Red"
 }, {
   "no": 3,
@@ -20,7 +20,7 @@ export const presidents = [{
   "name": "Belita O'Fogerty",
   "skills": "CQS",
   "salary": "$58.22",
-  "avaiable": 100,
+  "avaiable": "100 %",
   "type": "Turquoise"
 }, {
   "no": 4,
@@ -28,7 +28,7 @@ export const presidents = [{
   "name": "Chrysa Pearcy",
   "skills": "Mental Health Counseling",
   "salary": "$999.98",
-  "avaiable": 100,
+  "avaiable": "100 %",
   "type": "Violet"
 }, {
   "no": 5,
@@ -36,7 +36,7 @@ export const presidents = [{
   "name": "Garey Pybworth",
   "skills": "Technical Documentation",
   "salary": "$98.55",
-  "avaiable": 100,
+  "avaiable": "100 %",
   "type": "Violet"
 }, {
   "no": 6,
@@ -44,7 +44,7 @@ export const presidents = [{
   "name": "Enrika Robertson",
   "skills": "Space Planning",
   "salary": "$59.76",
-  "avaiable": 100,
+  "avaiable": "100 %",
   "type": "Crimson"
 }, {
   "no": 7,
@@ -52,7 +52,7 @@ export const presidents = [{
   "name": "Mallory Wealthall",
   "skills": "Business Development",
   "salary": "$475.60",
-  "avaiable": 100,
+  "avaiable": "100 %",
   "type": "Yellow"
 }, {
   "no": 8,
@@ -60,7 +60,7 @@ export const presidents = [{
   "name": "Cam Botley",
   "skills": "Marketing Communications",
   "salary": "$699.72",
-  "avaiable": 100,
+  "avaiable": "100 %",
   "type": "Purple"
 }, {
   "no": 9,
@@ -68,7 +68,7 @@ export const presidents = [{
   "name": "Charmane Peyntue",
   "skills": "Medical Affairs",
   "salary": "$267.55",
-  "avaiable": 100,
+  "avaiable": "100 %",
   "type": "Indigo"
 }, {
   "no": 10,
@@ -76,7 +76,7 @@ export const presidents = [{
   "name": "Bryn Chisman",
   "skills": "Eblasts",
   "salary": "$70.25",
-  "avaiable": 100,
+  "avaiable": "100 %",
   "type": "Teal"
 }, {
   "no": 11,
@@ -84,7 +84,7 @@ export const presidents = [{
   "name": "Artie Inglese",
   "skills": "DB2",
   "salary": "$54.23",
-  "avaiable": 100,
+  "avaiable": "100 %",
   "type": "Aquamarine"
 }, {
   "no": 12,
@@ -92,7 +92,7 @@ export const presidents = [{
   "name": "Hedi Leipoldt",
   "skills": "Start-up Ventures",
   "salary": "$300.58",
-  "avaiable": 100,
+  "avaiable": "100 %",
   "type": "Indigo"
 }, {
   "no": 13,
@@ -100,7 +100,7 @@ export const presidents = [{
   "name": "Kristi McQuorkel",
   "skills": "Jenkins",
   "salary": "$297.77",
-  "avaiable": 100,
+  "avaiable": "100 %",
   "type": "Orange"
 }, {
   "no": 14,
@@ -108,7 +108,7 @@ export const presidents = [{
   "name": "Simonette Strowthers",
   "skills": "Machine Tools",
   "salary": "$289.35",
-  "avaiable": 100,
+  "avaiable": "100 %",
   "type": "Khaki"
 }, {
   "no": 15,
@@ -116,7 +116,7 @@ export const presidents = [{
   "name": "Reinwald Brimm",
   "skills": "KMS",
   "salary": "$901.35",
-  "avaiable": 100,
+  "avaiable": "100 %",
   "type": "Turquoise"
 }, {
   "no": 16,
@@ -124,7 +124,7 @@ export const presidents = [{
   "name": "Twyla Overbury",
   "skills": "LPS",
   "salary": "$833.58",
-  "avaiable": 100,
+  "avaiable": "100 %",
   "type": "Purple"
 }, {
   "no": 17,
@@ -132,7 +132,7 @@ export const presidents = [{
   "name": "Delmore Sympson",
   "skills": "DLS",
   "salary": "$712.73",
-  "avaiable": 100,
+  "avaiable": "100 %",
   "type": "Indigo"
 }, {
   "no": 18,
@@ -140,7 +140,7 @@ export const presidents = [{
   "name": "Roanne Sambals",
   "skills": "UE",
   "salary": "$141.38",
-  "avaiable": 100,
+  "avaiable": "100 %",
   "type": "Green"
 }, {
   "no": 19,
@@ -148,7 +148,7 @@ export const presidents = [{
   "name": "Raddie Hourican",
   "skills": "Project Estimation",
   "salary": "$418.99",
-  "avaiable": 100,
+  "avaiable": "100 %",
   "type": "Purple"
 }, {
   "no": 20,
@@ -156,6 +156,6 @@ export const presidents = [{
   "name": "Dion O'Daly",
   "skills": "Valves",
   "salary": "$34.64",
-  "avaiable": 100,
+  "avaiable": "100 %",
   "type": "Orange"
 }];
