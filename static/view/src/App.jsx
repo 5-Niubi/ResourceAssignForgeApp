@@ -30,14 +30,14 @@ function App() {
 		await router.open(authenUrl);
 	}
 
-	// Check authenticate every time reload page
-	useEffect(function () {
-		invoke("getAuthenUrl").then(function (res) {
-			if (!res.isAuthenticated) {
-				handleAuthenOAuth(res.authenUrl);
-			}
-		});
-	}, []);
+  // Check authenticate every time reload page
+  useEffect(function () {
+    // invoke("getAuthenUrl").then(function (res) {
+    //   if (!res.isAuthenticated) {
+    //     handleAuthenOAuth(res.authenUrl);
+    //   }
+    // });
+  }, []);
 
 	// // Set this app context to storage
 	// useEffect(() => {
@@ -93,7 +93,6 @@ function App() {
 							</Router>
 						</div>
 					</LeftSidebar>
-
 					<Main testId="main" id="main">
 						<AppFrame>
 							<Router
