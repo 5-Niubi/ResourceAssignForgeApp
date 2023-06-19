@@ -30,8 +30,10 @@
     "@forge/bridge": "2.6.0",
     "@forge/ui": "^1.9.0",
     "eslint-plugin-no-inline-styles": "^1.0.5",
+    "gojs": "^2.3.8",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-gojs": "^4.9.0",
     "react-responsive": "^9.0.2",
     "react-router": "^6.12.1"
   },
