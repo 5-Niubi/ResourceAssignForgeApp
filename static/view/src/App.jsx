@@ -1,10 +1,8 @@
 // @ts-nocheck
 import React, { useEffect, useState } from "react";
 import { invoke, router, view } from "@forge/bridge";
-import HomePage from "./pages/HomePage";
 import { Route, Router, Routes } from "react-router";
 import ProjectFromNetPage from "./pages/ProjectFromNetPage";
-import Resources from "./pages/resources";
 
 import PertChart from "./pages/schedule/pertchart/PertChart";
 
@@ -30,19 +28,19 @@ function App() {
 		await router.open(authenUrl);
 	}
 
-  // Check authenticate every time reload page
-  useEffect(function () {
-    // invoke("getAuthenUrl").then(function (res) {
-    //   if (!res.isAuthenticated) {
-    //     handleAuthenOAuth(res.authenUrl);
-    //   }
-    // });
-  }, []);
+	// Check authenticate every time reload page
+	useEffect(function () {
+		invoke("getAuthenUrl").then(function (res) {
+			if (!res.isAuthenticated) {
+				handleAuthenOAuth(res.authenUrl);
+			}
+		});
+	}, []);
 
 	// // Set this app context to storage
-	// useEffect(() => {
-	//   invoke("setContextToGlobal").then().catch();
-	// }, []);
+	useEffect(() => {
+		invoke("setContextToGlobal").then().catch();
+	}, []);
 
 	// --- Config React Router ---
 	useEffect(() => {
@@ -85,10 +83,7 @@ function App() {
 							>
 								<Routes>
 									{/* Path with * take effect in all route after current */}
-									<Route
-										path="/*"
-										element={<HomeSideBar />}
-									></Route>
+									<Route path="/*" element={<HomeSideBar />}></Route>
 								</Routes>
 							</Router>
 						</div>
@@ -101,24 +96,15 @@ function App() {
 								location={historyState.location}
 							>
 								<Routes>
-									<Route
-										path="/"
-										element={<ProjectListHome />}
-									></Route>
+									<Route path="/" element={<ProjectListHome />}></Route>
 									<Route
 										path="/projects"
 										element={<ProjectFromNetPage />}
 									></Route>
 
-									<Route
-										path="/pert"
-										element={<SchedulePage />}
-									></Route>
+									<Route path="/pert" element={<SchedulePage />}></Route>
 
-									<Route
-										path="/resources"
-										element={<ResourcesPage />}
-									></Route>
+									<Route path="/resources" element={<ResourcesPage />}></Route>
 								</Routes>
 							</Router>
 						</AppFrame>

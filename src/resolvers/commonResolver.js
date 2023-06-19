@@ -10,6 +10,7 @@ function commonResolver(resolver) {
     "setContextToGlobal",
     async (/** @type {{ context: any; }} */ req) => {
       await storage.set(STORAGE.CONTEXT, req.context);
+      console.log(STORAGE.TOKEN, ": ", await storage.getSecret(STORAGE.TOKEN));
       return req.context;
     }
   );

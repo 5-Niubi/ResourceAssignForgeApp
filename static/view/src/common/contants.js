@@ -13,3 +13,9 @@ export const MEDIA_QUERY = {
     MAX: 767,
   },
 };
+
+export const MODAL_WIDTH = {
+  XL: "x-large",
+  L: "large",
+  M: "medium",
+};
