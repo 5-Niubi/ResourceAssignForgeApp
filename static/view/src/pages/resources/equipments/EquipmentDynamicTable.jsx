@@ -33,7 +33,7 @@ const overflow = css({
 const EquipmentDynamicTable = () => (
   <div css={wrapperStyles}>
     <div css={overflow}>
-      <DynamicTable head={head} rows={rows} />
+      <DynamicTable head={head} width={"100%"} rows={rows} />
     </div>
   </div>
 );

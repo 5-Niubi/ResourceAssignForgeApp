@@ -23,13 +23,12 @@ export default function WorkforceModal() {
   const closeModal = useCallback(() => setIsOpen(false), []);
 
   return (
-    <div>
+    <div style={{display: "inline"}}>
       <Button
         iconBefore={<EditIcon label="" size="medium" />}
         appearance="subtle"
         onClick={openModal}
-      ></Button>
-      <Button
+      ></Button><Button
         iconBefore={<TrashIcon label="" size="medium" />}
         appearance="subtle"
         onClick={openModal}
@@ -49,9 +48,7 @@ export default function WorkforceModal() {
             </ModalBody>
             <ModalFooter>
               <Button appearance="subtle" onClick={closeModal}>Cancel</Button>
-              <Button appearance="danger" onClick={closeModal} autoFocus>
-                Delete
-              </Button>
+              <Button appearance="danger" onClick={closeModal} autoFocus>Delete</Button>
             </ModalFooter>
           </Modal>
         )}

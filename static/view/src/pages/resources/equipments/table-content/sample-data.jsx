@@ -54,40 +54,42 @@ export const createHead = (withWidth) => {
       {
         key: 'id',
         content: 'ID',
-        width: withWidth ? 25 : undefined,
+        width: withWidth ? 8 : undefined,
       },
       {
         key: 'name',
         content: 'Name',
-        width: withWidth ? 45 : undefined,
+        width: withWidth ? 17 : undefined,
       },
       {
         key: 'functions',
         content: 'Function',
         shouldTruncate: false,
-        width: withWidth ? 400 : undefined,
+        width: withWidth ? 25 : undefined,
       },
       {
         key: 'amount',
         content: 'Amount',
         shouldTruncate: true,
+        width: withWidth ? 5 : undefined,
       },
       {
         key: 'price',
         content: 'Price (Hour)',
         shouldTruncate: true,
+        width: withWidth ? 5 : undefined,
       },
       {
         key: 'available',
         content: 'Availabel',
         shouldTruncate: true,
-        width: withWidth ? 20 : undefined,
+        width: withWidth ? 5 : undefined,
       },
       {
         key: 'action',
         content: 'Action',
         shouldTruncate: true,
-        width: withWidth ? 10 : undefined,
+        width: withWidth ? 8 : undefined,
       },
     ],
   };
