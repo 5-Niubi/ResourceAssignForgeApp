@@ -3,11 +3,10 @@ import React, { useEffect, useState } from "react";
 import { invoke, router, view } from "@forge/bridge";
 import { Route, Router, Routes } from "react-router";
 import ProjectFromNetPage from "./pages/ProjectFromNetPage";
-import Resources from "./pages/resources";
 
 import { LeftSidebar, Main, PageLayout, Content } from "@atlaskit/page-layout";
 import HomeSideBar from "./components/side-nav/HomeSideBar";
-import ProjectListHome from "./pages/projects/ProjectsListHome";
+import ProjectListHome from "./pages/resources/projects/ProjectsListHome";
 import AppFrame from "./components/common/AppFrame";
 
 function App() {
