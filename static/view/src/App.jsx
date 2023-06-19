@@ -6,7 +6,7 @@ import ProjectFromNetPage from "./pages/ProjectFromNetPage";
 
 import { LeftSidebar, Main, PageLayout, Content } from "@atlaskit/page-layout";
 import HomeSideBar from "./components/side-nav/HomeSideBar";
-import ProjectListHome from "./pages/resources/projects/ProjectsListHome";
+import ProjectListHome from "./pages/projects/ProjectsListHome";
 import AppFrame from "./components/common/AppFrame";
 
 function App() {

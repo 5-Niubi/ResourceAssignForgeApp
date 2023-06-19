@@ -12,7 +12,7 @@ import TextField from "@atlaskit/textfield";
 import Form, { Field, FormSection } from "@atlaskit/form";
 import { DatePicker } from "@atlaskit/datetime-picker";
 import ObjectiveRange from "../form/ObjectiveRange";
-import { getCurrentTime } from "../../../../common/utils";
+import { getCurrentTime } from "../../../common/utils";
 
 function CreateProjectModal() {
 	const columns = 10;
