@@ -48,16 +48,16 @@ export default function ResourceTabs() {
 				<Tab>Equipments</Tab>
 			</TabList>
 			<TabPanel>
-				<Panel>
+                <div style={{width: "100%"}}>   
 					<WorkforcePageHeader></WorkforcePageHeader>
 					<WorkforceDynamicTable></WorkforceDynamicTable>
-				</Panel>
+				</div>
 			</TabPanel>
 			<TabPanel>
-				<Panel>
+                <div style={{width: "100%"}}>   
 					<EquipmentPageHeader></EquipmentPageHeader>
 					<EquipmentDynamicTable></EquipmentDynamicTable>
-				</Panel>
+				</div>
 			</TabPanel>
 		</Tabs>
 	);

@@ -54,40 +54,42 @@ export const createHead = (withWidth) => {
       {
         key: 'id',
         content: 'ID',
-        width: withWidth ? 15 : undefined,
+        width: withWidth ? 8 : undefined,
       },
       {
         key: 'name',
         content: 'Name',
-        width: withWidth ? 25 : undefined,
+        width: withWidth ? 17 : undefined,
       },
       {
         key: 'skill',
         content: 'Skills',
         shouldTruncate: false,
-        width: withWidth ? 300 : undefined,
+        width: withWidth ? 25 : undefined,
       },
       {
         key: 'salary',
         content: 'Salary (Hour)',
-        shouldTruncate: true,
+        shouldTruncate: false,
+        width: withWidth ? 5 : undefined,
       },
       {
         key: 'avaiable',
         content: 'Available',
-        shouldTruncate: true,
+        shouldTruncate: false,
+        width: withWidth ? 5 : undefined,
       },
       {
         key: 'type',
         content: 'Type',
-        shouldTruncate: true,
-        width: withWidth ? 20 : undefined,
+        shouldTruncate: false,
+        width: withWidth ? 5 : undefined,
       },
       {
         key: 'action',
         content: 'Action',
-        shouldTruncate: true,
-        width: withWidth ?  10: undefined,
+        shouldTruncate: false,
+        width: withWidth ?  5: undefined,
       },
     ],
   };
@@ -143,7 +145,7 @@ export const rows = workforces.map((workforce, index) => ({
       content: workforce.avaiable,
     },
     {
-      key: workforce.type,
+      key: 'type',
       content: workforce.type,
     },
     {

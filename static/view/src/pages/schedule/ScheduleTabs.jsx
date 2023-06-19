@@ -1,5 +1,11 @@
 import Tabs, { Tab, TabList, TabPanel } from "@atlaskit/tabs";
 import VisualizeTasksPage from "./pertchart/VisualizeTasks";
+import ParameterPageHeader from "./parameter/ParameterPageHeader";
+import ParameterDynamicTable from "./parameter/ParameterDynamicTable";
+import { Panel } from "../resources/ResourceTabs";
+import ParameterWorkforceList from "./parameter/ParameterWorkforceList";
+import ParameterEquipmentList from "./parameter/ParameterEquipmentList";
+import ParameterObjectInput from "./parameter/ParameterObjectInput";
 
 export default function ScheduleTabs() {
 	return (
@@ -15,7 +21,15 @@ export default function ScheduleTabs() {
 			<TabPanel>
 				<VisualizeTasksPage />
 			</TabPanel>
-			<TabPanel>One</TabPanel>
+			<TabPanel>
+                <div style={{width: "100%"}}>
+                    <ParameterPageHeader></ParameterPageHeader>
+                    <ParameterDynamicTable></ParameterDynamicTable>
+                    <ParameterWorkforceList></ParameterWorkforceList>
+                    <ParameterEquipmentList></ParameterEquipmentList>
+                    <ParameterObjectInput></ParameterObjectInput>
+                </div>
+            </TabPanel>
 			<TabPanel>One</TabPanel>
 		</Tabs>
 	);

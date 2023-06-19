@@ -17,18 +17,19 @@ const boldStyles = css({
   fontWeight: "bold",
 });
 
-export default function WorkforceModal() {
+export default function EquipmentModal() {
   const [isOpen, setIsOpen] = useState(false);
   const openModal = useCallback(() => setIsOpen(true), []);
   const closeModal = useCallback(() => setIsOpen(false), []);
 
   return (
-    <div style={{display: "inline"}}>
+    <div>
       <Button
         iconBefore={<EditIcon label="" size="medium" />}
         appearance="subtle"
         onClick={openModal}
-      ></Button><Button
+      ></Button>
+      <Button
         iconBefore={<TrashIcon label="" size="medium" />}
         appearance="subtle"
         onClick={openModal}
@@ -48,7 +49,9 @@ export default function WorkforceModal() {
             </ModalBody>
             <ModalFooter>
               <Button appearance="subtle" onClick={closeModal}>Cancel</Button>
-              <Button appearance="danger" onClick={closeModal} autoFocus>Delete</Button>
+              <Button appearance="danger" onClick={closeModal} autoFocus>
+                Delete
+              </Button>
             </ModalFooter>
           </Modal>
         )}

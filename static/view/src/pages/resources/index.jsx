@@ -12,7 +12,6 @@ function ResourcesPage() {
 	let navigate = useNavigate();
 	return (
 		<>
-			<h3>This is resource page</h3>
 			<ResourceTabs></ResourceTabs>
 		</>
 	);
