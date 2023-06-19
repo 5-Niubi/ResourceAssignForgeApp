@@ -4,7 +4,7 @@ import "gojs/extensions/DrawCommandHandler";
 import "gojs/extensions/Figures";
 import "gojs/extensions/GeometryReshapingTool";
 
-const PertChart = () => {
+const PertChart = ({updateCurrentTask}) => {
 	const diagramRef = useRef(null);
 
 	// colors used, named for easier identification
@@ -57,10 +57,6 @@ const PertChart = () => {
 					separatorStroke: "black",
 				}),
 				$(go.RowColumnDefinition, {
-					column: 2,
-					separatorStroke: "black",
-				}),
-				$(go.RowColumnDefinition, {
 					row: 1,
 					separatorStroke: "black",
 					background: "white",
@@ -71,39 +67,17 @@ const PertChart = () => {
 					separatorStroke: "black",
 				}),
 				$(
-					go.TextBlock, // earlyStart
-					new go.Binding("text", "earlyStart"),
-					{
-						row: 0,
-						column: 0,
-						margin: 5,
-						textAlign: "center",
-					}
-				),
-				$(
                     go.TextBlock, 
-                    new go.Binding("text", "length"), {
+                    new go.Binding("text", "duration"), {
 					row: 0,
 					column: 1,
 					margin: 5,
 					textAlign: "center",
 				}),
-				$(
-					go.TextBlock, // earlyFinish
-					new go.Binding("text", "", (d) =>
-						(d.earlyStart + d.length).toFixed(2)
-					),
-					{
-						row: 0,
-						column: 2,
-						margin: 5,
-						textAlign: "center",
-					}
-				),
 
 				$(
                     go.TextBlock, 
-                    new go.Binding("text", "text"), {
+                    new go.Binding("text", "name"), {
 					row: 1,
 					column: 0,
 					columnSpan: 3,
@@ -113,11 +87,12 @@ const PertChart = () => {
 				})
 			), // end Table Panel
 			{
-				click: (e, obj) => {},
-				selectionChanged: (part) => {
-					// var shape = part.elt(0);
-					// shape.stroke = part.isSelected ? "blue" : (part.data.critical ? pink : blue);
-				},
+				click: (e, obj) => {updateCurrentTask(obj.part.data);},
+				// selectionChanged: (part) => {
+				// 	// var shape = part.elt(0);
+				// 	// shape.stroke = part.isSelected ? "blue" : (part.data.critical ? pink : blue);
+                //     updateCurrentTask(part.data);
+				// },
 			}
 		);
 	}
@@ -161,65 +136,56 @@ const PertChart = () => {
 			nodeDataArray: [
 				{
 					key: 1,
-					text: "Start",
-					length: 0,
-					earlyStart: 0,
+					name: "Start",
+					duration: 0,
 					critical: true,
 				},
 				{
 					key: 2,
-					text: "Task 1",
-					length: 4,
-					earlyStart: 0,
+					name: "Task 1",
+					duration: 4,
 					critical: true,
 				},
 				{
 					key: 3,
-					text: "Task 2",
-					length: 5.33,
-					earlyStart: 0,
+					name: "Task 2",
+					duration: 5.33,
 					critical: false,
 				},
 				{
 					key: 4,
-					text: "Task 3 siêuuuuuuuuuuuuuuuuu dàiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii",
-					length: 5.17,
-					earlyStart: 4,
+					name: "Task 3 siêuuuuuuuuuuuuuuuuu dàiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii",
+					duration: 5.17,
 					critical: true,
 				},
 				{
 					key: 5,
-					text: "Task 4",
-					length: 6.33,
-					earlyStart: 4,
+					name: "Task 4",
+					duration: 6.33,
 					critical: false,
 				},
 				{
 					key: 6,
-					text: "Task 5",
-					length: 5.17,
-					earlyStart: 9.17,
+					name: "Task 5",
+					duration: 5.17,
 					critical: true,
 				},
 				{
 					key: 7,
-					text: "Task 6",
-					length: 4.5,
-					earlyStart: 10.33,
+					name: "Task 6",
+					duration: 4.5,
 					critical: false,
 				},
 				{
 					key: 8,
-					text: "Task 7",
-					length: 5.17,
-					earlyStart: 14.34,
+					name: "Task 7",
+					duration: 5.17,
 					critical: true,
 				},
 				{
 					key: 9,
-					text: "Finish",
-					length: 0,
-					earlyStart: 19.51,
+					name: "Finish",
+					duration: 0,
 					critical: true,
 				},
 			],
@@ -242,7 +208,7 @@ const PertChart = () => {
 		<div
 			ref={diagramRef}
 			className="diagram-component"
-			style={{ height: "50vh", width: "100%" }}
+			style={{ height: "40vh", width: "100%" }}
 		></div>
 	);
 };
