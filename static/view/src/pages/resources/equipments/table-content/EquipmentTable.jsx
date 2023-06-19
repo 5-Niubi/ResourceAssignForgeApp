@@ -30,7 +30,7 @@ const overflow = css({
   },
 });
 
-const DynamicTableWorkforce = () => (
+const EquipmentDynamicTable = () => (
   <div css={wrapperStyles}>
     <div css={overflow}>
       <DynamicTable head={head} rows={rows} />
@@ -38,4 +38,4 @@ const DynamicTableWorkforce = () => (
   </div>
 );
 
-export default DynamicTableWorkforce;
+export default EquipmentDynamicTable;

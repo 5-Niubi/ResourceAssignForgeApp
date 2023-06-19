@@ -10,7 +10,10 @@ const wrapperStyles = css({
 	position: "relative",
 	table: {
 		width: "100%",
+        backgroundColor: "#091E42",
 	},
+    backgroundColor: "#091E42",
+    width: "100%",
 });
 
 const overflow = css({
@@ -30,12 +33,12 @@ const overflow = css({
 	},
 });
 
-const WorkforceDynamicTable = () => (
+const ParameterDynamicTable = () => (
 	<div css={wrapperStyles}>
 		<div css={overflow}>
-			<DynamicTable head={head} rows={rows} />
+			<DynamicTable head={head} width={"100%"} rows={rows} />
 		</div>
 	</div>
 );
 
-export default WorkforceDynamicTable;
+export default ParameterDynamicTable;
