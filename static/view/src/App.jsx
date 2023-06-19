@@ -6,25 +6,29 @@ import { Route, Router, Routes } from "react-router";
 import ProjectFromNetPage from "./pages/ProjectFromNetPage";
 import Resources from "./pages/resources";
 
+import PertChart from "./pages/schedule/pertchart/PertChart";
+
 import { LeftSidebar, Main, PageLayout, Content } from "@atlaskit/page-layout";
 import HomeSideBar from "./components/side-nav/HomeSideBar";
 import ProjectListHome from "./pages/projects/ProjectsListHome";
 import AppFrame from "./components/common/AppFrame";
+import VisualizeTasksPage from "./pages/schedule/pertchart/VisualizeTasks";
+import SchedulePage from "./pages/schedule";
 import ResourcesPage from "./pages/resources";
 
 function App() {
-  // Enable auto change theme Dark/light mode within Jira
-  view.theme.enable();
+	// Enable auto change theme Dark/light mode within Jira
+	view.theme.enable();
 
-  const [history, setHistory] = useState();
-  const [historyState, setHistoryState] = useState();
+	const [history, setHistory] = useState();
+	const [historyState, setHistoryState] = useState();
 
-  /**
-   * @param {string} authenUrl
-   */
-  async function handleAuthenOAuth(authenUrl) {
-    await router.open(authenUrl);
-  }
+	/**
+	 * @param {string} authenUrl
+	 */
+	async function handleAuthenOAuth(authenUrl) {
+		await router.open(authenUrl);
+	}
 
   // Check authenticate every time reload page
   useEffect(function () {
@@ -35,85 +39,96 @@ function App() {
     // });
   }, []);
 
-  // // Set this app context to storage
-  // useEffect(() => {
-  //   invoke("setContextToGlobal").then().catch();
-  // }, []);
+	// // Set this app context to storage
+	// useEffect(() => {
+	//   invoke("setContextToGlobal").then().catch();
+	// }, []);
 
-  // --- Config React Router ---
-  useEffect(() => {
-    view.createHistory().then((newHistory) => {
-      setHistory(newHistory);
-    });
-  }, []);
+	// --- Config React Router ---
+	useEffect(() => {
+		view.createHistory().then((newHistory) => {
+			setHistory(newHistory);
+		});
+	}, []);
 
-  useEffect(() => {
-    if (!historyState && history) {
-      setHistoryState({
-        action: history.action,
-        location: history.location,
-      });
-    }
-  }, [history, historyState]);
+	useEffect(() => {
+		if (!historyState && history) {
+			setHistoryState({
+				action: history.action,
+				location: history.location,
+			});
+		}
+	}, [history, historyState]);
 
-  useEffect(() => {
-    if (history) {
-      history.listen((location, action) => {
-        setHistoryState({
-          action,
-          location,
-        });
-      });
-    }
-  }, [history]);
-  // --- / ---
+	useEffect(() => {
+		if (history) {
+			history.listen((location, action) => {
+				setHistoryState({
+					action,
+					location,
+				});
+			});
+		}
+	}, [history]);
+	// --- / ---
 
-  return (
-    <PageLayout>
-      {history && historyState ? (
-        <Content>
-          <LeftSidebar>
-            <div style={{ height: "100vh" }}>
-              <Router
-                navigator={history}
-                navigationType={historyState.action}
-                location={historyState.location}
-              >
-                <Routes>
-                  {/* Path with * take effect in all route after current */}
-                  <Route path="/*" element={<HomeSideBar />}></Route>
-                </Routes>
-              </Router>
-            </div>
-          </LeftSidebar>
+	return (
+		<PageLayout>
+			{history && historyState ? (
+				<Content>
+					<LeftSidebar>
+						<div style={{ height: "100vh" }}>
+							<Router
+								navigator={history}
+								navigationType={historyState.action}
+								location={historyState.location}
+							>
+								<Routes>
+									{/* Path with * take effect in all route after current */}
+									<Route
+										path="/*"
+										element={<HomeSideBar />}
+									></Route>
+								</Routes>
+							</Router>
+						</div>
+					</LeftSidebar>
+					<Main testId="main" id="main">
+						<AppFrame>
+							<Router
+								navigator={history}
+								navigationType={historyState.action}
+								location={historyState.location}
+							>
+								<Routes>
+									<Route
+										path="/"
+										element={<ProjectListHome />}
+									></Route>
+									<Route
+										path="/projects"
+										element={<ProjectFromNetPage />}
+									></Route>
 
-          <Main testId="main" id="main">
-            <AppFrame>
-              <Router
-                navigator={history}
-                navigationType={historyState.action}
-                location={historyState.location}
-              >
-                <Routes>
-                  <Route path="/" element={<ProjectListHome />}></Route>
-                  <Route
-                    path="/projects"
-                    element={<ProjectFromNetPage />}
-                  ></Route>
-                  <Route
-                    path="/resources"
-                    element={<ResourcesPage />}
-                  ></Route>
-                </Routes>
-              </Router>
-            </AppFrame>
-          </Main>
-        </Content>
-      ) : (
-        "Loading..."
-      )}
-    </PageLayout>
-  );
+									<Route
+										path="/pert"
+										element={<SchedulePage />}
+									></Route>
+
+									<Route
+										path="/resources"
+										element={<ResourcesPage />}
+									></Route>
+								</Routes>
+							</Router>
+						</AppFrame>
+					</Main>
+				</Content>
+			) : (
+				"Loading..."
+			)}
+		</PageLayout>
+	);
 }
 
 export default App;
