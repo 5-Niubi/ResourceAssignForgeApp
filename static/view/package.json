@@ -6,6 +6,7 @@
   "dependencies": {
     "@atlaskit/atlassian-navigation": "^2.6.5",
     "@atlaskit/avatar": "^21.3.4",
+    "@atlaskit/badge": "^15.1.6",
     "@atlaskit/breadcrumbs": "^11.10.4",
     "@atlaskit/button": "^16.7.6",
     "@atlaskit/css-reset": "^6.5.2",
