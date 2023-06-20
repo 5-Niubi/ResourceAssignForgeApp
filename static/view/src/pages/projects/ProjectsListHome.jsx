@@ -25,27 +25,29 @@ function ProjectListHome() {
 
 	useEffect(
 		function () {
-			invoke("getProjectsList", { page }).then(function (res) {
-				let projectsList = [];
-				let itemProject = {};
-				handlePaging(res.total);
-				for (let project of res.values) {
-					itemProject.id = project.id;
-					itemProject.content = {
-						no: 1,
-						projectName: project.name,
-						startDate: project.startDate,
-					};
-					itemProject.hasChildren = false;
-					projectsList.push(itemProject);
-				}
-				// @ts-ignore
-				setProjects(projectsList);
-			}).catch();
+			invoke("getProjectsList", { page })
+				.then(function (res) {
+					let projectsList = [];
+					let itemProject = {};
+					handlePaging(res.total);
+					for (let project of res.values) {
+						itemProject.id = project.id;
+						itemProject.content = {
+							no: 1,
+							projectId: project.id,
+							projectName: project.name,
+							startDate: project.startDate,
+						};
+						itemProject.hasChildren = false;
+						projectsList.push(itemProject);
+					}
+					// @ts-ignore
+					setProjects(projectsList);
+				})
+				.catch();
 		},
 		[page]
 	);
-	
 
 	function handlePaging(total) {
 		let _pageNumberList = [];
