@@ -45,6 +45,7 @@ function ProjectListHome() {
 		},
 		[page]
 	);
+	
 
 	function handlePaging(total) {
 		let _pageNumberList = [];

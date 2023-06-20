@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@forge/api": "^2.16.0",
-    "@forge/bridge": "^2.6.0",
     "@forge/resolver": "1.5.8"
   }
 }
