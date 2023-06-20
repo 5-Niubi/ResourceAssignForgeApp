@@ -1,9 +1,6 @@
-import React from "react";
-
-import SettingsIcon from "@atlaskit/icon/glyph/settings";
-import ActivityIcon from "@atlaskit/icon/glyph/activity";
-import PeopleGroupIcon from "@atlaskit/icon/glyph/people-group";
-
+import RoadmapIcon from "@atlaskit/icon/glyph/roadmap";
+import IssuesIcon from "@atlaskit/icon/glyph/issues";
+import GraphLineIcon from "@atlaskit/icon/glyph/graph-line";
 import {
 	Header,
 	NavigationFooter,
@@ -12,9 +9,10 @@ import {
 	Section,
 	SideNavigation,
 } from "@atlaskit/side-navigation";
+import React from "react";
 import ButtonItemSideBar from "./ButtonItemSideBar";
 
-function HomeSideBar(rootPath) {
+function ProjectSideBar(rootPath = "") {
 	return (
 		<SideNavigation label="project" testId="side-navigation">
 			<NavigationHeader>
@@ -28,21 +26,21 @@ function HomeSideBar(rootPath) {
 				<Section hasSeparator>
 					<ButtonItemSideBar
 						rootPath={rootPath}
-						text={"Project Lists"}
-						pathTo={""}
-						iconBefore={<ActivityIcon label="" />}
+						text={"Schedule"}
+						pathTo={"/schedule"}
+						iconBefore={<RoadmapIcon label="" />}
 					/>
 					<ButtonItemSideBar
 						rootPath={rootPath}
-						text={"Resources"}
-						pathTo={"resources"}
-						iconBefore={<PeopleGroupIcon label="" />}
+						text={"Task Lists"}
+						pathTo={"/tasks"}
+						iconBefore={<IssuesIcon label="" />}
 					/>
 					<ButtonItemSideBar
 						rootPath={rootPath}
-						text={"Settings"}
-						pathTo={"settings"}
-						iconBefore={<SettingsIcon label="" />}
+						text={"Reports"}
+						pathTo={"/reports"}
+						iconBefore={<GraphLineIcon label="" />}
 					/>
 				</Section>
 			</NestableNavigationContent>
@@ -54,4 +52,4 @@ function HomeSideBar(rootPath) {
 	);
 }
 
-export default HomeSideBar;
+export default ProjectSideBar;
