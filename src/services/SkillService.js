@@ -1,4 +1,4 @@
-import APIServices from "./APIServices";
+import APIServices from "./common/APIServices";
 
 async function getAllSkill() {
 	try {

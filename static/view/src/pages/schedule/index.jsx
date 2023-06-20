@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import ScheduleTabs from "./ScheduleTabs";
 
 /**
@@ -8,6 +8,11 @@ import ScheduleTabs from "./ScheduleTabs";
  */
 function SchedulePage() {
 	let navigate = useNavigate();
+	let {project} = useParams();
+
+	
+	project;
+
 	return (<ScheduleTabs/>);
 }
 

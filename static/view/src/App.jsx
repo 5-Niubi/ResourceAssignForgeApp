@@ -13,6 +13,7 @@ import AppFrame from "./components/common/AppFrame";
 import VisualizeTasksPage from "./pages/schedule/pertchart/VisualizeTasks";
 import SchedulePage from "./pages/schedule";
 import ResourcesPage from "./pages/resources";
+import ProjectSideBar from "./components/side-nav/ProjectSideBar";
 
 function App() {
 	// Enable auto change theme Dark/light mode within Jira
@@ -83,7 +84,15 @@ function App() {
 							>
 								<Routes>
 									{/* Path with * take effect in all route after current */}
-									<Route path="/*" element={<HomeSideBar />}></Route>
+									<Route path="/" element={<HomeSideBar rootPath="/"/>}>
+										<Route path="/projects" element={<HomeSideBar rootPath="/"/>}></Route>
+										<Route path="/resources" element={<HomeSideBar rootPath="/"/>}></Route>
+										<Route path="/settings" element={<HomeSideBar rootPath="/"/>}></Route>
+									</Route>
+									<Route
+										path="/:project/*"
+										element={<ProjectSideBar rootPath="/:project"/>}
+									></Route>
 								</Routes>
 							</Router>
 						</div>
@@ -97,14 +106,21 @@ function App() {
 							>
 								<Routes>
 									<Route path="/" element={<ProjectListHome />}></Route>
-									<Route
-										path="/projects"
-										element={<ProjectFromNetPage />}
-									></Route>
-
-									<Route path="/pert" element={<SchedulePage />}></Route>
-
 									<Route path="/resources" element={<ResourcesPage />}></Route>
+									<Route path="/settings" element={<div>Settings</div>}></Route>
+
+									<Route path="/:project">
+										<Route path="" element={<SchedulePage />}></Route>
+										<Route path="schedule" element={<SchedulePage />}></Route>
+										<Route
+											path="tasks"
+											element={<div>Tasks Page of</div>}
+										></Route>
+										<Route
+											path="reports"
+											element={<div>Reporsts Page</div>}
+										></Route>
+									</Route>
 								</Routes>
 							</Router>
 						</AppFrame>

@@ -1,7 +1,7 @@
 import API, { storage } from "@forge/api";
-import { BACKEND_dNET_DOMAIN, STORAGE } from "../common/constants";
-import { HttpStatus } from "../common/httpStatus";
-import AuthenWithBE from "./authens/AuthenWithBE";
+import { BACKEND_dNET_DOMAIN, STORAGE } from "../../common/constants";
+import { HttpStatus } from "../../common/httpStatus";
+import AuthenWithBE from "../authens/AuthenWithBE";
 
 /**
  * Using for get api from .NET server
