@@ -6,6 +6,7 @@ import ProjectActionDropdown from "../dropdown/ProjectActionDropdown";
 import DeleteProjectModal from "../modal/DeleteProjectModal";
 import EditProjectModal from "../modal/EditProjectModal";
 import { ModalDialog } from "@forge/ui";
+import { formatDateDMY } from "../../../common/utils";
 
 function ProjectsListHomeTable({ items }) {
 	const [isOpen, setIsOpen] = useState(false);
@@ -33,7 +34,7 @@ function ProjectsListHomeTable({ items }) {
 			</span>
 		</span>
 	);
-	const StartDate = (props) => <span>{props.startDate}</span>;
+	const StartDate = (props) => <span>{formatDateDMY(props.startDate)}</span>;
 	const Amount = (props) => <span>{10}</span>;
 	const Option = (props) => {
 		function handleDeleteProjectOnClick() {

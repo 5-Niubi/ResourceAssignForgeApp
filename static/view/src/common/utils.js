@@ -9,3 +9,7 @@ export function getCurrentTime() {
 	let currentDate = date.format("YYYY-MM-DD");
 	return currentDate;
 }
+
+export function formatDateDMY(date){
+	return moment(date).format("DD-MM-YYYY");
+}

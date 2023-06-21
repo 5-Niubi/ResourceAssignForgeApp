@@ -12,25 +12,31 @@ import Modal, { ModalTransition } from "@atlaskit/modal-dialog";
 import CreateProjectModal from "./modal/CreateProjectModal";
 import { invoke } from "@forge/bridge";
 
+const width = MODAL_WIDTH.M;
+
 function ProjectListHome() {
 	const columns = 10;
-	const width = MODAL_WIDTH.M;
-
 	const [isOpen, setIsOpen] = useState(false);
+
 	const isDesktopOrLaptop = useMediaQuery({
 		query: `(min-width: ${MEDIA_QUERY.DESKTOP_LAPTOP.MIN}px)`,
 	});
 
 	const [searchBoxValue, setSearchBoxValue] = useState("");
 	const [searchParams, setSearchParams] = useSearchParams();
-	const [page, setPage] = useState(searchParams.get("page") ? searchParams.get("page") : 1);
+	const [page, setPage] = useState(
+		searchParams.get("page") ? searchParams.get("page") : 1
+	);
 
 	const [projects, setProjects] = useState([]);
 	const [pageNumberList, setPageNumberList] = useState([]);
 
-	// useEffect(function (){
-	// 	setPage(searchParams.get("page"));
-	// }, []);
+	const openModal = useCallback(
+		function () {
+			setIsOpen(true);
+		},
+		[setIsOpen]
+	);
 
 	useEffect(
 		function () {
@@ -72,19 +78,6 @@ function ProjectListHome() {
 		setSearchBoxValue(e.target.value);
 	}
 
-	const closeModal = useCallback(
-		function () {
-			setIsOpen(false);
-		},
-		[setIsOpen]
-	);
-	const openModal = useCallback(
-		function () {
-			setIsOpen(true);
-		},
-		[setIsOpen]
-	);
-
 	return (
 		<>
 			<Grid layout="fluid" spacing="comfortable" columns={columns}>
@@ -119,15 +112,7 @@ function ProjectListHome() {
 				</Desktop>
 			</Grid>
 
-			{
-				<ModalTransition>
-					{isOpen && (
-						<Modal onClose={closeModal} width={width}>
-							<CreateProjectModal />
-						</Modal>
-					)}
-				</ModalTransition>
-			}
+			{<CreateProjectModal isOpen={isOpen} setIsOpen={setIsOpen}/>}
 		</>
 	);
 }
