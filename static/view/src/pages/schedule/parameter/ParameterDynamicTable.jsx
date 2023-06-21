@@ -4,7 +4,7 @@ import { token } from "@atlaskit/tokens";
 
 import DynamicTable from "@atlaskit/dynamic-table";
 
-import { head, rows } from "./table-content/sample-data";
+import { head, rows } from "./table-content-estimate-resources/sample-data";
 
 const wrapperStyles = css({
 	position: "relative",
