@@ -19,7 +19,17 @@ async function createProject(projectRequest) {
 	}
 }
 
+async function getProjectDetail(projectId){
+	try {
+		let response = await APIServices.get(`/api/Projects/GetProject`, {projectId});
+		return response;
+	} catch (error) {
+		return Promise.reject(error);
+	}
+}
+
 export {
 	getProjects,
-	createProject
+	createProject,
+	getProjectDetail
 };

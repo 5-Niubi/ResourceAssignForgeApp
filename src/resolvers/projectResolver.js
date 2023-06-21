@@ -23,6 +23,16 @@ function projectResolver(resolver) {
 			return Promise.reject(error);
 		}
 	});
+
+	resolver.define("getProjectDetail", async function (req) {
+		try {
+			let response = await projectService.getProjectDetail(req.payload.projectId);
+			console.log(response);
+		} catch (error) {
+			console.log("Error in createNewProjectProjectLists: ", error);
+			return Promise.reject(error);
+		}
+	});
 }
 
 export default projectResolver;

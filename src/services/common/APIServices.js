@@ -23,7 +23,7 @@ class APIServices {
 			let response = await API.fetch(fetchUrl.toString(), {
 				method: "GET",
 				headers: {
-					Authorization: `Bearer ${await storage.getSecret(STORAGE.TOKEN)}`,
+					Authorization: `Bearer ${await storage.getSecret(STORAGE.TOKEN)}`
 				},
 			});
 			switch (response.status) {
@@ -58,7 +58,7 @@ class APIServices {
 				headers: {
 					Authorization: `Bearer ${await storage.getSecret(STORAGE.TOKEN)}`,
 				},
-				body: JSON.stringify(data),
+				body:JSON.stringify(data),
 			});
 			switch (response.status) {
 				case HttpStatus.OK.code:
