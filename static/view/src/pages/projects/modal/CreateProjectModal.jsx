@@ -13,6 +13,7 @@ import Form, { Field, FormSection } from "@atlaskit/form";
 import { DatePicker } from "@atlaskit/datetime-picker";
 import ObjectiveRange from "../form/ObjectiveRange";
 import { getCurrentTime } from "../../../common/utils";
+import { invoke } from "@forge/bridge";
 
 function CreateProjectModal() {
 	const columns = 10;
@@ -70,6 +71,20 @@ function CreateProjectModal() {
 	const handleRangeSetObjQuality = useCallback(function (value) {
 		setObjQuality(value);
 	}, []);
+
+	function handleSubmitCreate() {
+		let projectObjRequest = {
+			name: projectName,
+			startDate,
+			deadline: endDate,
+			budget,
+			budgetUnit: unit,
+			objectiveTime: objTime,
+			objectiveCost: objCost,
+			objectiveQuality: objQuality
+		}
+		invoke("createNewProjectProjectLists", {projectObjRequest}).then().catch();
+	}
 
 	return (
 		<Fragment>
@@ -187,7 +202,11 @@ function CreateProjectModal() {
 								<Button appearance="default" onClick={onClose}>
 									Cancel
 								</Button>
-								<Button type="submit" appearance="primary" autoFocus>
+								<Button
+									type="submit"
+									appearance="primary"								
+									onClick={handleSubmitCreate}
+								>
 									Create
 								</Button>
 							</ButtonGroup>

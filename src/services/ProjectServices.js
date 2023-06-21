@@ -10,6 +10,16 @@ async function getProjects(page) {
 	}
 }
 
+async function createProject(projectRequest) {
+	try {
+		let response = await APIServices.post(`/api/Projects/CreateProject`, null, projectRequest);
+		return response;
+	} catch (error) {
+		return Promise.reject(error);
+	}
+}
+
 export {
 	getProjects,
+	createProject
 };

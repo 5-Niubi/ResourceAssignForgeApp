@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useCallback, useEffect, useState } from "react";
 import ProjecstListHomePageHeader from "./page-header/ProjectsListHomePageHeader";
 import ProjectsListHomeTable from "./table/ProjectsListHomeTable";
@@ -27,10 +28,10 @@ function ProjectListHome() {
 		function () {
 			invoke("getProjectsList", { page })
 				.then(function (res) {
-					let projectsList = [];
-					let itemProject = {};
+					let projectsList = [];				
 					handlePaging(res.total);
 					for (let project of res.values) {
+						let itemProject = {};
 						itemProject.id = project.id;
 						itemProject.content = {
 							no: 1,
@@ -44,7 +45,10 @@ function ProjectListHome() {
 					// @ts-ignore
 					setProjects(projectsList);
 				})
-				.catch();
+				.catch(function(error){
+					debugger
+					console.log(error);
+				});
 		},
 		[page]
 	);
