@@ -4,13 +4,10 @@ import { invoke, router, view } from "@forge/bridge";
 import { Route, Router, Routes } from "react-router";
 import ProjectFromNetPage from "./pages/ProjectFromNetPage";
 
-import PertChart from "./pages/schedule/pertchart/PertChart";
-
 import { LeftSidebar, Main, PageLayout, Content } from "@atlaskit/page-layout";
 import HomeSideBar from "./components/side-nav/HomeSideBar";
 import ProjectListHome from "./pages/projects/ProjectsListHome";
 import AppFrame from "./components/common/AppFrame";
-import VisualizeTasksPage from "./pages/schedule/pertchart/VisualizeTasks";
 import SchedulePage from "./pages/schedule";
 import ResourcesPage from "./pages/resources";
 import ProjectSideBar from "./components/side-nav/ProjectSideBar";

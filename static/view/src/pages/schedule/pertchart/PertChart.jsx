@@ -3,8 +3,9 @@ import * as go from "gojs";
 import "gojs/extensions/DrawCommandHandler";
 import "gojs/extensions/Figures";
 import "gojs/extensions/GeometryReshapingTool";
+import { duration } from "moment";
 
-const PertChart = ({updateCurrentTask}) => {
+const PertChart = ({ updateCurrentTask }) => {
 	const diagramRef = useRef(null);
 
 	// colors used, named for easier identification
@@ -39,9 +40,12 @@ const PertChart = ({updateCurrentTask}) => {
 		return $(
 			go.Node,
 			"Auto",
+			{
+				desiredSize: new go.Size(150, NaN),
+			}, // on Panel
 			$(
 				go.Shape,
-				"Rectangle", // the border
+				"RoundedRectangle",
 				{ fill: "white", strokeWidth: 2 },
 				new go.Binding("fill", "critical", (b) =>
 					b ? pinkfill : bluefill
@@ -51,47 +55,46 @@ const PertChart = ({updateCurrentTask}) => {
 			$(
 				go.Panel,
 				"Table",
-				{ padding: 0.5 },
+				{
+					padding: 0.5,
+					desiredSize: new go.Size(150, NaN),
+				},
 				$(go.RowColumnDefinition, {
-					column: 1,
+					row: 0,
 					separatorStroke: "black",
 				}),
 				$(go.RowColumnDefinition, {
 					row: 1,
 					separatorStroke: "black",
 					background: "white",
-					coversSeparators: true,
 				}),
-				$(go.RowColumnDefinition, {
-					row: 2,
-					separatorStroke: "black",
-				}),
-				$(
-                    go.TextBlock, 
-                    new go.Binding("text", "duration"), {
+				$(go.TextBlock, {
 					row: 0,
-					column: 1,
+					column: 0,
 					margin: 5,
 					textAlign: "center",
-				}),
+				},
+				new go.Binding("text", "duration", (duration) => "Duration: "+ duration)),
 
-				$(
-                    go.TextBlock, 
-                    new go.Binding("text", "name"), {
+				$(go.TextBlock, new go.Binding("text", "name"), {
 					row: 1,
 					column: 0,
-					columnSpan: 3,
 					margin: 5,
 					textAlign: "center",
-					font: "bold 14px sans-serif",
+					font: "bold 14px sans-serif", 
+					maxSize: new go.Size(150, NaN), // Maximum width for truncation
+					overflow: go.TextBlock.OverflowEllipsis, // Truncate overflowing text
+					maxLines: 1, // Restrict to a single line
 				})
 			), // end Table Panel
 			{
-				click: (e, obj) => {updateCurrentTask(obj.part.data);},
+				click: (e, obj) => {
+					updateCurrentTask(obj.part.data);
+				},
 				// selectionChanged: (part) => {
 				// 	// var shape = part.elt(0);
 				// 	// shape.stroke = part.isSelected ? "blue" : (part.data.critical ? pink : blue);
-                //     updateCurrentTask(part.data);
+				//     updateCurrentTask(part.data);
 				// },
 			}
 		);
