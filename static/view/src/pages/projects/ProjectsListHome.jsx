@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React, { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import ProjecstListHomePageHeader from "./page-header/ProjectsListHomePageHeader";
 import ProjectsListHomeTable from "./table/ProjectsListHomeTable";
 import Pagination from "@atlaskit/pagination";
@@ -20,15 +21,22 @@ function ProjectListHome() {
 		query: `(min-width: ${MEDIA_QUERY.DESKTOP_LAPTOP.MIN}px)`,
 	});
 
-	const [page, setPage] = useState(1);
+	const [searchBoxValue, setSearchBoxValue] = useState("");
+	const [searchParams, setSearchParams] = useSearchParams();
+	const [page, setPage] = useState(searchParams.get("page") ? searchParams.get("page") : 1);
+
 	const [projects, setProjects] = useState([]);
 	const [pageNumberList, setPageNumberList] = useState([]);
+
+	// useEffect(function (){
+	// 	setPage(searchParams.get("page"));
+	// }, []);
 
 	useEffect(
 		function () {
 			invoke("getProjectsList", { page })
 				.then(function (res) {
-					let projectsList = [];				
+					let projectsList = [];
 					handlePaging(res.total);
 					for (let project of res.values) {
 						let itemProject = {};
@@ -42,23 +50,26 @@ function ProjectListHome() {
 						itemProject.hasChildren = false;
 						projectsList.push(itemProject);
 					}
-					// @ts-ignore
 					setProjects(projectsList);
 				})
-				.catch(function(error){
-					debugger
+				.catch(function (error) {
 					console.log(error);
 				});
+			return setProjects([]);
 		},
 		[page]
 	);
 
-	function handlePaging(total) {
-		let _pageNumberList = [];
+	const handlePaging = useCallback(function (total) {
 		for (let i = 1; i <= total; i++) {
-			_pageNumberList.push(i);
+			pageNumberList.push(i);
 		}
-		setPageNumberList(_pageNumberList);
+		pageNumberList;
+		setPageNumberList((prev) => [...prev]);
+	}, []);
+
+	function handleOnSearchBoxChange(e) {
+		setSearchBoxValue(e.target.value);
 	}
 
 	const closeModal = useCallback(
@@ -78,7 +89,11 @@ function ProjectListHome() {
 		<>
 			<Grid layout="fluid" spacing="comfortable" columns={columns}>
 				<GridColumn medium={columns}>
-					<ProjecstListHomePageHeader createProjectButtonOnClick={openModal} />
+					<ProjecstListHomePageHeader
+						createProjectButtonOnClick={openModal}
+						searchBoxValue={searchBoxValue}
+						onSearchBoxChange={handleOnSearchBoxChange}
+					/>
 				</GridColumn>
 				<GridColumn medium={isDesktopOrLaptop ? 7 : columns}>
 					<div style={{ marginBottom: "1rem" }}>
@@ -93,16 +108,14 @@ function ProjectListHome() {
 							previousLabel="Previous"
 							selectedIndex={page - 1}
 							onChange={(e, p) => {
+								setSearchParams({ page: p });
 								setPage(p);
-								setProjects([]);
 							}}
 						/>
 					</div>
 				</GridColumn>
 				<Desktop>
-					<GridColumn medium={3}>
-						<div>Hover panel</div>
-					</GridColumn>
+					<GridColumn medium={3}>{/* <div>Hover panel</div> */}</GridColumn>
 				</Desktop>
 			</Grid>
 

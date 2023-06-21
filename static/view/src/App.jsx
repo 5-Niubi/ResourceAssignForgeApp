@@ -9,6 +9,7 @@ import AppFrame from "./components/common/AppFrame";
 import SchedulePage from "./pages/schedule";
 import ResourcesPage from "./pages/resources";
 import ProjectSideBar from "./components/side-nav/ProjectSideBar";
+import Spinner from "@atlaskit/spinner";
 
 function App() {
 	// Enable auto change theme Dark/light mode within Jira
@@ -132,7 +133,7 @@ function App() {
 					</Main>
 				</Content>
 			) : (
-				"Loading..."
+				<Spinner interactionName="load" />
 			)}
 		</PageLayout>
 	);
