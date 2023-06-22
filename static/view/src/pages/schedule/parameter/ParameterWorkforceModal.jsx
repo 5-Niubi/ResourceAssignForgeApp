@@ -1,5 +1,4 @@
 import { useCallback, useState, Fragment } from "react";
-
 import { css, jsx } from "@emotion/react";
 import DynamicTable from "@atlaskit/dynamic-table";
 import Button, { ButtonGroup } from "@atlaskit/button";
@@ -8,7 +7,7 @@ import StarFilledIcon from "@atlaskit/icon/glyph/star-filled";
 import TrashIcon from "@atlaskit/icon/glyph/trash";
 import EditIcon from "@atlaskit/icon/glyph/edit";
 import StarIcon from "@atlaskit/icon/glyph/star";
-import InfoIcon from '@atlaskit/icon/glyph/info';
+import InfoIcon from "@atlaskit/icon/glyph/info";
 import Modal, {
 	ModalBody,
 	ModalFooter,
@@ -257,8 +256,12 @@ export function ParameterCreareWorkforceModal() {
 										/>
 										{!error && (
 											<HelperMessage>
-                                                <InfoIcon size="small" content=""></InfoIcon> 
-                                                Click add circle button in order to add skills into table
+												<InfoIcon
+													size="small"
+													content=""
+												></InfoIcon>
+												Click add circle button in order
+												to add skills into table
 											</HelperMessage>
 										)}
 										{error && (
@@ -357,7 +360,7 @@ export function ParameterSkillsTable() {
 
 	return (
 		<>
-			<DynamicTable head={head} rows={rows}/>
+			<DynamicTable head={head} rows={rows} />
 		</>
 	);
 }
@@ -394,6 +397,22 @@ export function ParameterSelectWorkforcesTable() {
 
 	return (
 		<>
+			<div style={{ display: "flex" }}>
+				<div style={{ flex: "0 0 300px" }}>
+					<TextField
+						isCompact
+						placeholder="Search Workforce Name"
+						aria-label="Filter"
+					/>
+				</div>
+				<div
+					style={{
+						flex: "0 0 300px",
+					}}
+				>
+					<Button appearance="primary">Create new</Button>
+                </div>
+			</div>
 			<DynamicTable
 				shouldScrollInViewport
 				head={head}
