@@ -1,10 +1,14 @@
 import { useCallback, useState, Fragment } from "react";
 
 import { css, jsx } from "@emotion/react";
-import TrashIcon from "@atlaskit/icon/glyph/trash";
-import EditIcon from "@atlaskit/icon/glyph/edit";
+import DynamicTable from "@atlaskit/dynamic-table";
 import Button, { ButtonGroup } from "@atlaskit/button";
 import AddCircleIcon from "@atlaskit/icon/glyph/add-circle";
+import StarFilledIcon from "@atlaskit/icon/glyph/star-filled";
+import TrashIcon from "@atlaskit/icon/glyph/trash";
+import EditIcon from "@atlaskit/icon/glyph/edit";
+import StarIcon from "@atlaskit/icon/glyph/star";
+import InfoIcon from '@atlaskit/icon/glyph/info';
 import Modal, {
 	ModalBody,
 	ModalFooter,
@@ -27,6 +31,8 @@ import Form, {
 	RequiredAsterisk,
 	ValidMessage,
 } from "@atlaskit/form";
+import { workforces } from "../../resources/workforces/table-content/workforces";
+import AddCircle from "@atlaskit/icon/glyph/add-circle";
 
 const boldStyles = css({
 	fontWeight: "bold",
@@ -66,7 +72,7 @@ export default function ParameterWorkforceModal() {
 							<ModalTitle>Add new workforce</ModalTitle>
 						</ModalHeader>
 						<ModalBody>
-							<CreareWorkforceModal></CreareWorkforceModal>
+							<ParameterCreareWorkforceModal></ParameterCreareWorkforceModal>
 						</ModalBody>
 						<ModalFooter>
 							<Button
@@ -81,7 +87,7 @@ export default function ParameterWorkforceModal() {
 								onClick={closeCWModal}
 								autoFocus
 							>
-								Confirm
+								Create
 							</Button>
 						</ModalFooter>
 					</Modal>
@@ -99,7 +105,9 @@ export default function ParameterWorkforceModal() {
 						<ModalHeader>
 							<ModalTitle>Select Workforce</ModalTitle>
 						</ModalHeader>
-						<ModalBody>This is a select table</ModalBody>
+						<ModalBody>
+							<ParameterSelectWorkforcesTable></ParameterSelectWorkforcesTable>
+						</ModalBody>
 						<ModalFooter>
 							<Button
 								appearance="subtle"
@@ -123,7 +131,16 @@ export default function ParameterWorkforceModal() {
 	);
 }
 
-export function CreareWorkforceModal() {
+export function ParameterCreareWorkforceModal() {
+	const buttonAddSkills = (
+		<>
+			<Button
+				iconBefore={<AddCircle label="" size="medium" />}
+				appearance="subtle"
+				// onClick={openModal}
+			></Button>
+		</>
+	);
 	return (
 		<>
 			<div
@@ -162,12 +179,10 @@ export function CreareWorkforceModal() {
 										<TextField
 											autoComplete="off"
 											{...fieldProps}
+											placeholder="You can use letters and numbers."
 										/>
 										{!error && (
-											<HelperMessage>
-												You can use letters, numbers,
-												and periods.
-											</HelperMessage>
+											<HelperMessage></HelperMessage>
 										)}
 										{error && (
 											<ErrorMessage>
@@ -189,12 +204,10 @@ export function CreareWorkforceModal() {
 										<TextField
 											autoComplete="off"
 											{...fieldProps}
+											placeholder="You can use letters and numbers."
 										/>
 										{!error && (
-											<HelperMessage>
-												You can use letters, numbers,
-												and periods.
-											</HelperMessage>
+											<HelperMessage></HelperMessage>
 										)}
 										{error && (
 											<ErrorMessage>
@@ -205,7 +218,7 @@ export function CreareWorkforceModal() {
 									</Fragment>
 								)}
 							</Field>
-                            <Field
+							<Field
 								name="salary"
 								label="Salary (Hour)"
 								isRequired
@@ -216,11 +229,10 @@ export function CreareWorkforceModal() {
 										<TextField
 											autoComplete="off"
 											{...fieldProps}
+											placeholder="Number only"
 										/>
 										{!error && (
-											<HelperMessage>
-												Number only.
-											</HelperMessage>
+											<HelperMessage></HelperMessage>
 										)}
 										{error && (
 											<ErrorMessage>
@@ -240,11 +252,13 @@ export function CreareWorkforceModal() {
 									<Fragment>
 										<TextField
 											autoComplete="off"
+											elemAfterInput={buttonAddSkills}
 											{...fieldProps}
 										/>
 										{!error && (
 											<HelperMessage>
-												Number only.
+                                                <InfoIcon size="small" content=""></InfoIcon> 
+                                                Click add circle button in order to add skills into table
 											</HelperMessage>
 										)}
 										{error && (
@@ -255,14 +269,10 @@ export function CreareWorkforceModal() {
 									</Fragment>
 								)}
 							</Field>
-
+							<ParameterSkillsTable></ParameterSkillsTable>
 							<FormFooter>
-								<ButtonGroup>
-									<Button
-										appearance="subtle"
-									>
-										Cancel
-									</Button>
+								{/* <ButtonGroup>
+									<Button appearance="subtle">Cancel</Button>
 									<LoadingButton
 										type="submit"
 										appearance="primary"
@@ -270,12 +280,126 @@ export function CreareWorkforceModal() {
 									>
 										Create
 									</LoadingButton>
-								</ButtonGroup>
+								</ButtonGroup> */}
 							</FormFooter>
 						</form>
 					)}
 				</Form>
 			</div>
+		</>
+	);
+}
+
+export function ParameterSkillsTable() {
+	const head = {
+		cells: [
+			{
+				key: "skills",
+				content: "Skills",
+				width: 30,
+			},
+			{
+				key: "star",
+				content: "Star",
+				width: 60,
+			},
+			{
+				key: "action",
+				content: "Actions",
+				width: 10,
+			},
+		],
+	};
+
+	const rows = [
+		["SQL", "d"],
+		["JAVA", "c"],
+		["C#", "a"],
+		["Unity", "b"],
+	].map(([number, letter]) => ({
+		key: number.toString(),
+		cells: [
+			{
+				key: number,
+				content: number,
+			},
+			{
+				key: letter,
+				content: (
+					<>
+						<StarFilledIcon></StarFilledIcon>
+						<StarFilledIcon></StarFilledIcon>
+						<StarFilledIcon></StarFilledIcon>
+						<StarFilledIcon></StarFilledIcon>
+						<StarIcon></StarIcon>
+					</>
+				),
+			},
+			{
+				key: "actions",
+				content: (
+					<>
+						<Button
+							iconBefore={<EditIcon label="" size="medium" />}
+							appearance="subtle"
+							// onClick={openModal}
+						></Button>
+						<Button
+							iconBefore={<TrashIcon label="" size="medium" />}
+							appearance="subtle"
+							// onClick={openModal}
+						></Button>
+					</>
+				),
+			},
+		],
+	}));
+
+	return (
+		<>
+			<DynamicTable head={head} rows={rows}/>
+		</>
+	);
+}
+
+export function ParameterSelectWorkforcesTable() {
+	const head = {
+		cells: [
+			{
+				key: "no",
+				content: "No",
+				width: 10,
+			},
+			{
+				key: "name",
+				content: "Name",
+				width: 90,
+			},
+		],
+	};
+
+	const rows = workforces?.map((workforce) => ({
+		key: name,
+		cells: [
+			{
+				key: "no",
+				content: <Checkbox></Checkbox>,
+			},
+			{
+				key: "name",
+				content: workforce.name,
+			},
+		],
+	}));
+
+	return (
+		<>
+			<DynamicTable
+				shouldScrollInViewport
+				head={head}
+				rows={rows}
+				isFixedSize
+			/>
 		</>
 	);
 }
