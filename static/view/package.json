@@ -26,26 +26,27 @@
     "@atlaskit/section-message": "^6.4.5",
     "@atlaskit/select": "^16.5.3",
     "@atlaskit/side-navigation": "^1.8.6",
+    "@atlaskit/spinner": "^15.5.2",
     "@atlaskit/table-tree": "^9.5.0",
     "@atlaskit/tabs": "^13.4.2",
     "@atlaskit/textarea": "^4.7.1",
     "@atlaskit/textfield": "^5.5.1",
     "@atlaskit/tokens": "^1.5.2",
-    "@forge/bridge": "2.6.0",
+    "@forge/bridge": "^2.6.0",
     "@forge/ui": "^1.9.0",
     "buffer": "^6.0.3",
     "eslint-plugin-no-inline-styles": "^1.0.5",
-    "moment": "^2.29.4",
     "gojs": "^2.3.8",
+    "moment": "^2.29.4",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-gojs": "^4.9.0",
     "react-responsive": "^9.0.2",
-    "react-router": "^6.12.1"
+    "react-router": "^6.12.1",
+    "react-router-dom": "^6.13.0"
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "eslint": "^8.43.0",
     "react-scripts": "^5.0.1"
   },
   "scripts": {
