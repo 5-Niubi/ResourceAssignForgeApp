@@ -1,16 +1,15 @@
 // @ts-nocheck
 import React, { useEffect, useState } from "react";
 import { invoke, router, view } from "@forge/bridge";
-import HomePage from "./pages/HomePage";
-import BasicExample from "./components/Nav";
-import { Route, Router, Routes, useNavigate } from "react-router";
-import ProjectFromNetPage from "./pages/ProjectFromNetPage";
-
-import {
-	LeftSidebarWithoutResize,
-	Main,
-	PageLayout,
-} from "@atlaskit/page-layout";
+import { Route, Router, Routes } from "react-router";
+import { LeftSidebar, Main, PageLayout, Content } from "@atlaskit/page-layout";
+import HomeSideBar from "./components/side-nav/HomeSideBar";
+import ProjectListHome from "./pages/projects/ProjectsListHome";
+import AppFrame from "./components/common/AppFrame";
+import SchedulePage from "./pages/schedule";
+import ResourcesPage from "./pages/resources";
+import ProjectSideBar from "./components/side-nav/ProjectSideBar";
+import Spinner from "@atlaskit/spinner";
 
 function App() {
 	// Enable auto change theme Dark/light mode within Jira
@@ -36,15 +35,16 @@ function App() {
 	}, []);
 
 	// // Set this app context to storage
-	// useEffect(() => {
-	//   invoke("setContextToGlobal").then().catch();
-	// }, []);
+	useEffect(() => {
+		invoke("setContextToGlobal").then().catch();
+	}, []);
 
 	// --- Config React Router ---
-	useEffect(() => {
+	useEffect(() => {	
 		view.createHistory().then((newHistory) => {
 			setHistory(newHistory);
 		});
+		
 	}, []);
 
 	useEffect(() => {
@@ -68,48 +68,11 @@ function App() {
 	}, [history]);
 	// --- / ---
 
-	// return (
-	//   <div>
-	//     {history && historyState ? (
-	//       <Router
-	//         navigator={history}
-	//         navigationType={historyState.action}
-	//         location={historyState.location}
-	//       >
-	//         <Routes>
-	//           <Route path="/" element={<BasicExample />}></Route>
-	//           <Route path="/projects" element={<ProjectFromNetPage />}></Route>
-	//         </Routes>
-	//       </Router>
-	//     ) : (
-	//       "Loading..."
-	//     )}
-	//   </div>
-	// );
-
 	return (
 		<PageLayout>
-			<LeftSidebarWithoutResize testId="leftSidebar" id="space-navigation">
-				{history && historyState ? (
-					<div style={{ height: "100vh" }}>
-						<Router
-							navigator={history}
-							navigationType={historyState.action}
-							location={historyState.location}
-						>
-							<Routes>
-								<Route path="/" element={<BasicExample />}></Route>
-							</Routes>
-						</Router>
-					</div>
-				) : (
-					"Loading..."
-				)}
-			</LeftSidebarWithoutResize>
-
-			{
-				<Main testId="main" id="main">
-					{history && historyState ? (
+			{history && historyState ? (
+				<Content>
+					<LeftSidebar>
 						<div style={{ height: "100vh" }}>
 							<Router
 								navigator={history}
@@ -117,15 +80,61 @@ function App() {
 								location={historyState.location}
 							>
 								<Routes>
-									<Route path="/" element={<HomePage />}></Route>
+									{/* Path with * take effect in all route after current */}
+									<Route path="/" element={<HomeSideBar rootPath="/" />}>
+										<Route
+											path="/projects"
+											element={<HomeSideBar rootPath="/" />}
+										></Route>
+										<Route
+											path="/resources"
+											element={<HomeSideBar rootPath="/" />}
+										></Route>
+										<Route
+											path="/settings"
+											element={<HomeSideBar rootPath="/" />}
+										></Route>
+									</Route>
+									<Route
+										path="/:project/*"
+										element={<ProjectSideBar rootPath="/:project/" />}
+									></Route>
 								</Routes>
 							</Router>
 						</div>
-					) : (
-						"Loading..."
-					)}
-				</Main>
-			}
+					</LeftSidebar>
+					<Main testId="main" id="main">
+						<AppFrame>
+							<Router
+								navigator={history}
+								navigationType={historyState.action}
+								location={historyState.location}
+							>
+								<Routes>
+									<Route path="/" element={<ProjectListHome />}></Route>
+									<Route path="/resources" element={<ResourcesPage />}></Route>
+									<Route path="/settings" element={<div>Settings</div>}></Route>
+
+									<Route path="/:project">
+										<Route path="" element={<SchedulePage />}></Route>
+										<Route path="schedule" element={<SchedulePage />}></Route>
+										<Route
+											path="tasks"
+											element={<div>Tasks Page of</div>}
+										></Route>
+										<Route
+											path="reports"
+											element={<div>Reporsts Page</div>}
+										></Route>
+									</Route>
+								</Routes>
+							</Router>
+						</AppFrame>
+					</Main>
+				</Content>
+			) : (
+				<Spinner interactionName="load" />
+			)}
 		</PageLayout>
 	);
 }

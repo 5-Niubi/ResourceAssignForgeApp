@@ -1,25 +1,38 @@
 import Resolver from "@forge/resolver";
-import ProjectServices from "../services/projectServices";
+import { projectService } from "../services";
 
 /**
  * @param {Resolver} resolver
  */
 function projectResolver(resolver) {
-  resolver.define("getProjectFromNet", async function (req) {
-    try {
-      return await ProjectServices.getProjectJiraThrowdNetServer();
-    } catch (error) {
-      console.log("Error in getProjectFromNet: ", error);
-    }
-  });
+	resolver.define("getProjectsList", async function (req) {
+		try {
+			return await projectService.getProjects(req.payload.page);
+		} catch (error) {
+			console.log("Error in getProjectsList: ", error);
+			return Promise.reject(error);
+		}
+	});
 
-  resolver.define("createProject", async function () {
-    try {
-        return await ProjectServices.createProjectJiraThrowdNetServer();
-      } catch (error) {
-        console.log("Error in createProject: ", error);
-      }
-  });
+	resolver.define("createNewProjectProjectLists", async function (req) {
+		try {
+			let response = await projectService.createProject(req.payload.projectObjRequest);
+			console.log(response);
+		} catch (error) {
+			console.log("Error in createNewProjectProjectLists: ", error);
+			return Promise.reject(error);
+		}
+	});
+
+	resolver.define("getProjectDetail", async function (req) {
+		try {
+			let response = await projectService.getProjectDetail(req.payload.projectId);
+			console.log(response);
+		} catch (error) {
+			console.log("Error in createNewProjectProjectLists: ", error);
+			return Promise.reject(error);
+		}
+	});
 }
 
 export default projectResolver;

@@ -10,6 +10,7 @@ function commonResolver(resolver) {
     "setContextToGlobal",
     async (/** @type {{ context: any; }} */ req) => {
       await storage.set(STORAGE.CONTEXT, req.context);
+      console.log(STORAGE.TOKEN, ": ", await storage.getSecret(STORAGE.TOKEN));
       return req.context;
     }
   );
@@ -17,7 +18,6 @@ function commonResolver(resolver) {
   resolver.define("getAuthenUrl", async function (req) {
     let authenUrl = await AuthenWithBE.generateOAuthURL(req.context);
     let isAuthenticated = await storage.get("isAuthenticated");
-    console.log(isAuthenticated);
     return Promise.resolve({
       isAuthenticated,
       authenUrl,
