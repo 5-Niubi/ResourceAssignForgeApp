@@ -9,14 +9,14 @@ import React, { useEffect, useState } from "react";
 function ProjectFromNetPage() {
 	const [project, setProject] = useState("");
 	useEffect(function () {
-		invoke("getProjectFromNet").then(function (res) {
+		invoke("getAllSkills", {}).then(function (res) {
 			setProject(JSON.stringify(res, null, 2));
 		});
 	}, []);
 
 	return (
 		<>
-			<h1>Project: </h1>
+			<h1>Skills: </h1>
 			<div>
 				<pre>{project ? project : "Loading..."}</pre>
 			</div>

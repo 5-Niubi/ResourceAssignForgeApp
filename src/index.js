@@ -1,11 +1,10 @@
 import Resolver from "@forge/resolver";
-import resolver from "./resolvers";
-
-const forgeResolver = new Resolver();
+import resolverReg from "./resolvers";
+const resolver = new Resolver();
 
 /**
  * Register Resolver
  */
-resolver(forgeResolver);
+resolverReg(resolver);
 
-export const handler = forgeResolver.getDefinitions();
+export const handler = resolver.getDefinitions();

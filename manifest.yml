@@ -1,29 +1,18 @@
 modules:
   jira:globalPage:
-    - key: resource-assign-demo-app
+    - key: resourceassigndemo-hello-world-page
       resource: main
       resolver:
         function: resolver
       title: ResourceAssignDemo
       layout: blank
-
-  # Khai báo các trigger theo các key event
-  trigger:
-    - key: provide-oauth-url
-      function: provide-oauth-function
-      events:
-        - avi:forge:upgraded:app
-
   # Khai báo webtrigger cho server callback lúc grant quyền
   webtrigger:
     - key: authen-app-web-trigger-key
       function: authen-trigger-function
-
   function:
     - key: resolver
       handler: index.handler
-    - key: provide-oauth-function
-      handler: trigger.provideOAuthUrlForUser
     - key: authen-trigger-function
       handler: trigger.authenBECallbackTrigger
 
@@ -34,10 +23,11 @@ resources:
       port: 3000
 app:
   # Replace app id here
-  id: ari:cloud:ecosystem::app/7b4bc712-696a-4789-a9cd-224d641c583a
+  id: ari:cloud:ecosystem::app/87284dfd-9947-4a51-a7bb-20a3c938db04
   #----#
   licensing:
     enabled: true
+
 permissions:
   external:
     fetch:
