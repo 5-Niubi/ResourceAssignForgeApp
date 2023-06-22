@@ -19,3 +19,7 @@ export const MODAL_WIDTH = {
   L: "large",
   M: "medium",
 };
+
+export const DATE_FORMAT = {
+  DMY : "DD/MM/YYYY",
+}
