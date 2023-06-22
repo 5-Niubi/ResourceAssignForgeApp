@@ -1,4 +1,4 @@
-import Button, { ButtonGroup, LoadingButton } from "@atlaskit/button";
+import Button, { ButtonGroup } from "@atlaskit/button";
 import Modal, {
 	ModalBody,
 	ModalFooter,
@@ -15,13 +15,11 @@ import { DatePicker } from "@atlaskit/datetime-picker";
 import ObjectiveRange from "../form/ObjectiveRange";
 import { getCurrentTime } from "../../../common/utils";
 import { invoke } from "@forge/bridge";
-import { DATE_FORMAT, MODAL_WIDTH } from "../../../common/contants";
+import { MODAL_WIDTH } from "../../../common/contants";
 
-const width = MODAL_WIDTH.M;
-function CreateProjectModal({isOpen, onClose, setIsOpen}) {
+function EditProjectModal({ project, isOpen, onClose }) {
+	const width = MODAL_WIDTH.M;
 	const columns = 10;
-
-	
 
 	const [projectName, setProjectName] = useState("");
 	const [startDate, setStartDate] = useState(getCurrentTime());
@@ -32,7 +30,19 @@ function CreateProjectModal({isOpen, onClose, setIsOpen}) {
 	const [objCost, setObjCost] = useState(50);
 	const [objQuality, setObjQuality] = useState(50);
 
-	const [isSubmitting, setIsSubmitting] = useState(false);
+	const loadProjectInfo = useEffect(
+		function () {
+			setProjectName(project.projectName);
+			setStartDate(project.startDate);
+
+			invoke("getProjectDetail", { projectId: project.projectId })
+				.then(function (res) {
+                    
+                })
+				.catch(function (error) {});
+		},
+		[project]
+	);
 
 	const handleSetProjectName = useCallback(function (e) {
 		setProjectName(e.target.value);
@@ -78,19 +88,7 @@ function CreateProjectModal({isOpen, onClose, setIsOpen}) {
 		setObjQuality(value);
 	}, []);
 
-	useEffect(function (){
-		setIsSubmitting(false)
-	}, []);
-
-	const closeModal = useCallback(
-		function () {
-			setIsOpen(false);
-		},
-		[setIsOpen]
-	);
-	
 	function handleSubmitCreate() {
-		setIsSubmitting(true);
 		let projectObjRequest = {
 			name: projectName,
 			startDate,
@@ -102,16 +100,14 @@ function CreateProjectModal({isOpen, onClose, setIsOpen}) {
 			objectiveQuality: objQuality,
 		};
 		invoke("createNewProjectProjectLists", { projectObjRequest })
-			.then(function (res){
-				closeModal();
-			})
+			.then()
 			.catch();
 	}
 
 	return (
 		<ModalTransition>
 			{isOpen && (
-				<Modal onClose={closeModal} width={width}>
+				<Modal onClose={onClose} width={width}>
 					<Form
 						onSubmit={(formState) => console.log("form submitted", formState)}
 					>
@@ -145,7 +141,6 @@ function CreateProjectModal({isOpen, onClose, setIsOpen}) {
 															<DatePicker
 																value={startDate}
 																onChange={handleSetStartDate}
-																dateFormat={DATE_FORMAT.DMY}
 															/>
 														</Fragment>
 													)}
@@ -157,7 +152,6 @@ function CreateProjectModal({isOpen, onClose, setIsOpen}) {
 																minDate={startDate}
 																value={endDate}
 																onChange={handleSetEndDate}
-																dateFormat={DATE_FORMAT.DMY}
 															/>
 														</Fragment>
 													)}
@@ -227,22 +221,16 @@ function CreateProjectModal({isOpen, onClose, setIsOpen}) {
 
 								<ModalFooter>
 									<ButtonGroup>
-										<Button appearance="default" onClick={closeModal}>
+										<Button appearance="default" onClick={onClose}>
 											Cancel
 										</Button>
-										{isSubmitting ? (
-											<LoadingButton appearance="primary" isLoading>
-												Loading button
-											</LoadingButton>
-										) : (
-											<Button
-												type="submit"
-												appearance="primary"
-												onClick={handleSubmitCreate}
-											>
-												Create
-											</Button>
-										)}
+										<Button
+											type="submit"
+											appearance="primary"
+											onClick={handleSubmitCreate}
+										>
+											Create
+										</Button>
 									</ButtonGroup>
 								</ModalFooter>
 							</form>
@@ -254,4 +242,4 @@ function CreateProjectModal({isOpen, onClose, setIsOpen}) {
 	);
 }
 
-export default CreateProjectModal;
+export default EditProjectModal;
