@@ -18,6 +18,7 @@ function projectResolver(resolver) {
 		try {
 			let response = await projectService.createProject(req.payload.projectObjRequest);
 			console.log(response);
+			return response;
 		} catch (error) {
 			console.log("Error in createNewProjectProjectLists: ", error);
 			return Promise.reject(error);
@@ -28,6 +29,7 @@ function projectResolver(resolver) {
 		try {
 			let response = await projectService.getProjectDetail(req.payload.projectId);
 			console.log(response);
+			return response;
 		} catch (error) {
 			console.log("Error in createNewProjectProjectLists: ", error);
 			return Promise.reject(error);
