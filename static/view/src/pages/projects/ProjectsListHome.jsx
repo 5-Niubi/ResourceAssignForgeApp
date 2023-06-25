@@ -1,4 +1,6 @@
+// @ts-nocheck
 import React, { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import ProjecstListHomePageHeader from "./page-header/ProjectsListHomePageHeader";
 import ProjectsListHomeTable from "./table/ProjectsListHomeTable";
 import Pagination from "@atlaskit/pagination";
@@ -10,57 +12,25 @@ import Modal, { ModalTransition } from "@atlaskit/modal-dialog";
 import CreateProjectModal from "./modal/CreateProjectModal";
 import { invoke } from "@forge/bridge";
 
+const width = MODAL_WIDTH.M;
+
 function ProjectListHome() {
 	const columns = 10;
-	const width = MODAL_WIDTH.M;
-
 	const [isOpen, setIsOpen] = useState(false);
+
 	const isDesktopOrLaptop = useMediaQuery({
 		query: `(min-width: ${MEDIA_QUERY.DESKTOP_LAPTOP.MIN}px)`,
 	});
 
-	const [page, setPage] = useState(1);
+	const [searchBoxValue, setSearchBoxValue] = useState("");
+	const [searchParams, setSearchParams] = useSearchParams();
+	const [page, setPage] = useState(
+		searchParams.get("page") ? searchParams.get("page") : 1
+	);
+
 	const [projects, setProjects] = useState([]);
 	const [pageNumberList, setPageNumberList] = useState([]);
 
-	useEffect(
-		function () {
-			invoke("getProjectsList", { page }).then(function (res) {
-				let projectsList = [];
-				let itemProject = {};
-				handlePaging(res.total);
-				for (let project of res.values) {
-					itemProject.id = project.id;
-					itemProject.content = {
-						no: 1,
-						projectName: project.name,
-						startDate: project.startDate,
-					};
-					itemProject.hasChildren = false;
-					projectsList.push(itemProject);
-				}
-				// @ts-ignore
-				setProjects(projectsList);
-			}).catch();
-		},
-		[page]
-	);
-	
-
-	function handlePaging(total) {
-		let _pageNumberList = [];
-		for (let i = 1; i <= total; i++) {
-			_pageNumberList.push(i);
-		}
-		setPageNumberList(_pageNumberList);
-	}
-
-	const closeModal = useCallback(
-		function () {
-			setIsOpen(false);
-		},
-		[setIsOpen]
-	);
 	const openModal = useCallback(
 		function () {
 			setIsOpen(true);
@@ -68,11 +38,55 @@ function ProjectListHome() {
 		[setIsOpen]
 	);
 
+	useEffect(
+		function () {
+			invoke("getProjectsList", { page })
+				.then(function (res) {
+					let projectsList = [];
+					handlePaging(res.total);
+					for (let project of res.values) {
+						let itemProject = {};
+						itemProject.id = project.id;
+						itemProject.content = {
+							no: 1,
+							projectId: project.id,
+							projectName: project.name,
+							startDate: project.startDate,
+						};
+						itemProject.hasChildren = false;
+						projectsList.push(itemProject);
+					}
+					setProjects(projectsList);
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
+			return setProjects([]);
+		},
+		[page]
+	);
+
+	const handlePaging = useCallback(function (total) {
+		for (let i = 1; i <= total; i++) {
+			pageNumberList.push(i);
+		}
+		pageNumberList;
+		setPageNumberList((prev) => [...prev]);
+	}, []);
+
+	function handleOnSearchBoxChange(e) {
+		setSearchBoxValue(e.target.value);
+	}
+
 	return (
 		<>
 			<Grid layout="fluid" spacing="comfortable" columns={columns}>
 				<GridColumn medium={columns}>
-					<ProjecstListHomePageHeader createProjectButtonOnClick={openModal} />
+					<ProjecstListHomePageHeader
+						createProjectButtonOnClick={openModal}
+						searchBoxValue={searchBoxValue}
+						onSearchBoxChange={handleOnSearchBoxChange}
+					/>
 				</GridColumn>
 				<GridColumn medium={isDesktopOrLaptop ? 7 : columns}>
 					<div style={{ marginBottom: "1rem" }}>
@@ -87,28 +101,18 @@ function ProjectListHome() {
 							previousLabel="Previous"
 							selectedIndex={page - 1}
 							onChange={(e, p) => {
+								setSearchParams({ page: p });
 								setPage(p);
-								setProjects([]);
 							}}
 						/>
 					</div>
 				</GridColumn>
 				<Desktop>
-					<GridColumn medium={3}>
-						<div>Hover panel</div>
-					</GridColumn>
+					<GridColumn medium={3}>{/* <div>Hover panel</div> */}</GridColumn>
 				</Desktop>
 			</Grid>
 
-			{
-				<ModalTransition>
-					{isOpen && (
-						<Modal onClose={closeModal} width={width}>
-							<CreateProjectModal />
-						</Modal>
-					)}
-				</ModalTransition>
-			}
+			{<CreateProjectModal isOpen={isOpen} setIsOpen={setIsOpen}/>}
 		</>
 	);
 }

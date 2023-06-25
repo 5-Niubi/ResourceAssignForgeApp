@@ -7,7 +7,7 @@ import { token } from "@atlaskit/tokens";
 import Heading from "@atlaskit/heading";
 import EditorSearchIcon from "@atlaskit/icon/glyph/editor/search";
 
-function ProjecstListHomePageHeader({createProjectButtonOnClick}) {
+function ProjecstListHomePageHeader({createProjectButtonOnClick, onSearchBoxChange, searchBoxValue, state}) {
   const actionsContent = (
     <ButtonGroup>
       <Button appearance="primary" onClick={createProjectButtonOnClick}>Create project</Button>
@@ -22,6 +22,8 @@ function ProjecstListHomePageHeader({createProjectButtonOnClick}) {
           placeholder="Filter by Project Name"
           aria-label="Filter"
           elemAfterInput={<EditorSearchIcon label="Search" />}
+          onChange={onSearchBoxChange}
+          value={searchBoxValue}
         />
       </div>
       <div style={{ flex: "0 0 200px", marginLeft: token("space.100", "8px") }}>
@@ -29,6 +31,17 @@ function ProjecstListHomePageHeader({createProjectButtonOnClick}) {
           spacing="compact"
           placeholder="Sorted by"
           aria-label="Choose an option"
+          options={[
+            { label: 'Adelaide', value: 'adelaide' },
+            { label: 'Brisbane', value: 'brisbane' },
+            { label: 'Canberra', value: 'canberra' },
+            { label: 'Darwin', value: 'darwin' },
+            { label: 'Hobart', value: 'hobart' },
+            { label: 'Melbourne', value: 'melbourne' },
+            { label: 'Perth', value: 'perth' },
+            { label: 'Sydney', value: 'sydney' },
+          ]}
+          
         />
       </div>
     </div>

@@ -8,27 +8,32 @@ import AuthenWithBE from "../authens/AuthenWithBE";
  */
 class APIServices {
 	DOMAIN = BACKEND_dNET_DOMAIN;
-
+	
 	/**
 	 * @param {string} url
 	 */
-	async get(url, params = {}) {
+	async get(url, params) {
 		try {
 			let fetchUrl = new URL(`${this.DOMAIN}${url}`);
-
-			Object.keys(params).forEach((key) =>
-				fetchUrl.searchParams.append(key, params[key])
-			);
+			if (params) {
+				Object.keys(params).forEach((key) =>
+					fetchUrl.searchParams.append(key, params[key])
+				);
+			}
 			let response = await API.fetch(fetchUrl.toString(), {
 				method: "GET",
 				headers: {
-					Authorization: `Bearer ${await storage.getSecret(STORAGE.TOKEN)}`,
+					Authorization: `Bearer ${await storage.getSecret(STORAGE.TOKEN)}`
 				},
 			});
-			if (response.ok) {
-				return await response.json();
-			} else if (response.status === HttpStatus.UNAUTHORIZED.code) {
-				AuthenWithBE.handleUnauthorizedStatus();
+			switch (response.status) {
+				case HttpStatus.OK.code:
+					return await response.json();
+				case HttpStatus.UNAUTHORIZED.code:
+					AuthenWithBE.handleUnauthorizedStatus();
+					break;
+				case HttpStatus.BAD_REQUEST.code:
+					return Promise.reject(await response.json());
 			}
 			return Promise.reject(response);
 		} catch (err) {
@@ -40,25 +45,29 @@ class APIServices {
 	 * @param {string} url
 	 * @param {Object} data
 	 */
-	async post(url, params = {}, data = {}) {
+	async post(url, params, data) {
 		try {
 			let fetchUrl = new URL(`${this.DOMAIN}${url}`);
-
-			Object.keys(params).forEach((key) =>
-				fetchUrl.searchParams.append(key, params[key])
-			);
-
+			if (params) {
+				Object.keys(params).forEach((key) =>
+					fetchUrl.searchParams.append(key, params[key])
+				);
+			}
 			let response = await API.fetch(fetchUrl.toString(), {
 				method: "POST",
 				headers: {
 					Authorization: `Bearer ${await storage.getSecret(STORAGE.TOKEN)}`,
 				},
-				body: JSON.stringify(data),
+				body:JSON.stringify(data),
 			});
-			if (response.ok) {
-				return await response.json();
-			} else if (response.status === HttpStatus.UNAUTHORIZED.code) {
-				AuthenWithBE.handleUnauthorizedStatus();
+			switch (response.status) {
+				case HttpStatus.OK.code:
+					return await response.json();
+				case HttpStatus.UNAUTHORIZED.code:
+					AuthenWithBE.handleUnauthorizedStatus();
+					break;
+				case HttpStatus.BAD_REQUEST.code:
+					return Promise.reject(await response.json());
 			}
 			return Promise.reject(response);
 		} catch (err) {
@@ -70,13 +79,14 @@ class APIServices {
 	 * @param {{}} params
 	 * @param {{}} data
 	 */
-	async put(url, params = {}, data = {}) {
+	async put(url, params, data) {
 		try {
 			let fetchUrl = new URL(`${this.DOMAIN}${url}`);
-
-			Object.keys(params).forEach((key) =>
-				fetchUrl.searchParams.append(key, params[key])
-			);
+			if (params) {
+				Object.keys(params).forEach((key) =>
+					fetchUrl.searchParams.append(key, params[key])
+				);
+			}
 			let response = await API.fetch(fetchUrl.toString(), {
 				method: "PUT",
 				headers: {
@@ -84,12 +94,15 @@ class APIServices {
 				},
 				body: JSON.stringify(data),
 			});
-			if (response.ok) {
-				return await response.json();
-			} else if (response.status === HttpStatus.UNAUTHORIZED.code) {
-				AuthenWithBE.handleUnauthorizedStatus();
+			switch (response.status) {
+				case HttpStatus.OK.code:
+					return await response.json();
+				case HttpStatus.UNAUTHORIZED.code:
+					AuthenWithBE.handleUnauthorizedStatus();
+					break;
+				case HttpStatus.BAD_REQUEST.code:
+					return Promise.reject(await response.json());
 			}
-			return Promise.reject(response);
 		} catch (err) {
 			return Promise.reject(err);
 		}
@@ -98,14 +111,14 @@ class APIServices {
 	/**
 	 * @param {string} url
 	 */
-	async delete(url, params = {}) {
+	async delete(url, params) {
 		try {
 			let fetchUrl = new URL(`${this.DOMAIN}${url}`);
-
-			Object.keys(params).forEach((key) =>
-				fetchUrl.searchParams.append(key, params[key])
-			);
-
+			if (params) {
+				Object.keys(params).forEach((key) =>
+					fetchUrl.searchParams.append(key, params[key])
+				);
+			}
 			console.log("TOKEN: ", await storage.getSecret(STORAGE.TOKEN));
 			let response = await API.fetch(fetchUrl.toString(), {
 				method: "DELETE",
@@ -113,12 +126,15 @@ class APIServices {
 					Authorization: `Bearer ${await storage.getSecret(STORAGE.TOKEN)}`,
 				},
 			});
-			if (response.ok) {
-				return await response.json();
-			} else if (response.status === HttpStatus.UNAUTHORIZED.code) {
-				AuthenWithBE.handleUnauthorizedStatus();
+			switch (response.status) {
+				case HttpStatus.OK.code:
+					return await response.json();
+				case HttpStatus.UNAUTHORIZED.code:
+					AuthenWithBE.handleUnauthorizedStatus();
+					break;
+				case HttpStatus.BAD_REQUEST.code:
+					return Promise.reject(await response.json());
 			}
-			return Promise.reject(response);
 		} catch (err) {
 			return Promise.reject(err);
 		}

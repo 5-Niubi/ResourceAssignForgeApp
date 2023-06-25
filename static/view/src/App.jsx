@@ -2,8 +2,6 @@
 import React, { useEffect, useState } from "react";
 import { invoke, router, view } from "@forge/bridge";
 import { Route, Router, Routes } from "react-router";
-import ProjectFromNetPage from "./pages/ProjectFromNetPage";
-
 import { LeftSidebar, Main, PageLayout, Content } from "@atlaskit/page-layout";
 import HomeSideBar from "./components/side-nav/HomeSideBar";
 import ProjectListHome from "./pages/projects/ProjectsListHome";
@@ -11,6 +9,7 @@ import AppFrame from "./components/common/AppFrame";
 import SchedulePage from "./pages/schedule";
 import ResourcesPage from "./pages/resources";
 import ProjectSideBar from "./components/side-nav/ProjectSideBar";
+import Spinner from "@atlaskit/spinner";
 
 function App() {
 	// Enable auto change theme Dark/light mode within Jira
@@ -28,11 +27,11 @@ function App() {
 
 	// Check authenticate every time reload page
 	useEffect(function () {
-		invoke("getAuthenUrl").then(function (res) {
-			if (!res.isAuthenticated) {
-				handleAuthenOAuth(res.authenUrl);
-			}
-		});
+		// invoke("getAuthenUrl").then(function (res) {
+		// 	if (!res.isAuthenticated) {
+		// 		handleAuthenOAuth(res.authenUrl);
+		// 	}
+		// });
 	}, []);
 
 	// // Set this app context to storage
@@ -41,10 +40,11 @@ function App() {
 	}, []);
 
 	// --- Config React Router ---
-	useEffect(() => {
+	useEffect(() => {	
 		view.createHistory().then((newHistory) => {
 			setHistory(newHistory);
 		});
+		
 	}, []);
 
 	useEffect(() => {
@@ -81,14 +81,23 @@ function App() {
 							>
 								<Routes>
 									{/* Path with * take effect in all route after current */}
-									<Route path="/" element={<HomeSideBar rootPath="/"/>}>
-										<Route path="/projects" element={<HomeSideBar rootPath="/"/>}></Route>
-										<Route path="/resources" element={<HomeSideBar rootPath="/"/>}></Route>
-										<Route path="/settings" element={<HomeSideBar rootPath="/"/>}></Route>
+									<Route path="/" element={<HomeSideBar rootPath="/" />}>
+										<Route
+											path="/projects"
+											element={<HomeSideBar rootPath="/" />}
+										></Route>
+										<Route
+											path="/resources"
+											element={<HomeSideBar rootPath="/" />}
+										></Route>
+										<Route
+											path="/settings"
+											element={<HomeSideBar rootPath="/" />}
+										></Route>
 									</Route>
 									<Route
 										path="/:project/*"
-										element={<ProjectSideBar rootPath="/:project"/>}
+										element={<ProjectSideBar rootPath="/:project/" />}
 									></Route>
 								</Routes>
 							</Router>
@@ -124,7 +133,7 @@ function App() {
 					</Main>
 				</Content>
 			) : (
-				"Loading..."
+				<Spinner interactionName="load" />
 			)}
 		</PageLayout>
 	);

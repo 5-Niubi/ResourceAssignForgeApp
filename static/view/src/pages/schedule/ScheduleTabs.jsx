@@ -6,6 +6,7 @@ import ParameterWorkforceList from "./parameter/ParameterWorkforceList";
 import ParameterEquipmentList from "./parameter/ParameterEquipmentList";
 import ParameterObjectInput from "./parameter/ParameterObjectInput";
 import GanttChartPage from "./ganttchart/GanttChartPage";
+import Badge from '@atlaskit/badge';
 
 export default function ScheduleTabs() {
 	return (
@@ -14,9 +15,9 @@ export default function ScheduleTabs() {
 			id="default"
 		>
 			<TabList>
-				<Tab>PertChart</Tab>
-				<Tab>Parameter</Tab>
-				<Tab>Gantt chart</Tab>
+				<Tab><Badge>{1}</Badge> PertChart</Tab>
+				<Tab><Badge>{2}</Badge> Parameters</Tab>
+				<Tab><Badge>{3}</Badge> Gantt chart</Tab>
 			</TabList>
 			<TabPanel>
 				<VisualizeTasksPage />
