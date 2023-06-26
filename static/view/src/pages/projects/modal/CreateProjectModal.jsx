@@ -18,10 +18,8 @@ import { invoke } from "@forge/bridge";
 import { DATE_FORMAT, MODAL_WIDTH } from "../../../common/contants";
 
 const width = MODAL_WIDTH.M;
-function CreateProjectModal({isOpen, onClose, setIsOpen}) {
+function CreateProjectModal({ isOpen, setIsOpen }) {
 	const columns = 10;
-
-	
 
 	const [projectName, setProjectName] = useState("");
 	const [startDate, setStartDate] = useState(getCurrentTime());
@@ -78,8 +76,8 @@ function CreateProjectModal({isOpen, onClose, setIsOpen}) {
 		setObjQuality(value);
 	}, []);
 
-	useEffect(function (){
-		setIsSubmitting(false)
+	useEffect(function () {
+		setIsSubmitting(false);
 	}, []);
 
 	const closeModal = useCallback(
@@ -88,7 +86,7 @@ function CreateProjectModal({isOpen, onClose, setIsOpen}) {
 		},
 		[setIsOpen]
 	);
-	
+
 	function handleSubmitCreate() {
 		setIsSubmitting(true);
 		let projectObjRequest = {
@@ -102,7 +100,7 @@ function CreateProjectModal({isOpen, onClose, setIsOpen}) {
 			objectiveQuality: objQuality,
 		};
 		invoke("createNewProjectProjectLists", { projectObjRequest })
-			.then(function (res){
+			.then(function (res) {
 				closeModal();
 			})
 			.catch();

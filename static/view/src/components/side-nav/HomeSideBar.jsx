@@ -5,6 +5,7 @@ import SettingsIcon from "@atlaskit/icon/glyph/settings";
 import ActivityIcon from "@atlaskit/icon/glyph/activity";
 import PeopleGroupIcon from "@atlaskit/icon/glyph/people-group";
 import SignOutIcon from "@atlaskit/icon/glyph/sign-out";
+import { AtlassianIcon } from "@atlaskit/logo";
 
 import {
 	Header,
@@ -18,9 +19,9 @@ import {
 import { invoke, router } from "@forge/bridge";
 
 import ButtonItemSideBar from "./ButtonItemSideBar";
+import { APP_NAME, APP_NAME_DESCRIPTOR } from "../../common/contants";
 
 function HomeSideBar(rootPath) {
-
 	const handleSignout = useCallback(function () {
 		invoke("signout")
 			.then(function (res) {
@@ -34,7 +35,12 @@ function HomeSideBar(rootPath) {
 	return (
 		<SideNavigation label="project" testId="side-navigation">
 			<NavigationHeader>
-				<Header description="Sidebar header description">Sidebar Header</Header>
+				<Header
+					iconBefore={<AtlassianIcon appearance="brand" />}
+					description={APP_NAME_DESCRIPTOR}
+				>
+					{APP_NAME}
+				</Header>
 			</NavigationHeader>
 
 			<NestableNavigationContent

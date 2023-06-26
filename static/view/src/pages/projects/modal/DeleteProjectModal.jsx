@@ -10,12 +10,19 @@ import Modal, {
 	ModalTransition,
 } from "@atlaskit/modal-dialog";
 
-function DeleteProjectModal({ project, isOpen, onClose }) {
+function DeleteProjectModal({ openState, setOpenState }) {
+	const closeModal = useCallback(
+		function () {
+			setOpenState({ isOpen: false });
+		},
+		[setOpenState]
+	);
+	const project = openState.project;
 	return (
 		<>
 			<ModalTransition>
-				{isOpen && (
-					<Modal onClose={onClose}>
+				{openState.isOpen && (
+					<Modal onClose={closeModal}>
 						<ModalHeader>
 							<ModalTitle appearance="warning">
 								Delete the {project.projectName} Project
@@ -26,10 +33,10 @@ function DeleteProjectModal({ project, isOpen, onClose }) {
 							be undone!!!
 						</ModalBody>
 						<ModalFooter>
-							<Button appearance="subtle" onClick={onClose} autoFocus>
+							<Button appearance="subtle" onClick={closeModal} autoFocus>
 								Cancel
 							</Button>
-							<Button appearance="warning" onClick={onClose}>
+							<Button appearance="warning" onClick={closeModal}>
 								Delete
 							</Button>
 						</ModalFooter>

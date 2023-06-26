@@ -17,10 +17,10 @@ import { getCurrentTime } from "../../../common/utils";
 import { invoke } from "@forge/bridge";
 import { MODAL_WIDTH } from "../../../common/contants";
 
-function EditProjectModal({ project, isOpen, onClose }) {
+function EditProjectModal({ openState, setOpenState }) {
 	const width = MODAL_WIDTH.M;
 	const columns = 10;
-
+	const project = openState.project
 	const [projectName, setProjectName] = useState("");
 	const [startDate, setStartDate] = useState(getCurrentTime());
 	const [endDate, setEndDate] = useState(getCurrentTime());
@@ -29,16 +29,19 @@ function EditProjectModal({ project, isOpen, onClose }) {
 	const [objTime, setObjTime] = useState(50);
 	const [objCost, setObjCost] = useState(50);
 	const [objQuality, setObjQuality] = useState(50);
-
+	const closeModal = useCallback(
+		function () {
+			setOpenState({isOpen: false});
+		},
+		[setOpenState]
+	);
 	const loadProjectInfo = useEffect(
 		function () {
 			setProjectName(project.projectName);
 			setStartDate(project.startDate);
 
-			invoke("getProjectDetail", { projectId: project.projectId })
-				.then(function (res) {
-                    
-                })
+			invoke("getProjectDetail", { projectId: project.id })
+				.then(function (res) {})
 				.catch(function (error) {});
 		},
 		[project]
@@ -100,14 +103,16 @@ function EditProjectModal({ project, isOpen, onClose }) {
 			objectiveQuality: objQuality,
 		};
 		invoke("createNewProjectProjectLists", { projectObjRequest })
-			.then()
+			.then(function (res) {
+				closeModal();
+			})
 			.catch();
 	}
 
 	return (
 		<ModalTransition>
-			{isOpen && (
-				<Modal onClose={onClose} width={width}>
+			{openState.isOpen && (
+				<Modal onClose={closeModal} width={width}>
 					<Form
 						onSubmit={(formState) => console.log("form submitted", formState)}
 					>
@@ -221,7 +226,7 @@ function EditProjectModal({ project, isOpen, onClose }) {
 
 								<ModalFooter>
 									<ButtonGroup>
-										<Button appearance="default" onClick={onClose}>
+										<Button appearance="default" onClick={closeModal}>
 											Cancel
 										</Button>
 										<Button

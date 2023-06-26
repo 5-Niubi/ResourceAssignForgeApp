@@ -4,6 +4,7 @@ import GraphLineIcon from "@atlaskit/icon/glyph/graph-line";
 import ArrowLeftCircleIcon from "@atlaskit/icon/glyph/arrow-left-circle";
 import { ButtonItem } from "@atlaskit/side-navigation";
 import { invoke } from "@forge/bridge";
+import Spinner from "@atlaskit/spinner";
 
 import {
 	Header,
@@ -16,7 +17,7 @@ import {
 import React, { useEffect, useState } from "react";
 import ButtonItemSideBar from "./ButtonItemSideBar";
 import { useNavigate, useParams } from "react-router";
-import Toastify from "../../common/Toastify";
+import { AtlassianIcon } from "@atlaskit/logo";
 
 function ProjectSideBar(rootPath = "") {
 	const navigate = useNavigate();
@@ -34,8 +35,15 @@ function ProjectSideBar(rootPath = "") {
 	return (
 		<SideNavigation label="project" testId="side-navigation">
 			<NavigationHeader>
-				<Header description="Sidebar header description">
-					{projectSidebar ? projectSidebar.name : "Sidebar Header"}{" "}
+				<Header
+					description="Sidebar header description"
+					iconBefore={<AtlassianIcon appearance="neutral" />}
+				>
+					{projectSidebar.name ? (
+						projectSidebar.name
+					) : (
+						<Spinner interactionName="load" />
+					)}{" "}
 				</Header>
 			</NavigationHeader>
 

@@ -31,7 +31,7 @@ function projectResolver(resolver) {
 			console.log(response);
 			return response;
 		} catch (error) {
-			console.log("Error in createNewProjectProjectLists: ", error);
+			console.log("Error in getProjectDetail: ", error);
 			return Promise.reject(error);
 		}
 	});
