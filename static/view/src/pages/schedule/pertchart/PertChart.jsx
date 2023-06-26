@@ -191,10 +191,17 @@ const PertChart = ({ updateCurrentTask }) => {
 					duration: 0,
 					critical: true,
 				},
+				{
+					key: 10,
+					name: "Task 8",
+					duration: 0,
+					critical: true,
+				},
 			],
 			linkDataArray: [
 				{ from: 1, to: 2 },
 				{ from: 1, to: 3 },
+				{ from: 1, to: 10 },
 				{ from: 2, to: 4 },
 				{ from: 4, to: 5 },
 				{ from: 3, to: 6 },

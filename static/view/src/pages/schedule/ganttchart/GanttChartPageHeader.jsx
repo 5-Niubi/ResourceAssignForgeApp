@@ -6,8 +6,9 @@ import PageHeader from "@atlaskit/page-header";
 
 const actionsContent = (
 	<ButtonGroup>
-		<Button>Select tasks</Button>
-		<Button appearance="primary">Estimate</Button>
+		<Button href="projects/schedule">Reschedule</Button>
+		<Button appearance="primary">Sync to Jira</Button>
+		<Button appearance="primary">Save</Button>
 	</ButtonGroup>
 );
 

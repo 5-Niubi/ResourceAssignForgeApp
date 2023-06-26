@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import GanttChartPageHeader from "./GanttChartPageHeader";
 import GanttChart from "./GanttChart";
 import { render } from "react-dom";
+import GanttChartStats from "./GanttChartStat";
 
 /**
  * Using as Page to show gantt chart as a result
@@ -11,7 +12,7 @@ function GanttChartPage() {
 	return (
 		<div style={{width: "100%"}}>
             <GanttChartPageHeader/>
-			<div id='gantt'></div>
+			<GanttChartStats/>
             <GanttChart/>
 		</div>
 	);
