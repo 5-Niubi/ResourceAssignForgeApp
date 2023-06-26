@@ -31,7 +31,7 @@ function EditProjectModal({ openState, setOpenState }) {
 	const [objQuality, setObjQuality] = useState(50);
 	const closeModal = useCallback(
 		function () {
-			setOpenState({isOpen: false});
+			setOpenState({project, isOpen: false});
 		},
 		[setOpenState]
 	);

@@ -5,15 +5,15 @@ import TrashIcon from "@atlaskit/icon/glyph/trash";
 import CopyIcon from "@atlaskit/icon/glyph/copy";
 
 import DropdownMenu from "@atlaskit/dropdown-menu";
-import React from "react";
+import React, { useContext } from "react";
 import { DropdownItem, DropdownItemGroup } from "@atlaskit/dropdown-menu";
+import { ModalStateContext } from "../../ProjectsListHome";
 
-function ProjectDropdownAction(
-	project,
-	setModalEditState,
-	setModalDeleteState
-) {
+function ProjectDropdownAction(project) {
+	const { setModalEditState, setModalDeleteState } =
+		useContext(ModalStateContext);
 	function editOnClick() {
+		debugger;
 		setModalEditState({ project, isOpen: true });
 	}
 
@@ -30,7 +30,7 @@ function ProjectDropdownAction(
 					iconBefore={<MoreIcon label="more" />}
 					ref={triggerRef}
 				/>
-			)} 
+			)}
 		>
 			<DropdownItemGroup>
 				<DropdownItem

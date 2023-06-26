@@ -26,3 +26,5 @@ export const MODAL_WIDTH = {
 export const DATE_FORMAT = {
   DMY : "DD/MM/YYYY",
 }
+
+export const ROW_PER_PAGE = 10;

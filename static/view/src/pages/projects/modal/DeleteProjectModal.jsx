@@ -13,7 +13,7 @@ import Modal, {
 function DeleteProjectModal({ openState, setOpenState }) {
 	const closeModal = useCallback(
 		function () {
-			setOpenState({ isOpen: false });
+			setOpenState({project, isOpen: false });
 		},
 		[setOpenState]
 	);

@@ -1,31 +1,45 @@
 import DynamicTable from "@atlaskit/dynamic-table";
 import React, { createContext, useCallback, useState } from "react";
-import DeleteProjectModal from "../modal/DeleteProjectModal";
-import EditProjectModal from "../modal/EditProjectModal";
+import { useSearchParams } from "react-router-dom";
 
-import DropdownMenu, {
-	DropdownItem,
-	DropdownItemGroup,
-} from "@atlaskit/dropdown-menu";
+import Avatar from "@atlaskit/avatar";
+
 import ProjectDropdownAction from "./dropdown-options/ProjectDropdownAction";
 import { formatDateDMY } from "../../../common/utils";
+import Link from "../../../components/common/Link";
+import { ROW_PER_PAGE } from "../../../common/contants";
 
-function ProjectListDynamicTable({
-	content,
-	setEditModalState,
-	setDeleteModalState,
-}) {
+function ProjectListDynamicTable({ content }) {
+	const [searchParams, setSearchParams] = useSearchParams();
+	const [page, setPage] = useState(
+		searchParams.get("page") ? Number(searchParams.get("page")) : 1
+	);
+
 	const rows = content.map((data, index) => ({
-		key: `row-${index}-${data.name}`,
+		key: `row-${index+1}-${data.name}`,
 		isHighlighted: false,
 		cells: [
 			{
 				key: data.id,
-				content: index,
+				content: index+1,
 			},
 			{
 				key: data.id,
-				content: data.name,
+				content: (
+					<span>
+						<span style={{ verticalAlign: "middle", marginRight: "0.5rem" }}>
+							<Avatar
+								size="small"
+								appearance="square"
+								src={"https://placehold.co/600x400"}
+								name="Project Avatar"
+							/>
+						</span>
+						<span>
+							<Link to={`${data.id}/schedule`}>{data.name}</Link>
+						</span>
+					</span>
+				),
 			},
 			{
 				key: data.id,
@@ -37,13 +51,7 @@ function ProjectListDynamicTable({
 			},
 			{
 				key: "option",
-				content: (
-					<ProjectDropdownAction
-						project={data}
-						setModalEditState={setEditModalState}
-						setModalDeleteState={setDeleteModalState}
-					/>
-				),
+				content: <ProjectDropdownAction project={data} />,
 			},
 		],
 	}));
@@ -52,13 +60,15 @@ function ProjectListDynamicTable({
 			<DynamicTable
 				head={head}
 				rows={rows}
-				rowsPerPage={5}
+				rowsPerPage={ROW_PER_PAGE}
 				defaultPage={1}
 				isFixedSize
-				defaultSortKey="term"
-				defaultSortOrder="ASC"
+				defaultSortKey="no"
+				defaultSortOrder="DESC"
 				onSort={() => console.log("onSort")}
-				onSetPage={() => console.log("onSetPage")}
+				onSetPage={(page) => { setPage(page); setSearchParams({page: `${page}`})}}
+				isLoading={content.length == 0}
+				page={page}
 			/>
 		</>
 	);
