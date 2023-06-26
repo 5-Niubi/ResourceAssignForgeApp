@@ -39,10 +39,12 @@
     "buffer": "^6.0.3",
     "eslint-plugin-no-inline-styles": "^1.0.5",
     "gojs": "^2.3.8",
+    "highcharts": "^11.1.0",
     "moment": "^2.29.4",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-gojs": "^4.9.0",
+    "react-google-charts": "^4.0.0",
     "react-responsive": "^9.0.2",
     "react-router": "^6.12.1",
     "react-router-dom": "^6.13.0"
