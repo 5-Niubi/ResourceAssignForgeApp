@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useCallback } from "react";
+import { useNavigate } from "react-router";
 
 import SettingsIcon from "@atlaskit/icon/glyph/settings";
 import ActivityIcon from "@atlaskit/icon/glyph/activity";
 import PeopleGroupIcon from "@atlaskit/icon/glyph/people-group";
+import SignOutIcon from "@atlaskit/icon/glyph/sign-out";
+import { AtlassianIcon } from "@atlaskit/logo";
 
 import {
 	Header,
@@ -11,14 +14,33 @@ import {
 	NestableNavigationContent,
 	Section,
 	SideNavigation,
+	ButtonItem,
 } from "@atlaskit/side-navigation";
+import { invoke, router } from "@forge/bridge";
+
 import ButtonItemSideBar from "./ButtonItemSideBar";
+import { APP_NAME, APP_NAME_DESCRIPTOR } from "../../common/contants";
 
 function HomeSideBar(rootPath) {
+	const handleSignout = useCallback(function () {
+		invoke("signout")
+			.then(function (res) {
+				router.reload();
+			})
+			.catch(function (error) {
+				console.log(error);
+			});
+	}, []);
+
 	return (
 		<SideNavigation label="project" testId="side-navigation">
 			<NavigationHeader>
-				<Header description="Sidebar header description">Sidebar Header</Header>
+				<Header
+					iconBefore={<AtlassianIcon appearance="brand" />}
+					description={APP_NAME_DESCRIPTOR}
+				>
+					{APP_NAME}
+				</Header>
 			</NavigationHeader>
 
 			<NestableNavigationContent
@@ -48,7 +70,14 @@ function HomeSideBar(rootPath) {
 			</NestableNavigationContent>
 
 			<NavigationFooter>
-				<div></div>
+				<Section hasSeparator>
+					<ButtonItem
+						iconBefore={<SignOutIcon label="signout" />}
+						onClick={handleSignout}
+					>
+						Sign out
+					</ButtonItem>
+				</Section>
 			</NavigationFooter>
 		</SideNavigation>
 	);
