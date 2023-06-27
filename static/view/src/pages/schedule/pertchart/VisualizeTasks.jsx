@@ -3,26 +3,13 @@ import { useNavigate } from "react-router";
 import PertChart from "./PertChart";
 import TaskDetail from "./TaskDetail";
 import VisualizePageHeader from "./VisualizePageHeader";
-import { Field } from "@atlaskit/form";
+import { Field, Label } from "@atlaskit/form";
 import { DatePicker } from "@atlaskit/datetime-picker";
 
 const startDate = (
 	<div>
-		<Field
-			name="start-date"
-			label="Start date"
-			isRequired={false}
-			defaultValue=""
-		>
-			{({ fieldProps }) => (
-				<>
-					<DatePicker
-						{...fieldProps}
-						selectProps={{ inputId: fieldProps.id }}
-					/>
-				</>
-			)}
-		</Field>
+		<Label>Start date: </Label>
+		<DatePicker />
 	</div>
 );
 
@@ -31,7 +18,6 @@ const startDate = (
  * @returns {import("react").ReactElement}
  */
 function VisualizeTasksPage() {
-	let navigate = useNavigate();
     const [currentTask, setCurrentTask] = useState(null);
 
     const updateCurrentTask = (task) => {
