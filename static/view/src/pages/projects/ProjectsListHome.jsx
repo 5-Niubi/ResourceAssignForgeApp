@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, createContext, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import ProjecstListHomePageHeader from "./page-header/ProjectsListHomePageHeader";
 import ProjectsListHomeTable from "./table/ProjectsListHomeTable";
@@ -11,12 +11,21 @@ import { MEDIA_QUERY, MODAL_WIDTH } from "../../common/contants";
 import Modal, { ModalTransition } from "@atlaskit/modal-dialog";
 import CreateProjectModal from "./modal/CreateProjectModal";
 import { invoke } from "@forge/bridge";
+import ProjectListDynamicTable from "./table/ProjectListDynamicTable";
+import EditProjectModal from "./modal/EditProjectModal";
+import DeleteProjectModal from "./modal/DeleteProjectModal";
+import Toastify from "../../common/Toastify";
 
 const width = MODAL_WIDTH.M;
+const modalInitState = { project: {}, isOpen: false };
+export const ModalStateContext = createContext();
 
 function ProjectListHome() {
 	const columns = 10;
-	const [isOpen, setIsOpen] = useState(false);
+
+	const [isModalCreateOpen, setIsModalCreateOpen] = useState(false);
+	const [modalDeleteState, setModalDeleteState] = useState(modalInitState);
+	const [modalEditState, setModalEditState] = useState(modalInitState);
 
 	const isDesktopOrLaptop = useMediaQuery({
 		query: `(min-width: ${MEDIA_QUERY.DESKTOP_LAPTOP.MIN}px)`,
@@ -29,53 +38,37 @@ function ProjectListHome() {
 	);
 
 	const [projects, setProjects] = useState([]);
-	const [pageNumberList, setPageNumberList] = useState([]);
 
-	const openModal = useCallback(
-		function () {
-			setIsOpen(true);
-		},
-		[setIsOpen]
-	);
-
-	useEffect(
-		function () {
-			invoke("getProjectsList", { page })
-				.then(function (res) {
-					let projectsList = [];
-					handlePaging(res.total);
-					for (let project of res.values) {
-						let itemProject = {};
-						itemProject.id = project.id;
-						itemProject.content = {
-							no: 1,
-							projectId: project.id,
-							projectName: project.name,
-							startDate: project.startDate,
-						};
-						itemProject.hasChildren = false;
-						projectsList.push(itemProject);
-					}
-					setProjects(projectsList);
-				})
-				.catch(function (error) {
-					console.log(error);
-				});
-			return setProjects([]);
-		},
-		[page]
-	);
-
-	const handlePaging = useCallback(function (total) {
-		for (let i = 1; i <= total; i++) {
-			pageNumberList.push(i);
-		}
-		pageNumberList;
-		setPageNumberList((prev) => [...prev]);
+	useEffect(function () {
+		invoke("getProjectsList", { page })
+			.then(function (res) {
+				let projectsList = [];
+				for (let project of res) {
+					let itemProject = {};
+					itemProject = {
+						id: project.id,
+						imageAvatar: project.imageAvatar,
+						name: project.name,
+						startDate: project.startDate,
+						tasks: project.tasksNumber,
+					};
+					projectsList.push(itemProject);
+				}
+				setProjects(projectsList);
+			})
+			.catch(function (error) {
+				console.log(error);
+				Toastify.error(error);
+			});
+		return setProjects([]);
 	}, []);
 
 	function handleOnSearchBoxChange(e) {
 		setSearchBoxValue(e.target.value);
+	}
+
+	function handleOnSearchButtonClick() {
+		searchBoxValue;
 	}
 
 	return (
@@ -83,53 +76,54 @@ function ProjectListHome() {
 			<Grid layout="fluid" spacing="comfortable" columns={columns}>
 				<GridColumn medium={columns}>
 					<ProjecstListHomePageHeader
-						createProjectButtonOnClick={openModal}
+						createProjectButtonOnClick={() => setIsModalCreateOpen(true)}
 						searchBoxValue={searchBoxValue}
 						onSearchBoxChange={handleOnSearchBoxChange}
+						onSearchButtonClick={handleOnSearchButtonClick}
 					/>
 				</GridColumn>
 				<GridColumn medium={isDesktopOrLaptop ? 7 : columns}>
 					<div style={{ marginBottom: "1rem" }}>
-						<ProjectsListHomeTable items={projects} />
-					</div>
-					<div style={{ marginTop: "3rem" }}>
-						<Pagination
-							pages={pageNumberList}
-							nextLabel="Next"
-							label="Page"
-							pageLabel="Page"
-							previousLabel="Previous"
-							selectedIndex={page - 1}
-							onChange={(e, p) => {
-								setSearchParams({ page: p });
-								setPage(p);
-							}}
-						/>
+						<ModalStateContext.Provider
+							value={{ setModalEditState, setModalDeleteState }}
+						>
+							<ProjectListDynamicTable content={projects} />
+						</ModalStateContext.Provider>
 					</div>
 				</GridColumn>
 				<Desktop>
 					<GridColumn medium={3}>{/* <div>Hover panel</div> */}</GridColumn>
 				</Desktop>
 			</Grid>
+			{isModalCreateOpen ? (
+				<CreateProjectModal
+					isOpen={isModalCreateOpen}
+					setIsOpen={setIsModalCreateOpen}
+					setProjectsDisplay={setProjects}
+				/>
+			) : (
+				""
+			)}
 
-			{<CreateProjectModal isOpen={isOpen} setIsOpen={setIsOpen}/>}
+			{modalDeleteState.isOpen ? (
+				<DeleteProjectModal
+					openState={modalDeleteState}
+					setOpenState={setModalDeleteState}
+				/>
+			) : (
+				""
+			)}
+
+			{modalEditState.isOpen ? (
+				<EditProjectModal
+					openState={modalEditState}
+					setOpenState={setModalEditState}
+				/>
+			) : (
+				""
+			)}
 		</>
 	);
 }
 
 export default ProjectListHome;
-const items = [
-	{
-		id: "item1",
-		content: {
-			no: "1",
-			projectName: "First top-level item",
-			projectImage:
-				"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREabvR30BJaXiYN2Azwc8fPUWJmv1nzMatw9YIxxrygA&s",
-			startDate: "11/10/11",
-			amount: 10,
-		},
-		hasChildren: false,
-		children: [],
-	},
-];

@@ -3,6 +3,8 @@ import IssuesIcon from "@atlaskit/icon/glyph/issues";
 import GraphLineIcon from "@atlaskit/icon/glyph/graph-line";
 import ArrowLeftCircleIcon from "@atlaskit/icon/glyph/arrow-left-circle";
 import { ButtonItem } from "@atlaskit/side-navigation";
+import { invoke } from "@forge/bridge";
+import Spinner from "@atlaskit/spinner";
 
 import {
 	Header,
@@ -12,17 +14,37 @@ import {
 	Section,
 	SideNavigation,
 } from "@atlaskit/side-navigation";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ButtonItemSideBar from "./ButtonItemSideBar";
-import {useNavigate} from "react-router";
+import { useNavigate, useParams } from "react-router";
+import { AtlassianIcon } from "@atlaskit/logo";
 
 function ProjectSideBar(rootPath = "") {
 	const navigate = useNavigate();
+	const [projectSidebar, setProjectSidebar] = useState(Object);
+	const { projectId } = useParams();
+
+	useEffect(function () {
+		invoke("getProjectDetail", { projectId })
+			.then(function (res) {
+				setProjectSidebar(res);
+			})
+			.catch(function (error) {});
+	}, []);
 
 	return (
 		<SideNavigation label="project" testId="side-navigation">
 			<NavigationHeader>
-				<Header description="Sidebar header description">Sidebar Header</Header>
+				<Header
+					description="Sidebar header description"
+					iconBefore={<AtlassianIcon appearance="neutral" />}
+				>
+					{projectSidebar.name ? (
+						projectSidebar.name
+					) : (
+						<Spinner interactionName="load" />
+					)}{" "}
+				</Header>
 			</NavigationHeader>
 
 			<NestableNavigationContent
@@ -30,8 +52,10 @@ function ProjectSideBar(rootPath = "") {
 				testId="nestable-navigation-content"
 			>
 				<Section>
-					<ButtonItem iconBefore={<ArrowLeftCircleIcon label="" />}
-					onClick={() => navigate("../")}>
+					<ButtonItem
+						iconBefore={<ArrowLeftCircleIcon label="" />}
+						onClick={() => navigate("../")}
+					>
 						Go back
 					</ButtonItem>
 				</Section>

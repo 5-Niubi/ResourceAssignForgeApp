@@ -24,4 +24,20 @@ async function authenBECallbackTrigger(request) {
   }
 }
 
-export { authenBECallbackTrigger };
+async function logoutTrigger(request) {
+  try {
+    // do the things
+    await AuthenWithBE.handleUnauthorizedStatus();
+    let response = createWebTriggerResponse({}, HttpStatus.OK);
+    return response;
+  } catch (err) {
+    console.log("Error in webtrigger: ", err);
+    let response = createWebTriggerResponse(
+      {},
+      HttpStatus.INTERNAL_SERVER_ERROR
+    );
+    return response;
+  }
+}
+
+export { authenBECallbackTrigger , logoutTrigger};
