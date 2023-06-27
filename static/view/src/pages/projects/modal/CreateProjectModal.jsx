@@ -18,7 +18,7 @@ import { invoke } from "@forge/bridge";
 import { DATE_FORMAT, MODAL_WIDTH } from "../../../common/contants";
 
 const width = MODAL_WIDTH.M;
-function CreateProjectModal({ isOpen, setIsOpen }) {
+function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 	const columns = 10;
 
 	const [projectName, setProjectName] = useState("");
@@ -82,7 +82,7 @@ function CreateProjectModal({ isOpen, setIsOpen }) {
 
 	const closeModal = useCallback(
 		function () {
-			setIsOpen(false);
+			setIsOpen(false);	
 		},
 		[setIsOpen]
 	);
@@ -101,6 +101,7 @@ function CreateProjectModal({ isOpen, setIsOpen }) {
 		};
 		invoke("createNewProjectProjectLists", { projectObjRequest })
 			.then(function (res) {
+				setProjectsDisplay((prevs) => [res,...prevs])
 				closeModal();
 			})
 			.catch();

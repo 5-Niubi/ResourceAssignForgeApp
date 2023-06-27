@@ -20,7 +20,7 @@ import { MODAL_WIDTH } from "../../../common/contants";
 function EditProjectModal({ openState, setOpenState }) {
 	const width = MODAL_WIDTH.M;
 	const columns = 10;
-	const project = openState.project
+	const project = openState.project;
 	const [projectName, setProjectName] = useState("");
 	const [startDate, setStartDate] = useState(getCurrentTime());
 	const [endDate, setEndDate] = useState(getCurrentTime());
@@ -35,7 +35,7 @@ function EditProjectModal({ openState, setOpenState }) {
 		},
 		[setOpenState]
 	);
-	const loadProjectInfo = useEffect(
+	useEffect(
 		function () {
 			setProjectName(project.projectName);
 			setStartDate(project.startDate);

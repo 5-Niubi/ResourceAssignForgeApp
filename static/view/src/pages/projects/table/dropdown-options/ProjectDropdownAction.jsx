@@ -14,11 +14,11 @@ function ProjectDropdownAction(project) {
 		useContext(ModalStateContext);
 	function editOnClick() {
 		debugger;
-		setModalEditState({ project, isOpen: true });
+		setModalEditState({ project: {...project}, isOpen: true });
 	}
 
 	function deleteOnClick() {
-		setModalDeleteState({ project, isOpen: true });
+		setModalDeleteState({ project: {...project}, isOpen: true });
 	}
 
 	return (

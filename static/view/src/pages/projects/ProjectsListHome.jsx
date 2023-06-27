@@ -38,7 +38,6 @@ function ProjectListHome() {
 	);
 
 	const [projects, setProjects] = useState([]);
-	const [pageNumberList, setPageNumberList] = useState([]);
 
 	useEffect(function () {
 		invoke("getProjectsList", { page })
@@ -96,21 +95,33 @@ function ProjectListHome() {
 					<GridColumn medium={3}>{/* <div>Hover panel</div> */}</GridColumn>
 				</Desktop>
 			</Grid>
+			{isModalCreateOpen ? (
+				<CreateProjectModal
+					isOpen={isModalCreateOpen}
+					setIsOpen={setIsModalCreateOpen}
+					setProjectsDisplay={setProjects}
+				/>
+			) : (
+				""
+			)}
 
-			<CreateProjectModal
-				isOpen={isModalCreateOpen}
-				setIsOpen={setIsModalCreateOpen}
-			/>
+			{modalDeleteState.isOpen ? (
+				<DeleteProjectModal
+					openState={modalDeleteState}
+					setOpenState={setModalDeleteState}
+				/>
+			) : (
+				""
+			)}
 
-			<DeleteProjectModal
-				openState={modalDeleteState}
-				setOpenState={setModalDeleteState}
-			/>
-
-			<EditProjectModal
-				openState={modalEditState}
-				setOpenState={setModalEditState}
-			/>
+			{modalEditState.isOpen ? (
+				<EditProjectModal
+					openState={modalEditState}
+					setOpenState={setModalEditState}
+				/>
+			) : (
+				""
+			)}
 		</>
 	);
 }
