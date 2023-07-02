@@ -75,17 +75,6 @@ function ProjectsListHomeTable({ items }) {
 					""
 				)}
 			</TableTree>
-			<DeleteProjectModal
-				project={projectForModal}
-				isOpen={isOpen}
-				onClose={closeModal}
-			/>
-
-			<EditProjectModal
-				project={projectForModal}
-				isOpen={isModalEditOpen}
-				onClose={closeModalEdit}
-			/>
 		</>
 	);
 }

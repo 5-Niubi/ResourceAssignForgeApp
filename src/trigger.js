@@ -1,3 +1,3 @@
-import { authenBECallbackTrigger } from "./triggers/webTrigger";
+import { authenBECallbackTrigger, logoutTrigger } from "./triggers/webTrigger";
 
-export {authenBECallbackTrigger};
+export {authenBECallbackTrigger, logoutTrigger};
