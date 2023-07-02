@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { invoke, router, view } from "@forge/bridge";
 import { Route, Router, Routes, useNavigate } from "react-router";
-import { LeftSidebar, Main, PageLayout, Content } from "@atlaskit/page-layout";
+import { LeftSidebar, Main, PageLayout, Content, RightSidebar } from "@atlaskit/page-layout";
 import HomeSideBar from "./components/side-nav/HomeSideBar";
 import ProjectListHome from "./pages/projects/ProjectsListHome";
 import AppFrame from "./components/common/AppFrame";
@@ -12,6 +12,7 @@ import ProjectSideBar from "./components/side-nav/ProjectSideBar";
 import Spinner from "@atlaskit/spinner";
 import StartUpPage from "./pages/startup/StartUpPage";
 import { ToastContainer } from "react-toastify";
+import TasksCompact from "./pages/schedule/pertchart/TasksCompact";
 
 function App() {
 	// Enable auto change theme Dark/light mode within Jira
@@ -78,24 +79,37 @@ function App() {
 									>
 										<Routes>
 											{/* Path with * take effect in all route after current */}
-											<Route path="/" element={<HomeSideBar rootPath="/" />}>
+											<Route
+												path="/"
+												element={
+													<HomeSideBar rootPath="/" />
+												}
+											>
 												<Route></Route>
 												<Route
 													path="/projects"
-													element={<HomeSideBar rootPath="/" />}
+													element={
+														<HomeSideBar rootPath="/" />
+													}
 												></Route>
 												<Route
 													path="/resources"
-													element={<HomeSideBar rootPath="/" />}
+													element={
+														<HomeSideBar rootPath="/" />
+													}
 												></Route>
 												<Route
 													path="/settings"
-													element={<HomeSideBar rootPath="/" />}
+													element={
+														<HomeSideBar rootPath="/" />
+													}
 												></Route>
 											</Route>
 											<Route
 												path="/:projectId/*"
-												element={<ProjectSideBar rootPath="/:project/" />}
+												element={
+													<ProjectSideBar rootPath="/:project/" />
+												}
 											></Route>
 										</Routes>
 									</Router>
@@ -109,8 +123,14 @@ function App() {
 										location={historyState.location}
 									>
 										<Routes>
-											<Route path="/" element={<ProjectListHome />}></Route>
-											<Route path="/startup" element={<StartUpPage />}></Route>
+											<Route
+												path="/"
+												element={<ProjectListHome />}
+											></Route>
+											<Route
+												path="/startup"
+												element={<StartUpPage />}
+											></Route>
 
 											<Route
 												path="/resources"
@@ -122,24 +142,66 @@ function App() {
 											></Route>
 
 											<Route path="/:projectId">
-												<Route path="" element={<SchedulePage />}></Route>
+												<Route
+													path=""
+													element={<SchedulePage />}
+												></Route>
 												<Route
 													path="schedule"
 													element={<SchedulePage />}
 												></Route>
 												<Route
 													path="tasks"
-													element={<div>Tasks Page of</div>}
+													element={
+														<div>Tasks Page of</div>
+													}
 												></Route>
 												<Route
 													path="reports"
-													element={<div>Reporsts Page</div>}
+													element={
+														<div>Reporsts Page</div>
+													}
 												></Route>
 											</Route>
 										</Routes>
 									</Router>
 								</AppFrame>
 							</Main>
+							<div style={{ backgroundColor: "#fafbfc", boxSizing: "border-box", borderLeft: "1px solid #e5e5e5", }}>
+								<RightSidebar
+									testId="rightSidebar"
+									id="right-sidebar"
+									skipLinkTitle="Right Sidebar"
+									isFixed={false}
+									width={400}
+								>
+									<div
+										style={{
+											minHeight: "100vh",
+											padding: "10px",
+											boxSizing: "border-box"
+										}}
+									>
+										<Router
+											navigator={history}
+											navigationType={historyState.action}
+											location={historyState.location}
+										>
+											<Routes>
+												{/* Path with * take effect in all route after current */}
+												<Route path="/:projectId">
+													<Route
+														path="schedule"
+														element={
+															<TasksCompact />
+														}
+													></Route>
+												</Route>
+											</Routes>
+										</Router>
+									</div>
+								</RightSidebar>
+							</div>
 						</Content>
 					) : (
 						<Spinner interactionName="load" />
@@ -148,8 +210,7 @@ function App() {
 			) : (
 				<StartUpPage />
 			)}
-			<ToastContainer
-			/>
+			<ToastContainer />
 		</>
 	);
 }

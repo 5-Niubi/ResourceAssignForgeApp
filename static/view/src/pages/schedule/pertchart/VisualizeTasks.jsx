@@ -5,6 +5,7 @@ import TaskDetail from "./TaskDetail";
 import VisualizePageHeader from "./VisualizePageHeader";
 import { Field, Label } from "@atlaskit/form";
 import { DatePicker } from "@atlaskit/datetime-picker";
+import PertChart2 from "./PertChart2";
 
 const startDate = (
 	<div>
@@ -28,7 +29,7 @@ function VisualizeTasksPage() {
 		<div style={{width: "100%"}}>
             <VisualizePageHeader title="Visualize Tasks"/>
             {startDate}
-            <PertChart updateCurrentTask={updateCurrentTask}/>
+            <PertChart2 updateCurrentTask={updateCurrentTask}/>
             <TaskDetail currentTask={currentTask}/>
 		</div>
 	);

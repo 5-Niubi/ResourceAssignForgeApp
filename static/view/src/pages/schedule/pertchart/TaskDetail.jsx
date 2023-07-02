@@ -18,7 +18,7 @@ const TaskDetail = ({ currentTask }) => {
 	);
 
 	return (
-		<>
+		<div style={{ borderTop: "1px solid #e5e5e5"}}>
 			<PageHeader actions={actionsContent}>
 				Task details: 
 			</PageHeader>
@@ -154,7 +154,7 @@ const TaskDetail = ({ currentTask }) => {
 					)}
 				</pre>
 			</div>
-		</>
+		</div>
 	);
 };
 
