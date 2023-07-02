@@ -210,6 +210,7 @@ const PertChart = ({ updateCurrentTask }) => {
 				{ from: 6, to: 8 },
 				{ from: 7, to: 9 },
 				{ from: 8, to: 9 },
+				{ from: 10, to: 9 },
 			],
 		});
 	}

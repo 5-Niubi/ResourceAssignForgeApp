@@ -4,6 +4,7 @@ import __noop from "@atlaskit/ds-lib/noop";
 import PageHeader from "@atlaskit/page-header";
 import SelectTaskModal from "./modal/SelectTaskModal";
 import { useState } from "react";
+import EstimateModal from "./modal/EstimateModal";
 
 const VisualizePageHeader = ({title}) => {
 	const [isOpenSelectModal, setOpenSelectModal] = useState(false);
@@ -17,10 +18,20 @@ const VisualizePageHeader = ({title}) => {
 		setOpenSelectModal(true);
 	}
 
+	const updateOpenEstimateModal = (isOpen) => {
+		setOpenEstimateModal(isOpen);
+	};
+
+	function openEstimateModal() {
+		setOpenEstimateModal(true);
+	}
+
 	const actionsContent = (
 		<ButtonGroup>
 			<Button onClick={openSelectModal}>Select tasks</Button>
-			<Button appearance="primary">Estimate</Button>
+			<Button appearance="primary" onClick={openEstimateModal}>
+				Estimate
+			</Button>
 		</ButtonGroup>
 	);
 
@@ -31,6 +42,8 @@ const VisualizePageHeader = ({title}) => {
 				isOpen={isOpenSelectModal}
 				updateOpenSelectModal={updateOpenSelectModal}
 			/>
+
+			<EstimateModal isOpen={isOpenEstimateModal} updateOpenEstimateModal={updateOpenEstimateModal}/>
 		</PageHeader>
 	);
 };
