@@ -4,8 +4,9 @@ import "gojs/extensions/DrawCommandHandler";
 import "gojs/extensions/Figures";
 import "gojs/extensions/GeometryReshapingTool";
 import { duration } from "moment";
+import { selectedTasks } from "../data";
 
-const PertChart2 = ({ updateCurrentTask }) => {
+const PertChart2 = ({tasks, updateCurrentTask }) => {
 	const diagramRef = useRef(null);
 
 	// colors used, named for easier identification
@@ -65,7 +66,7 @@ const PertChart2 = ({ updateCurrentTask }) => {
         
 		diagram.nodeTemplate = createNodeTemplate();
 		diagram.linkTemplate = createLinkTemplate();
-		diagram.model = createDiagramModel();
+		diagram.model = createDiagramModel(tasks);
         
 		// Perform any additional initialization or configuration here
         
@@ -73,7 +74,7 @@ const PertChart2 = ({ updateCurrentTask }) => {
 			// Perform any necessary cleanup here
 			diagram.div = null;
 		};
-	}, []);
+	}, [tasks]); //call useEffect each time tasks changed
 
 	// Define a function for creating a "port" that is normally transparent.
 	// The "name" is used as the GraphObject.portId, the "spot" is used to control how links connect
@@ -257,71 +258,10 @@ const PertChart2 = ({ updateCurrentTask }) => {
 		);
 	}
 
-	function createDiagramModel() {
+	function createDiagramModel(tasks) {
 		const $ = go.GraphObject.make;
 		return $(go.GraphLinksModel, {
-			nodeDataArray: [
-				{
-					key: 1,
-					name: "Start",
-					duration: 0,
-					critical: true,
-				},
-				{
-					key: 2,
-					name: "Task 1",
-					duration: 4,
-					critical: true,
-				},
-				{
-					key: 3,
-					name: "Task 2",
-					duration: 5.33,
-					critical: false,
-				},
-				{
-					key: 4,
-					name: "Task 3 siêuuuuuuuuuuuuuuuuu dàiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii",
-					duration: 5.17,
-					critical: true,
-				},
-				{
-					key: 5,
-					name: "Task 4",
-					duration: 6.33,
-					critical: false,
-				},
-				{
-					key: 6,
-					name: "Task 5",
-					duration: 5.17,
-					critical: true,
-				},
-				{
-					key: 7,
-					name: "Task 6",
-					duration: 4.5,
-					critical: false,
-				},
-				{
-					key: 8,
-					name: "Task 7",
-					duration: 5.17,
-					critical: true,
-				},
-				{
-					key: 9,
-					name: "Finish",
-					duration: 0,
-					critical: true,
-				},
-				{
-					key: 10,
-					name: "Task 8",
-					duration: 0,
-					critical: true,
-				},
-			],
+			nodeDataArray: tasks,
 			linkDataArray: [],
 		});
 	}

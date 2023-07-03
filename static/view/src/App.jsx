@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { invoke, router, view } from "@forge/bridge";
 import { Route, Router, Routes, useNavigate } from "react-router";
-import { LeftSidebar, Main, PageLayout, Content, RightSidebar } from "@atlaskit/page-layout";
+import { LeftSidebar, Main, PageLayout, Content } from "@atlaskit/page-layout";
 import HomeSideBar from "./components/side-nav/HomeSideBar";
 import ProjectListHome from "./pages/projects/ProjectsListHome";
 import AppFrame from "./components/common/AppFrame";
@@ -12,7 +12,6 @@ import ProjectSideBar from "./components/side-nav/ProjectSideBar";
 import Spinner from "@atlaskit/spinner";
 import StartUpPage from "./pages/startup/StartUpPage";
 import { ToastContainer } from "react-toastify";
-import TasksCompact from "./pages/schedule/pertchart/TasksCompact";
 
 function App() {
 	// Enable auto change theme Dark/light mode within Jira
@@ -24,11 +23,11 @@ function App() {
 
 	// Check authenticate every time reload page
 	useEffect(function () {
-		invoke("getIsAuthenticated").then(function (res) {
-			if (!res.isAuthenticated) {
-				setIsAuthenticated(false);
-			}
-		});
+		// invoke("getIsAuthenticated").then(function (res) {
+		// 	if (!res.isAuthenticated) {
+		// 		setIsAuthenticated(false);
+		// 	}
+		// });
 	}, []);
 
 	// // Set this app context to storage
@@ -167,41 +166,6 @@ function App() {
 									</Router>
 								</AppFrame>
 							</Main>
-							<div style={{ backgroundColor: "#fafbfc", boxSizing: "border-box", borderLeft: "1px solid #e5e5e5", }}>
-								<RightSidebar
-									testId="rightSidebar"
-									id="right-sidebar"
-									skipLinkTitle="Right Sidebar"
-									isFixed={false}
-									width={400}
-								>
-									<div
-										style={{
-											minHeight: "100vh",
-											padding: "10px",
-											boxSizing: "border-box"
-										}}
-									>
-										<Router
-											navigator={history}
-											navigationType={historyState.action}
-											location={historyState.location}
-										>
-											<Routes>
-												{/* Path with * take effect in all route after current */}
-												<Route path="/:projectId">
-													<Route
-														path="schedule"
-														element={
-															<TasksCompact />
-														}
-													></Route>
-												</Route>
-											</Routes>
-										</Router>
-									</div>
-								</RightSidebar>
-							</div>
 						</Content>
 					) : (
 						<Spinner interactionName="load" />

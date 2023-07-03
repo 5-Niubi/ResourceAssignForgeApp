@@ -10,7 +10,6 @@ function SchedulePage() {
 	let navigate = useNavigate();
 	let {project} = useParams();
 
-	
 	project;
 
 	return (<ScheduleTabs/>);
