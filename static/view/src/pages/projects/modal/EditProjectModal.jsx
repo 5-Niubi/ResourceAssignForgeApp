@@ -15,11 +15,11 @@ import { DatePicker } from "@atlaskit/datetime-picker";
 import ObjectiveRange from "../form/ObjectiveRange";
 import { getCurrentTime } from "../../../common/utils";
 import { invoke } from "@forge/bridge";
-import { MODAL_WIDTH } from "../../../common/contants";
+import { DATE_FORMAT, MODAL_WIDTH } from "../../../common/contants";
+const width = MODAL_WIDTH.M;
+const columns = 10;
 
 function EditProjectModal({ openState, setOpenState }) {
-	const width = MODAL_WIDTH.M;
-	const columns = 10;
 	const project = openState.project;
 	const [projectName, setProjectName] = useState("");
 	const [startDate, setStartDate] = useState(getCurrentTime());
@@ -29,15 +29,16 @@ function EditProjectModal({ openState, setOpenState }) {
 	const [objTime, setObjTime] = useState(50);
 	const [objCost, setObjCost] = useState(50);
 	const [objQuality, setObjQuality] = useState(50);
+
 	const closeModal = useCallback(
 		function () {
-			setOpenState({project, isOpen: false});
+			setOpenState({ project: {}, isOpen: false });
 		},
 		[setOpenState]
 	);
 	useEffect(
 		function () {
-			setProjectName(project.projectName);
+			setProjectName(project.name);
 			setStartDate(project.startDate);
 
 			invoke("getProjectDetail", { projectId: project.id })
@@ -146,6 +147,7 @@ function EditProjectModal({ openState, setOpenState }) {
 															<DatePicker
 																value={startDate}
 																onChange={handleSetStartDate}
+																dateFormat={DATE_FORMAT.DMY}
 															/>
 														</Fragment>
 													)}
@@ -157,6 +159,7 @@ function EditProjectModal({ openState, setOpenState }) {
 																minDate={startDate}
 																value={endDate}
 																onChange={handleSetEndDate}
+																dateFormat={DATE_FORMAT.DMY}
 															/>
 														</Fragment>
 													)}
