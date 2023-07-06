@@ -22,15 +22,92 @@ const startDate = (
  * @returns {import("react").ReactElement}
  */
 function VisualizeTasksPage() {
+    var sample = [
+		{
+			key: 1,
+			name: "Start",
+			duration: 0,
+			critical: true,
+			precedence: [],
+		},
+		{
+			key: 2,
+			name: "Task 1",
+			duration: 4,
+			critical: true,
+			precedence: [1],
+		},
+		{
+			key: 3,
+			name: "Task 2",
+			duration: 5.33,
+			critical: false,
+			precedence: [],
+		},
+		{
+			key: 4,
+			name: "Task 3 siêuuuuuuuuuuuuuuuuu dàiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii",
+			duration: 5.17,
+			critical: true,
+			precedence: [1, 2],
+		},
+		{
+			key: 5,
+			name: "Task 4",
+			duration: 6.33,
+			critical: false,
+			precedence: [],
+		},
+		{
+			key: 6,
+			name: "Task 5",
+			duration: 5.17,
+			critical: true,
+			precedence: [],
+		},
+		{
+			key: 7,
+			name: "Task 6",
+			duration: 4.5,
+			critical: false,
+			precedence: [],
+		},
+		{
+			key: 8,
+			name: "Task 7",
+			duration: 5.17,
+			critical: true,
+			precedence: [],
+		},
+		{
+			key: 9,
+			name: "Finish",
+			duration: 0,
+			critical: true,
+			precedence: [],
+		},
+		{
+			key: 10,
+			name: "Task 8",
+			duration: 0,
+			critical: true,
+			precedence: [],
+		},
+	];
+	const [tasks, setTasks] = useState(sample);
 	const [currentTask, setCurrentTask] = useState(null);
+    const [selected, setSelected] = useState(globalSelectedTasks);
 
 	const updateCurrentTask = (task) => {
 		setCurrentTask(task);
 	};
 
-	const [selected, setSelected] = useState(globalSelectedTasks);
 	const updateSelectedTasks = (tasks) => {
 		setSelected(tasks);
+	};
+
+    const updateTasks = (tasks) => {
+		setTasks(tasks);
 	};
 
 
@@ -41,10 +118,29 @@ function VisualizeTasksPage() {
 					<Main testId="main2" id="main2">
 						<VisualizePageHeader title="Visualize Tasks" />
 						{startDate}
-						<PertChart2 tasks={selected} updateCurrentTask={updateCurrentTask} />
-						<TaskDetail currentTask={currentTask} />
+						<PertChart2
+							tasks={tasks}
+							selectedTasks={selected}
+							updateCurrentTask={updateCurrentTask}
+							updateTasks={updateTasks}
+						/>
+						<TaskDetail
+							tasks={tasks}
+							selectedTasks={selected}
+							currentTask={currentTask}
+							updateTasks={updateTasks}
+							updateCurrentTask={updateCurrentTask}
+						/>
 					</Main>
-					<div style={{ backgroundColor: "#fafbfc", boxSizing: "border-box", borderLeft: "1px solid #e5e5e5", marginLeft: "2rem", marginRight: "-2rem" }}>
+					<div
+						style={{
+							backgroundColor: "#fafbfc",
+							boxSizing: "border-box",
+							borderLeft: "1px solid #e5e5e5",
+							marginLeft: "2rem",
+							marginRight: "-2rem",
+						}}
+					>
 						<RightSidebar
 							testId="rightSidebar"
 							id="right-sidebar"
@@ -56,17 +152,19 @@ function VisualizeTasksPage() {
 								style={{
 									minHeight: "95vh",
 									padding: "10px",
-									boxSizing: "border-box"
+									boxSizing: "border-box",
 								}}
 							>
-								<TasksCompact setSelected={updateSelectedTasks} updateCurrentTask={updateCurrentTask} />
-
+								<TasksCompact
+									tasks={tasks}
+									setSelected={updateSelectedTasks}
+									updateCurrentTask={updateCurrentTask}
+								/>
 							</div>
 						</RightSidebar>
 					</div>
 				</Content>
 			</PageLayout>
-
 		</div>
 	);
 }
