@@ -20,7 +20,7 @@ export default function ScheduleTabs() {
 				<Tab><Badge>{3}</Badge> Gantt chart</Tab>
 			</TabList>
 			<TabPanel>
-				<VisualizeTasksPage />
+				<VisualizeTasksPage/>
 			</TabPanel>
 			<TabPanel>
                 <div style={{width: "100%"}}>
