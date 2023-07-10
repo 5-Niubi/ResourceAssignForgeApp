@@ -147,7 +147,10 @@ function App() {
 											></Route>
 
 											<Route path="/:projectId">
-												<Route path="" element={<SchedulePage />}></Route>
+												<Route
+													path=""
+													element={<SchedulePage />}
+												></Route>
                                                 <Route
 													path="estimation"
 													element={<EstimationPage />}

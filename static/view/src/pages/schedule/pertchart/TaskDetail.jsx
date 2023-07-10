@@ -4,57 +4,35 @@ import Form, { Field, FormFooter } from "@atlaskit/form";
 import Textfield from "@atlaskit/textfield";
 import PageHeader from "@atlaskit/page-header";
 import Button, { ButtonGroup } from "@atlaskit/button";
+import { findObj } from "./VisualizeTasks";
+import { sampleSkills } from "../data";
 
 /**
  * Using as part of visualize task page. To show dependences of a specific task
  */
 const TaskDetail = ({
 	tasks,
-	selectedTasks,
-	currentTask,
+	selectedTaskIds,
+	currentTaskId,
 	updateTasks,
-	updateCurrentTask,
 }) => {
-	var sampleSkills = [
-		{
-			id: 1,
-			name: "Skill 0",
-		},
-		{
-			id: 2,
-			name: "Skill 1",
-		},
-		{
-			id: 3,
-			name: "Skill 2",
-		},
-		{
-			id: 4,
-			name: "Skill 3",
-		},
-		{
-			id: 5,
-			name: "Skill 4",
-		},
-	];
+	var currentTask = findObj(tasks, currentTaskId);
+	var selectedTasks = [];
+	selectedTaskIds.forEach((id) => {
+		var task = findObj(tasks, id);
+		if (task) selectedTasks.push(task);
+	});
 
 	const [skills, setSkills] = useState(sampleSkills);
 
-	const getTaskById = (arr, id) => {
-		for (let i = 0; i < arr.length; i++) {
-			if (arr[i].key == id) return arr[i];
-		}
-		return null;
-	};
-
 	var taskOpts = [];
-	selectedTasks.forEach((task) =>
-		taskOpts.push({ value: task.key, label: task.name })
+	selectedTasks?.forEach((task) =>
+		task.id != currentTaskId ? taskOpts.push({ value: task.id, label: task.name }) : ""
 	);
 	var taskValues = [];
 	currentTask?.precedence.forEach((pre) => {
-		let task = getTaskById(selectedTasks, pre);
-		if (task) taskValues.push({ value: task.key, label: task.name });
+		let task = findObj(tasks, pre);
+		if (task) taskValues.push({ value: task.id, label: task.name });
 	});
 
 	var skillOpts = [];
@@ -63,15 +41,15 @@ const TaskDetail = ({
 	);
 
 	const handleChangePrecedence = (values, action) => {
-		for (let i = 0; i < tasks.length; i++) {
-			if (tasks[i].key == currentTask.key) {
-				var ids = [];
-				values.forEach((item) => ids.push(item.value));
-				tasks[i].precedence = ids;
-				updateCurrentTask(tasks[i]);
-				updateTasks(tasks);
-				return;
-			}
+		var ids = [];
+		values.forEach((item) => ids.push(item.value));
+
+		var task = findObj(tasks, currentTaskId);
+		if (task) {
+			// console.log(ids);
+			// console.log(task);
+			task.precedence = ids;
+			updateTasks(tasks);
 		}
 	};
 
@@ -102,10 +80,10 @@ const TaskDetail = ({
 									>
 										<div style={{ width: "30%" }}>
 											<Field
-												label="Task key"
-												name="key"
+												label="Task id"
+												name="id"
 												isDisabled
-												defaultValue={currentTask.key}
+												defaultValue={currentTask.id}
 											>
 												{({ fieldProps }) => (
 													<Fragment>
@@ -166,7 +144,7 @@ const TaskDetail = ({
 													</Fragment>
 												)}
 											</Field>
-											<Field
+											{/* <Field
 												label="Required equipments"
 												name="equipments"
 												defaultValue=""
@@ -185,7 +163,7 @@ const TaskDetail = ({
 														/>
 													</Fragment>
 												)}
-											</Field>
+											</Field> */}
 											<Field
 												label="Precedence tasks"
 												name="precedences"

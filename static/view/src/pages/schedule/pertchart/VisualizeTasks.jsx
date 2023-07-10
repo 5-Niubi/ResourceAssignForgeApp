@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
-import PertChart from "./PertChart";
+import { useParams } from "react-router";
 import TaskDetail from "./TaskDetail";
 import VisualizePageHeader from "./VisualizePageHeader";
 import { Field, Label } from "@atlaskit/form";
 import { DatePicker } from "@atlaskit/datetime-picker";
-import PertChart2 from "./PertChart2";
+import PertChart from "./PertChart";
+import { invoke } from "@forge/bridge";
 import { Content, Main, PageLayout, RightSidebar } from "@atlaskit/page-layout";
 import TasksCompact from "./TasksCompact";
-import { globalSelectedTasks } from "../data";
+import { globalSelectedTasks, sample } from "../data";
+import Toastify from "../../../common/Toastify";
 
 const startDate = (
 	<div>
@@ -18,118 +19,124 @@ const startDate = (
 );
 
 /**
+ * Find an object in a list of objects by its id
+ * @param {array} arr
+ * @param {*} id
+ * @returns object | null
+ */
+export const findObj = (arr, id) => {
+	for (let i = 0; i < arr.length; i++) {
+		if (arr[i].id == id) {
+			return arr[i];
+		}
+	}
+	return null;
+};
+
+// var tasksData = JSON.parse(localStorage.getItem("tasks"));
+// if (!tasksData) {
+// 	tasksData = [];
+// }
+
+var selectedData = JSON.parse(localStorage.getItem("selected"));
+if (!selectedData) {
+	selectedData = [];
+}
+
+/**
  * Using as Page to show pert chart and task dependences
  * @returns {import("react").ReactElement}
  */
 function VisualizeTasksPage() {
-    var sample = [
-		{
-			key: 1,
-			name: "Start",
-			duration: 0,
-			critical: true,
-			precedence: [],
-		},
-		{
-			key: 2,
-			name: "Task 1",
-			duration: 4,
-			critical: true,
-			precedence: [1],
-		},
-		{
-			key: 3,
-			name: "Task 2",
-			duration: 5.33,
-			critical: false,
-			precedence: [],
-		},
-		{
-			key: 4,
-			name: "Task 3 siêuuuuuuuuuuuuuuuuu dàiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii",
-			duration: 5.17,
-			critical: true,
-			precedence: [1, 2],
-		},
-		{
-			key: 5,
-			name: "Task 4",
-			duration: 6.33,
-			critical: false,
-			precedence: [],
-		},
-		{
-			key: 6,
-			name: "Task 5",
-			duration: 5.17,
-			critical: true,
-			precedence: [],
-		},
-		{
-			key: 7,
-			name: "Task 6",
-			duration: 4.5,
-			critical: false,
-			precedence: [],
-		},
-		{
-			key: 8,
-			name: "Task 7",
-			duration: 5.17,
-			critical: true,
-			precedence: [],
-		},
-		{
-			key: 9,
-			name: "Finish",
-			duration: 0,
-			critical: true,
-			precedence: [],
-		},
-		{
-			key: 10,
-			name: "Task 8",
-			duration: 0,
-			critical: true,
-			precedence: [],
-		},
-	];
-	const [tasks, setTasks] = useState(sample);
-	const [currentTask, setCurrentTask] = useState(null);
-    const [selected, setSelected] = useState(globalSelectedTasks);
+    let {project} = useParams();
+    // console.log(project);
+	// project;
+	//tasks represent list of all tasks in the pool of current project
+	//-which are shown in the right panel
+	const [tasks, setTasks] = useState([]);
+    useEffect(function () {
+		invoke("getTasks", { project })
+			.then(function (res) {
+				let tasks = [];
+				for (let t of res) {
+					tasks.push({
+						id: t.id,
+						name: t.name,
+						precedence: t.precedence,
+						duration: t.duration,
+					});
+				}
+				setTasks(tasks);
+			})
+			.catch(function (error) {
+				console.log(error);
+				Toastify.error(error);
+			});
+		return setTasks([]);
+	}, []);
 
-	const updateCurrentTask = (task) => {
-		setCurrentTask(task);
+    
+	//currentTask represents the selected task to be shown in the bottom panel
+	const [currentTaskId, setCurrentTaskId] = useState(null);
+
+	//selectedTask represents the all the tasks that are currently selected for the pert chart
+	const [selectedIds, setSelectedIds] = useState(selectedData);
+
+	const updateCurrentTaskId = (taskId) => {
+		setCurrentTaskId(taskId);
 	};
 
-	const updateSelectedTasks = (tasks) => {
-		setSelected(tasks);
+	const updateSelectedTaskIds = (taskIds) => {
+		setSelectedIds(taskIds);
 	};
 
-    const updateTasks = (tasks) => {
+	const updateTasks = (tasks) => {
 		setTasks(tasks);
 	};
 
+    useEffect(() => {
+		localStorage.setItem("selected", JSON.stringify(selectedIds));
+		// localStorage.setItem("tasks", JSON.stringify(tasks));
+	}, [selectedIds]);
+
+	const PertChartMemo = React.memo(
+		PertChart,
+		(prevProps, nextProps) =>
+			(prevProps.selectedTaskIds.length ===
+				nextProps.selectedTaskIds.length &&
+				prevProps.selectedTaskIds.every(
+					(value, index) => value == nextProps.selectedTaskIds[index]
+				)) ||
+			prevProps.tasks.every(
+				(value, index) =>
+					value.id == nextProps.tasks[index]?.id &&
+					value.precedence.length ===
+						nextProps.tasks[index].precedence.length &&
+					value.precedence.every(
+						(v, i) => v == nextProps.tasks[index].precedence[i]
+					)
+			)
+	);
 
 	return (
 		<div style={{ width: "100%" }}>
+			{console.log("Render")}
 			<PageLayout>
 				<Content>
 					<Main testId="main2" id="main2">
 						<VisualizePageHeader title="Visualize Tasks" />
 						{startDate}
-						<PertChart2
+						<PertChartMemo
 							tasks={tasks}
-							selectedTasks={selected}
-							updateCurrentTask={updateCurrentTask}
+							selectedTaskIds={selectedIds}
+							updateCurrentTaskId={updateCurrentTaskId}
 							updateTasks={updateTasks}
 						/>
 						<TaskDetail
 							tasks={tasks}
-							selectedTasks={selected}
-							currentTask={currentTask}
+							selectedTaskIds={selectedIds}
+							currentTaskId={currentTaskId}
 							updateTasks={updateTasks}
-							updateCurrentTask={updateCurrentTask}
 						/>
 					</Main>
 					<div
@@ -157,8 +164,9 @@ function VisualizeTasksPage() {
 							>
 								<TasksCompact
 									tasks={tasks}
-									setSelected={updateSelectedTasks}
-									updateCurrentTask={updateCurrentTask}
+                                    selectedIds = {selectedIds}
+									setSelectedIds={updateSelectedTaskIds}
+									updateCurrentTaskId={updateCurrentTaskId}
 								/>
 							</div>
 						</RightSidebar>

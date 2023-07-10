@@ -2,7 +2,6 @@ import ButtonGroup from "@atlaskit/button/button-group";
 import Button from "@atlaskit/button/standard-button";
 import __noop from "@atlaskit/ds-lib/noop";
 import PageHeader from "@atlaskit/page-header";
-import SelectTaskModal from "./modal/SelectTaskModal";
 import { useState } from "react";
 import EstimateModal from "./modal/EstimateModal";
 
