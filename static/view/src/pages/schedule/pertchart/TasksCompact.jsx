@@ -14,7 +14,7 @@ import { findObj } from "./VisualizeTasks";
 /**
  * List of tasks with only name; use for select task to appeared in the pertchart
  */
-const TasksCompact = ({ tasks, setSelectedIds, updateCurrentTaskId }) => {
+const TasksCompact = ({ tasks, selectedIds, setSelectedIds, updateCurrentTaskId }) => {
 	const handleChangeCheckbox = (e) => {
 		// console.log(e.currentTarget);
 		// console.log(e.currentTarget.checked);
@@ -24,21 +24,27 @@ const TasksCompact = ({ tasks, setSelectedIds, updateCurrentTaskId }) => {
 			.getElementsByTagName("input");
 		var selected = [];
 		for (let i = 0; i < inputs.length; i++) {
+            console.log(inputs[i].value);
 			if (inputs[i].checked) {
 				let taskId = inputs[i].value;
 				selected.push(taskId);
-				updateCurrentTaskId(taskId);
+				// updateCurrentTaskId(taskId);
 			}
 		}
-
-		updateGlobalSelectedTasks(selected);
-		setSelectedIds(globalSelectedTasks);
+		// updateGlobalSelectedTasks(selected);
+        // localStorage.setItem("selected", JSON.stringify(selected));
+		setSelectedIds(selected);
 	};
+    var selectedTasks = [];
+	selectedIds.forEach((id) => {
+		var task = findObj(tasks, id);
+		if (task) selectedTasks.push(task);
+	});
 
 	const rows = tasks.map((item, index) => {
 		let checked = false;
-		for (let i = 0; i < globalSelectedTasks.length; i++) {
-			if (globalSelectedTasks[i] == item.id) {
+		for (let i = 0; i < selectedIds.length; i++) {
+			if (selectedIds[i] == item.id) {
 				checked = true;
 				break;
 			}

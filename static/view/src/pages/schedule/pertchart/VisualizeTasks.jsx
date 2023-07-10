@@ -30,6 +30,16 @@ export const findObj = (arr, id) => {
 	return null;
 };
 
+var tasksData = JSON.parse(localStorage.getItem("tasks"));
+if (!tasksData) {
+	tasksData = [];
+}
+
+var selectedData = JSON.parse(localStorage.getItem("selected"));
+if (!selectedData) {
+	selectedData = [];
+}
+
 /**
  * Using as Page to show pert chart and task dependences
  * @returns {import("react").ReactElement}
@@ -37,13 +47,13 @@ export const findObj = (arr, id) => {
 function VisualizeTasksPage() {
 	//tasks represent list of all tasks in the pool of current project
 	//-which are shown in the right panel
-	const [tasks, setTasks] = useState(sample);
+	const [tasks, setTasks] = useState(tasksData);
 
 	//currentTask represents the selected task to be shown in the bottom panel
 	const [currentTaskId, setCurrentTaskId] = useState(null);
 
 	//selectedTask represents the all the tasks that are currently selected for the pert chart
-	const [selectedIds, setSelectedIds] = useState(globalSelectedTasks);
+	const [selectedIds, setSelectedIds] = useState(selectedData);
 
 	const updateCurrentTaskId = (taskId) => {
 		setCurrentTaskId(taskId);
@@ -56,6 +66,11 @@ function VisualizeTasksPage() {
 	const updateTasks = (tasks) => {
 		setTasks(tasks);
 	};
+
+    useEffect(() => {
+		localStorage.setItem("selected", JSON.stringify(selectedIds));
+		localStorage.setItem("tasks", JSON.stringify(tasks));
+	}, [selectedIds, tasks]);
 
 	const PertChartMemo = React.memo(
 		PertChart,
@@ -122,6 +137,7 @@ function VisualizeTasksPage() {
 							>
 								<TasksCompact
 									tasks={tasks}
+                                    selectedIds = {selectedIds}
 									setSelectedIds={updateSelectedTaskIds}
 									updateCurrentTaskId={updateCurrentTaskId}
 								/>
