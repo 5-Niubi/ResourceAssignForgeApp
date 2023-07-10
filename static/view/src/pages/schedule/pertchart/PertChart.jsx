@@ -78,12 +78,12 @@ const PertChart = ({
 			if (toTask) {
 				var existed = false;
 				toTask.precedence.forEach((pre) => {
-					if (pre == fromNode.ub.id) {
+					if (pre.precedenceId == fromNode.ub.id) {
 						return (existed = true);
 					}
 				});
 				if (!existed) {
-					toTask.precedence.push(fromNode.ub.id);
+					toTask.precedence.push({taskId: toTask.id, precedenceId: fromNode.ub.id});
 					updateCurrentTaskId(toTask.id);
 					updateTasks(tasks);
 				}
@@ -105,7 +105,7 @@ const PertChart = ({
 				// console.log("Deleted link to node:", toNode.data);
 				var toTask = findObj(tasks, toNode.data.id);
 				if (toTask) {
-					const index = toTask.precedence.indexOf(fromNode.data.id);
+					const index = toTask.precedence.indexOf({taskId: toTask, precedenceId: fromNode.data.id});
 					if (index > -1) {
 						// only splice array when item is found
 						toTask.precedence.splice(index, 1); // 2nd parameter means remove one item only
@@ -325,7 +325,7 @@ const PertChart = ({
 
 	function createDiagramModel(tasks) {
 		const $ = go.GraphObject.make;
-
+		console.log(tasks);
 		// generate key for each node using its id
 		tasks.forEach((task) => (task.key = task.id));
 
@@ -333,7 +333,7 @@ const PertChart = ({
 		var links = [];
 		tasks.forEach((task) =>
 			task.precedence.forEach((pre) =>
-				findObj(tasks, pre)
+				findObj(tasks, pre.precedenceId)
 					? links.push({ from: pre, to: task.id })
 					: null
 			)

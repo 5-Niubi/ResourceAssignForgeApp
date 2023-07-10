@@ -31,7 +31,7 @@ const TaskDetail = ({
 	);
 	var taskValues = [];
 	currentTask?.precedence.forEach((pre) => {
-		let task = findObj(tasks, pre);
+		let task = findObj(tasks, pre.precedenceId);
 		if (task) taskValues.push({ value: task.id, label: task.name });
 	});
 
@@ -42,7 +42,7 @@ const TaskDetail = ({
 
 	const handleChangePrecedence = (values, action) => {
 		var ids = [];
-		values.forEach((item) => ids.push(item.value));
+		values.forEach((item) => ids.push({taskId: currentTaskId, precedenceId: item.value}));
 
 		var task = findObj(tasks, currentTaskId);
 		if (task) {
