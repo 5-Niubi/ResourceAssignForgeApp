@@ -109,7 +109,7 @@ function App() {
 											<Route
 												path="/:projectId/*"
 												element={
-													<ProjectSideBar rootPath="/:project/" />
+													<ProjectSideBar rootPath="/:projectId/" />
 												}
 											></Route>
 										</Routes>
