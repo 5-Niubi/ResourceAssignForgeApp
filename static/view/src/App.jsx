@@ -24,11 +24,11 @@ function App() {
 
 	// Check authenticate every time reload page
 	useEffect(function () {
-		invoke("getIsAuthenticated").then(function (res) {
-			if (!res.isAuthenticated) {
-				setIsAuthenticated(false);
-			}
-		});
+		// invoke("getIsAuthenticated").then(function (res) {
+		// 	if (!res.isAuthenticated) {
+		// 		setIsAuthenticated(false);
+		// 	}
+		// });
 	}, []);
 
 	// // Set this app context to storage
@@ -79,24 +79,37 @@ function App() {
 									>
 										<Routes>
 											{/* Path with * take effect in all route after current */}
-											<Route path="/" element={<HomeSideBar rootPath="/" />}>
+											<Route
+												path="/"
+												element={
+													<HomeSideBar rootPath="/" />
+												}
+											>
 												<Route></Route>
 												<Route
 													path="/projects"
-													element={<HomeSideBar rootPath="/" />}
+													element={
+														<HomeSideBar rootPath="/" />
+													}
 												></Route>
 												<Route
 													path="/resources"
-													element={<HomeSideBar rootPath="/" />}
+													element={
+														<HomeSideBar rootPath="/" />
+													}
 												></Route>
 												<Route
 													path="/settings"
-													element={<HomeSideBar rootPath="/" />}
+													element={
+														<HomeSideBar rootPath="/" />
+													}
 												></Route>
 											</Route>
 											<Route
 												path="/:projectId/*"
-												element={<ProjectSideBar rootPath="/:project/" />}
+												element={
+													<ProjectSideBar rootPath="/:project/" />
+												}
 											></Route>
 										</Routes>
 									</Router>
@@ -110,8 +123,14 @@ function App() {
 										location={historyState.location}
 									>
 										<Routes>
-											<Route path="/" element={<ProjectListHome />}></Route>
-											<Route path="/startup" element={<StartUpPage />}></Route>
+											<Route
+												path="/"
+												element={<ProjectListHome />}
+											></Route>
+											<Route
+												path="/startup"
+												element={<StartUpPage />}
+											></Route>
 
 											<Route
 												path="/resources"
@@ -123,7 +142,10 @@ function App() {
 											></Route>
 
 											<Route path="/:projectId">
-												<Route path="" element={<SchedulePage />}></Route>
+												<Route
+													path=""
+													element={<SchedulePage />}
+												></Route>
                                                 <Route
 													path="estimation"
 													element={<EstimationPage />}
@@ -134,11 +156,15 @@ function App() {
 												></Route>
 												<Route
 													path="tasks"
-													element={<div>Tasks Page of</div>}
+													element={
+														<div>Tasks Page of</div>
+													}
 												></Route>
 												<Route
 													path="reports"
-													element={<div>Reporsts Page</div>}
+													element={
+														<div>Reporsts Page</div>
+													}
 												></Route>
 											</Route>
 										</Routes>
@@ -153,8 +179,7 @@ function App() {
 			) : (
 				<StartUpPage />
 			)}
-			<ToastContainer
-			/>
+			<ToastContainer />
 		</>
 	);
 }

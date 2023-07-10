@@ -22,7 +22,7 @@ export default function ScheduleTabs() {
 				<Tab><Badge>{4}</Badge> Gantt chart</Tab>
 			</TabList>
 			<TabPanel>
-				<VisualizeTasksPage />
+				<VisualizeTasksPage/>
 			</TabPanel>
             <TabPanel>
 				<EstimationPage />

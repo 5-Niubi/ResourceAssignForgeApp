@@ -28,7 +28,7 @@ const GanttChart = () => {
 				from: today - 1 * day,
 				to: today + 2 * day,
 				dependency: "",
-				resources: [
+				assignees: [
 					{
 						name: "Lisa Star",
 					},
@@ -39,6 +39,17 @@ const GanttChart = () => {
 						name: "Jack Coleman",
 					},
 				],
+				equipments: [
+					{
+						name: "Hailie Marshall",
+					},
+					{
+						name: "Morgan Nicholson",
+					},
+					{
+						name: "William Harriet",
+					},
+				],
 			},
 			{
 				id: "2",
@@ -47,7 +58,7 @@ const GanttChart = () => {
 				dependency: "1",
 				from: today - 2 * day,
 				to: today + 1 * day,
-				resources: [
+				assignees: [
 					{
 						name: "Martin Hammond",
 					},
@@ -58,6 +69,17 @@ const GanttChart = () => {
 						name: "Robert Sailor",
 					},
 				],
+				equipments: [
+					{
+						name: "Hailie Marshall",
+					},
+					{
+						name: "Morgan Nicholson",
+					},
+					{
+						name: "William Harriet",
+					},
+				],
 			},
 			{
 				id: "3",
@@ -66,7 +88,7 @@ const GanttChart = () => {
 				dependency: "1",
 				from: today + 0 * day,
 				to: today + 3 * day,
-				resources: [
+				assignees: [
 					{
 						name: "Mona Ricci",
 					},
@@ -77,6 +99,17 @@ const GanttChart = () => {
 						name: "Bob Shurro",
 					},
 				],
+				equipments: [
+					{
+						name: "Hailie Marshall",
+					},
+					{
+						name: "Morgan Nicholson",
+					},
+					{
+						name: "William Harriet",
+					},
+				],
 			},
 			{
 				id: "4",
@@ -85,7 +118,12 @@ const GanttChart = () => {
 				dependency: "",
 				from: today - 1 * day,
 				to: today + 1 * day,
-				resources: [
+				assignees: [
+					{
+						name: "Hailie Marshall",
+					},
+				],
+				equipments: [
 					{
 						name: "Hailie Marshall",
 					},
@@ -101,10 +139,10 @@ const GanttChart = () => {
 				id: "5",
 				name: "Task 5",
 				current: 0,
-				dependency: '4',
+				dependency: "4",
 				from: today - 50 * day,
 				to: today - 48 * day,
-				resources: [
+				assignees: [
 					{
 						name: "Harry Peterson",
 					},
@@ -115,15 +153,32 @@ const GanttChart = () => {
 						name: "Ron Donald",
 					},
 				],
+				equipments: [
+					{
+						name: "Hailie Marshall",
+					},
+					{
+						name: "Morgan Nicholson",
+					},
+					{
+						name: "William Harriet",
+					},
+				],
 			},
 		];
 
 		// Parse car data into series.
 		var data = tasks.map(function (task, i) {
-			var rname = task.resources.map(function (resource) {
-				return resource.name;
+			var assignTo = task.assignees.map(function (assignee) {
+				return assignee.name;
 			});
-			rname = rname.join(', ');
+			assignTo = assignTo.join(", ");
+
+			var equipments = task.equipments.map(function (e) {
+				return e.name;
+			});
+			equipments = equipments.join(", ");
+			
 			return {
 				id: task.id,
 				start: task.from,
@@ -131,7 +186,8 @@ const GanttChart = () => {
 				dependency: task.dependency,
 				y: i,
 				name: task.name,
-				resources: rname,
+				assignTo: assignTo,
+				equipments: equipments,
 			};
 		});
 
@@ -165,7 +221,7 @@ const GanttChart = () => {
 			},
 			tooltip: {
 				pointFormat:
-					"<span>Assigned To: {point.resources}</span><br/><span>From: {point.start:%e. %b}</span><br/><span>To: {point.end:%e. %b}</span>",
+					"<span>Assigned To: {point.assignTo}</span><br/><span>Equipments: {point.equipments}</span><br/><span>From: {point.start:%e. %b}</span><br/><span>To: {point.end:%e. %b}</span>",
 			},
 			scrollbar: {
 				enabled: true,
@@ -199,9 +255,9 @@ const GanttChart = () => {
 				},
 				{
 					dateTimeLabelFormats: {
-						month: '%B',
+						month: "%B",
 					},
-					tickInterval: day*30,
+					tickInterval: day * 30,
 				},
 			],
 			yAxis: {
@@ -220,10 +276,18 @@ const GanttChart = () => {
 						},
 						{
 							title: {
-								text: "Resources",
+								text: "Assignees",
 							},
 							categories: data.map(function (s) {
-								return s.resources;
+								return s.assignTo;
+							}),
+						},
+						{
+							title: {
+								text: "Equipments",
+							},
+							categories: data.map(function (s) {
+								return s.equipments;
 							}),
 						},
 					],
