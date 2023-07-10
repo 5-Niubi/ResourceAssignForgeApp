@@ -3,47 +3,42 @@ import PageHeader from "@atlaskit/page-header";
 import Button, { ButtonGroup } from "@atlaskit/button";
 import { Checkbox } from "@atlaskit/checkbox";
 import DynamicTable from "@atlaskit/dynamic-table";
-import { globalSelectedTasks, selectedTasks, updateGlobalSelectedTasks, updateSelectedTasks } from "../data";
+import {
+	globalSelectedTasks,
+	selectedTasks,
+	updateGlobalSelectedTasks,
+	updateSelectedTasks,
+} from "../data";
+import { findObj } from "./VisualizeTasks";
 
 /**
  * List of tasks with only name; use for select task to appeared in the pertchart
  */
-const TasksCompact = ({ tasks, setSelected, updateCurrentTask }) => {
-	
-
-	const getTaskById = (id) => {
-		for (let i = 0; i < tasks.length; i++) {
-			if (tasks[i].key == id) {
-				return tasks[i];
-			}
-		}
-		return null;
-	}
-
+const TasksCompact = ({ tasks, setSelectedIds, updateCurrentTaskId }) => {
 	const handleChangeCheckbox = (e) => {
 		// console.log(e.currentTarget);
 		// console.log(e.currentTarget.checked);
 		// console.log(e.currentTarget.value);
-		var inputs = document.getElementById("tasks").getElementsByTagName('input');
+		var inputs = document
+			.getElementById("tasks")
+			.getElementsByTagName("input");
 		var selected = [];
 		for (let i = 0; i < inputs.length; i++) {
 			if (inputs[i].checked) {
-				let task = getTaskById(inputs[i].value);
-				if (task) {
-					selected.push(task);
-					updateCurrentTask(task);
-				}
+				let taskId = inputs[i].value;
+				selected.push(taskId);
+				updateCurrentTaskId(taskId);
 			}
-		};
+		}
 
 		updateGlobalSelectedTasks(selected);
-		setSelected(globalSelectedTasks);
+		setSelectedIds(globalSelectedTasks);
 	};
 
 	const rows = tasks.map((item, index) => {
 		let checked = false;
-		for(let i = 0; i < globalSelectedTasks.length; i++) {
-			if (globalSelectedTasks[i].key == item.key){
+		for (let i = 0; i < globalSelectedTasks.length; i++) {
+			if (globalSelectedTasks[i] == item.id) {
 				checked = true;
 				break;
 			}
@@ -54,10 +49,18 @@ const TasksCompact = ({ tasks, setSelected, updateCurrentTask }) => {
 			cells: [
 				{
 					key: item.id,
-					content: <Checkbox size="large" value={item.key} isChecked={checked} onChange={handleChangeCheckbox} label={item.name}></Checkbox>,
-				}
+					content: (
+						<Checkbox
+							size="large"
+							value={item.id}
+							isChecked={checked}
+							onChange={handleChangeCheckbox}
+							label={item.name}
+						></Checkbox>
+					),
+				},
 			],
-		}
+		};
 	});
 
 	const actionsContent = (
