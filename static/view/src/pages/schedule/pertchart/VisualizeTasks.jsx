@@ -33,15 +33,7 @@ export const findObj = (arr, id) => {
 	return null;
 };
 
-// var tasksData = JSON.parse(localStorage.getItem("tasks"));
-// if (!tasksData) {
-// 	tasksData = [];
-// }
 
-var selectedData = JSON.parse(localStorage.getItem("selected"));
-if (!selectedData) {
-	selectedData = [];
-}
 
 /**
  * Using as Page to show pert chart and task dependences
@@ -49,27 +41,32 @@ if (!selectedData) {
  */
 function VisualizeTasksPage() {
 	let { projectId } = useParams();
-	// console.log(project);
-	// project;
+
+    //get from Local Storage
+    var tasksData = JSON.parse(localStorage.getItem("tasks"));
+	if (!tasksData) {
+		tasksData = [];
+	}
+	var selectedData = JSON.parse(localStorage.getItem("selected"));
+	if (!selectedData) {
+		selectedData = [];
+	}
+
 	//tasks represent list of all tasks in the pool of current project
 	//-which are shown in the right panel
 	const [tasks, setTasks] = useState([]);
-    // debugger;
 	useEffect(function () {
 		invoke("getTasksList", { projectId: Number(projectId) })
 			.then(function (res) {
-                console.log(res);
-                let tasks = [];
-				for (let t of res) {
-                    tasks.push(t);
-				}
-				setTasks(tasks);
+                if (!tasksData || tasksData.length === 0) {
+				    setTasks(res);
+                }
 			})
 			.catch(function (error) {
 				console.log(error);
 				Toastify.error(error);
 			});
-		return setTasks([]);
+		return setTasks(tasksData);
 	}, []);
 
 	//currentTask represents the selected task to be shown in the bottom panel
