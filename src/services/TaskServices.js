@@ -2,7 +2,6 @@ import APIServices from "./common/APIServices";
 
 async function getTasks(projectId) {
 	try {
-		console.log(projectId);
 		let response = await APIServices.get(`/api/Tasks/GetTasksPertChart`, {ProjectId: projectId});
 		return response;
 	} catch (error) {

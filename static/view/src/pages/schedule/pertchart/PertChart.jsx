@@ -20,7 +20,7 @@ const PertChart = ({
 	var bluefill = "#B3E5FC";
 
 	var selectedTasks = [];
-	selectedTaskIds.forEach((id) => {
+	selectedTaskIds?.forEach((id) => {
 		var task = findObj(tasks, id);
 		if (task) selectedTasks.push(task);
 	});
@@ -77,13 +77,13 @@ const PertChart = ({
 			var toTask = findObj(tasks, toNode.ub.id);
 			if (toTask) {
 				var existed = false;
-				toTask.precedence.forEach((pre) => {
+				toTask.precedence?.forEach((pre) => {
 					if (pre.precedenceId == fromNode.ub.id) {
 						return (existed = true);
 					}
 				});
 				if (!existed) {
-					toTask.precedence.push({taskId: toTask.id, precedenceId: fromNode.ub.id});
+					toTask.precedence?.push({taskId: toTask.id, precedenceId: fromNode.ub.id});
 					updateCurrentTaskId(toTask.id);
 					updateTasks(tasks);
 				}
@@ -105,7 +105,7 @@ const PertChart = ({
 				// console.log("Deleted link to node:", toNode.data);
 				var toTask = findObj(tasks, toNode.data.id);
 				if (toTask) {
-					const index = toTask.precedence.indexOf({taskId: toTask, precedenceId: fromNode.data.id});
+					const index = toTask.precedence?.indexOf({taskId: toTask, precedenceId: fromNode.data.id});
 					if (index > -1) {
 						// only splice array when item is found
 						toTask.precedence.splice(index, 1); // 2nd parameter means remove one item only
@@ -325,16 +325,15 @@ const PertChart = ({
 
 	function createDiagramModel(tasks) {
 		const $ = go.GraphObject.make;
-		console.log(tasks);
 		// generate key for each node using its id
-		tasks.forEach((task) => (task.key = task.id));
+		tasks?.forEach((task) => (task.key = task.id));
 
 		//get all link from precedence tasks pre-defined
 		var links = [];
-		tasks.forEach((task) =>
-			task.precedence.forEach((pre) =>
+		tasks?.forEach((task) =>
+			task.precedence?.forEach((pre) =>
 				findObj(tasks, pre.precedenceId)
-					? links.push({ from: pre, to: task.id })
+					? links.push({ from: pre.precedenceId, to: task.id })
 					: null
 			)
 		);

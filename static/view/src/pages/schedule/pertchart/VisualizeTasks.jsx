@@ -54,17 +54,14 @@ function VisualizeTasksPage() {
 	//tasks represent list of all tasks in the pool of current project
 	//-which are shown in the right panel
 	const [tasks, setTasks] = useState([]);
+    // debugger;
 	useEffect(function () {
 		invoke("getTasksList", { projectId: Number(projectId) })
 			.then(function (res) {
+                console.log(res);
                 let tasks = [];
 				for (let t of res) {
-                    tasks.push({
-                        id: t.id,
-						name: t.name,
-						precedence: t.precedence,
-						duration: t.duration,
-					});
+                    tasks.push(t);
 				}
 				setTasks(tasks);
 			})
@@ -95,8 +92,8 @@ function VisualizeTasksPage() {
 
 	useEffect(() => {
 		localStorage.setItem("selected", JSON.stringify(selectedIds));
-		// localStorage.setItem("tasks", JSON.stringify(tasks));
-	}, [selectedIds]);
+		localStorage.setItem("tasks", JSON.stringify(tasks));
+	}, [selectedIds, tasks]);
 
 	const PertChartMemo = React.memo(
 		PertChart,
@@ -113,7 +110,7 @@ function VisualizeTasksPage() {
 						nextProps.tasks[index].precedence.length &&
 					value.precedence.every(
 						(v, i) =>
-							v ==
+							v.precedenceId ==
 							nextProps.tasks[index].precedence[i].precedenceId
 					)
 			)
@@ -121,7 +118,6 @@ function VisualizeTasksPage() {
 
 	return (
 		<div style={{ width: "100%" }}>
-			{console.log("Render")}
 			<PageLayout>
 				<Content>
 					<Main testId="main2" id="main2">

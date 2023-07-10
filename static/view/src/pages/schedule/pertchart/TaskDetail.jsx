@@ -18,7 +18,7 @@ const TaskDetail = ({
 }) => {
 	var currentTask = findObj(tasks, currentTaskId);
 	var selectedTasks = [];
-	selectedTaskIds.forEach((id) => {
+	selectedTaskIds?.forEach((id) => {
 		var task = findObj(tasks, id);
 		if (task) selectedTasks.push(task);
 	});
@@ -30,19 +30,19 @@ const TaskDetail = ({
 		task.id != currentTaskId ? taskOpts.push({ value: task.id, label: task.name }) : ""
 	);
 	var taskValues = [];
-	currentTask?.precedence.forEach((pre) => {
+	currentTask?.precedence?.forEach((pre) => {
 		let task = findObj(tasks, pre.precedenceId);
 		if (task) taskValues.push({ value: task.id, label: task.name });
 	});
 
 	var skillOpts = [];
-	skills.forEach((skill) =>
+	skills?.forEach((skill) =>
 		skillOpts.push({ value: skill.id, label: skill.name })
 	);
 
 	const handleChangePrecedence = (values, action) => {
 		var ids = [];
-		values.forEach((item) => ids.push({taskId: currentTaskId, precedenceId: item.value}));
+		values?.forEach((item) => ids.push({taskId: currentTaskId, precedenceId: item.value}));
 
 		var task = findObj(tasks, currentTaskId);
 		if (task) {

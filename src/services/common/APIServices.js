@@ -20,7 +20,6 @@ class APIServices {
 					fetchUrl.searchParams.append(key, params[key])
 				);
 			}
-			console.log(fetchUrl.toString())
 			let response = await API.fetch(fetchUrl.toString(), {
 				method: "GET",
 				headers: {
