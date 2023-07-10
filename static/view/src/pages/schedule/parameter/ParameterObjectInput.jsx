@@ -6,6 +6,7 @@ import Form, { Field, FormFooter, HelperMessage, RangeField } from '@atlaskit/fo
 import Range from '@atlaskit/range';
 
 import Textfield from '@atlaskit/textfield';
+import LoadingModal from './LoadingModal';
 
 export default function ParameterObjectInput() {
     const [valueTime, setValueTime] = useState(50);
@@ -70,6 +71,7 @@ export default function ParameterObjectInput() {
             <Button type="submit" appearance="primary">
               Schedule
             </Button>
+            <LoadingModal></LoadingModal>
           </FormFooter>
         </form>
       )}

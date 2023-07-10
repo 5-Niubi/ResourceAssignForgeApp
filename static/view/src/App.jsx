@@ -12,6 +12,7 @@ import ProjectSideBar from "./components/side-nav/ProjectSideBar";
 import Spinner from "@atlaskit/spinner";
 import StartUpPage from "./pages/startup/StartUpPage";
 import { ToastContainer } from "react-toastify";
+import EstimationPage from "./pages/schedule/estimation";
 
 function App() {
 	// Enable auto change theme Dark/light mode within Jira
@@ -144,6 +145,10 @@ function App() {
 												<Route
 													path=""
 													element={<SchedulePage />}
+												></Route>
+                                                <Route
+													path="estimation"
+													element={<EstimationPage />}
 												></Route>
 												<Route
 													path="schedule"
