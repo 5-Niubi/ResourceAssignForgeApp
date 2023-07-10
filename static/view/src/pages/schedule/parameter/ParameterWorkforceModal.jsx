@@ -1,4 +1,4 @@
-import { useCallback, useState, Fragment } from "react";
+import { useCallback,useEffect, useState, Fragment } from "react";
 import { css, jsx } from "@emotion/react";
 import DynamicTable from "@atlaskit/dynamic-table";
 import Button, { ButtonGroup } from "@atlaskit/button";
@@ -15,6 +15,8 @@ import Modal, {
 	ModalTitle,
 	ModalTransition,
 } from "@atlaskit/modal-dialog";
+import { invoke } from "@forge/bridge";
+import Toastify from "../../../common/Toastify";
 
 import LoadingButton from "@atlaskit/button";
 import { Checkbox } from "@atlaskit/checkbox";
@@ -30,7 +32,6 @@ import Form, {
 	RequiredAsterisk,
 	ValidMessage,
 } from "@atlaskit/form";
-import { workforces } from "../../resources/workforces/table-content/workforces";
 import AddCircle from "@atlaskit/icon/glyph/add-circle";
 
 const boldStyles = css({
@@ -366,6 +367,65 @@ export function ParameterSkillsTable() {
 }
 
 export function ParameterSelectWorkforcesTable() {
+        const [TableLoadingState, setTableLoadingState] = useState(true);
+        const [searchInput, setSearchInput] = useState("");
+        const [workforces, setWorkforces] = useState([]);
+
+        //FILTER WORKFORCE SELECT TABLE
+        const [workforcesFilter, setWorkforcesFilter] = useState(workforces);
+
+        const filterWorkforceName = useCallback(function (workforces, query) {
+            setWorkforcesFilter(
+                workforces.filter((e) => e.name.toLowerCase().includes(query.toLowerCase()))
+            );
+        }, []);
+    
+        useEffect(
+            function () {
+                filterWorkforceName(workforces, searchInput);
+            },
+            [workforces]
+        );
+
+        function handleOnSearchBoxChange(e) {
+            setSearchInput(e.target.value);
+            filterWorkforceName(workforces, searchInput);
+        }
+
+        function handleOnSearch() {
+            filterWorkforceName(workforces, searchInput);
+        }
+
+        //GET LIST WORKFORCES
+        useEffect(function () {
+            invoke("getAllWorkforces")
+                .then(function (res) {
+                    setTableLoadingState(false);
+                    let workforces = [];
+                    for (let workforce of res){
+                        let itemWorkforce = {
+                            id: workforce.id,
+                            accountId: workforce.accountId,
+                            email: workforce.email,
+                            accountType: workforce.accountType,
+                            name: workforce.name,
+                            avatar: workforce.avatar,
+                            displayName: workforce.displayName,
+                            unitSalary: workforce.unitSalary,
+                            workingType: workforce.workingType,
+                            workingEffort: workforce.workingEffort,
+                        };
+                        workforces.push(itemWorkforce);
+                    }
+                    setWorkforces(workforces);
+                    filterWorkforceName(workforces, searchInput);
+                })
+                .catch(function (error) {
+                    console.log(error);
+                    Toastify.error(error);
+                });
+        }, []);
+
 	const head = {
 		cells: [
 			{
@@ -381,12 +441,12 @@ export function ParameterSelectWorkforcesTable() {
 		],
 	};
 
-	const rows = workforces?.map((workforce) => ({
-		key: name,
+	const rows = workforcesFilter?.map((workforce, index) => ({
+		key: workforce.id,
 		cells: [
 			{
 				key: "no",
-				content: <Checkbox></Checkbox>,
+				content: <Checkbox isChecked></Checkbox>,
 			},
 			{
 				key: "name",
@@ -403,6 +463,9 @@ export function ParameterSelectWorkforcesTable() {
 						isCompact
 						placeholder="Search Workforce Name"
 						aria-label="Filter"
+                        onChange={handleOnSearchBoxChange}
+                        value={searchInput}
+                        onClick={handleOnSearch}
 					/>
 				</div>
 				<div
@@ -418,6 +481,7 @@ export function ParameterSelectWorkforcesTable() {
 				head={head}
 				rows={rows}
 				isFixedSize
+                isLoading={TableLoadingState}
 			/>
 		</>
 	);
