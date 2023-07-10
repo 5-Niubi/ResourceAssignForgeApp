@@ -12,6 +12,7 @@ import ProjectSideBar from "./components/side-nav/ProjectSideBar";
 import Spinner from "@atlaskit/spinner";
 import StartUpPage from "./pages/startup/StartUpPage";
 import { ToastContainer } from "react-toastify";
+import TestModal from "./pages/TestModal";
 import EstimationPage from "./pages/schedule/estimation";
 
 function App() {
@@ -108,7 +109,7 @@ function App() {
 											<Route
 												path="/:projectId/*"
 												element={
-													<ProjectSideBar rootPath="/:project/" />
+													<ProjectSideBar rootPath="/:projectId/" />
 												}
 											></Route>
 										</Routes>
@@ -139,6 +140,10 @@ function App() {
 											<Route
 												path="/settings"
 												element={<div>Settings</div>}
+											></Route>
+											<Route
+												path="/modals"
+												element={<TestModal/>}
 											></Route>
 
 											<Route path="/:projectId">

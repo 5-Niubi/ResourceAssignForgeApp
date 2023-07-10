@@ -9,16 +9,15 @@ import React, { useContext } from "react";
 import { DropdownItem, DropdownItemGroup } from "@atlaskit/dropdown-menu";
 import { ModalStateContext } from "../../ProjectsListHome";
 
-function ProjectDropdownAction(project) {
+function ProjectDropdownAction({project}) {
 	const { setModalEditState, setModalDeleteState } =
 		useContext(ModalStateContext);
 	function editOnClick() {
-		debugger;
-		setModalEditState({ project: {...project}, isOpen: true });
+		setModalEditState({ project, isOpen: true });
 	}
 
 	function deleteOnClick() {
-		setModalDeleteState({ project: {...project}, isOpen: true });
+		setModalDeleteState({ project, isOpen: true });
 	}
 
 	return (

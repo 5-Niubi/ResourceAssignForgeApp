@@ -2,19 +2,19 @@
 import React, { useCallback, createContext, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import ProjecstListHomePageHeader from "./page-header/ProjectsListHomePageHeader";
-import ProjectsListHomeTable from "./table/ProjectsListHomeTable";
-import Pagination from "@atlaskit/pagination";
+
 import { useMediaQuery } from "react-responsive";
 import { Grid, GridColumn } from "@atlaskit/page";
 import { Desktop } from "../../components/common/responsesive";
 import { MEDIA_QUERY, MODAL_WIDTH } from "../../common/contants";
-import Modal, { ModalTransition } from "@atlaskit/modal-dialog";
 import CreateProjectModal from "./modal/CreateProjectModal";
 import { invoke } from "@forge/bridge";
 import ProjectListDynamicTable from "./table/ProjectListDynamicTable";
 import EditProjectModal from "./modal/EditProjectModal";
 import DeleteProjectModal from "./modal/DeleteProjectModal";
 import Toastify from "../../common/Toastify";
+import EmptyState from "@atlaskit/empty-state";
+import Button from "@atlaskit/button";
 
 const width = MODAL_WIDTH.M;
 const modalInitState = { project: {}, isOpen: false };
@@ -22,26 +22,40 @@ export const ModalStateContext = createContext();
 
 function ProjectListHome() {
 	const columns = 10;
+	const [searchParams, setSearchParams] = useSearchParams();
+	const isDesktopOrLaptop = useMediaQuery({
+		query: `(min-width: ${MEDIA_QUERY.DESKTOP_LAPTOP.MIN}px)`,
+	});
+	const [projectTableLoadingState, setProjectTableLoadingState] =
+		useState(true);
 
 	const [isModalCreateOpen, setIsModalCreateOpen] = useState(false);
 	const [modalDeleteState, setModalDeleteState] = useState(modalInitState);
 	const [modalEditState, setModalEditState] = useState(modalInitState);
 
-	const isDesktopOrLaptop = useMediaQuery({
-		query: `(min-width: ${MEDIA_QUERY.DESKTOP_LAPTOP.MIN}px)`,
-	});
-
-	const [searchBoxValue, setSearchBoxValue] = useState("");
-	const [searchParams, setSearchParams] = useSearchParams();
-	const [page, setPage] = useState(
-		searchParams.get("page") ? searchParams.get("page") : 1
+	const [searchBoxValue, setSearchBoxValue] = useState(
+		searchParams.get("q") ? searchParams.get("q") : ""
 	);
 
 	const [projects, setProjects] = useState([]);
+	const [projectsForDisplay, setProjectsForDisplay] = useState(projects);
 
+	const filterProjectName = useCallback(function (projects, query) {
+		setProjectsForDisplay(
+			projects.filter((e) => e.name.toLowerCase().includes(query.toLowerCase()))
+		);
+	}, []);
+
+	useEffect(
+		function () {
+			filterProjectName(projects, searchBoxValue);
+		},
+		[projects]
+	);
 	useEffect(function () {
-		invoke("getProjectsList", { page })
+		invoke("getProjectsList")
 			.then(function (res) {
+				setProjectTableLoadingState(false);
 				let projectsList = [];
 				for (let project of res) {
 					let itemProject = {};
@@ -55,20 +69,22 @@ function ProjectListHome() {
 					projectsList.push(itemProject);
 				}
 				setProjects(projectsList);
+				filterProjectName(projectsList, searchBoxValue);
 			})
 			.catch(function (error) {
 				console.log(error);
 				Toastify.error(error);
 			});
-		return setProjects([]);
 	}, []);
 
 	function handleOnSearchBoxChange(e) {
 		setSearchBoxValue(e.target.value);
+		setSearchParams({ q: e.target.value });
+		filterProjectName(projects, searchBoxValue);
 	}
 
-	function handleOnSearchButtonClick() {
-		searchBoxValue;
+	function handleOnSearch() {
+		filterProjectName(projects, searchBoxValue);
 	}
 
 	return (
@@ -79,21 +95,41 @@ function ProjectListHome() {
 						createProjectButtonOnClick={() => setIsModalCreateOpen(true)}
 						searchBoxValue={searchBoxValue}
 						onSearchBoxChange={handleOnSearchBoxChange}
-						onSearchButtonClick={handleOnSearchButtonClick}
+						onSearchButtonClick={handleOnSearch}
 					/>
 				</GridColumn>
-				<GridColumn medium={isDesktopOrLaptop ? 7 : columns}>
-					<div style={{ marginBottom: "1rem" }}>
-						<ModalStateContext.Provider
-							value={{ setModalEditState, setModalDeleteState }}
-						>
-							<ProjectListDynamicTable content={projects} />
-						</ModalStateContext.Provider>
-					</div>
-				</GridColumn>
-				<Desktop>
-					<GridColumn medium={3}>{/* <div>Hover panel</div> */}</GridColumn>
-				</Desktop>
+
+				{!projectTableLoadingState && projects.length === 0 ? (
+					<GridColumn medium={columns}>
+						<EmptyState
+							header="Empty"
+							description="Look like you haven't create any projects yet. Create a new project to start using this app"
+							primaryAction={
+								<Button appearance="primary" onClick={setIsModalCreateOpen}>
+									Create project
+								</Button>
+							}
+						/>
+					</GridColumn>
+				) : (
+					<>
+						<GridColumn medium={isDesktopOrLaptop ? 7 : columns}>
+							<div style={{ marginBottom: "1rem" }}>
+								<ModalStateContext.Provider
+									value={{ setModalEditState, setModalDeleteState }}
+								>
+									<ProjectListDynamicTable
+										isLoading={projectTableLoadingState}
+										content={projectsForDisplay}
+									/>
+								</ModalStateContext.Provider>
+							</div>
+						</GridColumn>
+						<Desktop>
+							<GridColumn medium={3}>{/* <div>Hover panel</div> */}</GridColumn>
+						</Desktop>
+					</>
+				)}
 			</Grid>
 			{isModalCreateOpen ? (
 				<CreateProjectModal

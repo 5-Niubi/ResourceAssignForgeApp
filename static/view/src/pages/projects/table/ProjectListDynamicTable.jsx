@@ -9,19 +9,19 @@ import { formatDateDMY } from "../../../common/utils";
 import Link from "../../../components/common/Link";
 import { ROW_PER_PAGE } from "../../../common/contants";
 
-function ProjectListDynamicTable({ content }) {
+function ProjectListDynamicTable({ isLoading, content }) {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [page, setPage] = useState(
 		searchParams.get("page") ? Number(searchParams.get("page")) : 1
 	);
 
 	const rows = content.map((data, index) => ({
-		key: `row-${index+1}-${data.name}`,
+		key: `row-${index + 1}-${data.name}`,
 		isHighlighted: false,
 		cells: [
 			{
 				key: data.id,
-				content: index+1,
+				content: index + 1,
 			},
 			{
 				key: data.id,
@@ -31,7 +31,7 @@ function ProjectListDynamicTable({ content }) {
 							<Avatar
 								size="small"
 								appearance="square"
-								src={"https://placehold.co/600x400"}
+								src={""}
 								name="Project Avatar"
 							/>
 						</span>
@@ -62,13 +62,17 @@ function ProjectListDynamicTable({ content }) {
 				rows={rows}
 				rowsPerPage={ROW_PER_PAGE}
 				defaultPage={1}
+				page={page}
 				isFixedSize
 				defaultSortKey="no"
 				defaultSortOrder="DESC"
 				onSort={() => console.log("onSort")}
-				onSetPage={(page) => { setPage(page); setSearchParams({page: `${page}`})}}
-				isLoading={content.length == 0}
-				page={page}
+				onSetPage={(page) => {
+					setPage(page);
+					setSearchParams({ page: `${page}` });
+				}}
+				isLoading={isLoading}
+				emptyView={<h2>Not found any project match</h2>}
 			/>
 		</>
 	);
