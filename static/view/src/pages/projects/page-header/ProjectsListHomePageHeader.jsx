@@ -34,23 +34,6 @@ function ProjecstListHomePageHeader({
 				/>
 			</div>
 			<div style={{ flex: "0 0 200px", marginLeft: token("space.100", "8px") }}>
-				<Select
-					spacing="compact"
-					placeholder="Sorted by"
-					aria-label="Choose an option"
-					options={[
-						{ label: "Adelaide", value: "adelaide" },
-						{ label: "Brisbane", value: "brisbane" },
-						{ label: "Canberra", value: "canberra" },
-						{ label: "Darwin", value: "darwin" },
-						{ label: "Hobart", value: "hobart" },
-						{ label: "Melbourne", value: "melbourne" },
-						{ label: "Perth", value: "perth" },
-						{ label: "Sydney", value: "sydney" },
-					]}
-				/>
-			</div>
-			<div style={{ flex: "0 0 200px", marginLeft: token("space.100", "8px") }}>
 				<Button onClick={onSearchButtonClick}>Search</Button>
 			</div>
 		</div>
