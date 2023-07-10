@@ -25,11 +25,11 @@ function App() {
 
 	// Check authenticate every time reload page
 	useEffect(function () {
-		// invoke("getIsAuthenticated").then(function (res) {
-		// 	if (!res.isAuthenticated) {
-		// 		setIsAuthenticated(false);
-		// 	}
-		// });
+		invoke("getIsAuthenticated").then(function (res) {
+			if (!res.isAuthenticated) {
+				setIsAuthenticated(false);
+			}
+		});
 	}, []);
 
 	// // Set this app context to storage

@@ -48,23 +48,20 @@ if (!selectedData) {
  * @returns {import("react").ReactElement}
  */
 function VisualizeTasksPage() {
-    let {project} = useParams();
-    // console.log(project);
+	let { projectId } = useParams();
+	// console.log(project);
 	// project;
 	//tasks represent list of all tasks in the pool of current project
 	//-which are shown in the right panel
 	const [tasks, setTasks] = useState([]);
-    useEffect(function () {
-		invoke("getTasks", { project })
+    // debugger;
+	useEffect(function () {
+		invoke("getTasksList", { projectId: Number(projectId) })
 			.then(function (res) {
-				let tasks = [];
+                console.log(res);
+                let tasks = [];
 				for (let t of res) {
-					tasks.push({
-						id: t.id,
-						name: t.name,
-						precedence: t.precedence,
-						duration: t.duration,
-					});
+                    tasks.push(t);
 				}
 				setTasks(tasks);
 			})
@@ -75,7 +72,6 @@ function VisualizeTasksPage() {
 		return setTasks([]);
 	}, []);
 
-    
 	//currentTask represents the selected task to be shown in the bottom panel
 	const [currentTaskId, setCurrentTaskId] = useState(null);
 
@@ -94,10 +90,10 @@ function VisualizeTasksPage() {
 		setTasks(tasks);
 	};
 
-    useEffect(() => {
+	useEffect(() => {
 		localStorage.setItem("selected", JSON.stringify(selectedIds));
-		// localStorage.setItem("tasks", JSON.stringify(tasks));
-	}, [selectedIds]);
+		localStorage.setItem("tasks", JSON.stringify(tasks));
+	}, [selectedIds, tasks]);
 
 	const PertChartMemo = React.memo(
 		PertChart,
@@ -113,14 +109,15 @@ function VisualizeTasksPage() {
 					value.precedence.length ===
 						nextProps.tasks[index].precedence.length &&
 					value.precedence.every(
-						(v, i) => v == nextProps.tasks[index].precedence[i]
+						(v, i) =>
+							v.precedenceId ==
+							nextProps.tasks[index].precedence[i].precedenceId
 					)
 			)
 	);
 
 	return (
 		<div style={{ width: "100%" }}>
-			{console.log("Render")}
 			<PageLayout>
 				<Content>
 					<Main testId="main2" id="main2">
@@ -164,7 +161,7 @@ function VisualizeTasksPage() {
 							>
 								<TasksCompact
 									tasks={tasks}
-                                    selectedIds = {selectedIds}
+									selectedIds={selectedIds}
 									setSelectedIds={updateSelectedTaskIds}
 									updateCurrentTaskId={updateCurrentTaskId}
 								/>
