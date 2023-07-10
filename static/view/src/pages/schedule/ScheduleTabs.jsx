@@ -3,7 +3,6 @@ import VisualizeTasksPage from "./pertchart/VisualizeTasks";
 import ParameterPageHeader from "./parameter/ParameterPageHeader";
 import ParameterDynamicTable from "./parameter/ParameterDynamicTable";
 import ParameterWorkforceList from "./parameter/ParameterWorkforceList";
-import ParameterEquipmentList from "./parameter/ParameterEquipmentList";
 import ParameterObjectInput from "./parameter/ParameterObjectInput";
 import GanttChartPage from "./ganttchart/GanttChartPage";
 import Badge from '@atlaskit/badge';
@@ -32,7 +31,6 @@ export default function ScheduleTabs() {
                     <ParameterPageHeader></ParameterPageHeader>
                     <ParameterDynamicTable></ParameterDynamicTable>
                     <ParameterWorkforceList></ParameterWorkforceList>
-                    <ParameterEquipmentList></ParameterEquipmentList>
                     <ParameterObjectInput></ParameterObjectInput>
                 </div>
             </TabPanel>
