@@ -12,6 +12,7 @@ import ProjectSideBar from "./components/side-nav/ProjectSideBar";
 import Spinner from "@atlaskit/spinner";
 import StartUpPage from "./pages/startup/StartUpPage";
 import { ToastContainer } from "react-toastify";
+import TestModal from "./pages/TestModal";
 
 function App() {
 	// Enable auto change theme Dark/light mode within Jira
@@ -119,6 +120,10 @@ function App() {
 											<Route
 												path="/settings"
 												element={<div>Settings</div>}
+											></Route>
+											<Route
+												path="/modals"
+												element={<TestModal/>}
 											></Route>
 
 											<Route path="/:projectId">
