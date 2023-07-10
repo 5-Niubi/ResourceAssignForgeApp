@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
+import { useParams } from "react-router";
 import TaskDetail from "./TaskDetail";
 import VisualizePageHeader from "./VisualizePageHeader";
 import { Field, Label } from "@atlaskit/form";
 import { DatePicker } from "@atlaskit/datetime-picker";
 import PertChart from "./PertChart";
+import { invoke } from "@forge/bridge";
 import { Content, Main, PageLayout, RightSidebar } from "@atlaskit/page-layout";
 import TasksCompact from "./TasksCompact";
 import { globalSelectedTasks, sample } from "../data";
+import Toastify from "../../../common/Toastify";
 
 const startDate = (
 	<div>
@@ -30,10 +33,10 @@ export const findObj = (arr, id) => {
 	return null;
 };
 
-var tasksData = JSON.parse(localStorage.getItem("tasks"));
-if (!tasksData) {
-	tasksData = [];
-}
+// var tasksData = JSON.parse(localStorage.getItem("tasks"));
+// if (!tasksData) {
+// 	tasksData = [];
+// }
 
 var selectedData = JSON.parse(localStorage.getItem("selected"));
 if (!selectedData) {
@@ -45,10 +48,34 @@ if (!selectedData) {
  * @returns {import("react").ReactElement}
  */
 function VisualizeTasksPage() {
+    let {project} = useParams();
+    // console.log(project);
+	// project;
 	//tasks represent list of all tasks in the pool of current project
 	//-which are shown in the right panel
-	const [tasks, setTasks] = useState(tasksData);
+	const [tasks, setTasks] = useState([]);
+    useEffect(function () {
+		invoke("getTasks", { project })
+			.then(function (res) {
+				let tasks = [];
+				for (let t of res) {
+					tasks.push({
+						id: t.id,
+						name: t.name,
+						precedence: t.precedence,
+						duration: t.duration,
+					});
+				}
+				setTasks(tasks);
+			})
+			.catch(function (error) {
+				console.log(error);
+				Toastify.error(error);
+			});
+		return setTasks([]);
+	}, []);
 
+    
 	//currentTask represents the selected task to be shown in the bottom panel
 	const [currentTaskId, setCurrentTaskId] = useState(null);
 
@@ -69,8 +96,8 @@ function VisualizeTasksPage() {
 
     useEffect(() => {
 		localStorage.setItem("selected", JSON.stringify(selectedIds));
-		localStorage.setItem("tasks", JSON.stringify(tasks));
-	}, [selectedIds, tasks]);
+		// localStorage.setItem("tasks", JSON.stringify(tasks));
+	}, [selectedIds]);
 
 	const PertChartMemo = React.memo(
 		PertChart,

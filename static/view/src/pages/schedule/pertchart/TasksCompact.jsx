@@ -19,6 +19,7 @@ const TasksCompact = ({ tasks, selectedIds, setSelectedIds, updateCurrentTaskId 
 		// console.log(e.currentTarget);
 		// console.log(e.currentTarget.checked);
 		// console.log(e.currentTarget.value);
+        updateCurrentTaskId(e.currentTarget.value);
 		var inputs = document
 			.getElementById("tasks")
 			.getElementsByTagName("input");
@@ -32,7 +33,6 @@ const TasksCompact = ({ tasks, selectedIds, setSelectedIds, updateCurrentTaskId 
 			}
 		}
 		// updateGlobalSelectedTasks(selected);
-        // localStorage.setItem("selected", JSON.stringify(selected));
 		setSelectedIds(selected);
 	};
     var selectedTasks = [];
