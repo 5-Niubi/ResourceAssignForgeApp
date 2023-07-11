@@ -26,6 +26,24 @@ const PertChart = ({
 	});
 	// console.log(selectedTasks);
 
+	//add dummy tasks to the task list
+	tasks.unshilf({
+		id: -1,
+		name: "Start",
+		duration: 0,
+		milestoneId: 0,
+		precedences: [],
+		skillRequireds: [],
+	});
+	tasks.push({
+		id: -2,
+		name: "Finish",
+		duration: 0,
+		milestoneId: 0,
+		precedences: [],
+		skillRequireds: [],
+	});
+
 	useEffect(() => {
 		const $ = go.GraphObject.make;
 
@@ -64,7 +82,8 @@ const PertChart = ({
 
 		diagram.nodeTemplate = createNodeTemplate();
 		diagram.linkTemplate = createLinkTemplate();
-		diagram.model = createDiagramModel(selectedTasks);
+		// diagram.model = createDiagramModel(selectedTasks);
+		diagram.model = createDiagramModel(tasks);
 
 		//event listener
 		diagram.addDiagramListener("LinkDrawn", (e) => {
@@ -347,7 +366,6 @@ const PertChart = ({
 		var links = [];
 		tasks?.forEach((task) =>
 			task.precedences?.forEach((pre) =>{
-				console.log(pre)
 				findObj(tasks, pre.precedenceId)
 					? links.push({ from: pre.precedenceId, to: task.id })
 					: null
