@@ -88,10 +88,11 @@ const TasksCompact = ({ tasks, selectedIds, setSelectedIds, updateCurrentTaskId 
 		<div id="tasks">
 			<PageHeader actions={actionsContent}>Tasks list:</PageHeader>
 			<div
+				class="inner"
 				style={{
 					width: "100%",
 					height: "80vh",
-					overflowY: "scroll",
+					overflowY: "auto",
 					scrollbarWidth: "thin",
 					
 				}}

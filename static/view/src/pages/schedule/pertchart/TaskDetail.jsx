@@ -15,9 +15,13 @@ import Toastify from "../../../common/Toastify";
 const TaskDetail = ({
 	tasks,
 	skills,
+	milestones,
 	selectedTaskIds,
 	currentTaskId,
 	updateTasks,
+	updateDependenciesChanged,
+	updateTaskSkillsChanged,
+	updateCanEstimate,
 }) => {
 	var currentTask = findObj(tasks, currentTaskId);
 	var selectedTasks = [];
@@ -46,21 +50,6 @@ const TaskDetail = ({
 		precedences: [],
 		skillRequireds: [],
 	});
-
-	// const [skills, setSkills] = useState([]);
-	// useEffect(function () {
-	// 	invoke("getAllSkills", {})
-	// 		.then(function (res) {
-	// 			if (Object.keys(res).length !== 0) {
-	// 				setSkills(res);
-	// 			} else setSkills([]);
-	// 		})
-	// 		.catch(function (error) {
-	// 			console.log(error);
-	// 			Toastify.error(error);
-	// 		});
-	// 	return setSkills([]);
-	// }, []);
 
 	var taskOpts = [];
 	var taskValues = [];
@@ -95,27 +84,33 @@ const TaskDetail = ({
 		}
 	});
 
+	var milestoneOpts = [];
+	var milestoneValue = {};
+	milestones?.forEach((milestone) => {
+		milestoneOpts.push({
+			value: milestone.id,
+			label: milestone.name,
+		});
+	});
+	if (currentTask?.milestoneId) {
+		var milestone = findObj(milestones, currentTask.milestoneId);
+		if (milestone){
+			milestoneValue = {
+				value: milestone.id,
+				label: milestone.name,
+			};
+		}
+	}
+
 	const handleChangePrecedence = (values) => {
 		var ids = [];
 		values?.forEach((item) =>
 			ids.push({ taskId: currentTaskId, precedenceId: item.value })
 		);
 
-		// var task = findObj(tasks, currentTaskId);
-		// if (task) {
-		// 	// console.log(ids);
-		// 	// console.log(task);
-		// }
-		for(let i = 0; i < tasks.length; i++) {
-			if (tasks[i].id == currentTaskId) {
-				tasks[i].precedences = ids;
-				break;
-			}
-		}
-		// tasks.every((task) => {
-		// });
-		// currentTask.precedence = ids;
-		updateTasks(tasks);
+		currentTask.precedences = ids;
+		updateDependenciesChanged(ids);
+		updateCanEstimate(false);
 	};
 
 	const handleChangeSkill = (values) => {
@@ -126,23 +121,20 @@ const TaskDetail = ({
 			skills.push({ skillId: items[0], level: items[1] });
 		});
 
-		// var task = findObj(tasks, currentTaskId);
-		// if (currentTask) {
-		// 	// console.log(ids);
-		// 	// console.log(task);
-		// }
-		for (let i = 0; i < tasks.length; i++) {
-			if (tasks[i].id == currentTaskId) {
-				tasks[i].skillRequireds = skills;
-				break;
-			}
-		}
-		// currentTask.precedence = ids;
-		updateTasks(tasks);
+		currentTask.skillRequireds = skills;
+		updateTaskSkillsChanged(skills);
+		updateCanEstimate(false);
 	};
 
 	return (
-		<div style={{ borderTop: "1px solid #e5e5e5" }}>
+		<div
+			class="task-details"
+			style={{
+				borderTop: "1px solid #e5e5e5",
+				height: "40vh",
+				overflowY: "auto",
+			}}
+		>
 			{/* <PageHeader actions={actionsContent}>Task details:</PageHeader> */}
 			<PageHeader>Task details:</PageHeader>
 			<div style={{ width: "100%" }}>
@@ -275,7 +267,7 @@ const TaskDetail = ({
 													</Fragment>
 												)}
 											</Field>
-											{/* <Field
+											<Field
 												label="Milestone"
 												name="milestone"
 												defaultValue=""
@@ -286,8 +278,12 @@ const TaskDetail = ({
 															{...fieldProps}
 															inputId="select-milestone"
 															className="select-milestone"
-															options={taskOpts}
-															value={taskValues}
+															options={
+																milestoneOpts
+															}
+															value={
+																milestoneValue
+															}
 															// onChange={
 															// 	handleChangeMilestone
 															// }
@@ -296,7 +292,7 @@ const TaskDetail = ({
 														/>
 													</Fragment>
 												)}
-											</Field> */}
+											</Field>
 										</div>
 									</div>
 								</form>

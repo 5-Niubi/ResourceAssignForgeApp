@@ -7,11 +7,19 @@ import ParameterObjectInput from "./parameter/ParameterObjectInput";
 import GanttChartPage from "./ganttchart/GanttChartPage";
 import Badge from '@atlaskit/badge';
 import EstimationPage from "./estimation";
+import { useCallback, useState } from "react";
 
 export default function ScheduleTabs() {
+	const [selected, setSelected] = useState(0);
+
+	const handleChangeTab = useCallback(
+		(index) => setSelected(index),
+		[setSelected]
+	);
 	return (
 		<Tabs
-			onChange={(index) => console.log("Selected Tab", index + 1)}
+			onChange={handleChangeTab}
+			selected={selected}
 			id="default"
 		>
 			<TabList>
@@ -21,7 +29,7 @@ export default function ScheduleTabs() {
 				<Tab><Badge>{4}</Badge> Gantt chart</Tab>
 			</TabList>
 			<TabPanel>
-				<VisualizeTasksPage/>
+				<VisualizeTasksPage handleChangeTab={handleChangeTab}/>
 			</TabPanel>
             <TabPanel>
 				<EstimationPage />
