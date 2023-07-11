@@ -51,7 +51,6 @@ function JiraExport({ state }) {
 			})
 			.catch(async function (error) {
 				closeLoadingModal();
-				console.log(error.toString());
 				Toastify.error(error.toString());
 			});
 	}, []);
