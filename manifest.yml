@@ -42,3 +42,4 @@ permissions:
       - "unsafe-inline"
   scopes:
     - storage:app
+    - read:jira-work

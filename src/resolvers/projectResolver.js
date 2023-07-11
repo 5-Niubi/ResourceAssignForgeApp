@@ -35,6 +35,16 @@ function projectResolver(resolver) {
 			return Promise.reject(error);
 		}
 	});
+
+
+	resolver.define("getJiraProjectsList", async function (req) {
+		try {
+			return await projectService.getJiraSoftwareProjects({});
+		} catch (error) {
+			console.log("Error in getProjectsList: ", error);
+			return Promise.reject(error);
+		}
+	});
 }
 
 export default projectResolver;

@@ -1,4 +1,6 @@
+import API, { route } from "@forge/api";
 import APIServices from "./common/APIServices";
+import APIJiraServices from "./common/APIJiraServices";
 
 async function getProjects(page) {
 	try {
@@ -33,4 +35,20 @@ async function getProjectDetail(projectId) {
 	}
 }
 
-export { getProjects, createProject, getProjectDetail };
+async function getJiraSoftwareProjects(params) {
+	try {
+		params.orderBy = "-lastIssueUpdatedTime";
+		params.typeKey = "software";
+		const result = await APIJiraServices.get(`/rest/api/3/project/search`, params);
+		return result;
+	} catch (error) {
+		return Promise.reject(error);
+	}
+}
+
+export {
+	getProjects,
+	createProject,
+	getProjectDetail,
+	getJiraSoftwareProjects,
+};
