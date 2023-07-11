@@ -16,7 +16,7 @@ function EstimationPage() {
 	let navigate = useNavigate();
 	return (
 		<>
-            <EstimationPageHeader></EstimationPageHeader>
+            {/* <EstimationPageHeader></EstimationPageHeader> */}
 			<MilestonesTimeline></MilestonesTimeline>
 		</>
 	);

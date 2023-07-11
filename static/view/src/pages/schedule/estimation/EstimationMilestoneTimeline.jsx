@@ -5,11 +5,14 @@ import {
 import FlagFilledIcon from '@atlaskit/icon/glyph/flag-filled';
 import PeopleGroupIcon from '@atlaskit/icon/glyph/people-group';
 import TrayIcon from '@atlaskit/icon/glyph/tray';
+import { useState } from "react";
 
 export default function MilestonesTimeline() {
+    const [milstones, setMilestone] = useState();
+    
 	return (
         <>
-        		<VerticalTimeline lineColor="#172B4D">
+        	<VerticalTimeline lineColor="#172B4D">
 			<VerticalTimelineElement
 				className="vertical-timeline-element--work"
 				contentStyle={{
@@ -30,9 +33,6 @@ export default function MilestonesTimeline() {
 				<p>
                     <PeopleGroupIcon></PeopleGroupIcon> 1 PM
                 </p>
-                <p>
-                    <TrayIcon></TrayIcon> 3 IOS Devices
-				</p>
 			</VerticalTimelineElement>
 			<VerticalTimelineElement
 				className="vertical-timeline-element--work"
@@ -51,9 +51,6 @@ export default function MilestonesTimeline() {
 				<p>
                     <PeopleGroupIcon></PeopleGroupIcon> 2 Business Analyst, 1 PM, 2 Developer C#
                 </p>
-                <p>
-                    <TrayIcon></TrayIcon> None
-				</p>
 			</VerticalTimelineElement>
 			<VerticalTimelineElement
 				className="vertical-timeline-element--work"
@@ -72,9 +69,6 @@ export default function MilestonesTimeline() {
 				<p>
                     <PeopleGroupIcon></PeopleGroupIcon> 1 PM
                 </p>
-                <p>
-                    <TrayIcon></TrayIcon> 4 IOS Devices
-				</p>
 			</VerticalTimelineElement>
 			<VerticalTimelineElement
 				className="vertical-timeline-element--work"
@@ -93,9 +87,6 @@ export default function MilestonesTimeline() {
 				<p>
                     <PeopleGroupIcon></PeopleGroupIcon> 1 PM
                 </p>
-                <p>
-                    <TrayIcon></TrayIcon> 3 IOS Devices
-				</p>
 			</VerticalTimelineElement>
 			<VerticalTimelineElement
 				className="vertical-timeline-element--education"
@@ -114,9 +105,6 @@ export default function MilestonesTimeline() {
 				<p>
                     <PeopleGroupIcon></PeopleGroupIcon> 1 PM
                 </p>
-                <p>
-                    <TrayIcon></TrayIcon> 3 IOS Devices
-				</p>
 			</VerticalTimelineElement>
 		</VerticalTimeline>
         </>

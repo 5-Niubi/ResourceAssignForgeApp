@@ -7,6 +7,7 @@ import ParameterObjectInput from "./parameter/ParameterObjectInput";
 import GanttChartPage from "./ganttchart/GanttChartPage";
 import Badge from '@atlaskit/badge';
 import EstimationPage from "./estimation";
+import ParameterPage from "./parameter/ParameterPage";
 
 export default function ScheduleTabs() {
 	return (
@@ -28,10 +29,7 @@ export default function ScheduleTabs() {
 			</TabPanel>
 			<TabPanel>
                 <div style={{width: "100%"}}>
-                    <ParameterPageHeader></ParameterPageHeader>
-                    <ParameterDynamicTable></ParameterDynamicTable>
-                    <ParameterWorkforceList></ParameterWorkforceList>
-                    <ParameterObjectInput></ParameterObjectInput>
+                    <ParameterPage></ParameterPage>
                 </div>
             </TabPanel>
 			<TabPanel>

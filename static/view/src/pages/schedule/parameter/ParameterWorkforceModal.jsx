@@ -1,4 +1,4 @@
-import { useCallback,useEffect, useState, Fragment } from "react";
+import { useCallback, useEffect, useState, Fragment } from "react";
 import { css, jsx } from "@emotion/react";
 import DynamicTable from "@atlaskit/dynamic-table";
 import Button, { ButtonGroup } from "@atlaskit/button";
@@ -17,11 +17,10 @@ import Modal, {
 } from "@atlaskit/modal-dialog";
 import { invoke } from "@forge/bridge";
 import Toastify from "../../../common/Toastify";
-
+import { RadioGroup } from "@atlaskit/radio";
 import LoadingButton from "@atlaskit/button";
 import { Checkbox } from "@atlaskit/checkbox";
 import TextField from "@atlaskit/textfield";
-
 import Form, {
 	CheckboxField,
 	ErrorMessage,
@@ -34,9 +33,17 @@ import Form, {
 } from "@atlaskit/form";
 import AddCircle from "@atlaskit/icon/glyph/add-circle";
 
+
+
+const options = [
+    { name: 'workingType', value: '0', label: 'Fulltime' },
+    { name: 'workingType', value: '1', label: 'Part-time' },
+  ];
+  
 const boldStyles = css({
 	fontWeight: "bold",
 });
+
 
 export default function ParameterWorkforceModal() {
 	//CREATE WORKFORCE MODAL (CW)
@@ -132,6 +139,15 @@ export default function ParameterWorkforceModal() {
 }
 
 export function ParameterCreareWorkforceModal() {
+    const [isParttimeSelected, setIsParttimeSelected] = useState(false);
+    function handleOnSelected(e){
+        if(e.currentTarget.value == "1"){
+            setIsParttimeSelected(true);
+        }else{
+            setIsParttimeSelected(false);
+        }
+    }
+
 	const buttonAddSkills = (
 		<>
 			<Button
@@ -168,6 +184,26 @@ export function ParameterCreareWorkforceModal() {
 				>
 					{({ formProps, submitting }) => (
 						<form {...formProps}>
+							<Field
+								name="email"
+								label="Email"
+								isRequired
+								defaultValue=""
+							>
+								{({ fieldProps, error }) => (
+									<Fragment>
+										<TextField
+											autoComplete="off"
+											{...fieldProps}
+											placeholder="Email only."
+										/>
+										{!error && (
+											<HelperMessage></HelperMessage>
+										)}
+										{error && <ErrorMessage></ErrorMessage>}
+									</Fragment>
+								)}
+							</Field>
 							<Field
 								name="usernamejira"
 								label="Username Jira"
@@ -242,6 +278,143 @@ export function ParameterCreareWorkforceModal() {
 									</Fragment>
 								)}
 							</Field>
+							<Field
+								label="Working Type"
+								name="workingType"
+								defaultValue=""
+								isRequired
+							>
+								{({ fieldProps }) => (
+									<RadioGroup
+										{...fieldProps}
+										options={options}
+                                        // onChange={handleOnSelected}
+									/>
+								)}
+							</Field>
+							{/* WOKRING EFFORTS IN WEEEK */}
+							{isParttimeSelected && (
+								<Field
+									name="workingEffort"
+									label="Working Effort"
+									isRequired
+									defaultValue=""
+								>
+									{({ fieldProps, error }) => (
+										<Fragment style={{display: "flex"}}>
+											<TextField
+												style={{ flex: 1 }}
+												autoComplete="off"
+												defaultValue={0.99}
+												label="Monday"
+												elemBeforeInput={
+													<p
+														style={{
+															fontWeight: "bold",
+														}}
+													>
+														Mon
+													</p>
+												}
+												width={90}
+												isCompact
+											/>
+											<TextField
+												style={{ flex: 1 }}
+												autoComplete="off"
+												elemBeforeInput={
+													<p
+														style={{
+															fontWeight: "bold",
+														}}
+													>
+														Tues
+													</p>
+												}
+												width={90}
+												defaultValue={0.99}
+												isCompact
+											/>
+											<TextField
+												autoComplete="off"
+												elemBeforeInput={
+													<p
+														style={{
+															fontWeight: "bold",
+														}}
+													>
+														Wed
+													</p>
+												}
+												width={90}
+												isCompact
+												defaultValue={0.99}
+											/>
+											<TextField
+												autoComplete="off"
+												elemBeforeInput={
+													<p
+														style={{
+															fontWeight: "bold",
+														}}
+													>
+														Thurs
+													</p>
+												}
+												width={90}
+												isCompact
+												defaultValue={0.99}
+											/>
+											<TextField
+												defaultValue={0.99}
+												elemBeforeInput={
+													<p
+														style={{
+															fontWeight: "bold",
+														}}
+													>
+														Fri
+													</p>
+												}
+												width={90}
+												isCompact
+												autoComplete="off"
+											/>{" "}
+											<TextField
+												autoComplete="off"
+												elemBeforeInput={
+													<p
+														style={{
+															fontWeight: "bold",
+														}}
+													>
+														Sat
+													</p>
+												}
+												width={90}
+												isCompact
+												defaultValue={0.99}
+											/>
+											<TextField
+												autoComplete="off"
+												elemBeforeInput={
+													<p
+														style={{
+															fontWeight: "bold",
+														}}
+													>
+														Sun
+													</p>
+												}
+												width={90}
+												isCompact
+												defaultValue={0.99}
+											/>
+										</Fragment>
+									)}
+								</Field>
+							)}
+
 							<Field
 								name="skills"
 								label="Skills"
@@ -367,64 +540,66 @@ export function ParameterSkillsTable() {
 }
 
 export function ParameterSelectWorkforcesTable() {
-        const [TableLoadingState, setTableLoadingState] = useState(true);
-        const [searchInput, setSearchInput] = useState("");
-        const [workforces, setWorkforces] = useState([]);
+	const [TableLoadingState, setTableLoadingState] = useState(true);
+	const [searchInput, setSearchInput] = useState("");
+	const [workforces, setWorkforces] = useState([]);
 
-        //FILTER WORKFORCE SELECT TABLE
-        const [workforcesFilter, setWorkforcesFilter] = useState(workforces);
+	//FILTER WORKFORCE SELECT TABLE
+	const [workforcesFilter, setWorkforcesFilter] = useState(workforces);
 
-        const filterWorkforceName = useCallback(function (workforces, query) {
-            setWorkforcesFilter(
-                workforces.filter((e) => e.name.toLowerCase().includes(query.toLowerCase()))
-            );
-        }, []);
-    
-        useEffect(
-            function () {
-                filterWorkforceName(workforces, searchInput);
-            },
-            [workforces]
-        );
+	const filterWorkforceName = useCallback(function (workforces, query) {
+		setWorkforcesFilter(
+			workforces.filter((e) =>
+				e.name.toLowerCase().includes(query.toLowerCase())
+			)
+		);
+	}, []);
 
-        function handleOnSearchBoxChange(e) {
-            setSearchInput(e.target.value);
-            filterWorkforceName(workforces, searchInput);
-        }
+	useEffect(
+		function () {
+			filterWorkforceName(workforces, searchInput);
+		},
+		[workforces]
+	);
 
-        function handleOnSearch() {
-            filterWorkforceName(workforces, searchInput);
-        }
+	function handleOnSearchBoxChange(e) {
+		setSearchInput(e.target.value);
+		filterWorkforceName(workforces, searchInput);
+	}
 
-        //GET LIST WORKFORCES
-        useEffect(function () {
-            invoke("getAllWorkforces")
-                .then(function (res) {
-                    setTableLoadingState(false);
-                    let workforces = [];
-                    for (let workforce of res){
-                        let itemWorkforce = {
-                            id: workforce.id,
-                            accountId: workforce.accountId,
-                            email: workforce.email,
-                            accountType: workforce.accountType,
-                            name: workforce.name,
-                            avatar: workforce.avatar,
-                            displayName: workforce.displayName,
-                            unitSalary: workforce.unitSalary,
-                            workingType: workforce.workingType,
-                            workingEffort: workforce.workingEffort,
-                        };
-                        workforces.push(itemWorkforce);
-                    }
-                    setWorkforces(workforces);
-                    filterWorkforceName(workforces, searchInput);
-                })
-                .catch(function (error) {
-                    console.log(error);
-                    Toastify.error(error);
-                });
-        }, []);
+	function handleOnSearch() {
+		filterWorkforceName(workforces, searchInput);
+	}
+
+	//GET LIST WORKFORCES
+	useEffect(function () {
+		invoke("getAllWorkforces")
+			.then(function (res) {
+				setTableLoadingState(false);
+				let workforces = [];
+				for (let workforce of res) {
+					let itemWorkforce = {
+						id: workforce.id,
+						accountId: workforce.accountId,
+						email: workforce.email,
+						accountType: workforce.accountType,
+						name: workforce.name,
+						avatar: workforce.avatar,
+						displayName: workforce.displayName,
+						unitSalary: workforce.unitSalary,
+						workingType: workforce.workingType,
+						workingEffort: workforce.workingEffort,
+					};
+					workforces.push(itemWorkforce);
+				}
+				setWorkforces(workforces);
+				filterWorkforceName(workforces, searchInput);
+			})
+			.catch(function (error) {
+				console.log(error);
+				Toastify.error(error);
+			});
+	}, []);
 
 	const head = {
 		cells: [
@@ -463,9 +638,9 @@ export function ParameterSelectWorkforcesTable() {
 						isCompact
 						placeholder="Search Workforce Name"
 						aria-label="Filter"
-                        onChange={handleOnSearchBoxChange}
-                        value={searchInput}
-                        onClick={handleOnSearch}
+						onChange={handleOnSearchBoxChange}
+						value={searchInput}
+						onClick={handleOnSearch}
 					/>
 				</div>
 				<div
@@ -474,14 +649,14 @@ export function ParameterSelectWorkforcesTable() {
 					}}
 				>
 					<Button appearance="primary">Create new</Button>
-                </div>
+				</div>
 			</div>
 			<DynamicTable
 				shouldScrollInViewport
 				head={head}
 				rows={rows}
 				isFixedSize
-                isLoading={TableLoadingState}
+				isLoading={TableLoadingState}
 			/>
 		</>
 	);
