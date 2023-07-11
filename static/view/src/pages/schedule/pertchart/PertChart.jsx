@@ -20,9 +20,33 @@ const PertChart = ({
 	var bluefill = "#B3E5FC";
 
 	var selectedTasks = [];
-	selectedTaskIds?.forEach((id) => {
-		var task = findObj(tasks, id);
-		if (task) selectedTasks.push(task);
+	//get selected tasks
+	// selectedTaskIds?.forEach((id) => {
+	// 	var task = findObj(tasks, id);
+	// 	if (task) selectedTasks.push(task);
+	// });
+	// console.log(selectedTasks);
+
+	//-------
+	//add all task to selected
+	selectedTasks = JSON.parse(JSON.stringify(tasks));
+
+	//add dummy tasks to the task list
+	selectedTasks.unshift({
+		id: -1,
+		name: "Start",
+		duration: 0,
+		milestoneId: 0,
+		precedences: [],
+		skillRequireds: [],
+	});
+	selectedTasks.push({
+		id: -2,
+		name: "Finish",
+		duration: 0,
+		milestoneId: 0,
+		precedences: [],
+		skillRequireds: [],
 	});
 
 	useEffect(() => {
@@ -77,13 +101,16 @@ const PertChart = ({
 			var toTask = findObj(tasks, toNode.ub.id);
 			if (toTask) {
 				var existed = false;
-				toTask.precedence?.forEach((pre) => {
+				toTask.precedences?.forEach((pre) => {
 					if (pre.precedenceId == fromNode.ub.id) {
 						return (existed = true);
 					}
 				});
 				if (!existed) {
-					toTask.precedence?.push({taskId: toTask.id, precedenceId: fromNode.ub.id});
+					toTask.precedences?.push({
+						taskId: toTask.id,
+						precedenceId: fromNode.ub.id,
+					});
 					updateCurrentTaskId(toTask.id);
 					updateTasks(tasks);
 				}
@@ -105,10 +132,21 @@ const PertChart = ({
 				// console.log("Deleted link to node:", toNode.data);
 				var toTask = findObj(tasks, toNode.data.id);
 				if (toTask) {
-					const index = toTask.precedence?.indexOf({taskId: toTask, precedenceId: fromNode.data.id});
+					// const index = toTask.precedences?.indexOf({
+					// 	taskId: toTask,
+					// 	precedenceId: fromNode.data.id,
+					// });
+
+					var index = -1;
+					toTask.precedences?.forEach((pre, i) => {
+						if (pre.precedenceIdid === fromNode.data.id){
+							index=i;
+							return;
+						}
+					})
 					if (index > -1) {
 						// only splice array when item is found
-						toTask.precedence.splice(index, 1); // 2nd parameter means remove one item only
+						toTask.precedences.splice(index, 1); // 2nd parameter means remove one item only
 						updateTasks(tasks);
 						updateCurrentTaskId(toTask.id);
 					}
@@ -331,12 +369,33 @@ const PertChart = ({
 		//get all link from precedence tasks pre-defined
 		var links = [];
 		tasks?.forEach((task) =>
-			task.precedence?.forEach((pre) =>
+			task.precedences?.forEach((pre) =>{
 				findObj(tasks, pre.precedenceId)
 					? links.push({ from: pre.precedenceId, to: task.id })
 					: null
+			}
 			)
 		);
+
+		//create link to dummy tasks
+		tasks.forEach((task) =>{
+			if (
+				task.precedences.length == 0 &&
+				task.id != -1 &&
+				task.id != -2
+			) {
+				links.push({ from: -1, to: task.id });
+			}
+			task.precedences?.forEach((pre) =>{
+				var preObj = findObj(tasks, pre.precedenceId);
+				preObj.isNotEnd = true;
+			});
+		});
+		tasks.forEach(task => {
+			if (!task.isNotEnd && task.id != -1 && task.id != -2) {
+				links.push({ from: task.id, to: -2 });
+			}
+		})
 
 		return $(go.GraphLinksModel, {
 			nodeDataArray: tasks,

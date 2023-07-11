@@ -10,6 +10,9 @@ import { Content, Main, PageLayout, RightSidebar } from "@atlaskit/page-layout";
 import TasksCompact from "./TasksCompact";
 import { globalSelectedTasks, sample } from "../data";
 import Toastify from "../../../common/Toastify";
+import PageHeader from "@atlaskit/page-header";
+import Button, { ButtonGroup } from "@atlaskit/button";
+import EstimateModal from "./modal/EstimateModal";
 
 const startDate = (
 	<div>
@@ -33,43 +36,66 @@ export const findObj = (arr, id) => {
 	return null;
 };
 
-// var tasksData = JSON.parse(localStorage.getItem("tasks"));
-// if (!tasksData) {
-// 	tasksData = [];
-// }
-
-var selectedData = JSON.parse(localStorage.getItem("selected"));
-if (!selectedData) {
-	selectedData = [];
-}
-
 /**
  * Using as Page to show pert chart and task dependences
  * @returns {import("react").ReactElement}
  */
 function VisualizeTasksPage() {
 	let { projectId } = useParams();
-	// console.log(project);
-	// project;
-	//tasks represent list of all tasks in the pool of current project
-	//-which are shown in the right panel
-	const [tasks, setTasks] = useState([]);
-    // debugger;
-	useEffect(function () {
-		invoke("getTasksList", { projectId: Number(projectId) })
+
+	function handleEstimate() {
+		invoke("estimate", {projectId})
 			.then(function (res) {
-                console.log(res);
-                let tasks = [];
-				for (let t of res) {
-                    tasks.push(t);
-				}
-				setTasks(tasks);
+				console.log(res);
 			})
 			.catch(function (error) {
 				console.log(error);
 				Toastify.error(error);
 			});
-		return setTasks([]);
+	};
+
+    //get from Local Storage
+    var tasksData = JSON.parse(localStorage.getItem("tasks"));
+	if (!tasksData) {
+		tasksData = [];
+	}
+	var selectedData = JSON.parse(localStorage.getItem("selected"));
+	if (!selectedData) {
+		selectedData = [];
+	}
+
+	//tasks represent list of all tasks in the pool of current project
+	//-which are shown in the right panel
+	const [tasks, setTasks] = useState([]);
+	const [skills, setSkills] = useState([]);
+	useEffect(function () {
+		invoke("getTasksList", { projectId: Number(projectId) })
+			.then(function (res) {
+                // if (!tasksData || tasksData.length === 0) {
+                // }
+                setTasks(res);
+                
+                // storage.set("projectId", projectId);
+                // storage.set("tasks", JSON.stringify(tasks));
+			})
+			.catch(function (error) {
+				console.log(error);
+				Toastify.error(error);
+			});
+		setTasks(tasksData);
+
+		invoke("getAllSkills", {})
+			.then(function (res) {
+				if (Object.keys(res).length !== 0) {
+					setSkills(res);
+				} else setSkills([]);
+			})
+			.catch(function (error) {
+				console.log(error);
+				Toastify.error(error);
+			});
+		setSkills([]);
+		return;
 	}, []);
 
 	//currentTask represents the selected task to be shown in the bottom panel
@@ -116,13 +142,39 @@ function VisualizeTasksPage() {
 			)
 	);
 
+	const actionsContent = (
+		<div
+			style={{
+				display: "flex",
+				justifyContent: "flex-start",
+				gap: "20px",
+				alignItems: "end",
+			}}
+		>
+			<div style={{ width: "200px" }}>
+				<Label>Start date: </Label>
+				<DatePicker />
+			</div>
+			<ButtonGroup>
+				<Button appearance="primary">Save</Button>
+				<Button appearance="primary" onClick={handleEstimate}>
+					Estimate
+				</Button>
+			</ButtonGroup>
+		</div>
+	);
+
 	return (
-		<div style={{ width: "100%" }}>
+		<div style={{ width: "100%", height: "90vh" }}>
+			{/* {console.log("Render")} */}
 			<PageLayout>
 				<Content>
 					<Main testId="main2" id="main2">
-						<VisualizePageHeader title="Visualize Tasks" />
-						{startDate}
+						<PageHeader actions={actionsContent}>
+							Visualize Tasks
+						</PageHeader>
+						{/* <VisualizePageHeader title="Visualize Tasks" /> */}
+						{/* {startDate} */}
 						<PertChartMemo
 							tasks={tasks}
 							selectedTaskIds={selectedIds}
@@ -131,6 +183,7 @@ function VisualizeTasksPage() {
 						/>
 						<TaskDetail
 							tasks={tasks}
+                            skills={skills}
 							selectedTaskIds={selectedIds}
 							currentTaskId={currentTaskId}
 							updateTasks={updateTasks}
