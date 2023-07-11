@@ -1,4 +1,5 @@
 import  commonResolver  from "./commonResolver";
+import exportResolver from "./exportResolver";
 import projectResolver from "./projectResolver";
 import skillResolver from "./skillResolver";
 import taskResolver from "./taskResolver";
@@ -13,6 +14,7 @@ function resolverReg(resolver){
     skillResolver(resolver);
     taskResolver(resolver);
     workforceResolver(resolver);
+    exportResolver(resolver);
 }
 
 export default resolverReg;

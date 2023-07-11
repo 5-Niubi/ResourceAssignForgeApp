@@ -1,10 +1,11 @@
 import Button from "@atlaskit/button";
 import React, { useCallback, useState } from "react";
 import JiraExport from "../components/export/JiraExport";
+import { ModalTransition } from "@atlaskit/modal-dialog";
 
 function TestModal() {
 	const jiraExportModalState = useState(false);
-    const [IsJiraExportOpen, setIsJiraExportOpen] = jiraExportModalState;
+	const [IsJiraExportOpen, setIsJiraExportOpen] = jiraExportModalState;
 	const openJiraExportModal = useCallback(() => setIsJiraExportOpen(true), []);
 
 	return (
@@ -12,8 +13,9 @@ function TestModal() {
 			<Button appearance="primary" onClick={openJiraExportModal}>
 				Open modal JiraExport
 			</Button>
-
-            <JiraExport state={jiraExportModalState}/>
+			<ModalTransition>
+				{IsJiraExportOpen && <JiraExport state={jiraExportModalState} />}
+			</ModalTransition>
 		</div>
 	);
 }

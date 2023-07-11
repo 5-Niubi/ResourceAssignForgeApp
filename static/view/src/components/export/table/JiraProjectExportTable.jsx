@@ -1,11 +1,19 @@
 import Avatar from "@atlaskit/avatar";
 import DynamicTable from "@atlaskit/dynamic-table";
-import React from "react";
+import React, { useCallback, useContext } from "react";
 import { ROW_PER_PAGE } from "../../../common/contants";
-import { Button } from "@forge/ui";
+import Button from "@atlaskit/button";
+import { LoadingModalContext } from "../JiraExport";
 
-function JiraProjectExportTable({ isLoading, projects }) {
-	const rows = projects.map((data, index) => ({
+function JiraProjectExportTable({ isLoading, projects, exportButtonClick }) {
+	const loadingModalState = useContext(LoadingModalContext);
+	const [isLoadingModalOpen, setIsLoadingModalOpen] = loadingModalState;
+	const openLoadingModal = useCallback(
+		() => setIsLoadingModalOpen(true),
+		[setIsLoadingModalOpen]
+	);
+
+	const rows = projects?.map((data, index) => ({
 		key: `row-${index + 1}-${data.name}`,
 		isHighlighted: false,
 		cells: [
@@ -35,11 +43,12 @@ function JiraProjectExportTable({ isLoading, projects }) {
 				key: "export",
 				content: (
 					<Button
-						text="Export"
 						onClick={function () {
-							throw new Error("Function not implemented.");
+							exportButtonClick(data.id);
 						}}
-					/>
+					>
+						Export
+					</Button>
 				),
 			},
 		],
@@ -56,7 +65,7 @@ function JiraProjectExportTable({ isLoading, projects }) {
 			onSort={() => console.log("onSort")}
 			onSetPage={(page) => {}}
 			isLoading={isLoading}
-			emptyView={<h2>Not found any project match</h2>}
+			emptyView={<h2>Not found any project</h2>}
 		/>
 	);
 }
@@ -76,7 +85,7 @@ const head = {
 			content: "Project name",
 			shouldTruncate: true,
 			isSortable: true,
-			width: 50,
+			width: 70,
 		},
 		{
 			key: "export",

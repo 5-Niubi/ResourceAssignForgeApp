@@ -11,9 +11,10 @@ import ResourcesPage from "./pages/resources";
 import ProjectSideBar from "./components/side-nav/ProjectSideBar";
 import Spinner from "@atlaskit/spinner";
 import StartUpPage from "./pages/startup/StartUpPage";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import TestModal from "./pages/TestModal";
 import EstimationPage from "./pages/schedule/estimation";
+import Button from "@atlaskit/button";
 
 function App() {
 	// Enable auto change theme Dark/light mode within Jira
@@ -64,7 +65,6 @@ function App() {
 		}
 	}, [history]);
 	// --- / ---
-
 	return (
 		<>
 			{isAuthenticated ? (
@@ -80,37 +80,24 @@ function App() {
 									>
 										<Routes>
 											{/* Path with * take effect in all route after current */}
-											<Route
-												path="/"
-												element={
-													<HomeSideBar rootPath="/" />
-												}
-											>
+											<Route path="/" element={<HomeSideBar rootPath="/" />}>
 												<Route></Route>
 												<Route
 													path="/projects"
-													element={
-														<HomeSideBar rootPath="/" />
-													}
+													element={<HomeSideBar rootPath="/" />}
 												></Route>
 												<Route
 													path="/resources"
-													element={
-														<HomeSideBar rootPath="/" />
-													}
+													element={<HomeSideBar rootPath="/" />}
 												></Route>
 												<Route
 													path="/settings"
-													element={
-														<HomeSideBar rootPath="/" />
-													}
+													element={<HomeSideBar rootPath="/" />}
 												></Route>
 											</Route>
 											<Route
 												path="/:projectId/*"
-												element={
-													<ProjectSideBar rootPath="/:projectId/" />
-												}
+												element={<ProjectSideBar rootPath="/:projectId/" />}
 											></Route>
 										</Routes>
 									</Router>
@@ -124,14 +111,8 @@ function App() {
 										location={historyState.location}
 									>
 										<Routes>
-											<Route
-												path="/"
-												element={<ProjectListHome />}
-											></Route>
-											<Route
-												path="/startup"
-												element={<StartUpPage />}
-											></Route>
+											<Route path="/" element={<ProjectListHome />}></Route>
+											<Route path="/startup" element={<StartUpPage />}></Route>
 
 											<Route
 												path="/resources"
@@ -141,17 +122,11 @@ function App() {
 												path="/settings"
 												element={<div>Settings</div>}
 											></Route>
-											<Route
-												path="/modals"
-												element={<TestModal/>}
-											></Route>
+											<Route path="/modals" element={<TestModal />}></Route>
 
 											<Route path="/:projectId">
+												<Route path="" element={<SchedulePage />}></Route>
 												<Route
-													path=""
-													element={<SchedulePage />}
-												></Route>
-                                                <Route
 													path="estimation"
 													element={<EstimationPage />}
 												></Route>
@@ -161,15 +136,11 @@ function App() {
 												></Route>
 												<Route
 													path="tasks"
-													element={
-														<div>Tasks Page of</div>
-													}
+													element={<div>Tasks Page of</div>}
 												></Route>
 												<Route
 													path="reports"
-													element={
-														<div>Reporsts Page</div>
-													}
+													element={<div>Reporsts Page</div>}
 												></Route>
 											</Route>
 										</Routes>
@@ -182,7 +153,9 @@ function App() {
 					)}
 				</PageLayout>
 			) : (
-				<StartUpPage />
+				<>
+					<StartUpPage />
+				</>
 			)}
 			<ToastContainer />
 		</>
