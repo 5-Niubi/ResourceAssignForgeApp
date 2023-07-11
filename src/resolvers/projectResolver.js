@@ -45,6 +45,17 @@ function projectResolver(resolver) {
 			return Promise.reject(error);
 		}
 	});
+
+	resolver.define("estimate", async function (req) {
+		try {
+			let response = await projectService.estimate(req.payload.projectId);
+			console.log(response);
+			return response;
+		} catch (error) {
+			console.log("Error in estimate: ", error);
+			return Promise.reject(error);
+		}
+	});
 }
 
 export default projectResolver;

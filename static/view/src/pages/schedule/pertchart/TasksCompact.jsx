@@ -87,7 +87,15 @@ const TasksCompact = ({ tasks, selectedIds, setSelectedIds, updateCurrentTaskId 
 	return (
 		<div id="tasks">
 			<PageHeader actions={actionsContent}>Tasks list:</PageHeader>
-			<div style={{ width: "100%" , height: "80vh", overflowY: "scroll", scrollbarWidth: "0px"}}>
+			<div
+				style={{
+					width: "100%",
+					height: "80vh",
+					overflowY: "scroll",
+					scrollbarWidth: "thin",
+					
+				}}
+			>
 				<DynamicTable
 					rows={rows}
 					loadingSpinnerSize="large"

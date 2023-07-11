@@ -36,26 +36,23 @@ export const findObj = (arr, id) => {
 	return null;
 };
 
-const actionsContent = (
-	<div style={{ display: "flex", justifyContent: "flex-start", gap: "20px", alignItems: "end" }}>
-		<div style={{width: "200px"}}>
-			<Label>Start date: </Label>
-			<DatePicker />
-		</div>
-		<ButtonGroup>
-			<Button appearance="primary">Save</Button>
-			<Button appearance="primary">Estimate</Button>
-		</ButtonGroup>
-	</div>
-);
-
-
 /**
  * Using as Page to show pert chart and task dependences
  * @returns {import("react").ReactElement}
  */
 function VisualizeTasksPage() {
 	let { projectId } = useParams();
+
+	function handleEstimate() {
+		invoke("estimate", {projectId})
+			.then(function (res) {
+				console.log(res);
+			})
+			.catch(function (error) {
+				console.log(error);
+				Toastify.error(error);
+			});
+	};
 
     //get from Local Storage
     var tasksData = JSON.parse(localStorage.getItem("tasks"));
@@ -70,18 +67,35 @@ function VisualizeTasksPage() {
 	//tasks represent list of all tasks in the pool of current project
 	//-which are shown in the right panel
 	const [tasks, setTasks] = useState([]);
+	const [skills, setSkills] = useState([]);
 	useEffect(function () {
 		invoke("getTasksList", { projectId: Number(projectId) })
 			.then(function (res) {
                 // if (!tasksData || tasksData.length === 0) {
                 // }
                 setTasks(res);
+                
+                // storage.set("projectId", projectId);
+                // storage.set("tasks", JSON.stringify(tasks));
 			})
 			.catch(function (error) {
 				console.log(error);
 				Toastify.error(error);
 			});
-		return setTasks(tasksData);
+		setTasks(tasksData);
+
+		invoke("getAllSkills", {})
+			.then(function (res) {
+				if (Object.keys(res).length !== 0) {
+					setSkills(res);
+				} else setSkills([]);
+			})
+			.catch(function (error) {
+				console.log(error);
+				Toastify.error(error);
+			});
+		setSkills([]);
+		return;
 	}, []);
 
 	//currentTask represents the selected task to be shown in the bottom panel
@@ -128,8 +142,31 @@ function VisualizeTasksPage() {
 			)
 	);
 
+	const actionsContent = (
+		<div
+			style={{
+				display: "flex",
+				justifyContent: "flex-start",
+				gap: "20px",
+				alignItems: "end",
+			}}
+		>
+			<div style={{ width: "200px" }}>
+				<Label>Start date: </Label>
+				<DatePicker />
+			</div>
+			<ButtonGroup>
+				<Button appearance="primary">Save</Button>
+				<Button appearance="primary" onClick={handleEstimate}>
+					Estimate
+				</Button>
+			</ButtonGroup>
+		</div>
+	);
+
 	return (
 		<div style={{ width: "100%", height: "90vh" }}>
+			{/* {console.log("Render")} */}
 			<PageLayout>
 				<Content>
 					<Main testId="main2" id="main2">
@@ -146,6 +183,7 @@ function VisualizeTasksPage() {
 						/>
 						<TaskDetail
 							tasks={tasks}
+                            skills={skills}
 							selectedTaskIds={selectedIds}
 							currentTaskId={currentTaskId}
 							updateTasks={updateTasks}

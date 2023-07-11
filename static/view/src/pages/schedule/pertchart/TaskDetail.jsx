@@ -14,6 +14,7 @@ import Toastify from "../../../common/Toastify";
  */
 const TaskDetail = ({
 	tasks,
+	skills,
 	selectedTaskIds,
 	currentTaskId,
 	updateTasks,
@@ -46,57 +47,99 @@ const TaskDetail = ({
 		skillRequireds: [],
 	});
 
-	const [skills, setSkills] = useState([]);
-	useEffect(function () {
-		invoke("getAllSkills", {})
-			.then(function (res) {
-				if (Object.keys(res).length !== 0) setSkills(res);
-				else setSkills([]);
-			})
-			.catch(function (error) {
-				console.log(error);
-				Toastify.error(error);
-			});
-		return setSkills([]);
-	}, []);
+	// const [skills, setSkills] = useState([]);
+	// useEffect(function () {
+	// 	invoke("getAllSkills", {})
+	// 		.then(function (res) {
+	// 			if (Object.keys(res).length !== 0) {
+	// 				setSkills(res);
+	// 			} else setSkills([]);
+	// 		})
+	// 		.catch(function (error) {
+	// 			console.log(error);
+	// 			Toastify.error(error);
+	// 		});
+	// 	return setSkills([]);
+	// }, []);
 
 	var taskOpts = [];
+	var taskValues = [];
 	selectedTasks?.forEach((task) =>
 		task.id != currentTaskId
 			? taskOpts.push({ value: task.id, label: task.name })
 			: ""
 	);
-	var taskValues = [];
-	currentTask?.precedence?.forEach((pre) => {
-		let task = findObj(tasks, pre.precedenceId);
-		if (task) taskValues.push({ value: task.id, label: task.name });
+	currentTask?.precedences?.forEach((pre) => {
+		let preTask = findObj(tasks, pre.precedenceId);
+		if (preTask)
+			taskValues.push({ value: preTask.id, label: preTask.name });
 	});
 
 	var skillOpts = [];
-	skills?.forEach((skill) =>
-		skillOpts.push({ value: skill.id, label: skill.name })
-	);
+	var skillValues = [];
+	skills?.forEach((skill) => {
+		for (let i = 1; i <= 5; i++) {
+			skillOpts.push({
+				value: skill.id + "-" + i,
+				label: skill.name + " - level " + i,
+			});
+		}
+	});
+	currentTask?.skillRequireds?.forEach((s) => {
+		var skill = findObj(skills, s.skillId);
+		if (skill) {
+			skillValues.push({
+				value: skill.id + "-" + s.level,
+				label: skill.name + " - level " + s.level,
+			});
+		}
+	});
 
-	const handleChangePrecedence = (values, action) => {
+	const handleChangePrecedence = (values) => {
 		var ids = [];
 		values?.forEach((item) =>
 			ids.push({ taskId: currentTaskId, precedenceId: item.value })
 		);
 
-		var task = findObj(tasks, currentTaskId);
-		if (task) {
-			// console.log(ids);
-			// console.log(task);
-			task.precedence = ids;
-			updateTasks(tasks);
+		// var task = findObj(tasks, currentTaskId);
+		// if (task) {
+		// 	// console.log(ids);
+		// 	// console.log(task);
+		// }
+		for(let i = 0; i < tasks.length; i++) {
+			if (tasks[i].id == currentTaskId) {
+				tasks[i].precedences = ids;
+				break;
+			}
 		}
+		// tasks.every((task) => {
+		// });
+		// currentTask.precedence = ids;
+		updateTasks(tasks);
 	};
 
-	// const actionsContent = (
-	// 	<ButtonGroup>
-	// 		<Button>Save</Button>
-	// 	</ButtonGroup>
-	// );
+	const handleChangeSkill = (values) => {
+		var skills = [];
+		values?.forEach((item) => {
+			var items = item.value.split("-");
+			if (items.length != 2) return;
+			skills.push({ skillId: items[0], level: items[1] });
+		});
+
+		// var task = findObj(tasks, currentTaskId);
+		// if (currentTask) {
+		// 	// console.log(ids);
+		// 	// console.log(task);
+		// }
+		for (let i = 0; i < tasks.length; i++) {
+			if (tasks[i].id == currentTaskId) {
+				tasks[i].skillRequireds = skills;
+				break;
+			}
+		}
+		// currentTask.precedence = ids;
+		updateTasks(tasks);
+	};
 
 	return (
 		<div style={{ borderTop: "1px solid #e5e5e5" }}>
@@ -177,8 +220,12 @@ const TaskDetail = ({
 															className="multi-select"
 															classNamePrefix="react-select"
 															options={skillOpts}
+															value={skillValues}
 															isMulti
 															isSearchable={true}
+															onChange={
+																handleChangeSkill
+															}
 															placeholder="Choose skills"
 														/>
 													</Fragment>
