@@ -20,14 +20,19 @@ const PertChart = ({
 	var bluefill = "#B3E5FC";
 
 	var selectedTasks = [];
-	selectedTaskIds?.forEach((id) => {
-		var task = findObj(tasks, id);
-		if (task) selectedTasks.push(task);
-	});
+	//get selected tasks
+	// selectedTaskIds?.forEach((id) => {
+	// 	var task = findObj(tasks, id);
+	// 	if (task) selectedTasks.push(task);
+	// });
 	// console.log(selectedTasks);
 
+	//-------
+	//add all task to selected
+	selectedTasks = JSON.parse(JSON.stringify(tasks));
+
 	//add dummy tasks to the task list
-	tasks.unshilf({
+	selectedTasks.unshift({
 		id: -1,
 		name: "Start",
 		duration: 0,
@@ -35,7 +40,7 @@ const PertChart = ({
 		precedences: [],
 		skillRequireds: [],
 	});
-	tasks.push({
+	selectedTasks.push({
 		id: -2,
 		name: "Finish",
 		duration: 0,
@@ -82,8 +87,7 @@ const PertChart = ({
 
 		diagram.nodeTemplate = createNodeTemplate();
 		diagram.linkTemplate = createLinkTemplate();
-		// diagram.model = createDiagramModel(selectedTasks);
-		diagram.model = createDiagramModel(tasks);
+		diagram.model = createDiagramModel(selectedTasks);
 
 		//event listener
 		diagram.addDiagramListener("LinkDrawn", (e) => {
@@ -372,6 +376,26 @@ const PertChart = ({
 			}
 			)
 		);
+
+		//create link to dummy tasks
+		tasks.forEach((task) =>{
+			if (
+				task.precedences.length == 0 &&
+				task.id != -1 &&
+				task.id != -2
+			) {
+				links.push({ from: -1, to: task.id });
+			}
+			task.precedences?.forEach((pre) =>{
+				var preObj = findObj(tasks, pre.precedenceId);
+				preObj.isNotEnd = true;
+			});
+		});
+		tasks.forEach(task => {
+			if (!task.isNotEnd && task.id != -1 && task.id != -2) {
+				links.push({ from: task.id, to: -2 });
+			}
+		})
 
 		return $(go.GraphLinksModel, {
 			nodeDataArray: tasks,

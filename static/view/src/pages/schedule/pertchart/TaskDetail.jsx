@@ -6,6 +6,8 @@ import PageHeader from "@atlaskit/page-header";
 import Button, { ButtonGroup } from "@atlaskit/button";
 import { findObj } from "./VisualizeTasks";
 import { sampleSkills } from "../data";
+import { invoke } from "@forge/bridge";
+import Toastify from "../../../common/Toastify";
 
 /**
  * Using as part of visualize task page. To show dependences of a specific task
@@ -18,16 +20,51 @@ const TaskDetail = ({
 }) => {
 	var currentTask = findObj(tasks, currentTaskId);
 	var selectedTasks = [];
-	selectedTaskIds?.forEach((id) => {
-		var task = findObj(tasks, id);
-		if (task) selectedTasks.push(task);
+	// selectedTaskIds?.forEach((id) => {
+	// 	var task = findObj(tasks, id);
+	// 	if (task) selectedTasks.push(task);
+	// });
+
+	//add all task to selected
+	selectedTasks = JSON.parse(JSON.stringify(tasks));
+
+	//add dummy tasks to the task list
+	selectedTasks.unshift({
+		id: -1,
+		name: "Start",
+		duration: 0,
+		milestoneId: 0,
+		precedences: [],
+		skillRequireds: [],
+	});
+	selectedTasks.push({
+		id: -2,
+		name: "Finish",
+		duration: 0,
+		milestoneId: 0,
+		precedences: [],
+		skillRequireds: [],
 	});
 
-	const [skills, setSkills] = useState(sampleSkills);
+	const [skills, setSkills] = useState([]);
+	useEffect(function () {
+		invoke("getAllSkills", {})
+			.then(function (res) {
+				if (Object.keys(res).length !== 0) setSkills(res);
+				else setSkills([]);
+			})
+			.catch(function (error) {
+				console.log(error);
+				Toastify.error(error);
+			});
+		return setSkills([]);
+	}, []);
 
 	var taskOpts = [];
 	selectedTasks?.forEach((task) =>
-		task.id != currentTaskId ? taskOpts.push({ value: task.id, label: task.name }) : ""
+		task.id != currentTaskId
+			? taskOpts.push({ value: task.id, label: task.name })
+			: ""
 	);
 	var taskValues = [];
 	currentTask?.precedence?.forEach((pre) => {
@@ -42,7 +79,9 @@ const TaskDetail = ({
 
 	const handleChangePrecedence = (values, action) => {
 		var ids = [];
-		values?.forEach((item) => ids.push({taskId: currentTaskId, precedenceId: item.value}));
+		values?.forEach((item) =>
+			ids.push({ taskId: currentTaskId, precedenceId: item.value })
+		);
 
 		var task = findObj(tasks, currentTaskId);
 		if (task) {
@@ -53,15 +92,16 @@ const TaskDetail = ({
 		}
 	};
 
-	const actionsContent = (
-		<ButtonGroup>
-			<Button>Save</Button>
-		</ButtonGroup>
-	);
+	// const actionsContent = (
+	// 	<ButtonGroup>
+	// 		<Button>Save</Button>
+	// 	</ButtonGroup>
+	// );
 
 	return (
 		<div style={{ borderTop: "1px solid #e5e5e5" }}>
-			<PageHeader actions={actionsContent}>Task details:</PageHeader>
+			{/* <PageHeader actions={actionsContent}>Task details:</PageHeader> */}
+			<PageHeader>Task details:</PageHeader>
 			<div style={{ width: "100%" }}>
 				<pre>
 					{currentTask ? (
@@ -188,6 +228,28 @@ const TaskDetail = ({
 													</Fragment>
 												)}
 											</Field>
+											{/* <Field
+												label="Milestone"
+												name="milestone"
+												defaultValue=""
+											>
+												{({ fieldProps }) => (
+													<Fragment>
+														<Select
+															{...fieldProps}
+															inputId="select-milestone"
+															className="select-milestone"
+															options={taskOpts}
+															value={taskValues}
+															// onChange={
+															// 	handleChangeMilestone
+															// }
+															isSearchable={true}
+															placeholder="Choose milestone"
+														/>
+													</Fragment>
+												)}
+											</Field> */}
 										</div>
 									</div>
 								</form>

@@ -10,6 +10,9 @@ import { Content, Main, PageLayout, RightSidebar } from "@atlaskit/page-layout";
 import TasksCompact from "./TasksCompact";
 import { globalSelectedTasks, sample } from "../data";
 import Toastify from "../../../common/Toastify";
+import PageHeader from "@atlaskit/page-header";
+import Button, { ButtonGroup } from "@atlaskit/button";
+import EstimateModal from "./modal/EstimateModal";
 
 const startDate = (
 	<div>
@@ -33,6 +36,18 @@ export const findObj = (arr, id) => {
 	return null;
 };
 
+const actionsContent = (
+	<div style={{ display: "flex", justifyContent: "flex-start", gap: "20px", alignItems: "end" }}>
+		<div style={{width: "200px"}}>
+			<Label>Start date: </Label>
+			<DatePicker />
+		</div>
+		<ButtonGroup>
+			<Button appearance="primary">Save</Button>
+			<Button appearance="primary">Estimate</Button>
+		</ButtonGroup>
+	</div>
+);
 
 
 /**
@@ -58,9 +73,9 @@ function VisualizeTasksPage() {
 	useEffect(function () {
 		invoke("getTasksList", { projectId: Number(projectId) })
 			.then(function (res) {
-                if (!tasksData || tasksData.length === 0) {
-				    setTasks(res);
-                }
+                // if (!tasksData || tasksData.length === 0) {
+                // }
+                setTasks(res);
 			})
 			.catch(function (error) {
 				console.log(error);
@@ -114,12 +129,15 @@ function VisualizeTasksPage() {
 	);
 
 	return (
-		<div style={{ width: "100%" }}>
+		<div style={{ width: "100%", height: "90vh" }}>
 			<PageLayout>
 				<Content>
 					<Main testId="main2" id="main2">
-						<VisualizePageHeader title="Visualize Tasks" />
-						{startDate}
+						<PageHeader actions={actionsContent}>
+							Visualize Tasks
+						</PageHeader>
+						{/* <VisualizePageHeader title="Visualize Tasks" /> */}
+						{/* {startDate} */}
 						<PertChartMemo
 							tasks={tasks}
 							selectedTaskIds={selectedIds}
