@@ -10,11 +10,15 @@ modules:
   webtrigger:
     - key: authen-app-web-trigger-key
       function: authen-trigger-function
+    - key: logout-web-trigger-key
+      function: logout-trigger-function
   function:
     - key: resolver
       handler: index.handler
     - key: authen-trigger-function
       handler: trigger.authenBECallbackTrigger
+    - key : logout-trigger-function
+      handler: trigger.logoutTrigger
 
 resources:
   - key: main

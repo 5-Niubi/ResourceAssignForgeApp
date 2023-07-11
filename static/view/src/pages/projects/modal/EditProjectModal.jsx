@@ -15,12 +15,12 @@ import { DatePicker } from "@atlaskit/datetime-picker";
 import ObjectiveRange from "../form/ObjectiveRange";
 import { getCurrentTime } from "../../../common/utils";
 import { invoke } from "@forge/bridge";
-import { MODAL_WIDTH } from "../../../common/contants";
+import { DATE_FORMAT, MODAL_WIDTH } from "../../../common/contants";
+const width = MODAL_WIDTH.M;
+const columns = 10;
 
-function EditProjectModal({ project, isOpen, onClose }) {
-	const width = MODAL_WIDTH.M;
-	const columns = 10;
-
+function EditProjectModal({ openState, setOpenState }) {
+	const project = openState.project;
 	const [projectName, setProjectName] = useState("");
 	const [startDate, setStartDate] = useState(getCurrentTime());
 	const [endDate, setEndDate] = useState(getCurrentTime());
@@ -30,15 +30,19 @@ function EditProjectModal({ project, isOpen, onClose }) {
 	const [objCost, setObjCost] = useState(50);
 	const [objQuality, setObjQuality] = useState(50);
 
-	const loadProjectInfo = useEffect(
+	const closeModal = useCallback(
 		function () {
-			setProjectName(project.projectName);
+			setOpenState({ project: {}, isOpen: false });
+		},
+		[setOpenState]
+	);
+	useEffect(
+		function () {
+			setProjectName(project.name);
 			setStartDate(project.startDate);
 
-			invoke("getProjectDetail", { projectId: project.projectId })
-				.then(function (res) {
-                    
-                })
+			invoke("getProjectDetail", { projectId: project.id })
+				.then(function (res) {})
 				.catch(function (error) {});
 		},
 		[project]
@@ -100,14 +104,16 @@ function EditProjectModal({ project, isOpen, onClose }) {
 			objectiveQuality: objQuality,
 		};
 		invoke("createNewProjectProjectLists", { projectObjRequest })
-			.then()
+			.then(function (res) {
+				closeModal();
+			})
 			.catch();
 	}
 
 	return (
 		<ModalTransition>
-			{isOpen && (
-				<Modal onClose={onClose} width={width}>
+			{openState.isOpen && (
+				<Modal onClose={closeModal} width={width}>
 					<Form
 						onSubmit={(formState) => console.log("form submitted", formState)}
 					>
@@ -141,6 +147,7 @@ function EditProjectModal({ project, isOpen, onClose }) {
 															<DatePicker
 																value={startDate}
 																onChange={handleSetStartDate}
+																dateFormat={DATE_FORMAT.DMY}
 															/>
 														</Fragment>
 													)}
@@ -152,6 +159,7 @@ function EditProjectModal({ project, isOpen, onClose }) {
 																minDate={startDate}
 																value={endDate}
 																onChange={handleSetEndDate}
+																dateFormat={DATE_FORMAT.DMY}
 															/>
 														</Fragment>
 													)}
@@ -221,7 +229,7 @@ function EditProjectModal({ project, isOpen, onClose }) {
 
 								<ModalFooter>
 									<ButtonGroup>
-										<Button appearance="default" onClick={onClose}>
+										<Button appearance="default" onClick={closeModal}>
 											Cancel
 										</Button>
 										<Button

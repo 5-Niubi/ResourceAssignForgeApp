@@ -1,3 +1,6 @@
+export const APP_NAME = "Resource Assign";
+export const APP_NAME_DESCRIPTOR = "Resource Assign Demo";
+
 export const MEDIA_QUERY = {
   DESKTOP_LAPTOP: {
     MIN: 992,
@@ -19,3 +22,9 @@ export const MODAL_WIDTH = {
   L: "large",
   M: "medium",
 };
+
+export const DATE_FORMAT = {
+  DMY : "DD/MM/YYYY",
+}
+
+export const ROW_PER_PAGE = 10;

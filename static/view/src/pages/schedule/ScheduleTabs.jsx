@@ -2,10 +2,11 @@ import Tabs, { Tab, TabList, TabPanel } from "@atlaskit/tabs";
 import VisualizeTasksPage from "./pertchart/VisualizeTasks";
 import ParameterPageHeader from "./parameter/ParameterPageHeader";
 import ParameterDynamicTable from "./parameter/ParameterDynamicTable";
-import { Panel } from "../resources/ResourceTabs";
 import ParameterWorkforceList from "./parameter/ParameterWorkforceList";
-import ParameterEquipmentList from "./parameter/ParameterEquipmentList";
 import ParameterObjectInput from "./parameter/ParameterObjectInput";
+import GanttChartPage from "./ganttchart/GanttChartPage";
+import Badge from '@atlaskit/badge';
+import EstimationPage from "./estimation";
 
 export default function ScheduleTabs() {
 	return (
@@ -14,23 +15,28 @@ export default function ScheduleTabs() {
 			id="default"
 		>
 			<TabList>
-				<Tab>PertChart</Tab>
-				<Tab>Parameter</Tab>
-				<Tab>Gantt chart</Tab>
+				<Tab><Badge>{1}</Badge> PertChart</Tab>
+				<Tab><Badge>{2}</Badge> Estimation</Tab>
+				<Tab><Badge>{3}</Badge> Parameters</Tab>
+				<Tab><Badge>{4}</Badge> Gantt chart</Tab>
 			</TabList>
 			<TabPanel>
-				<VisualizeTasksPage />
+				<VisualizeTasksPage/>
+			</TabPanel>
+            <TabPanel>
+				<EstimationPage />
 			</TabPanel>
 			<TabPanel>
                 <div style={{width: "100%"}}>
                     <ParameterPageHeader></ParameterPageHeader>
                     <ParameterDynamicTable></ParameterDynamicTable>
                     <ParameterWorkforceList></ParameterWorkforceList>
-                    <ParameterEquipmentList></ParameterEquipmentList>
                     <ParameterObjectInput></ParameterObjectInput>
                 </div>
             </TabPanel>
-			<TabPanel>One</TabPanel>
+			<TabPanel>
+				<GanttChartPage/>
+			</TabPanel>
 		</Tabs>
 	);
 }

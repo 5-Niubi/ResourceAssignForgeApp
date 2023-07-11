@@ -1,16 +1,58 @@
 import React, { Fragment, useEffect, useState } from "react";
-import Select from "@atlaskit/select"
+import Select from "@atlaskit/select";
 import Form, { Field, FormFooter } from "@atlaskit/form";
 import Textfield from "@atlaskit/textfield";
 import PageHeader from "@atlaskit/page-header";
 import Button, { ButtonGroup } from "@atlaskit/button";
+import { findObj } from "./VisualizeTasks";
+import { sampleSkills } from "../data";
 
 /**
  * Using as part of visualize task page. To show dependences of a specific task
  */
-const TaskDetail = ({ currentTask }) => {
-	var skills= [{value: "1", label: "C#"}]
-	
+const TaskDetail = ({
+	tasks,
+	selectedTaskIds,
+	currentTaskId,
+	updateTasks,
+}) => {
+	var currentTask = findObj(tasks, currentTaskId);
+	var selectedTasks = [];
+	selectedTaskIds?.forEach((id) => {
+		var task = findObj(tasks, id);
+		if (task) selectedTasks.push(task);
+	});
+
+	const [skills, setSkills] = useState(sampleSkills);
+
+	var taskOpts = [];
+	selectedTasks?.forEach((task) =>
+		task.id != currentTaskId ? taskOpts.push({ value: task.id, label: task.name }) : ""
+	);
+	var taskValues = [];
+	currentTask?.precedence?.forEach((pre) => {
+		let task = findObj(tasks, pre.precedenceId);
+		if (task) taskValues.push({ value: task.id, label: task.name });
+	});
+
+	var skillOpts = [];
+	skills?.forEach((skill) =>
+		skillOpts.push({ value: skill.id, label: skill.name })
+	);
+
+	const handleChangePrecedence = (values, action) => {
+		var ids = [];
+		values?.forEach((item) => ids.push({taskId: currentTaskId, precedenceId: item.value}));
+
+		var task = findObj(tasks, currentTaskId);
+		if (task) {
+			// console.log(ids);
+			// console.log(task);
+			task.precedence = ids;
+			updateTasks(tasks);
+		}
+	};
+
 	const actionsContent = (
 		<ButtonGroup>
 			<Button>Save</Button>
@@ -18,10 +60,8 @@ const TaskDetail = ({ currentTask }) => {
 	);
 
 	return (
-		<>
-			<PageHeader actions={actionsContent}>
-				Task details: 
-			</PageHeader>
+		<div style={{ borderTop: "1px solid #e5e5e5" }}>
+			<PageHeader actions={actionsContent}>Task details:</PageHeader>
 			<div style={{ width: "100%" }}>
 				<pre>
 					{currentTask ? (
@@ -40,10 +80,10 @@ const TaskDetail = ({ currentTask }) => {
 									>
 										<div style={{ width: "30%" }}>
 											<Field
-												label="Task key"
-												name="key"
+												label="Task id"
+												name="id"
 												isDisabled
-												defaultValue={currentTask.key}
+												defaultValue={currentTask.id}
 											>
 												{({ fieldProps }) => (
 													<Fragment>
@@ -96,15 +136,15 @@ const TaskDetail = ({ currentTask }) => {
 															inputId="multi-select-example"
 															className="multi-select"
 															classNamePrefix="react-select"
-															options={skills}
+															options={skillOpts}
 															isMulti
-															isSearchable={false}
+															isSearchable={true}
 															placeholder="Choose skills"
 														/>
 													</Fragment>
 												)}
 											</Field>
-											<Field
+											{/* <Field
 												label="Required equipments"
 												name="equipments"
 												defaultValue=""
@@ -116,14 +156,14 @@ const TaskDetail = ({ currentTask }) => {
 															inputId="multi-select-example"
 															className="multi-select"
 															classNamePrefix="react-select"
-															options={skills}
+															options={skillOpts}
 															isMulti
 															isSearchable={false}
 															placeholder="Choose equipments"
 														/>
 													</Fragment>
 												)}
-											</Field>
+											</Field> */}
 											<Field
 												label="Precedence tasks"
 												name="precedences"
@@ -136,9 +176,13 @@ const TaskDetail = ({ currentTask }) => {
 															inputId="multi-select-example"
 															className="multi-select"
 															classNamePrefix="react-select"
-															options={skills}
+															options={taskOpts}
+															value={taskValues}
+															onChange={
+																handleChangePrecedence
+															}
 															isMulti
-															isSearchable={false}
+															isSearchable={true}
 															placeholder="Choose precedence tasks"
 														/>
 													</Fragment>
@@ -154,7 +198,7 @@ const TaskDetail = ({ currentTask }) => {
 					)}
 				</pre>
 			</div>
-		</>
+		</div>
 	);
 };
 
