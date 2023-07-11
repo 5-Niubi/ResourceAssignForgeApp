@@ -34,6 +34,8 @@ class AuthenWithBE {
 	 * @param {Object} data
 	 */
 	async handleAuthenCallbackFromNET(data) {
+		// Fixed accessToken BE
+		data.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJKV1RTZXJ2aWNlQWNjZXNzVG9rZW4iLCJqdGkiOiI2YmZlYjJkMS00NmU5LTQzMWItYTQwYy0zOTFlMmExOWFhNGIiLCJpYXQiOiIwNy8xMC8yMDIzIDE0OjIxOjIwIiwiYWNjb3VudF9pZCI6IjYxZTFiNzJmMDU4NmEyMDA2OWRlMjhmZSIsImNsb3VkX2lkIjoiZWE0OGRkYzctZWQ1Ni00ZDYwLTliNTUtMDI2Njc3MjQ4NDlkIiwiZXhwIjoxNzIwNjIxMjgwLCJpc3MiOiJKV1RBdXRoZW50aWNhdGlvblNlcnZlciIsImF1ZCI6IkppcmFDbG91ZCJ9.pU2H7ySjUxKopiBVqpJxqALU9ADNojxPb-u-G6PfKBU";
 		await storage.setSecret(STORAGE.TOKEN, data.token);
 		await storage.set(STORAGE.IS_AUTHENTICATED, true);
 	}
