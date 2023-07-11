@@ -46,9 +46,21 @@ async function getJiraSoftwareProjects(params) {
 	}
 }
 
+async function estimate(projectId) {
+	try {
+		let response = await APIServices.get(`/api/Algorithm/GetEstimateWorkforce`, {
+			projectId,
+		});
+		return response;
+	} catch (error) {
+		return Promise.reject(error);
+	}
+}
+
 export {
 	getProjects,
 	createProject,
 	getProjectDetail,
 	getJiraSoftwareProjects,
+	estimate
 };

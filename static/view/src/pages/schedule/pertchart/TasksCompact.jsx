@@ -25,7 +25,6 @@ const TasksCompact = ({ tasks, selectedIds, setSelectedIds, updateCurrentTaskId 
 			.getElementsByTagName("input");
 		var selected = [];
 		for (let i = 0; i < inputs.length; i++) {
-            console.log(inputs[i].value);
 			if (inputs[i].checked) {
 				let taskId = inputs[i].value;
 				selected.push(taskId);
@@ -35,6 +34,13 @@ const TasksCompact = ({ tasks, selectedIds, setSelectedIds, updateCurrentTaskId 
 		// updateGlobalSelectedTasks(selected);
 		setSelectedIds(selected);
 	};
+
+    const handleSelectTask = (e) => {
+		// console.log(e.currentTarget.dataset.id);
+		updateCurrentTaskId(e.currentTarget.dataset.id);
+	}
+
+
     var selectedTasks = [];
 	selectedIds.forEach((id) => {
 		var task = findObj(tasks, id);
@@ -56,13 +62,16 @@ const TasksCompact = ({ tasks, selectedIds, setSelectedIds, updateCurrentTaskId 
 				{
 					key: item.id,
 					content: (
-						<Checkbox
-							size="large"
-							value={item.id}
-							isChecked={checked}
-							onChange={handleChangeCheckbox}
-							label={item.name}
-						></Checkbox>
+						// <Checkbox
+						// 	size="large"
+						// 	value={item.id}
+						// 	isChecked={checked}
+						// 	onChange={handleChangeCheckbox}
+						// 	label={item.name}
+						// ></Checkbox>
+						<div style={{padding: "5px", cursor: "pointer"}} data-id={item.id} onClick={handleSelectTask}>
+							{item.name}
+						</div>
 					),
 				},
 			],
@@ -78,7 +87,15 @@ const TasksCompact = ({ tasks, selectedIds, setSelectedIds, updateCurrentTaskId 
 	return (
 		<div id="tasks">
 			<PageHeader actions={actionsContent}>Tasks list:</PageHeader>
-			<div style={{ width: "100%" }}>
+			<div
+				style={{
+					width: "100%",
+					height: "80vh",
+					overflowY: "scroll",
+					scrollbarWidth: "thin",
+					
+				}}
+			>
 				<DynamicTable
 					rows={rows}
 					loadingSpinnerSize="large"
