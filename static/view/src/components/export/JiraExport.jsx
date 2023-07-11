@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Button from "@atlaskit/button";
 import Modal, {
 	ModalTransition,
@@ -6,8 +7,11 @@ import Modal, {
 	ModalBody,
 	ModalFooter,
 } from "@atlaskit/modal-dialog";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { MODAL_WIDTH } from "../../common/contants";
+import { invoke, requestJira } from "@forge/bridge";
+import Toastify from "../../common/Toastify";
+import JiraProjectExportTable from "./table/JiraProjectExportTable";
 const width = MODAL_WIDTH.M;
 function JiraExport({ state }) {
 	const [IsJiraExportOpen, setIsJiraExportOpen] = state;
@@ -15,7 +19,19 @@ function JiraExport({ state }) {
 		() => setIsJiraExportOpen(false),
 		[]
 	);
+	const [projectList, setProjectList] = useState([]);
 
+	useEffect(() => {
+
+		invoke("getJiraProjectsList")
+			.then(function (res) {
+				setProjectList(res.values);
+			})
+			.catch(function (error) {
+				console.log(error);
+				Toastify.error(error);
+			});
+	}, []);
 
 	return (
 		<ModalTransition>
@@ -26,26 +42,11 @@ function JiraExport({ state }) {
 					</ModalHeader>
 					<ModalBody>
 						Select project to export to
-                        <div>
-                            Project 1
-                        </div>
-                        <div>
-                            Project 2
-                        </div>
-                        <div>
-                            Project 3
-                        </div>
+						<JiraProjectExportTable isLoading={false} projects={projectList}/>
 					</ModalBody>
 					<ModalFooter>
 						<Button appearance="subtle" onClick={closeJiraExportModal}>
 							Cancel
-						</Button>
-						<Button
-							appearance="primary"
-							onClick={closeJiraExportModal}
-							autoFocus
-						>
-							Duplicate
 						</Button>
 					</ModalFooter>
 				</Modal>
