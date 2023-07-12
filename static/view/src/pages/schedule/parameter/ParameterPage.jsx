@@ -12,7 +12,7 @@ import ParameterEstimateMessage from "./ParameterEstimateMessage";
  * Using as Demo Homepage
  * @returns {import("react").ReactElement}
  */
-function ParameterPage() {
+function ParameterPage({handleChangeTab}) {
 	let navigate = useNavigate();
 	return (
 		<div style={{width:"100%"}}>
@@ -20,7 +20,7 @@ function ParameterPage() {
 			<ParameterEstimateMessage></ParameterEstimateMessage>
 			<ParameterWorkforceList></ParameterWorkforceList>
 			<ParameterPageHeader name={"Parameter"}></ParameterPageHeader>
-			<ParameterObjectInput></ParameterObjectInput>
+			<ParameterObjectInput handleChangeTab={handleChangeTab}></ParameterObjectInput>
 		</div>
 	);
 }

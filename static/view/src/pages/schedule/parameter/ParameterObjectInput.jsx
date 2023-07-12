@@ -18,7 +18,7 @@ import {
 	RightPanel,
 } from "@atlaskit/page-layout";
 
-export default function ParameterObjectInput() {
+export default function ParameterObjectInput({handleChangeTab}) {
 	const [valueTime, setValueTime] = useState(50);
 	const [valueCost, setValueCost] = useState(50);
 	const [valueQuality, setValueQuality] = useState(50);
@@ -136,10 +136,7 @@ export default function ParameterObjectInput() {
 									)}
 								</RangeField> */}
 								<FormFooter>
-									<Button type="submit" appearance="primary">
-										Schedule
-									</Button>
-									<LoadingModal></LoadingModal>
+									<LoadingModal handleChangeTab={handleChangeTab}></LoadingModal>
 								</FormFooter>
 							</form>
 						)}

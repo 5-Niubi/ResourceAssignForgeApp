@@ -9,30 +9,16 @@ import StarFilledIcon from '@atlaskit/icon/glyph/star-filled';
 export default function ParameterEstimateMessage() {
 	var estimation = JSON.parse(localStorage.getItem("estimation"));
     let { projectId } = useParams();
-    const [milestones, setMilestones] = useState([]);
-	useEffect(function () {
+    var milestones = JSON.parse(localStorage.getItem("milestones"))
 
-		invoke("getAllMilestones", { projectId })
-			.then(function (res) {
-				if (Object.keys(res).length !== 0) {
-					setMilestones(res);
-				} else setMilestones([]);
-			})
-			.catch(function (error) {
-				console.log(error);
-				Toastify.error(error);
-			});
-		setMilestones([]);
-		return;
-	}, []);
 	return (
 		<SectionMessage title="We need these resources:" appearance="warning">
-			{estimation.workforceWithMilestoneList?.map((milestone, index) => {
-				let obj = findObj(milestones, milestone.id);
+			{estimation.workforceWithMilestoneList?.map((ml, index) => {
+				let obj = findObj(milestones, ml.id);
 				if (obj) {
 					return (
 						<ul>
-                            {milestone?.workforceOutputList?.map(
+                            {ml?.workforceOutputList?.map(
 										(workers, index) => {
 											let skills = [];
 											workers.skillOutputList?.forEach(skill => skills.push(skill.name + " level " + skill.level))
