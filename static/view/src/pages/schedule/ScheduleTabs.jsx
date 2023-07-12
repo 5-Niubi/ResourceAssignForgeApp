@@ -1,8 +1,8 @@
 import Tabs, { Tab, TabList, TabPanel } from "@atlaskit/tabs";
 import VisualizeTasksPage from "./pertchart/VisualizeTasks";
 import ParameterPageHeader from "./parameter/ParameterPageHeader";
-import ParameterDynamicTable from "./parameter/ParameterDynamicTable";
 import ParameterWorkforceList from "./parameter/ParameterWorkforceList";
+import ParameterEstimateMessage from "./parameter/ParameterEstimateMessage";
 import ParameterObjectInput from "./parameter/ParameterObjectInput";
 import GanttChartPage from "./ganttchart/GanttChartPage";
 import Badge from '@atlaskit/badge';
@@ -41,9 +41,10 @@ export default function ScheduleTabs() {
 			</TabPanel>
 			<TabPanel>
 				<div style={{ width: "100%" }}>
-					<ParameterPageHeader></ParameterPageHeader>
-					<ParameterDynamicTable></ParameterDynamicTable>
-					<ParameterWorkforceList></ParameterWorkforceList>
+					<ParameterPageHeader name={"Resource Estimation"}></ParameterPageHeader>
+					<ParameterEstimateMessage></ParameterEstimateMessage>
+                    <ParameterWorkforceList></ParameterWorkforceList>
+					<ParameterPageHeader name={"Parameter"}></ParameterPageHeader>
 					<ParameterObjectInput></ParameterObjectInput>
 				</div>
 			</TabPanel>

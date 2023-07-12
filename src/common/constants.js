@@ -1,5 +1,5 @@
 export const EMPTY_STRING = "";
-export const BACKEND_dNET_DOMAIN = "https://ff26-2401-d800-7e0b-29f3-5985-2543-e4b5-29.ngrok-free.app";
+export const BACKEND_dNET_DOMAIN = "https://28c5-2401-d800-5111-ae14-f85e-47d8-93c-3a1a.ngrok-free.app";
  
 /**
  * Key of Storage

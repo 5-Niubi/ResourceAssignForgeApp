@@ -33,17 +33,14 @@ import Form, {
 } from "@atlaskit/form";
 import AddCircle from "@atlaskit/icon/glyph/add-circle";
 
-
-
 const options = [
-    { name: 'workingType', value: '0', label: 'Fulltime' },
-    { name: 'workingType', value: '1', label: 'Part-time' },
-  ];
-  
+	{ name: "workingType", value: "0", label: "Fulltime" },
+	{ name: "workingType", value: "1", label: "Part-time" },
+];
+
 const boldStyles = css({
 	fontWeight: "bold",
 });
-
 
 export default function ParameterWorkforceModal() {
 	//CREATE WORKFORCE MODAL (CW)
@@ -139,37 +136,91 @@ export default function ParameterWorkforceModal() {
 }
 
 export function ParameterCreareWorkforceModal() {
-    const [isParttimeSelected, setIsParttimeSelected] = useState(false);
-    function handleOnSelected(e){
-        if(e.currentTarget.value == "1"){
-            setIsParttimeSelected(true);
-        }else{
-            setIsParttimeSelected(false);
-        }
-    }
+	const [isParttimeSelected, setIsParttimeSelected] = useState(false);
+
+	function handleOnSelected(e) {
+		if (e.currentTarget.value == "1") {
+			setIsParttimeSelected(true);
+		} else {
+			setIsParttimeSelected(false);
+		}
+	}
 
 	const buttonAddSkills = (
 		<>
 			<Button
 				iconBefore={<AddCircle label="" size="medium" />}
 				appearance="subtle"
-				// onClick={openModal}
 			></Button>
 		</>
 	);
+
+    const head = {
+		cells: [
+			{
+				key: "skills",
+				content: "Skills",
+				width: 30,
+			},
+			{
+				key: "star",
+				content: "Star",
+				width: 60,
+			},
+			{
+				key: "action",
+				content: "Actions",
+				width: 10,
+			},
+		],
+	};
+
+	const rows = [
+        { name: "C#", level: "3"},
+        { name: "Java", level: "5"},
+        { name: "Unity", level: "2"},
+    ].map((skill, index) => ({
+		key: skill.name?.toString(),
+		cells: [
+			{
+				key: skill.name?.toString(),
+				content: skill.name?.toString(),
+			},
+			{
+				key: skill.level?.toString(),
+				content: (
+					<>
+						<StarFilledIcon></StarFilledIcon>
+						<StarFilledIcon></StarFilledIcon>
+						<StarFilledIcon></StarFilledIcon>
+						<StarFilledIcon></StarFilledIcon>
+						<StarIcon></StarIcon>
+					</>
+				),
+			},
+			{
+				key: "actions",
+				content: (
+					<>
+						<Button
+							iconBefore={<EditIcon label="" size="medium" />}
+							appearance="subtle"
+							// onClick={openModal}
+						></Button>
+						<Button
+							iconBefore={<TrashIcon label="" size="medium" />}
+							appearance="subtle"
+							// onClick={openModal}
+						></Button>
+					</>
+				),
+			},
+		],
+	}));
+
 	return (
 		<>
-			<div
-				style={
-					{
-						// display: "flex",
-						// width: "400px",
-						// maxWidth: "100%",
-						// margin: "0 auto",
-						// flexDirection: "column",
-					}
-				}
-			>
+			<div>
 				<Form
 					onSubmit={(data) => {
 						console.log("form data", data);
@@ -288,7 +339,7 @@ export function ParameterCreareWorkforceModal() {
 									<RadioGroup
 										{...fieldProps}
 										options={options}
-                                        // onChange={handleOnSelected}
+										onChange={handleOnSelected}
 									/>
 								)}
 							</Field>
@@ -301,9 +352,8 @@ export function ParameterCreareWorkforceModal() {
 									defaultValue=""
 								>
 									{({ fieldProps, error }) => (
-										<Fragment style={{display: "flex"}}>
+										<Fragment>
 											<TextField
-												style={{ flex: 1 }}
 												autoComplete="off"
 												defaultValue={0.99}
 												label="Monday"
@@ -414,7 +464,6 @@ export function ParameterCreareWorkforceModal() {
 									)}
 								</Field>
 							)}
-
 							<Field
 								name="skills"
 								label="Skills"
@@ -428,7 +477,7 @@ export function ParameterCreareWorkforceModal() {
 											elemAfterInput={buttonAddSkills}
 											{...fieldProps}
 										/>
-										{!error && (
+                                        										{!error && (
 											<HelperMessage>
 												<InfoIcon
 													size="small"
@@ -446,9 +495,9 @@ export function ParameterCreareWorkforceModal() {
 									</Fragment>
 								)}
 							</Field>
-							<ParameterSkillsTable></ParameterSkillsTable>
+							<DynamicTable head={head} rows={rows} />
 							<FormFooter>
-								{/* <ButtonGroup>
+								<ButtonGroup>
 									<Button appearance="subtle">Cancel</Button>
 									<LoadingButton
 										type="submit"
@@ -457,84 +506,12 @@ export function ParameterCreareWorkforceModal() {
 									>
 										Create
 									</LoadingButton>
-								</ButtonGroup> */}
+								</ButtonGroup>
 							</FormFooter>
 						</form>
 					)}
 				</Form>
 			</div>
-		</>
-	);
-}
-
-export function ParameterSkillsTable() {
-	const head = {
-		cells: [
-			{
-				key: "skills",
-				content: "Skills",
-				width: 30,
-			},
-			{
-				key: "star",
-				content: "Star",
-				width: 60,
-			},
-			{
-				key: "action",
-				content: "Actions",
-				width: 10,
-			},
-		],
-	};
-
-	const rows = [
-		["SQL", "d"],
-		["JAVA", "c"],
-		["C#", "a"],
-		["Unity", "b"],
-	].map(([number, letter]) => ({
-		key: number.toString(),
-		cells: [
-			{
-				key: number,
-				content: number,
-			},
-			{
-				key: letter,
-				content: (
-					<>
-						<StarFilledIcon></StarFilledIcon>
-						<StarFilledIcon></StarFilledIcon>
-						<StarFilledIcon></StarFilledIcon>
-						<StarFilledIcon></StarFilledIcon>
-						<StarIcon></StarIcon>
-					</>
-				),
-			},
-			{
-				key: "actions",
-				content: (
-					<>
-						<Button
-							iconBefore={<EditIcon label="" size="medium" />}
-							appearance="subtle"
-							// onClick={openModal}
-						></Button>
-						<Button
-							iconBefore={<TrashIcon label="" size="medium" />}
-							appearance="subtle"
-							// onClick={openModal}
-						></Button>
-					</>
-				),
-			},
-		],
-	}));
-
-	return (
-		<>
-			<DynamicTable head={head} rows={rows} />
 		</>
 	);
 }

@@ -16,9 +16,10 @@ function ParameterPage() {
 	let navigate = useNavigate();
 	return (
 		<>
-			<ParameterPageHeader></ParameterPageHeader>
+			<ParameterPageHeader name={"Resource Estimation"}></ParameterPageHeader>
 			<ParameterEstimateMessage></ParameterEstimateMessage>
 			<ParameterWorkforceList></ParameterWorkforceList>
+			<ParameterPageHeader name={"Parameter"}></ParameterPageHeader>
 			<ParameterObjectInput></ParameterObjectInput>
 		</>
 	);
