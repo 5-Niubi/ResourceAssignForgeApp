@@ -422,7 +422,7 @@ export function ParameterSelectWorkforcesTable() {
                 })
                 .catch(function (error) {
                     console.log(error);
-                    Toastify.error(error);
+                    Toastify.error(error.toString());
                 });
         }, []);
 
