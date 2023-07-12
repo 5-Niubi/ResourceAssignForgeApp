@@ -10,6 +10,7 @@ const PertChart = ({
 	tasks,
 	milestones,
 	selectedTaskIds,
+	currentTaskId,
 	updateCurrentTaskId,
 	updateTasks,
 	updateCanEstimate,
@@ -80,6 +81,7 @@ const PertChart = ({
 				stroke: "deepskyblue",
 			}),
 			"undoManager.isEnabled": true,
+			"animationManager.isEnabled": false
 		});
 
 		// to make diagram span over screen
@@ -169,6 +171,24 @@ const PertChart = ({
 			// } else {
 			// 	if (idx >= 0) document.title = document.title.slice(0, idx);
 			// }
+		});
+
+		// this event handler is called when the diagram is first ready
+		diagram.addDiagramListener("InitialLayoutCompleted", (e) => {
+			// pick a random node data
+			var data = null;
+			diagram.model.nodeDataArray.forEach((node) => {
+				if (node.key == currentTaskId){
+					data = node;
+				}
+			});
+			// find the corresponding Node
+			var node = diagram.findNodeForData(data);
+			// and center it and select it
+			if (node) {
+				diagram.centerRect(node.actualBounds);
+				diagram.select(node);
+			}
 		});
 
 		// Perform any additional initialization or configuration here

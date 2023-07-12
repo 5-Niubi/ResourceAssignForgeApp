@@ -210,6 +210,11 @@ function VisualizeTasksPage({ handleChangeTab }) {
 		setTaskSkillsChanged(dataChanged);
 	};
 
+	const [taskMilestoneChanged, setTaskMilestoneChanged] = useState(null);
+	const updateTaskMilestoneChanged = (dataChanged) => {
+		setTaskMilestoneChanged(dataChanged);
+	};
+
 	const updateTasks = (tasks) => {
 		setTasks(tasks);
 	};
@@ -267,6 +272,7 @@ function VisualizeTasksPage({ handleChangeTab }) {
 							selectedTaskIds={selectedIds}
 							updateCurrentTaskId={updateCurrentTaskId}
 							updateTasks={updateTasks}
+							currentTaskId={currentTaskId}
 							updateCanEstimate={updateCanEstimate}
 						/>
 						<TaskDetail
@@ -280,6 +286,7 @@ function VisualizeTasksPage({ handleChangeTab }) {
 								updateDependenciesChanged
 							}
 							updateTaskSkillsChanged={updateTaskSkillsChanged}
+							updateTaskMilestoneChanged={updateTaskMilestoneChanged}
 							updateCanEstimate={updateCanEstimate}
 						/>
 					</Main>
