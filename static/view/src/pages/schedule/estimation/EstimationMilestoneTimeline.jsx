@@ -20,16 +20,18 @@ export default function MilestonesTimeline({ milestones, skills }) {
 								<VerticalTimelineElement
 									className="vertical-timeline-element--work"
 									contentStyle={{
-										background: colorsBank[index % 30],
+										background:
+											colorsBank[milestone.id % 30],
 										color: "#fff",
 									}}
 									contentArrowStyle={{
 										borderRight:
 											"7px solid " +
-											colorsBank[index % 30],
+											colorsBank[milestone.id % 30],
 									}}
 									iconStyle={{
-										background: colorsBank[index % 30],
+										background:
+											colorsBank[milestone.id % 30],
 										color: "black",
 										paddingRight: "10",
 									}}
@@ -44,11 +46,20 @@ export default function MilestonesTimeline({ milestones, skills }) {
 									{milestone?.workforceOutputList?.map(
 										(workers, index) => {
 											let skills = [];
-											workers.skillOutputList?.forEach(skill => skills.push(skill.name + " level " + skill.level))
+											workers.skillOutputList?.forEach(
+												(skill) =>
+													skills.push(
+														skill.name +
+															" level " +
+															skill.level
+													)
+											);
 											return (
 												<p>
 													<PeopleGroupIcon></PeopleGroupIcon>{" "}
-													{workers.quantity} workers with skills set ({skills.join("; ")})
+													{workers.quantity} workers
+													with skills set (
+													{skills.join("; ")})
 												</p>
 											);
 										}
