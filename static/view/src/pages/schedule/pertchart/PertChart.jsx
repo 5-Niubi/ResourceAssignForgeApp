@@ -143,7 +143,7 @@ const PertChart = ({
 
 					var index = -1;
 					toTask.precedences?.forEach((pre, i) => {
-						if (pre.precedenceIdid === fromNode.data.id) {
+						if (pre.precedenceId === fromNode.data.id) {
 							index = i;
 							return;
 						}
