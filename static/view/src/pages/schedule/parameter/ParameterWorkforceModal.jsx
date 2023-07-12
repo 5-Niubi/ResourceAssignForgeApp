@@ -42,6 +42,8 @@ const boldStyles = css({
 	fontWeight: "bold",
 });
 
+
+
 export default function ParameterWorkforceModal() {
 	//CREATE WORKFORCE MODAL (CW)
 	const [isCWOpen, setIsCWOpen] = useState(false);
