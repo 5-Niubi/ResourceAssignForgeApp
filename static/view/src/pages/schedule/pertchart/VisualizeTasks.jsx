@@ -286,9 +286,12 @@ function VisualizeTasksPage({handleChangeTab}) {
 							>
 								<TasksCompact
 									tasks={tasks}
+									milestones={milestones}
+									skills={skills}
 									selectedIds={selectedIds}
 									setSelectedIds={updateSelectedTaskIds}
 									updateCurrentTaskId={updateCurrentTaskId}
+									updateTasks={updateTasks}
 								/>
 							</div>
 						</RightSidebar>
