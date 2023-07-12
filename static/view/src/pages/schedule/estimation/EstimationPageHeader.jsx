@@ -10,6 +10,9 @@ import { MilestonesTimeline } from ".";
 const EstimationPageHeader = ({ handleChangeTab }) => {
 	const actionsContent = (
 		<ButtonGroup>
+			<Button onClick={() => handleChangeTab(0)}>
+				Back
+			</Button>
 			<Button appearance="primary" onClick={() => handleChangeTab(2)}>
 				Next
 			</Button>
