@@ -15,13 +15,13 @@ import ParameterEstimateMessage from "./ParameterEstimateMessage";
 function ParameterPage() {
 	let navigate = useNavigate();
 	return (
-		<>
+		<div style={{width:"100%"}}>
 			<ParameterPageHeader name={"Resource Estimation"}></ParameterPageHeader>
 			<ParameterEstimateMessage></ParameterEstimateMessage>
 			<ParameterWorkforceList></ParameterWorkforceList>
 			<ParameterPageHeader name={"Parameter"}></ParameterPageHeader>
 			<ParameterObjectInput></ParameterObjectInput>
-		</>
+		</div>
 	);
 }
 
