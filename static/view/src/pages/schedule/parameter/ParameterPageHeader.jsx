@@ -7,11 +7,11 @@ import __noop from '@atlaskit/ds-lib/noop';
 import PageHeader from '@atlaskit/page-header';
 
 
-const ParameterPageHeader = () => {
+function ParameterPageHeader ({name}) {
   return (
     <PageHeader >
         <div style={{width: "100%"}}>
-        Parameter
+        {name}
         </div>
     </PageHeader>
   );
