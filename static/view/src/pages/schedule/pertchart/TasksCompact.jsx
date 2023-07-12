@@ -10,16 +10,29 @@ import {
 	updateSelectedTasks,
 } from "../data";
 import { findObj } from "./VisualizeTasks";
+import CreateTaskModal from "./modal/CreateTaskModal";
+import { useParams } from "react-router";
 
 /**
  * List of tasks with only name; use for select task to appeared in the pertchart
  */
-const TasksCompact = ({ tasks, selectedIds, setSelectedIds, updateCurrentTaskId }) => {
+const TasksCompact = ({
+	tasks,
+	milestones,
+	skills,
+	selectedIds,
+	setSelectedIds,
+	updateCurrentTaskId,
+	updateTasks,
+}) => {
+	const [isModalCreateOpen, setIsModalCreateOpen] = useState(false);
+	let { projectId } = useParams();
+
 	const handleChangeCheckbox = (e) => {
 		// console.log(e.currentTarget);
 		// console.log(e.currentTarget.checked);
 		// console.log(e.currentTarget.value);
-        updateCurrentTaskId(e.currentTarget.value);
+		updateCurrentTaskId(e.currentTarget.value);
 		var inputs = document
 			.getElementById("tasks")
 			.getElementsByTagName("input");
@@ -35,13 +48,12 @@ const TasksCompact = ({ tasks, selectedIds, setSelectedIds, updateCurrentTaskId 
 		setSelectedIds(selected);
 	};
 
-    const handleSelectTask = (e) => {
+	const handleSelectTask = (e) => {
 		// console.log(e.currentTarget.dataset.id);
 		updateCurrentTaskId(e.currentTarget.dataset.id);
-	}
+	};
 
-
-    var selectedTasks = [];
+	var selectedTasks = [];
 	selectedIds.forEach((id) => {
 		var task = findObj(tasks, id);
 		if (task) selectedTasks.push(task);
@@ -69,7 +81,11 @@ const TasksCompact = ({ tasks, selectedIds, setSelectedIds, updateCurrentTaskId 
 						// 	onChange={handleChangeCheckbox}
 						// 	label={item.name}
 						// ></Checkbox>
-						<div style={{padding: "5px", cursor: "pointer"}} data-id={item.id} onClick={handleSelectTask}>
+						<div
+							style={{ padding: "5px", cursor: "pointer" }}
+							data-id={item.id}
+							onClick={handleSelectTask}
+						>
 							{item.name}
 						</div>
 					),
@@ -80,7 +96,12 @@ const TasksCompact = ({ tasks, selectedIds, setSelectedIds, updateCurrentTaskId 
 
 	const actionsContent = (
 		<ButtonGroup>
-			<Button appearance="subtle">Create task</Button>
+			<Button
+				appearance="subtle"
+				onClick={() => setIsModalCreateOpen(true)}
+			>
+				Create task
+			</Button>
 		</ButtonGroup>
 	);
 
@@ -88,12 +109,12 @@ const TasksCompact = ({ tasks, selectedIds, setSelectedIds, updateCurrentTaskId 
 		<div id="tasks">
 			<PageHeader actions={actionsContent}>Tasks list:</PageHeader>
 			<div
+				class="inner"
 				style={{
 					width: "100%",
 					height: "80vh",
-					overflowY: "scroll",
+					overflowY: "auto",
 					scrollbarWidth: "thin",
-					
 				}}
 			>
 				<DynamicTable
@@ -102,6 +123,20 @@ const TasksCompact = ({ tasks, selectedIds, setSelectedIds, updateCurrentTaskId 
 					isFixedSize
 				/>
 			</div>
+
+			{isModalCreateOpen ? (
+				<CreateTaskModal
+					isOpen={isModalCreateOpen}
+					setIsOpen={setIsModalCreateOpen}
+					projectId={projectId}
+					milestones={milestones}
+					tasks={tasks}
+					skills={skills}
+					updateTasks={updateTasks}
+				/>
+			) : (
+				""
+			)}
 		</div>
 	);
 };

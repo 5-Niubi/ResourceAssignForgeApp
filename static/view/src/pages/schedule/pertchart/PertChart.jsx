@@ -3,13 +3,16 @@ import * as go from "gojs";
 import "gojs/extensions/DrawCommandHandler";
 import "gojs/extensions/Figures";
 import "gojs/extensions/GeometryReshapingTool";
-import { findObj } from "./VisualizeTasks";
+import { colorsBank, findObj } from "./VisualizeTasks";
+import { color } from "highcharts";
 
 const PertChart = ({
 	tasks,
+	milestones,
 	selectedTaskIds,
 	updateCurrentTaskId,
 	updateTasks,
+	updateCanEstimate,
 }) => {
 	const diagramRef = useRef(null);
 
@@ -112,7 +115,8 @@ const PertChart = ({
 						precedenceId: fromNode.ub.id,
 					});
 					updateCurrentTaskId(toTask.id);
-					updateTasks(tasks);
+					// updateTasks(tasks);
+					updateCanEstimate(false);
 				}
 			}
 		});
@@ -139,16 +143,17 @@ const PertChart = ({
 
 					var index = -1;
 					toTask.precedences?.forEach((pre, i) => {
-						if (pre.precedenceIdid === fromNode.data.id){
-							index=i;
+						if (pre.precedenceIdid === fromNode.data.id) {
+							index = i;
 							return;
 						}
-					})
+					});
 					if (index > -1) {
 						// only splice array when item is found
 						toTask.precedences.splice(index, 1); // 2nd parameter means remove one item only
-						updateTasks(tasks);
+						// updateTasks(tasks);
 						updateCurrentTaskId(toTask.id);
+						updateCanEstimate(false);
 					}
 				}
 			}
@@ -235,10 +240,18 @@ const PertChart = ({
 				go.Shape,
 				"RoundedRectangle",
 				{ fill: "white", strokeWidth: 2 },
-				new go.Binding("fill", "critical", (b) =>
-					b ? pinkfill : bluefill
-				),
-				new go.Binding("stroke", "critical", (b) => (b ? pink : blue))
+				// new go.Binding("fill", "critical", (b) =>(b ? pinkfill : bluefill)),
+				// new go.Binding("stroke", "critical", (b) => (b ? pink : blue)),
+				new go.Binding("fill", "milestoneId", (id) => {
+					let color = "#fff";
+					for (let i = 0; i < milestones.length; i++) {
+						if (milestones[i].id == id) {
+							color = colorsBank[i % 30];
+							break;
+						}
+					}
+					return color;
+				})
 			),
 			$(
 				go.Panel,
@@ -297,12 +310,30 @@ const PertChart = ({
 					// if (task) {
 					updateCurrentTaskId(obj.part.data.id);
 					// }
+
+					var shape = obj.part.elt(0);
+					let color = blue;
+					for (let i = 0; i < milestones.length; i++) {
+						if (milestones[i].id == obj.part.data.id) {
+							color = colorsBank[i % 30];
+							break;
+						}
+					}
+					shape.stroke = color;
+					shape.strokeWidth = 3;
 				},
-				// selectionChanged: (part) => {
-				// 	// var shape = part.elt(0);
-				// 	// shape.stroke = part.isSelected ? "blue" : (part.data.critical ? pink : blue);
-				//     updateCurrentTask(part.data);
-				// },
+				selectionChanged: (part) => {
+					var shape = part.elt(0);
+					let color = blue;
+					for (let i = 0; i < milestones.length; i++) {
+						if (milestones[i].id == part.data.id) {
+							color = colorsBank[i % 30];
+							break;
+						}
+					}
+					shape.stroke = color;
+					// updateCurrentTask(part.data);
+				},
 			}
 		);
 	}
@@ -369,16 +400,15 @@ const PertChart = ({
 		//get all link from precedence tasks pre-defined
 		var links = [];
 		tasks?.forEach((task) =>
-			task.precedences?.forEach((pre) =>{
+			task.precedences?.forEach((pre) => {
 				findObj(tasks, pre.precedenceId)
 					? links.push({ from: pre.precedenceId, to: task.id })
-					: null
-			}
-			)
+					: null;
+			})
 		);
 
 		//create link to dummy tasks
-		tasks.forEach((task) =>{
+		tasks.forEach((task) => {
 			if (
 				task.precedences.length == 0 &&
 				task.id != -1 &&
@@ -386,16 +416,16 @@ const PertChart = ({
 			) {
 				links.push({ from: -1, to: task.id });
 			}
-			task.precedences?.forEach((pre) =>{
+			task.precedences?.forEach((pre) => {
 				var preObj = findObj(tasks, pre.precedenceId);
 				preObj.isNotEnd = true;
 			});
 		});
-		tasks.forEach(task => {
+		tasks.forEach((task) => {
 			if (!task.isNotEnd && task.id != -1 && task.id != -2) {
 				links.push({ from: task.id, to: -2 });
 			}
-		})
+		});
 
 		return $(go.GraphLinksModel, {
 			nodeDataArray: tasks,
