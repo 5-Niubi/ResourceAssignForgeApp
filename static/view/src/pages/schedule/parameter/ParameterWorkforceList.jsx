@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 
 import Button, { ButtonGroup } from "@atlaskit/button";
 import { workforces } from "../../resources/workforces/table-content/workforces";
-import ParameterWorkforceModal from "./ParameterWorkforceModal";
+import ParameterWorkforceModal, { ParameterCreareWorkforceModal } from "./ParameterWorkforceModal";
 import PageHeader from "@atlaskit/page-header";
-import { invoke } from "@forge/bridge";
+import { Modal, invoke } from "@forge/bridge";
 import Toastify from "../../../common/Toastify";
+import { ModalBody, ModalFooter, ModalHeader, ModalTitle, ModalTransition } from "@atlaskit/modal-dialog";
 
 function ParameterWorkforceList (){
 
@@ -34,7 +35,7 @@ function ParameterWorkforceList (){
 			})
 			.catch(function (error) {
 				console.log(error);
-				Toastify.error(error);
+				Toastify.error(error.toString());
 			});
 	}, []);
 
@@ -50,7 +51,8 @@ function ParameterWorkforceList (){
 			</div>
 			<div>
 				{workforces?.map((workforce, index) => (
-					<Button style={{ marginRight: "8px", marginBottom: "5px" }}>{workforce.name}</Button>
+					<Button style={{ marginRight: "8px", marginBottom: "5px" }}
+                        >{workforce.name}</Button>
 				))}
 			</div>
 		</div>

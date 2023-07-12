@@ -16,15 +16,18 @@ const boldStyles = css({
 	fontWeight: "bold",
 });
 
-export default function LoadingModal() {
+export default function LoadingModal({handleChangeTab}) {
 	const [isOpen, setIsOpen] = useState(false);
 	const openModal = useCallback(() => setIsOpen(true), []);
 	const closeModal = useCallback(() => setIsOpen(false), []);
 
 	return (
 		<div>
+            <Button onClick={() => handleChangeTab(1)}>
+				Back
+			</Button>
 			<Button appearance="primary" onClick={openModal}>
-				loading button
+				Schedule
 			</Button>
 
 			<ModalTransition>
@@ -40,11 +43,16 @@ export default function LoadingModal() {
 						</ModalBody>
 						<ModalFooter>
 							<Button
-								appearance="primary"
 								onClick={closeModal}
 								autoFocus
 							>
-								OK
+								Cancel
+							</Button>
+                            <Button
+                                appearance="primary"
+								onClick={closeModal && handleChangeTab(3) }
+							>
+								DONE
 							</Button>
 						</ModalFooter>
 					</Modal>

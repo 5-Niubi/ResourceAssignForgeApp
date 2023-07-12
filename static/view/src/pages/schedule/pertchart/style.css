@@ -3,6 +3,7 @@
 .visualize-tasks .task-details::-webkit-scrollbar{
 	display: none; /*Chrome*/
 }
+/* .visualize-tasks .diagram-component div:last-child::-webkit-scrollbar */
 
 .visualize-tasks #tasks .inner,
 .visualize-tasks .task-details{

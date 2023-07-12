@@ -133,6 +133,7 @@ const TasksCompact = ({
 					tasks={tasks}
 					skills={skills}
 					updateTasks={updateTasks}
+					updateCurrentTaskId={updateCurrentTaskId}
 				/>
 			) : (
 				""

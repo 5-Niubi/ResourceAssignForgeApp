@@ -21,6 +21,7 @@ const TaskDetail = ({
 	updateTasks,
 	updateDependenciesChanged,
 	updateTaskSkillsChanged,
+	updateTaskMilestoneChanged,
 	updateCanEstimate,
 }) => {
 	var currentTask = findObj(tasks, currentTaskId);
@@ -84,8 +85,8 @@ const TaskDetail = ({
 		}
 	});
 
-	var milestoneOpts = [];
 	var milestoneValue = {};
+	var milestoneOpts = [];
 	milestones?.forEach((milestone) => {
 		milestoneOpts.push({
 			value: milestone.id,
@@ -94,7 +95,7 @@ const TaskDetail = ({
 	});
 	if (currentTask?.milestoneId) {
 		var milestone = findObj(milestones, currentTask.milestoneId);
-		if (milestone){
+		if (milestone) {
 			milestoneValue = {
 				value: milestone.id,
 				label: milestone.name,
@@ -123,6 +124,12 @@ const TaskDetail = ({
 
 		currentTask.skillRequireds = skills;
 		updateTaskSkillsChanged(skills);
+		updateCanEstimate(false);
+	};
+	
+	const handleChangeMilestone = (objValue) => {
+		currentTask.milestoneId = objValue.value;
+		updateTaskMilestoneChanged(objValue);
 		updateCanEstimate(false);
 	};
 
@@ -284,9 +291,9 @@ const TaskDetail = ({
 															value={
 																milestoneValue
 															}
-															// onChange={
-															// 	handleChangeMilestone
-															// }
+															onChange={
+																handleChangeMilestone
+															}
 															isSearchable={true}
 															placeholder="Choose milestone"
 														/>
