@@ -23,6 +23,7 @@ function CreateTaskModal({
 	tasks,
 	skills,
 	updateTasks,
+	updateCurrentTaskId,
 }) {
 	const [taskName, setTaskName] = useState("");
 	const [duration, setDuration] = useState(0);
@@ -137,6 +138,7 @@ function CreateTaskModal({
 				if (res.id){
 					tasks.push(res);
 					updateTasks(tasks);
+					updateCurrentTaskId(res.id);
 				}
 				closeModal();
 			})
@@ -274,7 +276,7 @@ function CreateTaskModal({
 											<LoadingButton
 												appearance="primary"
 												isLoading
-											></LoadingButton>
+											>Saving...</LoadingButton>
 										) : (
 											<Button
 												type="submit"

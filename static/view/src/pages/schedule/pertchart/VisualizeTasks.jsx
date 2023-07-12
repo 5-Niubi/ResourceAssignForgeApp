@@ -9,7 +9,7 @@ import { Content, Main, PageLayout, RightSidebar } from "@atlaskit/page-layout";
 import TasksCompact from "./TasksCompact";
 import Toastify from "../../../common/Toastify";
 import PageHeader from "@atlaskit/page-header";
-import Button, { ButtonGroup } from "@atlaskit/button";
+import Button, { ButtonGroup, LoadingButton } from "@atlaskit/button";
 import "./style.css";
 
 export const colorsBank = [
@@ -64,7 +64,7 @@ export const findObj = (arr, id) => {
  * Using as Page to show pert chart and task dependences
  * @returns {import("react").ReactElement}
  */
-function VisualizeTasksPage({handleChangeTab}) {
+function VisualizeTasksPage({ handleChangeTab }) {
 	let { projectId } = useParams();
 
 	const [canEstimate, setCanEstimate] = useState(true);
@@ -72,21 +72,32 @@ function VisualizeTasksPage({handleChangeTab}) {
 		setCanEstimate(can);
 	};
 
+	const [isSaving, setIsSaving] = useState(false);
+	const [isEstimating, setIsEstimating] = useState(false);
+
 	function handleEstimate() {
+		setIsEstimating(true);
 		invoke("estimate", { projectId })
 			.then(function (res) {
 				// console.log(res);
-				localStorage.setItem("estimation", JSON.stringify(res));
-				//move to next tab
-				handleChangeTab(1);
+				if (res.id || res.id === 0){
+					Toastify.info("Estimated successfully");
+					localStorage.setItem("estimation", JSON.stringify(res));
+					//move to next tab
+					handleChangeTab(1);
+					setIsEstimating(false);
+				} else {
+					Toastify.error("Error in estimate");
+				}
 			})
 			.catch(function (error) {
 				console.log(error);
-				Toastify.error(error);
+				Toastify.error(error.toString());
 			});
 	}
 
 	function handleSave() {
+		setIsSaving(true);
 		var data = {
 			ProjectId: projectId,
 			TaskPrecedenceTasks: [],
@@ -100,18 +111,23 @@ function VisualizeTasksPage({handleChangeTab}) {
 				TaskId: task.id,
 				TaskPrecedences: preArray,
 			});
-			data.TaskSkillsRequireds.push({ TaskId: task.id, SkillsRequireds: task.skillRequireds });
+			data.TaskSkillsRequireds.push({
+				TaskId: task.id,
+				SkillsRequireds: task.skillRequireds,
+			});
 		});
 
 		invoke("saveTasks", { tasks: data })
 			.then(function (res) {
 				if (res) {
+					Toastify.info("Saved successfully");
 					setCanEstimate(true);
+					setIsSaving(false);
 				}
 			})
 			.catch(function (error) {
 				console.log(error);
-				Toastify.error(error);
+				Toastify.error(error.toString());
 			});
 	}
 
@@ -142,7 +158,7 @@ function VisualizeTasksPage({handleChangeTab}) {
 			})
 			.catch(function (error) {
 				console.log(error);
-				Toastify.error(error);
+				Toastify.error(error.toString());
 			});
 		setTasks(tasksData);
 
@@ -154,7 +170,7 @@ function VisualizeTasksPage({handleChangeTab}) {
 			})
 			.catch(function (error) {
 				console.log(error);
-				Toastify.error(error);
+				Toastify.error(error.toString());
 			});
 		setSkills([]);
 
@@ -166,7 +182,7 @@ function VisualizeTasksPage({handleChangeTab}) {
 			})
 			.catch(function (error) {
 				console.log(error);
-				Toastify.error(error);
+				Toastify.error(error.toString());
 			});
 		setMilestones([]);
 		return;
@@ -201,7 +217,9 @@ function VisualizeTasksPage({handleChangeTab}) {
 	useEffect(() => {
 		localStorage.setItem("selected", JSON.stringify(selectedIds));
 		localStorage.setItem("tasks", JSON.stringify(tasks));
-	}, [selectedIds, tasks]);
+		localStorage.setItem("milestones", JSON.stringify(milestones));
+		localStorage.setItem("skills", JSON.stringify(skills));
+	}, [selectedIds, tasks, milestones, skills]);
 
 	const actionsContent = (
 		<div
@@ -213,15 +231,19 @@ function VisualizeTasksPage({handleChangeTab}) {
 			}}
 		>
 			{canEstimate ? (
-				<>
-					<div style={{ width: "200px" }}>
-						<Label>Start date: </Label>
-						<DatePicker />
-					</div>
+				isEstimating ? (
+					<LoadingButton appearance="primary" isLoading>
+						Estimating...
+					</LoadingButton>
+				) : (
 					<Button appearance="primary" onClick={handleEstimate}>
 						Estimate
 					</Button>
-				</>
+				)
+			) : isSaving ? (
+				<LoadingButton appearance="primary" isLoading>
+					Saving...
+				</LoadingButton>
 			) : (
 				<Button appearance="primary" onClick={handleSave}>
 					Save

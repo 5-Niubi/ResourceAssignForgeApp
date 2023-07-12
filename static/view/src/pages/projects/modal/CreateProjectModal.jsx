@@ -112,15 +112,23 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 			{isOpen && (
 				<Modal onClose={closeModal} width={width}>
 					<Form
-						onSubmit={(formState) => console.log("form submitted", formState)}
+						onSubmit={(formState) =>
+							console.log("form submitted", formState)
+						}
 					>
 						{({ formProps }) => (
 							<form id="form-with-id" {...formProps}>
 								<ModalHeader>
-									<ModalTitle>Create new Software Project</ModalTitle>
+									<ModalTitle>
+										Create new Software Project
+									</ModalTitle>
 								</ModalHeader>
 								<ModalBody>
-									<Grid layout="fluid" spacing="compact" columns={columns}>
+									<Grid
+										layout="fluid"
+										spacing="compact"
+										columns={columns}
+									>
 										<GridColumn medium={7}>
 											<FormSection>
 												<Field
@@ -132,38 +140,63 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 														<TextField
 															autoComplete="off"
 															value={projectName}
-															onChange={handleSetProjectName}
+															onChange={
+																handleSetProjectName
+															}
 														/>
 													)}
 												</Field>
 											</FormSection>
 											<FormSection>
-												<Field name="startDate" label="Start Date" isRequired>
+												<Field
+													name="startDate"
+													label="Start Date"
+													isRequired
+												>
 													{() => (
 														<Fragment>
 															<DatePicker
-																value={startDate}
-																onChange={handleSetStartDate}
-																dateFormat={DATE_FORMAT.DMY}
+																value={
+																	startDate
+																}
+																onChange={
+																	handleSetStartDate
+																}
+																dateFormat={
+																	DATE_FORMAT.DMY
+																}
 															/>
 														</Fragment>
 													)}
 												</Field>
-												<Field name="endDate" label="End Date" isRequired>
+												<Field
+													name="endDate"
+													label="End Date"
+													isRequired
+												>
 													{() => (
 														<Fragment>
 															<DatePicker
-																minDate={startDate}
+																minDate={
+																	startDate
+																}
 																value={endDate}
-																onChange={handleSetEndDate}
-																dateFormat={DATE_FORMAT.DMY}
+																onChange={
+																	handleSetEndDate
+																}
+																dateFormat={
+																	DATE_FORMAT.DMY
+																}
 															/>
 														</Fragment>
 													)}
 												</Field>
 											</FormSection>
 											<FormSection>
-												<Grid spacing="compact" columns={columns}>
+												<Grid
+													spacing="compact"
+													columns={columns}
+												>
 													<GridColumn medium={8}>
 														<Field
 															aria-required={true}
@@ -173,8 +206,12 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 															{() => (
 																<TextField
 																	autoComplete="off"
-																	value={budget}
-																	onChange={handleSetBudget}
+																	value={
+																		budget
+																	}
+																	onChange={
+																		handleSetBudget
+																	}
 																	type="number"
 																/>
 															)}
@@ -190,7 +227,9 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 																<TextField
 																	autoComplete="off"
 																	value={unit}
-																	onChange={handleSetUnit}
+																	onChange={
+																		handleSetUnit
+																	}
 																/>
 															)}
 														</Field>
@@ -203,21 +242,29 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 													name="ObjectiveTime"
 													value={objTime}
 													onChange={handleSetObjTime}
-													rangeOnChange={handleRangeSetObjTime}
+													rangeOnChange={
+														handleRangeSetObjTime
+													}
 												/>
 												<ObjectiveRange
 													name="ObjectiveCost"
 													label="Objective Cost"
 													value={objCost}
 													onChange={handleSetObjCost}
-													rangeOnChange={handleRangeSetObjCost}
+													rangeOnChange={
+														handleRangeSetObjCost
+													}
 												/>
 												<ObjectiveRange
 													name="ObjectiveQuality"
 													label="Objective Quality"
 													value={objQuality}
-													onChange={handleSetObjQuality}
-													rangeOnChange={handleRangeSetObjQuality}
+													onChange={
+														handleSetObjQuality
+													}
+													rangeOnChange={
+														handleRangeSetObjQuality
+													}
 												/>
 											</FormSection>
 										</GridColumn>
@@ -226,12 +273,18 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 
 								<ModalFooter>
 									<ButtonGroup>
-										<Button appearance="default" onClick={closeModal}>
+										<Button
+											appearance="default"
+											onClick={closeModal}
+										>
 											Cancel
 										</Button>
 										{isSubmitting ? (
-											<LoadingButton appearance="primary" isLoading>
-												Loading button
+											<LoadingButton
+												appearance="primary"
+												isLoading
+											>
+												Create
 											</LoadingButton>
 										) : (
 											<Button

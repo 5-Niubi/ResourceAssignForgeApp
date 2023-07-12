@@ -34,7 +34,7 @@ function ParameterWorkforceList (){
 			})
 			.catch(function (error) {
 				console.log(error);
-				Toastify.error(error);
+				Toastify.error(error.toString());
 			});
 	}, []);
 
