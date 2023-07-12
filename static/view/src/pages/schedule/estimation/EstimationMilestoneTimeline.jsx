@@ -2,111 +2,63 @@ import {
 	VerticalTimeline,
 	VerticalTimelineElement,
 } from "react-vertical-timeline-component";
-import FlagFilledIcon from '@atlaskit/icon/glyph/flag-filled';
-import PeopleGroupIcon from '@atlaskit/icon/glyph/people-group';
-import TrayIcon from '@atlaskit/icon/glyph/tray';
-import { useState } from "react";
+import FlagFilledIcon from "@atlaskit/icon/glyph/flag-filled";
+import PeopleGroupIcon from "@atlaskit/icon/glyph/people-group";
+import TrayIcon from "@atlaskit/icon/glyph/tray";
+import { colorsBank, findObj } from "../pertchart/VisualizeTasks";
 
-export default function MilestonesTimeline() {
-    const [milstones, setMilestone] = useState();
-    
+export default function MilestonesTimeline({ milestones, skills }) {
+	var estimation = JSON.parse(localStorage.getItem("estimation"));
 	return (
-        <>
-        	<VerticalTimeline lineColor="#172B4D">
-			<VerticalTimelineElement
-				className="vertical-timeline-element--work"
-				contentStyle={{
-					background: "rgb(33, 150, 243)",
-					color: "#fff",
-				}}
-				contentArrowStyle={{
-					borderRight: "7px solid  rgb(33, 150, 243)",
-				}}
-				iconStyle={{ background: "rgb(33, 150, 243)", color: "black", paddingRight: "10" }}
-			>
-				<h3 className="vertical-timeline-element-title">
-					#Milestone 1 <FlagFilledIcon size="medium"></FlagFilledIcon>
-				</h3>
-				<h4 className="vertical-timeline-element-subtitle">
-                    Define project objectives, scope, and initial requirements
-				</h4>
-				<p>
-                    <PeopleGroupIcon></PeopleGroupIcon> 1 PM
-                </p>
-			</VerticalTimelineElement>
-			<VerticalTimelineElement
-				className="vertical-timeline-element--work"
-				iconStyle={{ background: "#B5D33D", color: "#fff" }}
-                contentStyle={{
-					background: "#B5D33D",
-					color: "#fff",
-				}}
-			>
-				<h3 className="vertical-timeline-element-title" >
-					#Milestone 2 <FlagFilledIcon size="medium"></FlagFilledIcon>
-				</h3>
-				<h4 className="vertical-timeline-element-subtitle" >
-                    Conduct interviews and workshops to gather detailed software requirements
-				</h4>
-				<p>
-                    <PeopleGroupIcon></PeopleGroupIcon> 2 Business Analyst, 1 PM, 2 Developer C#
-                </p>
-			</VerticalTimelineElement>
-			<VerticalTimelineElement
-				className="vertical-timeline-element--work"
-				iconStyle={{ background: "#EB7D58", color: "#fff" }}
-                contentStyle={{
-					background: "#EB7D58",
-					color: "#fff",
-				}}
-			>
-				<h3 className="vertical-timeline-element-title">
-					#Milestone 3 <FlagFilledIcon size="medium"></FlagFilledIcon>
-				</h3>
-				<h4 className="vertical-timeline-element-subtitle">
-                    Document and review software requirements with stakeholders
-				</h4>
-				<p>
-                    <PeopleGroupIcon></PeopleGroupIcon> 1 PM
-                </p>
-			</VerticalTimelineElement>
-			<VerticalTimelineElement
-				className="vertical-timeline-element--work"
-				iconStyle={{ background: "#FED23F", color: "#fff" }}
-                contentStyle={{
-					background: "#FED23F",
-					color: "#fff",
-				}}
-			>
-				<h3 className="vertical-timeline-element-title">
-					#Milestone 4 <FlagFilledIcon size="medium"></FlagFilledIcon>
-				</h3>
-				<h4 className="vertical-timeline-element-subtitle">
-                    Create the high-level and detailed design of the software architecture
-				</h4>
-				<p>
-                    <PeopleGroupIcon></PeopleGroupIcon> 1 PM
-                </p>
-			</VerticalTimelineElement>
-			<VerticalTimelineElement
-				className="vertical-timeline-element--education"
-				iconStyle={{ background: "#6CA2EA", color: "#fff" }}
-                contentStyle={{
-					background: "#6CA2EA",
-					color: "#fff",
-				}}
-			>
-				<h3 className="vertical-timeline-element-title">
-					#Milestone 5 <FlagFilledIcon size="medium"></FlagFilledIcon>
-				</h3>
-				<h4 className="vertical-timeline-element-subtitle">
-                    Conduct a review of the software design with relevant stakeholders
-				</h4>
-				<p>
-                    <PeopleGroupIcon></PeopleGroupIcon> 1 PM
-                </p>
-			</VerticalTimelineElement>
-		</VerticalTimeline>
-        </>
+		<>
+			<VerticalTimeline lineColor="#172B4D">
+				{estimation.workforceWithMilestoneList?.map(
+					(milestone, index) => {
+						let obj = findObj(milestones, milestone.id);
+						if (obj) {
+							return (
+								<VerticalTimelineElement
+									className="vertical-timeline-element--work"
+									contentStyle={{
+										background: colorsBank[index % 30],
+										color: "#fff",
+									}}
+									contentArrowStyle={{
+										borderRight:
+											"7px solid " +
+											colorsBank[index % 30],
+									}}
+									iconStyle={{
+										background: colorsBank[index % 30],
+										color: "black",
+										paddingRight: "10",
+									}}
+								>
+									<h3 className="vertical-timeline-element-title">
+										#Milestone {index + 1}{" "}
+										<FlagFilledIcon size="medium"></FlagFilledIcon>
+									</h3>
+									<h4 className="vertical-timeline-element-subtitle">
+										{obj.name}
+									</h4>
+									{milestone?.workforceOutputList?.map(
+										(workers, index) => {
+											let skills = [];
+											workers.skillOutputList?.forEach(skill => skills.push(skill.name + " level " + skill.level))
+											return (
+												<p>
+													<PeopleGroupIcon></PeopleGroupIcon>{" "}
+													{workers.quantity} workers with skills set ({skills.join("; ")})
+												</p>
+											);
+										}
+									)}
+								</VerticalTimelineElement>
+							);
+						}
+					}
+				)}
+			</VerticalTimeline>
+		</>
 	);
 }

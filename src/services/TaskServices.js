@@ -33,4 +33,17 @@ async function getTask(taskId) {
 	}
 }
 
-export { getTasks, createTask, getTask };
+async function saveTasks(tasks) {
+	try {
+		let response = await APIServices.post(
+			`/api/Tasks/SaveTasks`,
+			null,
+			tasks
+		);
+		return response;
+	} catch (error) {
+		return Promise.reject(error);
+	}
+}
+
+export { getTasks, createTask, getTask, saveTasks };
