@@ -35,6 +35,17 @@ function taskResolver(resolver) {
 			return Promise.reject(error);
 		}
 	});
+
+	resolver.define("saveTasks", async function (req) {
+		try {
+			let response = await taskService.saveTasks(req.payload.tasks);
+			console.log("SaveTasks response: ", response);
+			return response;
+		} catch (error) {
+			console.log("Error in saveTasks: ", error);
+			return Promise.reject(error);
+		}
+	});
 }
 
 export default taskResolver;

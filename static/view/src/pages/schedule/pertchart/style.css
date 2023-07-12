@@ -1,0 +1,11 @@
+/* Hide scroll bar */
+.visualize-tasks #tasks .inner::-webkit-scrollbar,
+.visualize-tasks .task-details::-webkit-scrollbar{
+	display: none; /*Chrome*/
+}
+
+.visualize-tasks #tasks .inner,
+.visualize-tasks .task-details{
+	-ms-overflow-style: none;/* IE and Edge */
+	scrollbar-width: thin;/* Firefox */;
+}
