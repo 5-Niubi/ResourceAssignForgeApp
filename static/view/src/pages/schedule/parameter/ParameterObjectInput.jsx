@@ -18,10 +18,11 @@ import Modal, {
 	ModalTitle,
 	ModalTransition,
 } from "@atlaskit/modal-dialog";
-import ProgressBar from '@atlaskit/progress-bar';
+import ProgressBar from "@atlaskit/progress-bar";
 import { invoke } from "@forge/bridge";
 import __noop from "@atlaskit/ds-lib/noop";
 import Toastify from "../../../common/Toastify";
+import { LoadingButton } from "@atlaskit/button";
 
 const boldStyles = css({
 	fontWeight: "bold",
@@ -31,36 +32,39 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 	let { projectId } = useParams();
 	const [expectedCost, setExpectedCost] = useState(50);
 	const [expectedDuration, setExpectedDuration] = useState(50);
+    const [isScheduling, setIsScheduling] = useState(false);
 
 	const [valueTime, setValueTime] = useState(50);
 	const [valueCost, setValueCost] = useState(50);
 	const [valueQuality, setValueQuality] = useState(50);
-    const [isOpen, setIsOpen] = useState(false);
+	const [isOpen, setIsOpen] = useState(false);
 	const openModal = useCallback(() => setIsOpen(true), []);
 	const closeModal = useCallback(() => setIsOpen(false), []);
 
 	function SaveParameters() {
+        setIsScheduling(true);
 		var data = {
 			ProjectId: Number(projectId),
 			Duration: expectedDuration,
 			Budget: expectedCost,
-            ParameterResources: [
-                {
-                    ResourceId: 1,
-                    Type: "workforce"
-                }
-            ]
+			ParameterResources: [
+				{
+					ResourceId: 1,
+					Type: "workforce",
+				},
+			],
 		};
 
 		invoke("saveParameters", { parameter: data })
 			.then(function (res) {
 				if (res) {
 					Toastify.info(res.toString());
-					setCanEstimate(true);
-					setIsSaving(false);
+					handleChangeTab(3);
+					setIsScheduling(false);
 				}
 			})
 			.catch(function (error) {
+					handleChangeTab(3);
 				Toastify.error(error.toString());
 			});
 	}
@@ -174,14 +178,23 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 								<Button onClick={() => handleChangeTab(1)}>
 									Back
 								</Button>
-								<Button
+								{isScheduling ? (
+									<LoadingButton
+										appearance="primary"
+										isLoading
+									>
+										Scheduling...
+									</LoadingButton>
+								) : (
+                                    <Button
 									appearance="primary"
 									onClick={openModal && SaveParameters}
 								>
 									Schedule
 								</Button>
-                                
-                                {/* LOADING MODAL BUTTON */}
+								)}
+
+								{/* LOADING MODAL BUTTON */}
 								<ModalTransition>
 									{isOpen && (
 										<Modal onClose={closeModal}>
