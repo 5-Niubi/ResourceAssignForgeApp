@@ -8,6 +8,7 @@ import TrashIcon from "@atlaskit/icon/glyph/trash";
 import EditIcon from "@atlaskit/icon/glyph/edit";
 import StarIcon from "@atlaskit/icon/glyph/star";
 import InfoIcon from "@atlaskit/icon/glyph/info";
+import { useParams } from "react-router";
 import Modal, {
 	ModalBody,
 	ModalFooter,
@@ -44,16 +45,47 @@ const boldStyles = css({
 
 export function ParameterSelectWorkforceModal() {
 	//SELECT WORKFORCE MODAL (SW)
+    let { projectId } = useParams();
+    let workforce_local = JSON.parse(localStorage.getItem("workforce_parameter"));
 	const [isSWOpen, setIsSWOpen] = useState(false);
 	const openSWModal = useCallback(() => setIsSWOpen(true), []);
 	const closeSWModal = useCallback(() => setIsSWOpen(false), []);
 	const [TableLoadingState, setTableLoadingState] = useState(true);
 	const [searchInput, setSearchInput] = useState("");
 	const [workforces, setWorkforces] = useState([]);
+	useEffect(function () {
+		invoke("getAllWorkforces")
+			.then(function (res) {
+				let workforces = [];
+				for (let workforce of res) {
+					let itemWorkforce = {
+						id: workforce.id,
+						accountId: workforce.accountId,
+						email: workforce.email,
+						accountType: workforce.accountType,
+						name: workforce.name,
+						avatar: workforce.avatar,
+						displayName: workforce.displayName,
+						unitSalary: workforce.unitSalary,
+						workingType: workforce.workingType,
+						workingEffort: workforce.workingEffort,
+					};
+					workforces.push(itemWorkforce);
+				}
+				setTableLoadingState(false);
+				setWorkforces(workforces);
+			})
+			.catch(function (error) {
+				console.log(error);
+				Toastify.error(error.toString());
+			});
+	}, []);
+
 
 	//FILTER WORKFORCE SELECT TABLE
 	const [workforcesFilter, setWorkforcesFilter] = useState(workforces);
-
+    
+    
 	const filterWorkforceName = useCallback(function (workforces, query) {
 		setWorkforcesFilter(
 			workforces.filter((e) =>
@@ -76,6 +108,13 @@ export function ParameterSelectWorkforceModal() {
 		}
 	}
 
+    function CheckSelectedWorkforce(workforceId){
+        workforce_local.map((workforce, index)=> {
+            return (workforce.id.toString() == workforceId.toString())? true: false;
+        })
+        return false
+    }
+
 	const head = {
 		cells: [
 			{
@@ -96,7 +135,9 @@ export function ParameterSelectWorkforceModal() {
 		cells: [
 			{
 				key: "no",
-				content: <Checkbox isChecked></Checkbox>,
+				content: (
+                    <Checkbox isChecked={CheckSelectedWorkforce(workforce.id)}></Checkbox>
+                ),
 			},
 			{
 				key: "name",
@@ -104,11 +145,6 @@ export function ParameterSelectWorkforceModal() {
 			},
 		],
 	}));
-
-	function handleCloseSWModal() {
-		closeSWModal;
-		console.log("Ngu di");
-	}
 
 	return (
 		<div>
@@ -145,7 +181,7 @@ export function ParameterSelectWorkforceModal() {
 									<Button
 										appearance="primary"
 										onClick={() => {
-											closeSWModal(), openCWModal();
+											closeSWModal()
 										}}
 									>
 										Create new

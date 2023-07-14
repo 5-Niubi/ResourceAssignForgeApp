@@ -9,7 +9,7 @@ import StarFilledIcon from '@atlaskit/icon/glyph/star-filled';
 export default function ParameterEstimateMessage() {
 	var estimation = JSON.parse(localStorage.getItem("estimation"));
     let { projectId } = useParams();
-    var milestones = JSON.parse(localStorage.getItem("milestones"))
+    var milestones = JSON.parse(localStorage.getItem("milestones"));
 
 	return (
 		<SectionMessage title="We need these resources:" appearance="warning">

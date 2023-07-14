@@ -12,4 +12,14 @@ async function saveParameters(parameter) {
 	}
 }
 
-export { saveParameters };
+async function getWorkforceParamter(projectId) {
+	try {
+		let response = await APIServices.get(
+            `/api/Parameter/GetWorkforceParameter`, {Id: projectId});
+		return response;
+	} catch (error) {
+		return Promise.reject(error);
+	}
+}
+
+export { saveParameters, getWorkforceParamter };
