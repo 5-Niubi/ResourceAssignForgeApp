@@ -15,7 +15,7 @@ export default function ScheduleTabs() {
 		[setSelected]
 	);
 	return (
-		<Tabs selected={selected} id="default">
+		<Tabs onChange={handleChangeTab} selected={selected} id="default">
 			<TabList>
 				<Tab>
 					<Badge>{1}</Badge> PertChart
