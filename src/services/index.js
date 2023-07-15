@@ -4,6 +4,7 @@ import * as taskService from "./TaskServices";
 import * as workforceService from "./WorkforceServices";
 import * as exportService from "./ExportService";
 import * as milestoneService from "./MilestoneServices";
+import * as parameterService from "./ParameterServices";
 
 export {
 	projectService,
@@ -12,4 +13,5 @@ export {
 	workforceService,
 	milestoneService,
 	exportService,
+	parameterService
 };
