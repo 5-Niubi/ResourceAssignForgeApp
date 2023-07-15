@@ -44,7 +44,7 @@ function ProjectListHome() {
 		setProjectsForDisplay(
 			projects.filter((e) => e.name.toLowerCase().includes(query.toLowerCase()))
 		);
-	}, []);
+	}, [projects]);
 
 	useEffect(
 		function () {
@@ -64,7 +64,7 @@ function ProjectListHome() {
 						imageAvatar: project.imageAvatar,
 						name: project.name,
 						startDate: project.startDate,
-						tasks: project.tasksNumber,
+						tasks: project.taskCount,
 					};
 					projectsList.push(itemProject);
 				}
@@ -80,7 +80,6 @@ function ProjectListHome() {
 	function handleOnSearchBoxChange(e) {
 		setSearchBoxValue(e.target.value);
 		setSearchParams({ q: e.target.value });
-		filterProjectName(projects, searchBoxValue);
 	}
 
 	function handleOnSearch() {
@@ -145,6 +144,7 @@ function ProjectListHome() {
 				<DeleteProjectModal
 					openState={modalDeleteState}
 					setOpenState={setModalDeleteState}
+					setProjectsListState={setProjects}
 				/>
 			) : (
 				""
@@ -154,6 +154,7 @@ function ProjectListHome() {
 				<EditProjectModal
 					openState={modalEditState}
 					setOpenState={setModalEditState}
+					setProjectsListState={setProjects}
 				/>
 			) : (
 				""

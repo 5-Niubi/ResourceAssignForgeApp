@@ -61,18 +61,21 @@ function ProjectSideBar(rootPath = "") {
 				</Section>
 				<Section hasSeparator>
 					<ButtonItemSideBar
+						key="schedule"
 						rootPath={rootPath}
 						text={"Schedule"}
 						pathTo={"schedule"}
 						iconBefore={<RoadmapIcon label="" />}
 					/>
 					<ButtonItemSideBar
+						key="task-list"
 						rootPath={rootPath}
 						text={"Task Lists"}
 						pathTo={"tasks"}
 						iconBefore={<IssuesIcon label="" />}
 					/>
 					<ButtonItemSideBar
+						key="reports"
 						rootPath={rootPath}
 						text={"Reports"}
 						pathTo={"reports"}
