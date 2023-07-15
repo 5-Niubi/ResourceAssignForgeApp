@@ -72,7 +72,7 @@ function ProjectListHome() {
 				filterProjectName(projectsList, searchBoxValue);
 			})
 			.catch(function (error) {
-				console.log(error);
+				setProjectTableLoadingState(false);
 				Toastify.error(error.toString());
 			});
 	}, []);

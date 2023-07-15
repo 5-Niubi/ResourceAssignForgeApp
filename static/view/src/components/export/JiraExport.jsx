@@ -45,9 +45,11 @@ function JiraExport({ state }) {
 
 	const handleExportClick = useCallback((projectId) => {
 		openLoadingModal();
-		invoke("exportToJira", {projectJiraId: projectId, scheduleId})
+		Toastify.info(projectId);
+		invoke("exportToJira", { projectJiraId: projectId, scheduleId })
 			.then(function (res) {
 				closeLoadingModal();
+				Toastify.info(JSON.stringify(res));
 			})
 			.catch(async function (error) {
 				closeLoadingModal();
