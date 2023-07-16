@@ -4,7 +4,9 @@ import Form, {
 	Field,
 	FormFooter,
 	HelperMessage,
+	ErrorMessage,
 	RangeField,
+	ValidMessage,
 } from "@atlaskit/form";
 import Range from "@atlaskit/range";
 import { useParams } from "react-router";
@@ -28,43 +30,70 @@ const boldStyles = css({
 	fontWeight: "bold",
 });
 
+
 export default function ParameterObjectInput({ handleChangeTab }) {
 	let { projectId } = useParams();
-	const [expectedCost, setExpectedCost] = useState(50);
-	const [expectedDuration, setExpectedDuration] = useState(50);
-    const [isScheduling, setIsScheduling] = useState(false);
-
-	const [valueTime, setValueTime] = useState(50);
-	const [valueCost, setValueCost] = useState(50);
-	const [valueQuality, setValueQuality] = useState(50);
 	const [isOpen, setIsOpen] = useState(false);
+	const [expectedDuration, setExpectedDuration] = useState(0);
+	const [expectedBudget, setExpectedBugdet] = useState(0);
 	const openModal = useCallback(() => setIsOpen(true), []);
 	const closeModal = useCallback(() => setIsOpen(false), []);
 
-	function SaveParameters() {
-        setIsScheduling(true);
+	const validateNumberOnly = (value) => {
+		//REQUIRES NOT NULL, NUMBER ONLY
+		if (!value) {
+			return "NOT_VALID";
+		}
+
+		if (isNaN(parseFloat(value))) {
+			return "NOT_VALID";
+		}
+		const regex = /^\d*\.?\d*$/;
+		if (!regex.test(value)) {
+			return "NOT_VALID";
+		}
+		return undefined;
+	};
+
+	const ParameterResourcesRequest = {
+		ResourceId: 0,
+		Type: "",
+	};
+
+    const params = {
+        Budget: 0,
+        Duration: 0,
+    }
+
+	function SaveParameters({cost,duration}) {
+		var parameterResourcesLocal = JSON.parse(
+			localStorage.getItem("workforce_parameter")
+		);
+		let parameterResources = [];
+		for (let item of parameterResourcesLocal) {
+			let itemParameterResource = {
+				ResourceId: item.id,
+				Type: "workforce",
+			};
+			parameterResources.push(itemParameterResource);
+		} 
 		var data = {
 			ProjectId: Number(projectId),
-			Duration: expectedDuration,
-			Budget: expectedCost,
-			ParameterResources: [
-				{
-					ResourceId: 1,
-					Type: "workforce",
-				},
-			],
+			Duration: cost,
+			Budget: duration,
+			ParameterResources: parameterResources,
 		};
+		console.log("Send parameter data: ", data);
 
 		invoke("saveParameters", { parameter: data })
 			.then(function (res) {
 				if (res) {
 					Toastify.info(res.toString());
 					handleChangeTab(3);
-					setIsScheduling(false);
 				}
+				Toastify.info(res);
 			})
 			.catch(function (error) {
-					handleChangeTab(3);
 				Toastify.error(error.toString());
 			});
 	}
@@ -72,27 +101,42 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 	return (
 		<div style={{ width: "100%" }}>
 			<Form
-				onSubmit={(formState) =>
-					console.log("form submitted", formState)
-				}
+				onSubmit={({cost,duration}) => {
+					console.log("Form Submitted: ", cost +", "+duration);
+					SaveParameters({cost,duration});
+					return new Promise((resolve) =>
+						setTimeout(resolve, 2000)
+					).then(() =>
+						data.username === "error"
+							? {
+									username: "IN_USE",
+							  }
+							: undefined
+					);
+				}}
 			>
-				{({
-					formProps,
-					expectedDuration,
-					expectedCost,
-					time,
-					cost,
-					quality,
-				}) => (
+				{({ formProps, submitting }) => (
 					<form {...formProps}>
-						<Field isRequired label="Expected Cost" name="cost">
-							{({ expectedCost }) => (
+						<Field
+							isRequired
+							label="Expected Cost"
+							name="cost"
+							validate={(value) => validateNumberOnly(value)}
+						>
+							{({ fieldProps, error }) => (
 								<Fragment>
 									<Textfield
+										{...fieldProps}
 										placeholder="What expected maximize project's cost?"
-										{...expectedCost}
+										elemBeforeInput={
+											<p style={{ marginLeft: 10 }}>$</p>
+										}
 									/>
-									<HelperMessage>Number only</HelperMessage>
+									{error === "NOT_VALID" && (
+										<ErrorMessage>
+											Wrong input.
+										</ErrorMessage>
+									)}
 								</Fragment>
 							)}
 						</Field>
@@ -100,99 +144,34 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 							isRequired
 							label="Expected Duration (days)"
 							name="duration"
+							validate={(value) => validateNumberOnly(value)}
 						>
-							{({ expectedDuration }) => (
+							{({ fieldProps, error }) => (
 								<Fragment>
 									<Textfield
+										{...fieldProps}
 										placeholder="What expected maximize durations for completing project?"
-										{...expectedDuration}
 									/>
-									<HelperMessage>Number only</HelperMessage>
+									{error === "NOT_VALID" && (
+										<ErrorMessage>
+											Wrong input.
+										</ErrorMessage>
+									)}
 								</Fragment>
 							)}
 						</Field>
-						{/* OBJECTIVE PARAMETER SLIDE */}
-						{/* <RangeField
-									isRequired
-									label="Time"
-									name="example-text"
-									defaultValue={50}
-								>
-									{({ time }) => (
-										<>
-											<Range
-												{...time}
-												onChange={(time) =>
-													setValueTime(time)
-												}
-											/>
-											<p>
-												The time value is: {valueTime}
-											</p>
-										</>
-									)}
-								</RangeField>
-								<RangeField
-									isRequired
-									label="Cost"
-									name="example-text"
-									defaultValue={50}
-								>
-									{({ cost }) => (
-										<>
-											<Range
-												{...cost}
-												onChange={(cost) =>
-													setValueCost(cost)
-												}
-											/>
-											<p>
-												The cost value is: {valueCost}
-											</p>
-										</>
-									)}
-								</RangeField>
-								<RangeField
-									isRequired
-									label="Quality"
-									name="example-text"
-									defaultValue={50}
-								>
-									{({ quality }) => (
-										<>
-											<Range
-												{...quality}
-												onChange={(quality) =>
-													setValueQuality(quality)
-												}
-											/>
-											<p>
-												The cost value is:{" "}
-												{valueQuality}
-											</p>
-										</>
-									)}
-								</RangeField> */}
 						<FormFooter>
 							<div>
 								<Button onClick={() => handleChangeTab(1)}>
 									Back
 								</Button>
-								{isScheduling ? (
-									<LoadingButton
-										appearance="primary"
-										isLoading
-									>
-										Scheduling...
-									</LoadingButton>
-								) : (
-                                    <Button
+								<LoadingButton
+									type="submit"
 									appearance="primary"
-									onClick={openModal && SaveParameters}
+									isLoading={submitting}
 								>
-									Schedule
-								</Button>
-								)}
+									Scheduling
+								</LoadingButton>
 
 								{/* LOADING MODAL BUTTON */}
 								<ModalTransition>

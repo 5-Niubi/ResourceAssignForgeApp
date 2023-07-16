@@ -15,6 +15,7 @@ import EditIcon from "@atlaskit/icon/glyph/edit";
 import StarIcon from "@atlaskit/icon/glyph/star";
 import InfoIcon from "@atlaskit/icon/glyph/info";
 import TrashIcon from "@atlaskit/icon/glyph/trash";
+import Select from "@atlaskit/select";
 import Form, {
 	CheckboxField,
 	ErrorMessage,
@@ -43,7 +44,15 @@ import TextField from "@atlaskit/textfield";
 import { findObj } from "../pertchart/VisualizeTasks";
 import Rating from "react-rating";
 
+
+
+
 function ParameterWorkforceList() {
+    const SelectProps =  {
+        value: 0,
+        label: "",
+      }
+
 	//GET LIST WORKFORCES
 	let { projectId } = useParams();
 	const [workforces, setWorkforces] = useState([]);
@@ -66,9 +75,11 @@ function ParameterWorkforceList() {
 						workingEffort: workforce.workingEffort,
 						skills: workforce.skills,
 					};
-                    let castWorkforceEffort = itemWorkforce.workingEffort.slice(1,-1).split(/[,]/);;
+					let castWorkforceEffort = itemWorkforce.workingEffort
+						.slice(1, -1)
+						.split(/[,]/);
 					itemWorkforce.workingEffort = castWorkforceEffort;
-                    workforces.push(itemWorkforce);
+					workforces.push(itemWorkforce);
 				}
 				setIsLoading(false);
 				localStorage.setItem(
@@ -110,8 +121,8 @@ function ParameterWorkforceList() {
 	);
 	const [isParttimeSelected, setIsParttimeSelected] = useState(false);
 	const options = [
-		{ name: "workingType", value: 0, label: "Fulltime" },
-		{ name: "workingType", value: 1, label: "Part-time" },
+        { label: "Fulltime", value: 0 },
+        { label: "Part-time", value: 1 },
 	];
 
 	const buttonAddSkills = (
@@ -217,11 +228,55 @@ function ParameterWorkforceList() {
 	};
 
 	const onChange = useCallback((event) => {
-		console.log(event.currentTarget.value);
-		event.currentTarget.value == 1
+		console.log("Day la event: ",event);
+		event.value == 1
 			? setIsParttimeSelected(true)
 			: setIsParttimeSelected(false);
 	}, []);
+
+	const styleTextfield = {
+		marginLeft: 10,
+		fontWeight: "bold",
+	};
+
+	const validateEmail = (value) => {
+		//REQUIRES NOT NULL, AND CONTAINS @ SYMBOL
+		if (!value) {
+			return "NOT_VALID";
+		}
+		if (!value.includes("@")) {
+			return "NOT_VALID";
+		}
+		return undefined;
+	};
+
+	const validateNumberOnly = (value) => {
+		//REQUIRES NOT NULL, NUMBER ONLY
+		if (!value) {
+			return "NOT_VALID";
+		}
+
+		if (isNaN(parseFloat(value))) {
+			return "NOT_VALID";
+		}
+		const regex = /^\d*\.?\d*$/;
+		if (!regex.test(value)) {
+			return "NOT_VALID";
+		}
+		return undefined;
+	};
+
+	const validateName = (value) => {
+		//REQUIRES NOT NULL, LETTER ONLY, 6 CHARACTERS AT LEAST
+		if (!value) {
+			return "NOT_VALID";
+		}
+		const regex = /^[A-Za-z ]{6,}$/;
+		if (!regex.test(value)) {
+			return "NOT_VALID";
+		}
+		return undefined;
+	};
 
 	return (
 		<div style={{ width: "100wh" }}>
@@ -268,7 +323,7 @@ function ParameterWorkforceList() {
 								<div>
 									<Form
 										onSubmit={(data) => {
-											console.log("form data", data);
+											console.log("Form Data", data);
 											return new Promise((resolve) =>
 												setTimeout(resolve, 2000)
 											).then(() =>
@@ -289,6 +344,9 @@ function ParameterWorkforceList() {
 													defaultValue={
 														selectedWorkforce.email
 													}
+													validate={(v) =>
+														validateEmail(v)
+													}
 												>
 													{({
 														fieldProps,
@@ -300,11 +358,23 @@ function ParameterWorkforceList() {
 																{...fieldProps}
 																placeholder="Email only."
 															/>
-															{!error && (
-																<HelperMessage></HelperMessage>
+															{error ===
+																"NOT_VALID" && (
+																<ErrorMessage>
+																	Invalid
+																	email, needs
+																	contains @
+																	symbol.
+																</ErrorMessage>
 															)}
-															{error && (
-																<ErrorMessage></ErrorMessage>
+															{error ===
+																"IN_USE" && (
+																<ErrorMessage>
+																	Username
+																	already
+																	taken, try
+																	another one
+																</ErrorMessage>
 															)}
 														</Fragment>
 													)}
@@ -349,6 +419,9 @@ function ParameterWorkforceList() {
 													defaultValue={
 														selectedWorkforce.name
 													}
+													validate={(v) =>
+														validateName(v)
+													}
 												>
 													{({
 														fieldProps,
@@ -358,18 +431,19 @@ function ParameterWorkforceList() {
 															<TextField
 																autoComplete="off"
 																{...fieldProps}
-																placeholder="You can use letters and numbers."
+																placeholder="Example: John Smith"
 															/>
-															{!error && (
-																<HelperMessage></HelperMessage>
-															)}
-															{error && (
+															{error ===
+																"NOT_VALID" && (
 																<ErrorMessage>
-																	This
-																	username is
-																	already in
-																	use, try
-																	another one.
+																	The name
+																	field should
+																	only contain
+																	letters and
+																	must have a
+																	minimum
+																	length of 6
+																	characters.
 																</ErrorMessage>
 															)}
 														</Fragment>
@@ -382,6 +456,11 @@ function ParameterWorkforceList() {
 													defaultValue={
 														selectedWorkforce.unitSalary
 													}
+													validate={(value) =>
+														validateNumberOnly(
+															value
+														)
+													}
 												>
 													{({
 														fieldProps,
@@ -392,11 +471,18 @@ function ParameterWorkforceList() {
 																autoComplete="off"
 																{...fieldProps}
 																placeholder="Number only"
+																elemBeforeInput={
+																	<p
+																		style={{
+																			marginLeft: 10,
+																		}}
+																	>
+																		$
+																	</p>
+																}
 															/>
-															{!error && (
-																<HelperMessage></HelperMessage>
-															)}
-															{error && (
+															{error ===
+																"NOT_VALID" && (
 																<ErrorMessage>
 																	Wrong input.
 																</ErrorMessage>
@@ -409,17 +495,27 @@ function ParameterWorkforceList() {
 													name="workingType"
 													isRequired
 												>
-													{({ fieldProps }) => (
-														<RadioGroup
-															{...fieldProps}
-															options={options}
-															onChange={onChange}
-															defaultValue={
-																selectedWorkforce.workingType
-															}
-														/>
+													{({ fieldProps: { id, ...rest } }) => (
+														<Fragment>
+															<Select
+																inputId={id}
+                                                                {...rest}
+																options={
+																	options
+																}
+																placeholder="Choose type..."
+																onChange={
+																	onChange && rest.value == (isParttimeSelected?1:0)
+																}
+                                                                value={(isParttimeSelected?1:0)}
+																defaultValue={
+                                                                      (selectedWorkforce.workingType==1? options[1]: options[0])
+																}
+															/>
+														</Fragment>
 													)}
 												</Field>
+
 												{/* WOKRING EFFORTS IN WEEEK */}
 												{isParttimeSelected && (
 													<Field
@@ -446,13 +542,15 @@ function ParameterWorkforceList() {
 																<Fragment>
 																	<TextField
 																		autoComplete="off"
-																		defaultValue={selectedWorkforce.workingEffort[0]}
+																		defaultValue={
+																			selectedWorkforce
+																				.workingEffort[0]
+																		}
 																		label="Monday"
 																		elemBeforeInput={
 																			<p
 																				style={{
-																					fontWeight:
-																						"bold",
+																					styleTextfield,
 																				}}
 																			>
 																				Mon
@@ -471,8 +569,7 @@ function ParameterWorkforceList() {
 																		elemBeforeInput={
 																			<p
 																				style={{
-																					fontWeight:
-																						"bold",
+																					styleTextfield,
 																				}}
 																			>
 																				Tues
@@ -481,7 +578,10 @@ function ParameterWorkforceList() {
 																		width={
 																			90
 																		}
-                                                                        defaultValue={selectedWorkforce.workingEffort[1]}
+																		defaultValue={
+																			selectedWorkforce
+																				.workingEffort[1]
+																		}
 																		isCompact
 																	/>
 																	<TextField
@@ -489,8 +589,7 @@ function ParameterWorkforceList() {
 																		elemBeforeInput={
 																			<p
 																				style={{
-																					fontWeight:
-																						"bold",
+																					styleTextfield,
 																				}}
 																			>
 																				Wed
@@ -500,15 +599,17 @@ function ParameterWorkforceList() {
 																			90
 																		}
 																		isCompact
-                                                                        defaultValue={selectedWorkforce.workingEffort[2]}
+																		defaultValue={
+																			selectedWorkforce
+																				.workingEffort[2]
+																		}
 																	/>
 																	<TextField
 																		autoComplete="off"
 																		elemBeforeInput={
 																			<p
 																				style={{
-																					fontWeight:
-																						"bold",
+																					styleTextfield,
 																				}}
 																			>
 																				Thurs
@@ -518,15 +619,20 @@ function ParameterWorkforceList() {
 																			90
 																		}
 																		isCompact
-																		defaultValue={selectedWorkforce.workingEffort[3]}
+																		defaultValue={
+																			selectedWorkforce
+																				.workingEffort[3]
+																		}
 																	/>
 																	<TextField
-																		defaultValue={selectedWorkforce.workingEffort[4]}
+																		defaultValue={
+																			selectedWorkforce
+																				.workingEffort[4]
+																		}
 																		elemBeforeInput={
 																			<p
 																				style={{
-																					fontWeight:
-																						"bold",
+																					styleTextfield,
 																				}}
 																			>
 																				Fri
@@ -543,8 +649,7 @@ function ParameterWorkforceList() {
 																		elemBeforeInput={
 																			<p
 																				style={{
-																					fontWeight:
-																						"bold",
+																					styleTextfield,
 																				}}
 																			>
 																				Sat
@@ -554,15 +659,17 @@ function ParameterWorkforceList() {
 																			90
 																		}
 																		isCompact
-																		defaultValue={selectedWorkforce.workingEffort[5]}
+																		defaultValue={
+																			selectedWorkforce
+																				.workingEffort[5]
+																		}
 																	/>
 																	<TextField
 																		autoComplete="off"
 																		elemBeforeInput={
 																			<p
 																				style={{
-																					fontWeight:
-																						"bold",
+																					styleTextfield,
 																				}}
 																			>
 																				Sun
@@ -572,7 +679,10 @@ function ParameterWorkforceList() {
 																			90
 																		}
 																		isCompact
-																		defaultValue={selectedWorkforce.workingEffort[6]}
+																		defaultValue={
+																			selectedWorkforce
+																				.workingEffort[6]
+																		}
 																	/>
 																</Fragment>
 															</div>
@@ -624,6 +734,30 @@ function ParameterWorkforceList() {
 														</Fragment>
 													)}
 												</Field>
+                                                <Field
+												label="Precedence tasks"
+												name="precedences"
+												defaultValue=""
+											>
+												{({ fieldProps }) => (
+													<Fragment>
+														<Select
+															{...fieldProps}
+															inputId="multi-select-example"
+															className="multi-select"
+															classNamePrefix="react-select"
+															options={rows}
+															// value={taskValues}
+															// onChange={
+															// 	handleChangePrecedence
+															// }
+															isMulti
+															isSearchable={true}
+															placeholder="Choose precedence tasks"
+														/>
+													</Fragment>
+												)}
+											</Field>
 												<DynamicTable
 													head={head}
 													rows={rows}
