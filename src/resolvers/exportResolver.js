@@ -7,7 +7,7 @@ import { exportService } from "../services";
 function exportResolver(resolver){
     resolver.define("exportToJira", async function (request){
         try {
-            return await exportService.exportToJira(request.payload.projectJiraId, request.payload.scheduleId);
+            return await exportService.exportToJira(request.payload.scheduleId);
         } catch (error){
             console.log("exportToJira Error: ", error);
             return Promise.reject(error);

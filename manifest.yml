@@ -37,6 +37,9 @@ permissions:
     fetch:
       backend:
         - "*.ngrok-free.app"
+    images:
+      - "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Microsoft_Project_%282019%E2%80%93present%29.svg/2346px-Microsoft_Project_%282019%E2%80%93present%29.svg.png"
+      - "https://wac-cdn.atlassian.com/dam/jcr:9e1841b9-2557-4eb2-ab47-d92428580b02/Jira%20Software@2x-blue.png"   
   content:
     styles:
       - "unsafe-inline"

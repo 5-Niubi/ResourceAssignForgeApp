@@ -15,7 +15,7 @@ const boldStyles = css({
 	fontWeight: "bold",
 });
 
-export default function LoadingModal({state}) {
+export default function LoadingModal({ state }) {
 	const [isOpen, setIsOpen] = state;
 	const closeModal = useCallback(() => setIsOpen(false), []);
 
@@ -31,7 +31,6 @@ export default function LoadingModal({state}) {
 						justifyContent: "center",
 					}}
 				>
-					<RecentIcon label=""></RecentIcon>
 					<p style={{ fontSize: "18px" }}>
 						This process will take some minutes...
 					</p>

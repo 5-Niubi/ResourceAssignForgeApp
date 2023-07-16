@@ -13,3 +13,4 @@ export function getCurrentTime() {
 export function formatDateDMY(date){
 	return moment(date).format("DD-MM-YYYY");
 }
+

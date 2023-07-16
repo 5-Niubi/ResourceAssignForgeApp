@@ -19,9 +19,10 @@ import Button from "@atlaskit/button";
 const width = MODAL_WIDTH.M;
 const modalInitState = { project: {}, isOpen: false };
 export const ModalStateContext = createContext();
+const columns = 10;
 
 function ProjectListHome() {
-	const columns = 10;
+	
 	const [searchParams, setSearchParams] = useSearchParams();
 	const isDesktopOrLaptop = useMediaQuery({
 		query: `(min-width: ${MEDIA_QUERY.DESKTOP_LAPTOP.MIN}px)`,

@@ -1,17 +1,17 @@
 import Avatar from "@atlaskit/avatar";
 import DynamicTable from "@atlaskit/dynamic-table";
 import React, { useCallback, useContext } from "react";
-import { ROW_PER_PAGE } from "../../../common/contants";
+import { ROW_PER_PAGE, ROW_PER_PAGE_MODAL_TABLE } from "../../../common/contants";
 import Button from "@atlaskit/button";
 import { LoadingModalContext } from "../JiraExport";
 
 function JiraProjectExportTable({ isLoading, projects, exportButtonClick }) {
 	const loadingModalState = useContext(LoadingModalContext);
-	const [isLoadingModalOpen, setIsLoadingModalOpen] = loadingModalState;
-	const openLoadingModal = useCallback(
-		() => setIsLoadingModalOpen(true),
-		[setIsLoadingModalOpen]
-	);
+	// const [isLoadingModalOpen, setIsLoadingModalOpen] = loadingModalState;
+	// const openLoadingModal = useCallback(
+	// 	() => setIsLoadingModalOpen(true),
+	// 	[setIsLoadingModalOpen]
+	// );
 
 	const rows = projects?.map((data, index) => ({
 		key: `row-${index + 1}-${data.name}`,
@@ -57,7 +57,7 @@ function JiraProjectExportTable({ isLoading, projects, exportButtonClick }) {
 		<DynamicTable
 			head={head}
 			rows={rows}
-			rowsPerPage={ROW_PER_PAGE}
+			rowsPerPage={ROW_PER_PAGE_MODAL_TABLE}
 			defaultPage={1}
 			isFixedSize
 			defaultSortKey="no"

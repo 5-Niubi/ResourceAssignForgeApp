@@ -1,78 +1,108 @@
-// @ts-nocheck
 import Button from "@atlaskit/button";
 import Modal, {
 	ModalHeader,
 	ModalTitle,
 	ModalBody,
 	ModalFooter,
+	ModalTransition,
 } from "@atlaskit/modal-dialog";
 import React, { createContext, useCallback, useEffect, useState } from "react";
-import { MODAL_WIDTH } from "../../common/contants";
+import { MODAL_WIDTH, THREAD_ACTION } from "../../common/contants";
 import { invoke, requestJira } from "@forge/bridge";
 import Toastify from "../../common/Toastify";
 import JiraProjectExportTable from "./table/JiraProjectExportTable";
-import LoadingModal from "./LoadingModal";
+import JiraAutoCreateProjectExport from "./gird/JiraAutoCreateProjectExport";
+import Heading from "@atlaskit/heading";
+import { ScheduleExportContext } from "../../pages/TestModal";
+import { ThreadLoadingContext } from "../../App";
+import { useContext } from "react";
 const width = MODAL_WIDTH.M;
 
-export const LoadingModalContext = createContext();
+const defaultValue = {
+	isLoadingProcessOpen: false,
+	dataExport: {},
+};
+const initProjectListState = {
+	isLoading: true,
+	projectsData: [],
+};
+export const LoadingModalContext = createContext(defaultValue);
+
 function JiraExport({ state }) {
-	const [IsJiraExportOpen, setIsJiraExportOpen] = state;
-	const scheduleId = 1;
-	const loadingModalState = useState(false);
-	const [isLoadingProcessOpen, setIsLoadingProcessOpen] = loadingModalState;
-	const openLoadingModal = useCallback(() => setIsLoadingProcessOpen(true), []);
-	const closeLoadingModal = useCallback(
-		() => setIsLoadingProcessOpen(false),
-		[]
-	);
+	const [isJiraExportOpen, setIsJiraExportOpen] = state;
 
 	const closeJiraExportModal = useCallback(
 		() => setIsJiraExportOpen(false),
 		[]
 	);
-	const [projectList, setProjectList] = useState(null);
+	const [projectListState, setProjectListState] =
+		useState(initProjectListState);
 
 	useEffect(() => {
 		invoke("getJiraProjectsList")
 			.then(function (res) {
-				setProjectList(res.values);
+				setProjectListState({ projectsData: res.values, isLoading: false });
 			})
 			.catch(function (error) {
-				setProjectList([]);
+				setProjectListState({ projectsData: [], isLoading: false });
 				Toastify.error(error.toString());
 			});
+		return () => {
+			setProjectListState(initProjectListState);
+		};
 	}, []);
 
-	const handleExportClick = useCallback((projectId) => {
-		openLoadingModal();
-		Toastify.info(projectId);
-		invoke("exportToJira", { projectJiraId: projectId, scheduleId })
-			.then(function (res) {
-				closeLoadingModal();
-				Toastify.info(JSON.stringify(res));
+	// State of Loading Thread Modal
+	const threadLoadingState = useContext(ThreadLoadingContext);
+	const [threadStateValue, setThreadStateValue] = threadLoadingState.state;
+	// --------
+
+	const schedule = useContext(ScheduleExportContext);
+	const [isLoading, setIsLoading] = useState(false);
+
+	const handleCreateThreadSuccess = useCallback((threadId) => {
+		let threadAction = THREAD_ACTION.JIRA_EXPORT;
+		setThreadStateValue({
+			threadId,
+			threadAction,
+			isModalOpen: true,
+		});
+		let threadInfo = {
+			threadId,
+			threadAction,
+		};
+		invoke("setThreadInfo", { threadInfo });
+		closeJiraExportModal();
+	}, []);
+
+	const handleExportClick = useCallback(() => {
+		setIsLoading(true);
+		invoke("exportToJira", { scheduleId: schedule.id })
+			.then((res) => {
+				handleCreateThreadSuccess(res.threadId);
 			})
-			.catch(async function (error) {
-				closeLoadingModal();
-				console.log(error);
+			.catch((error) => {
 				Toastify.error(error.toString());
 			});
 	}, []);
 
 	return (
-		<>
+		<ModalTransition>
 			<Modal onClose={closeJiraExportModal} width={width}>
 				<ModalHeader>
 					<ModalTitle>Duplicate this page</ModalTitle>
 				</ModalHeader>
 				<ModalBody>
-					Select project to export to
-					<LoadingModalContext.Provider value={loadingModalState}>
-						<JiraProjectExportTable
-							isLoading={!projectList}
-							projects={projectList}
-							exportButtonClick={handleExportClick}
-						/>
-					</LoadingModalContext.Provider>
+					<JiraAutoCreateProjectExport
+						isButtonExportLoading={isLoading}
+						onButtonExportClick={handleExportClick}
+					/>
+					<Heading level="h600">Select project to export to</Heading>
+					<JiraProjectExportTable
+						isLoading={projectListState.isLoading}
+						projects={projectListState.projectsData}
+						exportButtonClick={handleExportClick}
+					/>
 				</ModalBody>
 				<ModalFooter>
 					<Button appearance="subtle" onClick={closeJiraExportModal}>
@@ -80,8 +110,7 @@ function JiraExport({ state }) {
 					</Button>
 				</ModalFooter>
 			</Modal>
-			{isLoadingProcessOpen && <LoadingModal state={loadingModalState} />}
-		</>
+		</ModalTransition>
 	);
 }
 

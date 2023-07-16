@@ -6,6 +6,7 @@ import taskResolver from "./taskResolver";
 import workforceResolver from "./workforceResolver";
 import milestoneResolver from "./milestoneResolver";
 import parameterResolver from "./parameterResolver";
+import threadResolver from "./threadResolver";
 
 /**
  * @param {import("@forge/resolver").default} resolver
@@ -19,6 +20,7 @@ function resolverReg(resolver){
     exportResolver(resolver);
     milestoneResolver(resolver);
     parameterResolver(resolver);
+    threadResolver(resolver);
 }
 
 export default resolverReg;
