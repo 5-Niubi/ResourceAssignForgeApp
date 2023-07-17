@@ -36,7 +36,5 @@ export async function removeThreadInfo(threadId) {
 export function calculateDuration({startDate, endDate}){
     var a = moment(startDate);
     var b = moment(endDate);
-    console.log("calculate ngay: ", startDate +", "+ endDate);
-    console.log("Calculate day: ",b.diff(a, 'days'));
     return (b.diff(a, 'days'));
 }

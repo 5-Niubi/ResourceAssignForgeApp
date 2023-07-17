@@ -125,6 +125,8 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 		var data = {
 			ProjectId: Number(projectId),
 			Duration: calculateDuration({startDate,endDate}),
+            StartDate: startDate,
+            DeadLine: endDate,
 			Budget: Number(cost),
 			ParameterResources: parameterResources,
 		};
