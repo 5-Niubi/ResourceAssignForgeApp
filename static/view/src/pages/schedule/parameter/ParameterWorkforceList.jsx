@@ -44,6 +44,7 @@ import { Checkbox } from "@atlaskit/checkbox";
 import TextField from "@atlaskit/textfield";
 import { findObj } from "../pertchart/VisualizeTasks";
 import Rating from "react-rating";
+import CreatableAdvanced from "./creatable-selection";
 
 function ParameterWorkforceList() {
 	const SelectProps = {
@@ -111,6 +112,11 @@ function ParameterWorkforceList() {
 			},
 		],
 	});
+	const [skillsTable, setSkillsTable] = useState([{
+        id: 0,
+		name: "",
+		level: 0,
+	}]);
 	const [isWorkforceOpen, setIsWorkforceOpen] = useState(false);
 	const openWorkforceModal = useCallback(() => setIsWorkforceOpen(true), []);
 	const closeWorkforceModal = useCallback(
@@ -123,6 +129,22 @@ function ParameterWorkforceList() {
 		{ label: "Part-time", value: 1 },
 	];
 
+    const onSelectedValue = (childValue) => {
+		console.log("Received value from child:", childValue);
+		//LOAD DATA TO TABLE
+
+        // let skillInTable = [childValue.selectedValue?.map((skill) => ({
+        //     id: skill.value,
+        //     name: skill.value,
+        //     level: skill.level,
+        // }))];
+        // if(childValue.newOption != null){
+        //     childValue.selectedValue.push(childValue.newOption)
+        // }
+		setSkillsTable(childValue.selectedValue);
+		console.log("Received value display in table:",skillsTable);
+	};
+
 	const buttonAddSkills = (
 		<>
 			<Button
@@ -132,62 +154,7 @@ function ParameterWorkforceList() {
 		</>
 	);
 
-	const head = {
-		cells: [
-			{
-				key: "skills",
-				content: "Skills",
-				width: 30,
-			},
-			{
-				key: "level",
-				content: "Level",
-				width: 60,
-			},
-			{
-				key: "action",
-				content: "Actions",
-				width: 10,
-			},
-		],
-	};
 
-	const rows = selectedWorkforce.skills?.map((skill, index) => ({
-		key: skill.name?.toString(),
-		cells: [
-			{
-				key: skill.name?.toString(),
-				content: skill.name?.toString(),
-			},
-			{
-				key: skill.level?.toString(),
-				content: (
-					<>
-						<Rating
-							emptySymbol={<StarIcon />}
-							fullSymbol={<StarFilledIcon />}
-							initialRating={skill.level}
-						></Rating>
-					</>
-				),
-			},
-			{
-				key: "actions",
-				content: (
-					<>
-						<Button
-							iconBefore={<EditIcon label="" size="medium" />}
-							appearance="subtle"
-						></Button>
-						<Button
-							iconBefore={<TrashIcon label="" size="medium" />}
-							appearance="subtle"
-						></Button>
-					</>
-				),
-			},
-		],
-	}));
 
 	const buttonActions = (
 		<>
@@ -216,7 +183,9 @@ function ParameterWorkforceList() {
 			})),
 		});
 		setIsWorkforceOpen(true);
-		selected.workingType == 1? setIsParttimeSelected(true) : setIsParttimeSelected(false);
+		selected.workingType == 1
+			? setIsParttimeSelected(true)
+			: setIsParttimeSelected(false);
 	};
 
 	const styleTextfield = {
@@ -262,6 +231,63 @@ function ParameterWorkforceList() {
 		}
 		return undefined;
 	};
+
+	const head = {
+		cells: [
+			{
+				key: "skills",
+				content: "Skills",
+				width: 30,
+			},
+			{
+				key: "level",
+				content: "Level",
+				width: 60,
+			},
+			{
+				key: "action",
+				content: "Actions",
+				width: 10,
+			},
+		],
+	};
+
+	const rows = skillsTable?.map((skill, index) => ({
+		key: skill.name?.toString(),
+		cells: [
+			{
+				key: skill.label?.toString(),
+				content: skill.label?.toString(),
+			},
+			{
+				key: skill.level?.toString(),
+				content: (
+					<>
+						<Rating
+							emptySymbol={<StarIcon />}
+							fullSymbol={<StarFilledIcon />}
+							initialRating={skill.level}
+						></Rating>
+					</>
+				),
+			},
+			{
+				key: "actions",
+				content: (
+					<>
+						<Button
+							iconBefore={<EditIcon label="" size="medium" />}
+							appearance="subtle"
+						></Button>
+						<Button
+							iconBefore={<TrashIcon label="" size="medium" />}
+							appearance="subtle"
+						></Button>
+					</>
+				),
+			},
+		],
+	}));
 
 	return (
 		<div style={{ width: "100wh" }}>
@@ -518,17 +544,29 @@ function ParameterWorkforceList() {
 																		options
 																	}
 																	placeholder="Choose type..."
-																	onChange={(newValue)=>{
-                                                                        (newValue.value == 1)?setIsParttimeSelected(true):setIsParttimeSelected(false)
-                                                                        console.log("value Select moi",newValue)
-
-                                                                    }
-																	}
-                                                                    value={()=>{
-                                                                        selectedWorkforce.workingType
-                                                                        console.log("value Select",selectedWorkforce.workingType)
-                                                                    }
-                                                                    }
+																	onChange={(
+																		newValue
+																	) => {
+																		newValue.value ==
+																		1
+																			? setIsParttimeSelected(
+																					true
+																			  )
+																			: setIsParttimeSelected(
+																					false
+																			  );
+																		console.log(
+																			"value Select moi",
+																			newValue
+																		);
+																	}}
+																	value={() => {
+																		selectedWorkforce.workingType;
+																		console.log(
+																			"value Select",
+																			selectedWorkforce.workingType
+																		);
+																	}}
 																/>
 															</Fragment>
 														)}
@@ -559,7 +597,7 @@ function ParameterWorkforceList() {
 																		}
 																	>
 																		<TextField
-                                                                            isCompact
+																			isCompact
 																			autoComplete="off"
 																			defaultValue={
 																				selectedWorkforce
@@ -753,78 +791,42 @@ function ParameterWorkforceList() {
 															error,
 														}) => (
 															<Fragment>
-																<TextField
-																	autoComplete="off"
-																	elemAfterInput={
-																		buttonAddSkills
-																	}
-																	{...fieldProps}
-																	defaultValue={selectedWorkforce.skills?.map(
+																<CreatableAdvanced
+																	isRequired
+																	defaultOptions={selectedWorkforce.skills?.map(
 																		(
 																			skill
-																		) =>
-																			skill.name +
-																			"-level " +
-																			skill.level
+																		) => ({
+																			value: skill.name,
+																			label: skill.name,
+																			level: skill.level,
+																		})
 																	)}
-																/>
-																{!error && (
+																	selectedValue={selectedWorkforce.skills?.map(
+																		(
+																			skill
+																		) => ({
+																			value: skill.name,
+																			label: skill.name,
+																			level: skill.level,
+																		})
+																	)}
+																	onSelectedValue={
+																		onSelectedValue
+																	}
+																></CreatableAdvanced>
 																	<HelperMessage>
 																		<InfoIcon
 																			size="small"
 																			content=""
 																		></InfoIcon>
-																		Click
-																		add
-																		circle
-																		button
-																		in order
-																		to add
-																		skills
-																		into
-																		table
+																		Change skill's level in table
 																	</HelperMessage>
-																)}
-																{error && (
-																	<ErrorMessage>
-																		Wrong
-																		input.
-																	</ErrorMessage>
-																)}
 															</Fragment>
 														)}
 													</Field>
 												</GridColumn>
-												{/* <GridColumn medium={12}>
-													<Field
-														label="Precedence tasks"
-														name="precedences"
-														defaultValue=""
-													>
-														{({ fieldProps }) => (
-															<Fragment>
-																<Select
-																	{...fieldProps}
-																	inputId="multi-select-example"
-																	className="multi-select"
-																	classNamePrefix="react-select"
-																	options={
-																		rows
-																	}
-																	value={taskValues}
-																	onChange={
-																		handleChangePrecedence
-																	}
-																	isMulti
-																	isSearchable={
-																		true
-																	}
-																	placeholder="Choose precedence tasks"
-																/>
-															</Fragment>
-														)}
-													</Field>
-												</GridColumn> */}
+
 												<GridColumn medium={12}>
 													<DynamicTable
 														head={head}
