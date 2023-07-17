@@ -29,6 +29,7 @@ import { LoadingButton } from "@atlaskit/button";
 import { DATE_FORMAT, MODAL_WIDTH } from "../../../common/contants";
 import { DatePicker } from "@atlaskit/datetime-picker";
 import { getCurrentTime, calculateDuration } from "../../../common/utils";
+import Spinner from "@atlaskit/spinner";
 
 const boldStyles = css({
 	fontWeight: "bold",
@@ -40,6 +41,8 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 	const [endDate, setEndDate] = useState(getCurrentTime());
 	const [budget, setBudget] = useState();
 	const [budgetUnit, setBudgetUnit] = useState("");
+	const [isLoading, setIsLoading] = useState(true);
+
 
 	useEffect(function () {
 		invoke("getProjectDetail", { projectId })
@@ -59,6 +62,8 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 					project.startDate + ", " + project.endDate + ", "
                     +project.budget +", "+ project.budgetUnit
 				);
+
+                setIsLoading(false);
 			})
 			.catch(function (error) {
 				console.log("PROJECT DATE: ", error);
@@ -138,6 +143,10 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 
 	return (
 		<div style={{ width: "100%" }}>
+            {isLoading ? (
+					<Spinner size={"large"} />
+				) : null
+            }
 				<Form
 					onSubmit={({ cost }) => {
 						console.log("Form Submitted: ", cost);
@@ -155,6 +164,9 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 				>
 					{({ formProps, submitting }) => (
 						<form {...formProps}>
+							<Grid spacing="compact">
+                            <GridColumn medium={12}>
+
 							<Field
 								isRequired
 								label="Expected Cost"
@@ -180,6 +192,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 									</Fragment>
 								)}
 							</Field>
+                            </GridColumn>
 
 							{/* <Field
 								isRequired
@@ -201,7 +214,6 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 									</Fragment>
 								)}
 							</Field> */}
-							<Grid spacing="compact">
 								<GridColumn medium={6}>
 									<Field
 										name="startDate"

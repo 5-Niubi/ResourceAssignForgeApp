@@ -16,6 +16,7 @@ import StarIcon from "@atlaskit/icon/glyph/star";
 import InfoIcon from "@atlaskit/icon/glyph/info";
 import TrashIcon from "@atlaskit/icon/glyph/trash";
 import Select from "@atlaskit/select";
+import { Grid, GridColumn } from "@atlaskit/page";
 import Form, {
 	CheckboxField,
 	ErrorMessage,
@@ -44,14 +45,11 @@ import TextField from "@atlaskit/textfield";
 import { findObj } from "../pertchart/VisualizeTasks";
 import Rating from "react-rating";
 
-
-
-
 function ParameterWorkforceList() {
-    const SelectProps =  {
-        value: 0,
-        label: "",
-      }
+	const SelectProps = {
+		value: 0,
+		label: "",
+	};
 
 	//GET LIST WORKFORCES
 	let { projectId } = useParams();
@@ -121,8 +119,8 @@ function ParameterWorkforceList() {
 	);
 	const [isParttimeSelected, setIsParttimeSelected] = useState(false);
 	const options = [
-        { label: "Fulltime", value: 0 },
-        { label: "Part-time", value: 1 },
+		{ label: "Fulltime", value: 0 },
+		{ label: "Part-time", value: 1 },
 	];
 
 	const buttonAddSkills = (
@@ -180,12 +178,10 @@ function ParameterWorkforceList() {
 						<Button
 							iconBefore={<EditIcon label="" size="medium" />}
 							appearance="subtle"
-							// onClick={openModal}
 						></Button>
 						<Button
 							iconBefore={<TrashIcon label="" size="medium" />}
 							appearance="subtle"
-							// onClick={openModal}
 						></Button>
 					</>
 				),
@@ -219,20 +215,9 @@ function ParameterWorkforceList() {
 				level: skill.level,
 			})),
 		});
-		console.log("Workforce da chon: ", selectedWorkforce);
-		console.log("Id click:", value);
 		setIsWorkforceOpen(true);
-		selected.workingType == 1
-			? setIsParttimeSelected(true)
-			: setIsParttimeSelected(false);
+		selected.workingType == 1? setIsParttimeSelected(true) : setIsParttimeSelected(false);
 	};
-
-	const onChange = useCallback((event) => {
-		console.log("Day la event: ",event);
-		event.value == 1
-			? setIsParttimeSelected(true)
-			: setIsParttimeSelected(false);
-	}, []);
 
 	const styleTextfield = {
 		marginLeft: 10,
@@ -320,448 +305,527 @@ function ParameterWorkforceList() {
 								</ModalTitle>
 							</ModalHeader>
 							<ModalBody>
-								<div>
-									<Form
-										onSubmit={(data) => {
-											console.log("Form Data", data);
-											return new Promise((resolve) =>
-												setTimeout(resolve, 2000)
-											).then(() =>
-												data.username === "error"
-													? {
-															username: "IN_USE",
-													  }
-													: undefined
-											);
-										}}
-									>
-										{({ formProps, submitting }) => (
-											<form {...formProps}>
-												<Field
-													name="email"
-													label="Email"
-													isRequired
-													defaultValue={
-														selectedWorkforce.email
-													}
-													validate={(v) =>
-														validateEmail(v)
-													}
-												>
-													{({
-														fieldProps,
-														error,
-													}) => (
-														<Fragment>
-															<TextField
-																autoComplete="off"
-																{...fieldProps}
-																placeholder="Email only."
-															/>
-															{error ===
-																"NOT_VALID" && (
-																<ErrorMessage>
-																	Invalid
-																	email, needs
-																	contains @
-																	symbol.
-																</ErrorMessage>
-															)}
-															{error ===
-																"IN_USE" && (
-																<ErrorMessage>
-																	Username
-																	already
-																	taken, try
-																	another one
-																</ErrorMessage>
-															)}
-														</Fragment>
-													)}
-												</Field>
-												<Field
-													name="usernamejira"
-													label="Username Jira"
-													isRequired
-													defaultValue={
-														selectedWorkforce.displayName
-													}
-												>
-													{({
-														fieldProps,
-														error,
-													}) => (
-														<Fragment>
-															<TextField
-																autoComplete="off"
-																{...fieldProps}
-																placeholder="You can use letters and numbers."
-															/>
-															{!error && (
-																<HelperMessage></HelperMessage>
-															)}
-															{error && (
-																<ErrorMessage>
-																	This
-																	username is
-																	already in
-																	use, try
-																	another one.
-																</ErrorMessage>
-															)}
-														</Fragment>
-													)}
-												</Field>
-												<Field
-													name="name"
-													label="Name"
-													isRequired
-													defaultValue={
-														selectedWorkforce.name
-													}
-													validate={(v) =>
-														validateName(v)
-													}
-												>
-													{({
-														fieldProps,
-														error,
-													}) => (
-														<Fragment>
-															<TextField
-																autoComplete="off"
-																{...fieldProps}
-																placeholder="Example: John Smith"
-															/>
-															{error ===
-																"NOT_VALID" && (
-																<ErrorMessage>
-																	The name
-																	field should
-																	only contain
-																	letters and
-																	must have a
-																	minimum
-																	length of 6
-																	characters.
-																</ErrorMessage>
-															)}
-														</Fragment>
-													)}
-												</Field>
-												<Field
-													name="salary"
-													label="Salary (Hour)"
-													isRequired
-													defaultValue={
-														selectedWorkforce.unitSalary
-													}
-													validate={(value) =>
-														validateNumberOnly(
-															value
-														)
-													}
-												>
-													{({
-														fieldProps,
-														error,
-													}) => (
-														<Fragment>
-															<TextField
-																autoComplete="off"
-																{...fieldProps}
-																placeholder="Number only"
-																elemBeforeInput={
-																	<p
-																		style={{
-																			marginLeft: 10,
-																		}}
-																	>
-																		$
-																	</p>
-																}
-															/>
-															{error ===
-																"NOT_VALID" && (
-																<ErrorMessage>
-																	Wrong input.
-																</ErrorMessage>
-															)}
-														</Fragment>
-													)}
-												</Field>
-												<Field
-													label="Working Type"
-													name="workingType"
-													isRequired
-												>
-													{({ fieldProps: { id, ...rest } }) => (
-														<Fragment>
-															<Select
-																inputId={id}
-                                                                {...rest}
-																options={
-																	options
-																}
-																placeholder="Choose type..."
-																onChange={
-																	onChange && rest.value == (isParttimeSelected?1:0)
-																}
-                                                                value={(isParttimeSelected?1:0)}
-																defaultValue={
-                                                                      (selectedWorkforce.workingType==1? options[1]: options[0])
-																}
-															/>
-														</Fragment>
-													)}
-												</Field>
-
-												{/* WOKRING EFFORTS IN WEEEK */}
-												{isParttimeSelected && (
+								<Form
+									onSubmit={(data) => {
+										console.log("Form Data", data);
+										return new Promise((resolve) =>
+											setTimeout(resolve, 2000)
+										).then(() =>
+											data.username === "error"
+												? {
+														username: "IN_USE",
+												  }
+												: undefined
+										);
+									}}
+								>
+									{({ formProps, submitting }) => (
+										<form {...formProps}>
+											<Grid
+												layout="fluid"
+												spacing="compact"
+											>
+												<GridColumn medium={12}>
 													<Field
-														name="workingEffort"
-														label="Working Effort"
+														name="email"
+														label="Email"
 														isRequired
 														defaultValue={
-															selectedWorkforce.workingEffort
+															selectedWorkforce.email
+														}
+														validate={(v) =>
+															validateEmail(v)
 														}
 													>
 														{({
 															fieldProps,
 															error,
 														}) => (
-															<div
-																style={{
-																	width: "100%",
-																	display:
-																		"flex",
-																	justifyContent:
-																		"space-between",
-																}}
-															>
-																<Fragment>
-																	<TextField
-																		autoComplete="off"
-																		defaultValue={
-																			selectedWorkforce
-																				.workingEffort[0]
-																		}
-																		label="Monday"
-																		elemBeforeInput={
-																			<p
-																				style={{
-																					styleTextfield,
-																				}}
-																			>
-																				Mon
-																			</p>
-																		}
-																		width={
-																			90
-																		}
-																		isCompact
-																	/>
-																	<TextField
-																		style={{
-																			flex: 1,
-																		}}
-																		autoComplete="off"
-																		elemBeforeInput={
-																			<p
-																				style={{
-																					styleTextfield,
-																				}}
-																			>
-																				Tues
-																			</p>
-																		}
-																		width={
-																			90
-																		}
-																		defaultValue={
-																			selectedWorkforce
-																				.workingEffort[1]
-																		}
-																		isCompact
-																	/>
-																	<TextField
-																		autoComplete="off"
-																		elemBeforeInput={
-																			<p
-																				style={{
-																					styleTextfield,
-																				}}
-																			>
-																				Wed
-																			</p>
-																		}
-																		width={
-																			90
-																		}
-																		isCompact
-																		defaultValue={
-																			selectedWorkforce
-																				.workingEffort[2]
-																		}
-																	/>
-																	<TextField
-																		autoComplete="off"
-																		elemBeforeInput={
-																			<p
-																				style={{
-																					styleTextfield,
-																				}}
-																			>
-																				Thurs
-																			</p>
-																		}
-																		width={
-																			90
-																		}
-																		isCompact
-																		defaultValue={
-																			selectedWorkforce
-																				.workingEffort[3]
-																		}
-																	/>
-																	<TextField
-																		defaultValue={
-																			selectedWorkforce
-																				.workingEffort[4]
-																		}
-																		elemBeforeInput={
-																			<p
-																				style={{
-																					styleTextfield,
-																				}}
-																			>
-																				Fri
-																			</p>
-																		}
-																		width={
-																			90
-																		}
-																		isCompact
-																		autoComplete="off"
-																	/>{" "}
-																	<TextField
-																		autoComplete="off"
-																		elemBeforeInput={
-																			<p
-																				style={{
-																					styleTextfield,
-																				}}
-																			>
-																				Sat
-																			</p>
-																		}
-																		width={
-																			90
-																		}
-																		isCompact
-																		defaultValue={
-																			selectedWorkforce
-																				.workingEffort[5]
-																		}
-																	/>
-																	<TextField
-																		autoComplete="off"
-																		elemBeforeInput={
-																			<p
-																				style={{
-																					styleTextfield,
-																				}}
-																			>
-																				Sun
-																			</p>
-																		}
-																		width={
-																			90
-																		}
-																		isCompact
-																		defaultValue={
-																			selectedWorkforce
-																				.workingEffort[6]
-																		}
-																	/>
-																</Fragment>
-															</div>
+															<Fragment>
+																<TextField
+																	autoComplete="off"
+																	{...fieldProps}
+																	placeholder="Email only."
+																/>
+																{error ===
+																	"NOT_VALID" && (
+																	<ErrorMessage>
+																		Invalid
+																		email,
+																		needs
+																		contains
+																		@
+																		symbol.
+																	</ErrorMessage>
+																)}
+																{error ===
+																	"IN_USE" && (
+																	<ErrorMessage>
+																		Username
+																		already
+																		taken,
+																		try
+																		another
+																		one
+																	</ErrorMessage>
+																)}
+															</Fragment>
 														)}
 													</Field>
-												)}
-												<Field
-													name="skills"
-													label="Skills"
-													isRequired
-												>
-													{({
-														fieldProps,
-														error,
-													}) => (
-														<Fragment>
-															<TextField
-																autoComplete="off"
-																elemAfterInput={
-																	buttonAddSkills
-																}
-																{...fieldProps}
-																defaultValue={selectedWorkforce.skills?.map(
-																	(skill) =>
-																		skill.name +
-																		"-level " +
-																		skill.level
+												</GridColumn>
+												<GridColumn medium={6}>
+													<Field
+														name="usernamejira"
+														label="Username Jira"
+														isRequired
+														defaultValue={
+															selectedWorkforce.displayName
+														}
+													>
+														{({
+															fieldProps,
+															error,
+														}) => (
+															<Fragment>
+																<TextField
+																	autoComplete="off"
+																	{...fieldProps}
+																	placeholder="You can use letters and numbers."
+																/>
+																{!error && (
+																	<HelperMessage></HelperMessage>
 																)}
-															/>
-															{!error && (
-																<HelperMessage>
-																	<InfoIcon
-																		size="small"
-																		content=""
-																	></InfoIcon>
-																	Click add
-																	circle
-																	button in
-																	order to add
-																	skills into
-																	table
-																</HelperMessage>
+																{error && (
+																	<ErrorMessage>
+																		This
+																		username
+																		is
+																		already
+																		in use,
+																		try
+																		another
+																		one.
+																	</ErrorMessage>
+																)}
+															</Fragment>
+														)}
+													</Field>
+												</GridColumn>
+												<GridColumn medium={6}>
+													<Field
+														name="name"
+														label="Name"
+														isRequired
+														defaultValue={
+															selectedWorkforce.name
+														}
+														validate={(v) =>
+															validateName(v)
+														}
+													>
+														{({
+															fieldProps,
+															error,
+														}) => (
+															<Fragment>
+																<TextField
+																	autoComplete="off"
+																	{...fieldProps}
+																	placeholder="Example: John Smith"
+																/>
+																{error ===
+																	"NOT_VALID" && (
+																	<ErrorMessage>
+																		The name
+																		field
+																		should
+																		only
+																		contain
+																		letters
+																		and must
+																		have a
+																		minimum
+																		length
+																		of 6
+																		characters.
+																	</ErrorMessage>
+																)}
+															</Fragment>
+														)}
+													</Field>
+												</GridColumn>
+												<GridColumn medium={12}>
+													<Field
+														name="salary"
+														label="Salary (Hour)"
+														isRequired
+														defaultValue={
+															selectedWorkforce.unitSalary
+														}
+														validate={(value) =>
+															validateNumberOnly(
+																value
+															)
+														}
+													>
+														{({
+															fieldProps,
+															error,
+														}) => (
+															<Fragment>
+																<TextField
+																	autoComplete="off"
+																	{...fieldProps}
+																	placeholder="Number only"
+																	elemBeforeInput={
+																		<p
+																			style={{
+																				marginLeft: 10,
+																			}}
+																		>
+																			$
+																		</p>
+																	}
+																/>
+																{error ===
+																	"NOT_VALID" && (
+																	<ErrorMessage>
+																		Wrong
+																		input.
+																	</ErrorMessage>
+																)}
+															</Fragment>
+														)}
+													</Field>
+												</GridColumn>
+												<GridColumn medium={3}>
+													<Field
+														label="Working Type"
+														name="workingType"
+														isRequired
+													>
+														{({
+															fieldProps: {
+																id,
+																...rest
+															},
+														}) => (
+															<Fragment>
+																<Select
+																	inputId={id}
+																	{...rest}
+																	options={
+																		options
+																	}
+																	placeholder="Choose type..."
+																	onChange={(newValue)=>{
+                                                                        (newValue.value == 1)?setIsParttimeSelected(true):setIsParttimeSelected(false)
+                                                                    }
+																	}
+                                                                    inputValue={selectedWorkforce.workingType}
+																/>
+															</Fragment>
+														)}
+													</Field>
+												</GridColumn>
+												<GridColumn medium={9}>
+													{/* WOKRING EFFORTS IN WEEEK */}
+													{isParttimeSelected && (
+														<Field
+															name="workingEffort"
+															label="Working Effort"
+															isRequired
+															defaultValue={
+																selectedWorkforce.workingEffort
+															}
+														>
+															{({
+																fieldProps,
+																error,
+															}) => (
+																<Grid
+																	layout="fluid"
+																	spacing="compact"
+																>
+																	<GridColumn
+																		medium={
+																			1.25
+																		}
+																	>
+																		<TextField
+                                                                            isCompact
+																			autoComplete="off"
+																			defaultValue={
+																				selectedWorkforce
+																					.workingEffort[0]
+																			}
+																			label="Monday"
+																			elemBeforeInput={
+																				<p
+																					style={{
+																						styleTextfield,
+																					}}
+																				>
+																					Mon
+																				</p>
+																			}
+																		/>
+																	</GridColumn>
+																	<GridColumn
+																		medium={
+																			1.25
+																		}
+																	>
+																		<TextField
+																			style={{
+																				flex: 1,
+																			}}
+																			autoComplete="off"
+																			elemBeforeInput={
+																				<p
+																					style={{
+																						styleTextfield,
+																					}}
+																				>
+																					Tues
+																				</p>
+																			}
+																			width={
+																				90
+																			}
+																			defaultValue={
+																				selectedWorkforce
+																					.workingEffort[1]
+																			}
+																			isCompact
+																		/>
+																	</GridColumn>
+																	<GridColumn
+																		medium={
+																			1.25
+																		}
+																	>
+																		<TextField
+																			autoComplete="off"
+																			elemBeforeInput={
+																				<p
+																					style={{
+																						styleTextfield,
+																					}}
+																				>
+																					Wed
+																				</p>
+																			}
+																			width={
+																				90
+																			}
+																			isCompact
+																			defaultValue={
+																				selectedWorkforce
+																					.workingEffort[2]
+																			}
+																		/>
+																	</GridColumn>
+																	<GridColumn
+																		medium={
+																			1.25
+																		}
+																	>
+																		<TextField
+																			autoComplete="off"
+																			elemBeforeInput={
+																				<p
+																					style={{
+																						styleTextfield,
+																					}}
+																				>
+																					Thurs
+																				</p>
+																			}
+																			width={
+																				90
+																			}
+																			isCompact
+																			defaultValue={
+																				selectedWorkforce
+																					.workingEffort[3]
+																			}
+																		/>
+																	</GridColumn>
+																	<GridColumn
+																		medium={
+																			1.25
+																		}
+																	>
+																		<TextField
+																			defaultValue={
+																				selectedWorkforce
+																					.workingEffort[4]
+																			}
+																			elemBeforeInput={
+																				<p
+																					style={{
+																						styleTextfield,
+																					}}
+																				>
+																					Fri
+																				</p>
+																			}
+																			width={
+																				90
+																			}
+																			isCompact
+																			autoComplete="off"
+																		/>
+																	</GridColumn>
+																	<GridColumn
+																		medium={
+																			1.25
+																		}
+																	>
+																		<TextField
+																			autoComplete="off"
+																			elemBeforeInput={
+																				<p
+																					style={{
+																						styleTextfield,
+																					}}
+																				>
+																					Sat
+																				</p>
+																			}
+																			width={
+																				90
+																			}
+																			isCompact
+																			defaultValue={
+																				selectedWorkforce
+																					.workingEffort[5]
+																			}
+																		/>
+																	</GridColumn>
+																	<GridColumn
+																		medium={
+																			1.25
+																		}
+																	>
+																		<TextField
+																			autoComplete="off"
+																			elemBeforeInput={
+																				<p
+																					style={{
+																						styleTextfield,
+																					}}
+																				>
+																					Sun
+																				</p>
+																			}
+																			width={
+																				90
+																			}
+																			isCompact
+																			defaultValue={
+																				selectedWorkforce
+																					.workingEffort[6]
+																			}
+																		/>
+																	</GridColumn>
+																</Grid>
 															)}
-															{error && (
-																<ErrorMessage>
-																	Wrong input.
-																</ErrorMessage>
-															)}
-														</Fragment>
+														</Field>
 													)}
-												</Field>
-                                                <Field
-												label="Precedence tasks"
-												name="precedences"
-												defaultValue=""
-											>
-												{({ fieldProps }) => (
-													<Fragment>
-														<Select
-															{...fieldProps}
-															inputId="multi-select-example"
-															className="multi-select"
-															classNamePrefix="react-select"
-															options={rows}
-															// value={taskValues}
-															// onChange={
-															// 	handleChangePrecedence
-															// }
-															isMulti
-															isSearchable={true}
-															placeholder="Choose precedence tasks"
-														/>
-													</Fragment>
-												)}
-											</Field>
-												<DynamicTable
-													head={head}
-													rows={rows}
-												/>
+												</GridColumn>
+
+												<GridColumn medium={12}>
+													<Field
+														name="skills"
+														label="Skills"
+														isRequired
+													>
+														{({
+															fieldProps,
+															error,
+														}) => (
+															<Fragment>
+																<TextField
+																	autoComplete="off"
+																	elemAfterInput={
+																		buttonAddSkills
+																	}
+																	{...fieldProps}
+																	defaultValue={selectedWorkforce.skills?.map(
+																		(
+																			skill
+																		) =>
+																			skill.name +
+																			"-level " +
+																			skill.level
+																	)}
+																/>
+																{!error && (
+																	<HelperMessage>
+																		<InfoIcon
+																			size="small"
+																			content=""
+																		></InfoIcon>
+																		Click
+																		add
+																		circle
+																		button
+																		in order
+																		to add
+																		skills
+																		into
+																		table
+																	</HelperMessage>
+																)}
+																{error && (
+																	<ErrorMessage>
+																		Wrong
+																		input.
+																	</ErrorMessage>
+																)}
+															</Fragment>
+														)}
+													</Field>
+												</GridColumn>
+												<GridColumn medium={12}>
+													<Field
+														label="Precedence tasks"
+														name="precedences"
+														defaultValue=""
+													>
+														{({ fieldProps }) => (
+															<Fragment>
+																<Select
+																	{...fieldProps}
+																	inputId="multi-select-example"
+																	className="multi-select"
+																	classNamePrefix="react-select"
+																	options={
+																		rows
+																	}
+																	// value={taskValues}
+																	// onChange={
+																	// 	handleChangePrecedence
+																	// }
+																	isMulti
+																	isSearchable={
+																		true
+																	}
+																	placeholder="Choose precedence tasks"
+																/>
+															</Fragment>
+														)}
+													</Field>
+												</GridColumn>
+												<GridColumn medium={12}>
+													<DynamicTable
+														head={head}
+														rows={rows}
+													/>
+												</GridColumn>
+
 												<FormFooter>
 													<ButtonGroup>
 														<Button appearance="subtle">
@@ -778,10 +842,10 @@ function ParameterWorkforceList() {
 														</LoadingButton>
 													</ButtonGroup>
 												</FormFooter>
-											</form>
-										)}
-									</Form>
-								</div>
+											</Grid>
+										</form>
+									)}
+								</Form>
 							</ModalBody>
 							<ModalFooter>
 								<Button
