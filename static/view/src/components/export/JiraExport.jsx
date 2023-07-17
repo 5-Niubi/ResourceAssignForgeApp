@@ -91,7 +91,10 @@ function JiraExport({ state }) {
 		<ModalTransition>
 			<Modal onClose={closeJiraExportModal} width={width}>
 				<ModalHeader>
-					<ModalTitle>Duplicate this page</ModalTitle>
+					<ModalTitle>
+						<Heading level="h600">Export this solution to a Jira Software Project</Heading>
+						<Heading level="h200">(This process will take a while and can not undo)</Heading>
+					</ModalTitle>
 				</ModalHeader>
 				<ModalBody>
 					<JiraAutoCreateProjectExport
