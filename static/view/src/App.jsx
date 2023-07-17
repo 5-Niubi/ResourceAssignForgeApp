@@ -41,6 +41,15 @@ function App() {
 	}, []);
 
 	useEffect(function () {
+		let threadInfoRaw = localStorage.getItem("thread_info");
+		let threadInfo = JSON.parse(threadInfoRaw);
+		if(threadInfo){
+			setThreadStateValue({
+				threadId: threadInfo.threadId,
+				threadAction: threadInfo.threadAction,
+				isModalOpen: true
+			});
+		}
 		invoke("getThreadStateInfo")
 			.then(function (res) {
 				console.log(res);
@@ -56,9 +65,9 @@ function App() {
 	}, []);
 
 	// // Set this app context to storage
-	useEffect(() => {
-		invoke("setContextToGlobal").then().catch();
-	}, []);
+	// useEffect(() => {
+	// 	invoke("setContextToGlobal").then().catch();
+	// }, []);
 
 	// --- Config React Router ---
 	useEffect(() => {

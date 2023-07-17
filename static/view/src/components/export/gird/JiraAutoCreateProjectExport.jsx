@@ -35,7 +35,7 @@ function JiraAutoCreateProjectExport({isButtonExportLoading, onButtonExportClick
 				<Box xcss={containerStyles}>
 					<Image
 						src={
-							"https://wac-cdn.atlassian.com/dam/jcr:9e1841b9-2557-4eb2-ab47-d92428580b02/Jira%20Software@2x-blue.png"
+							"https://assets.stickpng.com/images/62a9ad4c8ff6441a2952dab8.png"
 						}
 						alt="JiraSoftware Logo"
 					/>

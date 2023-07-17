@@ -1,4 +1,4 @@
-import Button from "@atlaskit/button";
+import Button, { LoadingButton } from "@atlaskit/button";
 import Modal, {
 	ModalTransition,
 	ModalHeader,
@@ -6,15 +6,15 @@ import Modal, {
 	ModalBody,
 	ModalFooter,
 } from "@atlaskit/modal-dialog";
-import React, { useCallback, useState } from "react";
-import { LoadingModalContext } from "./JiraExport";
-import LoadingModal from "./LoadingModal";
-import JiraProjectExportTable from "./table/JiraProjectExportTable";
+import React, { useCallback, useContext, useState } from "react";
 import { MODAL_WIDTH } from "../../common/contants";
 import { Grid, GridColumn } from "@atlaskit/page";
 import Image from "@atlaskit/image";
 import { Box, xcss } from "@atlaskit/primitives";
 import Heading from "@atlaskit/heading";
+import { invoke, router } from "@forge/bridge";
+import Toastify from "../../common/Toastify";
+import { ScheduleExportContext } from "../../pages/TestModal";
 
 const width = MODAL_WIDTH.M;
 const columns = 10;
@@ -34,9 +34,22 @@ const buttonContainerStyles = xcss({
 });
 
 function OtherExport({ state }) {
+	const schedule = useContext(ScheduleExportContext);
+
 	const [otherExportState, setOtherExportState] = state;
 	const closeOtherExportModal = useCallback(() => {
 		setOtherExportState({ isModalOpen: false, schedule: {} });
+	}, []);
+	const [isLoading, setIsLoading] = useState(false);
+
+	const handleExportMSPClick = useCallback(async () => {
+		invoke("getDownloadMSXMLUrl", { scheduleId: schedule.id })
+			.then(async (res) => {
+				await router.open(res);
+			})
+			.catch((error) => {
+				Toastify.error(error.toString());
+			});
 	}, []);
 
 	return (
@@ -65,13 +78,24 @@ function OtherExport({ state }) {
 						</GridColumn>
 						<GridColumn medium={2}>
 							<Box xcss={buttonContainerStyles}>
-								<Button appearance="primary">Export</Button>
+								<LoadingButton
+									isLoading={isLoading}
+									appearance="primary"
+									onClick={handleExportMSPClick}
+									autoFocus={false}
+								>
+									Export
+								</LoadingButton>
 							</Box>
 						</GridColumn>
 					</Grid>
 				</ModalBody>
 				<ModalFooter>
-					<Button appearance="subtle" onClick={closeOtherExportModal}>
+					<Button
+						appearance="subtle"
+						onClick={closeOtherExportModal}
+						autoFocus={true}
+					>
 						Cancel
 					</Button>
 				</ModalFooter>

@@ -16,6 +16,7 @@ import Heading from "@atlaskit/heading";
 import { ScheduleExportContext } from "../../pages/TestModal";
 import { ThreadLoadingContext } from "../../App";
 import { useContext } from "react";
+import { saveThreadInfo } from "../../common/utils";
 const width = MODAL_WIDTH.M;
 
 const defaultValue = {
@@ -71,7 +72,7 @@ function JiraExport({ state }) {
 			threadId,
 			threadAction,
 		};
-		invoke("setThreadInfo", { threadInfo });
+		saveThreadInfo(threadInfo);
 		closeJiraExportModal();
 	}, []);
 
@@ -97,15 +98,20 @@ function JiraExport({ state }) {
 						isButtonExportLoading={isLoading}
 						onButtonExportClick={handleExportClick}
 					/>
-					<Heading level="h600">Select project to export to</Heading>
+					{/* <Heading level="h600">Select project to export to</Heading>
 					<JiraProjectExportTable
 						isLoading={projectListState.isLoading}
 						projects={projectListState.projectsData}
 						exportButtonClick={handleExportClick}
-					/>
+					/> */}
 				</ModalBody>
 				<ModalFooter>
-					<Button appearance="subtle" onClick={closeJiraExportModal}>
+					<Button
+						appearance="subtle"
+						isDisabled={isLoading}
+						onClick={closeJiraExportModal}
+						autoFocus={true}
+					>
 						Cancel
 					</Button>
 				</ModalFooter>
