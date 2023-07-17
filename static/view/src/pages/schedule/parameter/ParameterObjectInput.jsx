@@ -140,8 +140,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 					// setIsScheduling(false);
 
 					//call api to schedule
-					// invoke("getThreadSchedule", { parameterId: res.id })
-					invoke("getThreadSchedule", { parameterId: 12 })
+					invoke("getThreadSchedule", { parameterId: res.id })
 						.then(function (res) {
 							if (res) {
 								//Getting result
@@ -152,7 +151,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 												clearInterval(scheduleInterval);
 
 												Toastify.info("Schedule successfully.");
-												localStorage.setItem("solutions", JSON.stringify(res));
+												localStorage.setItem("solutions", res.result);
 
 												handleChangeTab(3);
 												setIsScheduling(false);

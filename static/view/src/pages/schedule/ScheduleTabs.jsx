@@ -18,16 +18,16 @@ export default function ScheduleTabs() {
 		<Tabs onChange={handleChangeTab} selected={selected} id="default">
 			<TabList>
 				<Tab>
-					<Badge>{1}</Badge> PertChart
+					<Badge>{1}</Badge> Define tasks dependencies
 				</Tab>
 				<Tab>
-					<Badge>{2}</Badge> Estimation
+					<Badge>{2}</Badge> Resource suggestion
 				</Tab>
 				<Tab>
 					<Badge>{3}</Badge> Parameters
 				</Tab>
 				<Tab>
-					<Badge>{4}</Badge> Gantt chart
+					<Badge>{4}</Badge> Schedule
 				</Tab>
 			</TabList>
 			<TabPanel>

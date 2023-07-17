@@ -21,17 +21,12 @@ function ResultPage({ handleChangeTab }) {
 	const [solutions, setSolutions] = useState([]);
 	useEffect(function(){
 		var solutionCache = localStorage.getItem("solutions");
-		console.log(JSON.parse(solutionCache));
 		if (solutionCache){
 			setSolutions(JSON.parse(solutionCache));
 		}
 	}, [])
 
     const [selectedSolution, setSelectedSolution] = useState(null)
-
-    function goToGantt(){
-        
-    }
 
 	const head = {
 		cells: [
@@ -68,9 +63,9 @@ function ResultPage({ handleChangeTab }) {
 		],
 	};
 
-    var content = [{id: 1, name: "s1"}];
-	const rows = content.map((data, index) => ({
-		key: `row-${index + 1}`,
+    // var content = [{id: 1, name: "s1"}];
+	const rows = solutions.map((s, index) => ({
+		key: `row-${s.id}`,
 		isHighlighted: false,
 		cells: [
 			{
@@ -78,30 +73,30 @@ function ResultPage({ handleChangeTab }) {
 				content: (
 					<Button
 						appearance="subtle-link"
-						onClick={() => setSelectedSolution(index)}
+						onClick={() => setSelectedSolution(s.id)}
 					>
-						{"Solution #" + index + 1}
+						{"Solution #" + s.id}
 					</Button>
 				),
 			},
 			{
 				key: index,
-				content: "123 days",
+				content: s.duration + " days",
 			},
 			{
 				key: index,
-				content: "$100,00",
+				content: "$"+s.cost,
 			},
 			{
 				key: index,
-				content: "120%",
+				content: s.quality + "%",
 			},
 			{
 				key: "option",
 				content: (
 					<Button
 						appearance="primary"
-						onClick={() => setSelectedSolution(index)}
+						onClick={() => setSelectedSolution(s.id)}
 					>
 						View
 					</Button>
@@ -112,7 +107,7 @@ function ResultPage({ handleChangeTab }) {
 	return (
 		<div style={{ width: "100%", height: "90vh" }}>
 			{selectedSolution !== null ? (
-				<GanttChartPage setSelectedSolution={setSelectedSolution} index={selectedSolution} />
+				<GanttChartPage setSelectedSolution={setSelectedSolution} selectedSolution={selectedSolution} />
 			) : (
 				<>
 					<PageHeader actions={actionsContent}>

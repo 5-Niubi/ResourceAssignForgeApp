@@ -9,8 +9,6 @@ import { findObj } from "../pertchart/VisualizeTasks";
 import { sampleData } from "./data";
 
 const findClosestNode = (arr, node) => {
-    console.log(node);
-    console.log(arr);
 	//filter all task nodes in same row with target
 	var sameRows = [];
 	arr?.forEach((e) => {
@@ -29,9 +27,6 @@ const findClosestNode = (arr, node) => {
 				res = sameRows[i];
 			}
 		}
-
-        console.log(res);
-
 		//make sure the distance is no longer than 10000000 milliseconds
 		// if (
 		// 	Math.abs(node.start - res.end) < 10000000 ||
@@ -41,48 +36,60 @@ const findClosestNode = (arr, node) => {
 		// 	return res;
 		// else return null;
 
-        return res;
+		return res;
 	}
 
 	return null;
 };
 
-const GanttChart3 = () => {
+const GanttChart3 = ({ selectedSolution }) => {
 	HighchartsGantt(Highcharts);
 	HighchartsDraggablePoints(Highcharts);
+	const [tasks, setTasks] = useState([]);
 
-    const [tasks, setTasks] = useState(sampleData);
-    const [isChangeResource, setIsChangeResource] = useState(false);
+	useEffect(() => {
+		var solution = findObj(
+			JSON.parse(localStorage.getItem("solutions")),
+			selectedSolution
+		);
+		if (solution) {
+			console.log(JSON.parse(solution.tasks));
+			setTasks(JSON.parse(solution.tasks));
+		}
+	}, []);
+
+	const [isChangeResource, setIsChangeResource] = useState(false);
 
 	useEffect(() => {
 		// Initialize the Highcharts Gantt module
 		HighchartsGantt(Highcharts);
 
-        var day = 1000 * 60 * 60 * 24,
+		var day = 1000 * 60 * 60 * 24,
 			dateFormat = Highcharts.dateFormat;
-		
+
 		// Parse data into series.
 		var data = tasks.map(function (task, i) {
 			return {
 				id: task.id,
-				start: task.from,
-				end: task.to,
-				dependency: task.dependency,
+				start: new Date(task.startDate).getTime(),
+				end: new Date(task.endDate).getTime(),
+				dependency: task.taskIdPrecedences,
 				y: i,
 				name: task.name,
-				assignTo: task.assignees[0]?.name || "",
-                type: "task",
+				assignTo: task.workforce,
+				type: "task",
 			};
 		});
+		console.log(data);
 
 		// Parse data into series.
 		var data2 = tasks.map(function (task, i) {
 			return {
-				id: task.id,
-				start: task.to,
-				end: task.to,
+				id: task.id + "-2",
+				start: new Date(task.endDate).getTime(),
+				end: new Date(task.endDate).getTime(),
 				y: i,
-				assignTo: task.assignees[0]?.name || "",
+				assignTo: task.workforce,
 				color: "transparent",
 				type: "resource",
 			};
@@ -117,7 +124,7 @@ const GanttChart3 = () => {
 						crop: false,
 						overflow: "none",
 						allowOverlap: true,
-						format: "{point.assignTo}",
+						format: "{point.assignTo.name}",
 						align: "left",
 						style: {
 							fontWeight: "normal",
@@ -151,33 +158,26 @@ const GanttChart3 = () => {
 										tasks,
 										closestNode.id
 									);
-									var oldResource = newTask.assignees[0];
+									// var oldResource = newTask.workforce;
 									if (newTask) {
-										newTask.assignees = [
-											{
-												name: e.origin.points[
-													Object.keys(
-														e.origin.points
-													)[0]
-												]?.point?.options?.assignTo,
-											},
-										];
+										newTask.workforce =
+											e.origin.points[
+												Object.keys(e.origin.points)[0]
+											]?.point?.options?.assignTo;
 									}
 
-									var oldTask = findObj(
-										tasks,
-										e.origin.points[
-											Object.keys(e.origin.points)[0]
-										]?.point?.id
-									);
-									if (oldTask) {
-										oldTask.assignees = [oldResource];
-									}
+									// var oldTask = findObj(
+									// 	tasks,
+									// 	e.origin.points[
+									// 		Object.keys(e.origin.points)[0]
+									// 	]?.point?.id
+									// );
+                                    // console.log(e);
+									// if (oldTask) {
+									// 	oldTask.workforce = oldResource;
+									// }
 
 									setTasks(tasks);
-									setIsChangeResource(!isChangeResource);
-								} else {
-									//use to rerender to reset the node position
 									setIsChangeResource(!isChangeResource);
 								}
 							},
@@ -202,7 +202,7 @@ const GanttChart3 = () => {
 					return false;
 				},
 				// 	pointFormat:
-				// 		"<span>Assigned To: {point.assignTo}</span><br/><span>From: {point.start:%e. %b}</span><span> To: {point.end:%e. %b}</span>",
+				// 		"<span>Assigned To: {point.assignTo.name}</span><br/><span>From: {point.start:%e. %b}</span><span> To: {point.end:%e. %b}</span>",
 			},
 			scrollbar: {
 				enabled: true,
@@ -267,7 +267,7 @@ const GanttChart3 = () => {
 								text: "PIC",
 							},
 							categories: data.map(function (s) {
-								return s.assignTo;
+								return s.assignTo.name;
 							}),
 							labels: {
 								align: "left",

@@ -1,8 +1,9 @@
 import { Grid, GridColumn } from "@atlaskit/page";
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { findObj } from "../pertchart/VisualizeTasks";
 
-const GanttChartStat = ({title, value}) => {
-    return (
+const GanttChartStat = ({ title, value }) => {
+	return (
 		<div
 			style={{
 				width: "100%",
@@ -23,7 +24,7 @@ const GanttChartStat = ({title, value}) => {
 			<div
 				style={{
 					textAlign: "center",
-                    fontSize: "40px",
+					fontSize: "40px",
 				}}
 			>
 				{value}
@@ -32,19 +33,37 @@ const GanttChartStat = ({title, value}) => {
 	);
 };
 
-const GanttChartStats = () => {
-	return (
-        <Grid layout="fluid" spacing="comfortable" columns={3}>
-            <GridColumn medium={1}>
-                <GanttChartStat title="Duration" value="100 days" />
-            </GridColumn>
-            <GridColumn medium={1}>
-                <GanttChartStat title="Cost" value="$1000.00" />
-            </GridColumn>
-            <GridColumn medium={1}>
-                <GanttChartStat title="Quality" value="123.45%" />
-            </GridColumn>   
-        </Grid>
+const GanttChartStats = ({ selectedSolution }) => {
+	const [solution, setSolution] = useState([]);
+	useEffect(() => {
+		var s = findObj(
+			JSON.parse(localStorage.getItem("solutions")),
+			selectedSolution
+		);
+		if (s) {
+			setSolution(s);
+		}
+	}, []);
+	return solution ? (
+		<Grid layout="fluid" spacing="comfortable" columns={3}>
+			<GridColumn medium={1}>
+				<GanttChartStat
+					title="Duration"
+					value={solution.duration + " days"}
+				/>
+			</GridColumn>
+			<GridColumn medium={1}>
+				<GanttChartStat title="Cost" value={"$" + solution.cost} />
+			</GridColumn>
+			<GridColumn medium={1}>
+				<GanttChartStat
+					title="Quality"
+					value={solution.quality + "%"}
+				/>
+			</GridColumn>
+		</Grid>
+	) : (
+		""
 	);
 };
 
