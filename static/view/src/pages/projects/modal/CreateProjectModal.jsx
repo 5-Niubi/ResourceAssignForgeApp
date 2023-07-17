@@ -109,7 +109,6 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 
 	return (
 		<ModalTransition>
-			{isOpen && (
 				<Modal onClose={closeModal} width={width}>
 					<Form
 						onSubmit={(formState) =>
@@ -236,7 +235,7 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 													</GridColumn>
 												</Grid>
 											</FormSection>
-											<FormSection>
+											{/* <FormSection>
 												<ObjectiveRange
 													label="Objective Time"
 													name="ObjectiveTime"
@@ -266,7 +265,7 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 														handleRangeSetObjQuality
 													}
 												/>
-											</FormSection>
+											</FormSection> */}
 										</GridColumn>
 									</Grid>
 								</ModalBody>
@@ -301,7 +300,6 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 						)}
 					</Form>
 				</Modal>
-			)}
 		</ModalTransition>
 	);
 }

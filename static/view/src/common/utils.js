@@ -1,4 +1,5 @@
-import moment from "moment";
+import { invoke } from "@forge/bridge";
+import moment, {diff} from "moment";
 
 /**
  * Using moment.js to get current date into format "YYYY-MM-DD"
@@ -10,6 +11,32 @@ export function getCurrentTime() {
 	return currentDate;
 }
 
-export function formatDateDMY(date){
+export function formatDateDMY(date) {
 	return moment(date).format("DD-MM-YYYY");
+}
+
+export async function saveThreadInfo(threadInfo) {
+	try {
+		await invoke("setThreadInfo", { threadInfo });
+		localStorage.setItem("thread_info", JSON.stringify(threadInfo));
+	} catch (error) {
+		Promise.reject(error);
+	}
+}
+
+export async function removeThreadInfo(threadId) {
+	try {
+		await invoke("removeThreadInfo", { threadId });
+		localStorage.removeItem("thread_info");
+	} catch (error) {
+		Promise.reject(error);
+	}
+}
+
+export function calculateDuration({startDate, endDate}){
+    var a = moment(startDate);
+    var b = moment(endDate);
+    console.log("calculate ngay: ", startDate +", "+ endDate);
+    console.log("Calculate day: ",b.diff(a, 'days'));
+    return (b.diff(a, 'days'));
 }

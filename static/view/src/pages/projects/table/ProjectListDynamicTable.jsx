@@ -106,6 +106,7 @@ export const createHead = () => {
 			{
 				key: "tasks",
 				content: "Tasks",
+				isSortable: true,
 				shouldTruncate: true,
 				width: 10,
 			},
