@@ -44,3 +44,5 @@ export const THREAD_STATE_DEFAULT = Object.freeze({
 	threadAction: "",
 	threadId: "",
 });
+
+export const INTERVAL_FETCH = 10000;
