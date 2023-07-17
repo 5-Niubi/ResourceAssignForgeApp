@@ -520,9 +520,15 @@ function ParameterWorkforceList() {
 																	placeholder="Choose type..."
 																	onChange={(newValue)=>{
                                                                         (newValue.value == 1)?setIsParttimeSelected(true):setIsParttimeSelected(false)
+                                                                        console.log("value Select moi",newValue)
+
                                                                     }
 																	}
-                                                                    inputValue={selectedWorkforce.workingType}
+                                                                    value={()=>{
+                                                                        selectedWorkforce.workingType
+                                                                        console.log("value Select",selectedWorkforce.workingType)
+                                                                    }
+                                                                    }
 																/>
 															</Fragment>
 														)}
@@ -789,7 +795,7 @@ function ParameterWorkforceList() {
 														)}
 													</Field>
 												</GridColumn>
-												<GridColumn medium={12}>
+												{/* <GridColumn medium={12}>
 													<Field
 														label="Precedence tasks"
 														name="precedences"
@@ -805,10 +811,10 @@ function ParameterWorkforceList() {
 																	options={
 																		rows
 																	}
-																	// value={taskValues}
-																	// onChange={
-																	// 	handleChangePrecedence
-																	// }
+																	value={taskValues}
+																	onChange={
+																		handleChangePrecedence
+																	}
 																	isMulti
 																	isSearchable={
 																		true
@@ -818,7 +824,7 @@ function ParameterWorkforceList() {
 															</Fragment>
 														)}
 													</Field>
-												</GridColumn>
+												</GridColumn> */}
 												<GridColumn medium={12}>
 													<DynamicTable
 														head={head}
