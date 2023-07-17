@@ -39,7 +39,10 @@ async function getJiraSoftwareProjects(params) {
 	try {
 		params.orderBy = "-lastIssueUpdatedTime";
 		params.typeKey = "software";
-		const result = await APIJiraServices.get(`/rest/api/3/project/search`, params);
+		const result = await APIJiraServices.get(
+			`/rest/api/3/project/search`,
+			params
+		);
 		return result;
 	} catch (error) {
 		return Promise.reject(error);
@@ -48,7 +51,34 @@ async function getJiraSoftwareProjects(params) {
 
 async function estimate(projectId) {
 	try {
-		let response = await APIServices.get(`/api/Algorithm/GetEstimateWorkforce`, {
+		let response = await APIServices.get(
+			`/api/Algorithm/GetEstimateWorkforce`,
+			{
+				projectId,
+			}
+		);
+		return response;
+	} catch (error) {
+		return Promise.reject(error);
+	}
+}
+
+async function editProject(projectRequest) {
+	try {
+		let response = await APIServices.put(
+			`/api/Projects/UpdateProject`,
+			{ projectId: projectRequest.id },
+			projectRequest
+		);
+		return response;
+	} catch (error) {
+		return Promise.reject(error);
+	}
+}
+
+async function deleteProject(projectId) {
+	try {
+		let response = await APIServices.delete(`/api/Projects/DeleteProject`, {
 			projectId,
 		});
 		return response;
@@ -56,11 +86,12 @@ async function estimate(projectId) {
 		return Promise.reject(error);
 	}
 }
-
 export {
 	getProjects,
 	createProject,
 	getProjectDetail,
 	getJiraSoftwareProjects,
-	estimate
+	estimate,
+	editProject,
+	deleteProject,
 };
