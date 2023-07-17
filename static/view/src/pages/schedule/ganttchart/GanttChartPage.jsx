@@ -4,6 +4,8 @@ import GanttChart from "./GanttChart";
 import { render } from "react-dom";
 import GanttChartStats from "./GanttChartStat";
 import Breadcrumbs, { BreadcrumbsItem } from "@atlaskit/breadcrumbs";
+import GanttChart2 from "./GanttChart2";
+import GanttChart3 from "./GanttChart3";
 
 /**
  * Using as Page to show gantt chart as a result
@@ -21,7 +23,7 @@ function GanttChartPage({ setSelectedSolution, index}) {
 			</Breadcrumbs>
 			<GanttChartPageHeader />
 			<GanttChartStats />
-			<GanttChart />
+			<GanttChart3 />
 		</div>
 	);
 }
