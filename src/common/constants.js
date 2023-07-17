@@ -8,4 +8,5 @@ export const STORAGE = Object.freeze({
   IS_AUTHENTICATED: "isAuthenticated",
   TOKEN: "token",
   CONTEXT: "context",
+  THEAD_STATE: "threadState"
 });

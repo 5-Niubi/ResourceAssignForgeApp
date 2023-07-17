@@ -12,18 +12,15 @@ class APIJiraService {
 					queryParams.append(key, params[key])
 				);
 			}
-			let response = await API.asApp().requestJira(route`${url}?${queryParams}`, {
-				method: "GET"
-			});
+			let response = await API.asApp().requestJira(
+				route`${url}?${queryParams}`,
+				{
+					method: "GET",
+				}
+			);
 
-			switch (response.status) {
-				case HttpStatus.OK.code:
-					return await response.json();
-				case HttpStatus.UNAUTHORIZED.code:
-					AuthenWithBE.handleUnauthorizedStatus();
-					break;
-				case HttpStatus.BAD_REQUEST.code:
-					return Promise.reject(await response.json());
+			if (response.ok) {
+				return await response.json();
 			}
 			return Promise.reject(response);
 		} catch (err) {
@@ -45,21 +42,12 @@ class APIJiraService {
 			}
 			let response = await API.asApp().requestJira(route`${url}?${queryParams}`, {
 				method: "POST",
-				headers: {
-					Authorization: `Bearer ${await storage.getSecret(STORAGE.TOKEN)}`,
-				},
 				body: JSON.stringify(data),
 			});
-			switch (response.status) {
-				case HttpStatus.OK.code:
-					return await response.json();
-				case HttpStatus.UNAUTHORIZED.code:
-					AuthenWithBE.handleUnauthorizedStatus();
-					break;
-				case HttpStatus.BAD_REQUEST.code:
-					return Promise.reject(await response.json());
-			}
-			return Promise.reject(response);
+			if(response.ok){
+				return await response.json();
+			} 
+			return Promise.reject(await response.json());
 		} catch (err) {
 			return Promise.reject(err);
 		}
