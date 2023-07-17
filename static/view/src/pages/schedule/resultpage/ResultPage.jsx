@@ -18,6 +18,15 @@ function ResultPage({ handleChangeTab }) {
 		</ButtonGroup>
 	);
 
+	const [solutions, setSolutions] = useState([]);
+	useEffect(function(){
+		var solutionCache = localStorage.getItem("solutions");
+		console.log(JSON.parse(solutionCache));
+		if (solutionCache){
+			setSolutions(JSON.parse(solutionCache));
+		}
+	}, [])
+
     const [selectedSolution, setSelectedSolution] = useState(null)
 
     function goToGantt(){

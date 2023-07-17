@@ -42,6 +42,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 	const [budget, setBudget] = useState();
 	const [budgetUnit, setBudgetUnit] = useState("");
 	const [isLoading, setIsLoading] = useState(true);
+	const [isScheduling, setIsScheduling] = useState(false);
 
 
 	useEffect(function () {
@@ -109,6 +110,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 	};
 
 	function SaveParameters({ cost }) {
+		setIsScheduling(true);
 		var parameterResourcesLocal = JSON.parse(
 			localStorage.getItem("workforce_parameter")
 		);
@@ -136,8 +138,8 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 					// setIsScheduling(false);
 
 					//call api to schedule
-					invoke("getThreadSchedule", { parameterId: 12 })
 					// invoke("getThreadSchedule", { parameterId: res.id })
+					invoke("getThreadSchedule", { parameterId: 12 })
 						.then(function (res) {
 							if (res) {
 								//Getting result
@@ -296,7 +298,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 									<LoadingButton
 										type="submit"
 										appearance="primary"
-										isLoading={submitting}
+										isLoading={isScheduling}
 									>
 										Scheduling
 									</LoadingButton>
