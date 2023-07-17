@@ -5,6 +5,7 @@ import taskResolver from "./taskResolver";
 import workforceResolver from "./workforceResolver";
 import milestoneResolver from "./milestoneResolver";
 import parameterResolver from "./parameterResolver";
+import scheduleResolver from "./scheduleResolver";
 
 /**
  * @param {import("@forge/resolver").default} resolver
@@ -17,6 +18,7 @@ function resolverReg(resolver){
     workforceResolver(resolver);
     milestoneResolver(resolver);
     parameterResolver(resolver);
+    scheduleResolver(resolver);
 }
 
 export default resolverReg;

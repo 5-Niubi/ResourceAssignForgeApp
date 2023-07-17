@@ -58,13 +58,42 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 		invoke("saveParameters", { parameter: data })
 			.then(function (res) {
 				if (res) {
-					Toastify.info(res.toString());
-					handleChangeTab(3);
-					setIsScheduling(false);
+					// Toastify.info("Save successfully.");
+					// handleChangeTab(3);
+					// setIsScheduling(false);
+
+					//call api to schedule
+					invoke("getThreadSchedule", { parameterId: 12 })
+					// invoke("getThreadSchedule", { parameterId: res.id })
+						.then(function (res) {
+							if (res) {
+								//Getting result
+								var scheduleInterval = setInterval(function(){
+									invoke("schedule", { threadId: res.threadId })
+										.then(function (res) {
+											if (res && res.status == "success") {
+												clearInterval(scheduleInterval);
+
+												Toastify.info("Schedule successfully.");
+												localStorage.setItem("solutions", JSON.stringify(res));
+
+												handleChangeTab(3);
+												setIsScheduling(false);
+											}
+										})
+										.catch(function (error) {
+											Toastify.error(error.toString());
+										});
+								}, 5000);
+							}
+						})
+						.catch(function (error) {
+							Toastify.error(error.toString());
+						});
 				}
 			})
 			.catch(function (error) {
-					handleChangeTab(3);
+				// handleChangeTab(3);
 				Toastify.error(error.toString());
 			});
 	}
