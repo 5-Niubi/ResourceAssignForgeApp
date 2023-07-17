@@ -1,12 +1,15 @@
-import React, { Fragment, useState, useCallback } from "react";
+import React, { Fragment, useState, useCallback, useEffect } from "react";
 import Button from "@atlaskit/button/standard-button";
 import Form, {
 	Field,
 	FormFooter,
 	HelperMessage,
+	ErrorMessage,
 	RangeField,
+	ValidMessage,
 } from "@atlaskit/form";
 import Range from "@atlaskit/range";
+import { Grid, GridColumn } from "@atlaskit/page";
 import { useParams } from "react-router";
 import Textfield from "@atlaskit/textfield";
 import { css, jsx } from "@emotion/react";
@@ -23,232 +26,307 @@ import { invoke } from "@forge/bridge";
 import __noop from "@atlaskit/ds-lib/noop";
 import Toastify from "../../../common/Toastify";
 import { LoadingButton } from "@atlaskit/button";
+import { DATE_FORMAT, MODAL_WIDTH } from "../../../common/contants";
+import { DatePicker } from "@atlaskit/datetime-picker";
+import { getCurrentTime, calculateDuration } from "../../../common/utils";
+import Spinner from "@atlaskit/spinner";
 
 const boldStyles = css({
 	fontWeight: "bold",
 });
 
 export default function ParameterObjectInput({ handleChangeTab }) {
-	let { projectId } = useParams();
-	const [expectedCost, setExpectedCost] = useState(50);
-	const [expectedDuration, setExpectedDuration] = useState(50);
-    const [isScheduling, setIsScheduling] = useState(false);
+	const { projectId } = useParams();
+	const [startDate, setStartDate] = useState(getCurrentTime());
+	const [endDate, setEndDate] = useState(getCurrentTime());
+	const [budget, setBudget] = useState();
+	const [budgetUnit, setBudgetUnit] = useState("");
+	const [isLoading, setIsLoading] = useState(true);
 
-	const [valueTime, setValueTime] = useState(50);
-	const [valueCost, setValueCost] = useState(50);
-	const [valueQuality, setValueQuality] = useState(50);
+
+	useEffect(function () {
+		invoke("getProjectDetail", { projectId })
+			.then(function (res) {
+				let project = {
+					startDate: res.startDate,
+					endDate: res.deadline,
+                    budgetUnit: res.budgetUnit,
+                    budget: res.budget,
+				};
+				setStartDate(project.startDate);
+				setEndDate(project.endDate);
+                setBudget(project.budget);
+                setBudgetUnit(project.budgetUnit);
+				console.log(
+					"PROJECT DATE: ",
+					project.startDate + ", " + project.endDate + ", "
+                    +project.budget +", "+ project.budgetUnit
+				);
+
+                setIsLoading(false);
+			})
+			.catch(function (error) {
+				console.log("PROJECT DATE: ", error);
+			});
+	}, []);
+
+	const handleSetStartDate = useCallback(function (value) {
+		setStartDate(value);
+	}, []);
+
+	const handleSetEndDate = useCallback(function (value) {
+		setEndDate(value);
+	}, []);
+
 	const [isOpen, setIsOpen] = useState(false);
 	const openModal = useCallback(() => setIsOpen(true), []);
 	const closeModal = useCallback(() => setIsOpen(false), []);
 
-	function SaveParameters() {
-        setIsScheduling(true);
+	const validateNumberOnly = (value) => {
+		//REQUIRES NOT NULL, NUMBER ONLY
+		if (!value) {
+			return "NOT_VALID";
+		}
+
+		if (isNaN(parseFloat(value))) {
+			return "NOT_VALID";
+		}
+		const regex = /^\d*\.?\d*$/;
+		if (!regex.test(value)) {
+			return "NOT_VALID";
+		}
+		return undefined;
+	};
+
+	const ParameterResourcesRequest = {
+		ResourceId: 0,
+		Type: "",
+	};
+
+	const params = {
+		Budget: 0,
+		Duration: 0,
+	};
+
+	function SaveParameters({ cost }) {
+		var parameterResourcesLocal = JSON.parse(
+			localStorage.getItem("workforce_parameter")
+		);
+		let parameterResources = [];
+		for (let item of parameterResourcesLocal) {
+			let itemParameterResource = {
+				ResourceId: item.id,
+				Type: "workforce",
+			};
+			parameterResources.push(itemParameterResource);
+		}
 		var data = {
 			ProjectId: Number(projectId),
-			Duration: expectedDuration,
-			Budget: expectedCost,
-			ParameterResources: [
-				{
-					ResourceId: 1,
-					Type: "workforce",
-				},
-			],
+			Duration: calculateDuration({startDate,endDate}),
+			Budget: Number(cost),
+			ParameterResources: parameterResources,
 		};
+		console.log("Send parameter data: ", data);
 
 		invoke("saveParameters", { parameter: data })
 			.then(function (res) {
 				if (res) {
 					Toastify.info(res.toString());
 					handleChangeTab(3);
-					setIsScheduling(false);
 				}
+				Toastify.info(res);
 			})
 			.catch(function (error) {
-					handleChangeTab(3);
 				Toastify.error(error.toString());
 			});
 	}
 
 	return (
 		<div style={{ width: "100%" }}>
-			<Form
-				onSubmit={(formState) =>
-					console.log("form submitted", formState)
-				}
-			>
-				{({
-					formProps,
-					expectedDuration,
-					expectedCost,
-					time,
-					cost,
-					quality,
-				}) => (
-					<form {...formProps}>
-						<Field isRequired label="Expected Cost" name="cost">
-							{({ expectedCost }) => (
-								<Fragment>
-									<Textfield
-										placeholder="What expected maximize project's cost?"
-										{...expectedCost}
-									/>
-									<HelperMessage>Number only</HelperMessage>
-								</Fragment>
-							)}
-						</Field>
-						<Field
-							isRequired
-							label="Expected Duration (days)"
-							name="duration"
-						>
-							{({ expectedDuration }) => (
-								<Fragment>
-									<Textfield
-										placeholder="What expected maximize durations for completing project?"
-										{...expectedDuration}
-									/>
-									<HelperMessage>Number only</HelperMessage>
-								</Fragment>
-							)}
-						</Field>
-						{/* OBJECTIVE PARAMETER SLIDE */}
-						{/* <RangeField
-									isRequired
-									label="Time"
-									name="example-text"
-									defaultValue={50}
-								>
-									{({ time }) => (
-										<>
-											<Range
-												{...time}
-												onChange={(time) =>
-													setValueTime(time)
-												}
-											/>
-											<p>
-												The time value is: {valueTime}
-											</p>
-										</>
-									)}
-								</RangeField>
-								<RangeField
-									isRequired
-									label="Cost"
-									name="example-text"
-									defaultValue={50}
-								>
-									{({ cost }) => (
-										<>
-											<Range
-												{...cost}
-												onChange={(cost) =>
-													setValueCost(cost)
-												}
-											/>
-											<p>
-												The cost value is: {valueCost}
-											</p>
-										</>
-									)}
-								</RangeField>
-								<RangeField
-									isRequired
-									label="Quality"
-									name="example-text"
-									defaultValue={50}
-								>
-									{({ quality }) => (
-										<>
-											<Range
-												{...quality}
-												onChange={(quality) =>
-													setValueQuality(quality)
-												}
-											/>
-											<p>
-												The cost value is:{" "}
-												{valueQuality}
-											</p>
-										</>
-									)}
-								</RangeField> */}
-						<FormFooter>
-							<div>
-								<Button onClick={() => handleChangeTab(1)}>
-									Back
-								</Button>
-								{isScheduling ? (
-									<LoadingButton
-										appearance="primary"
-										isLoading
-									>
-										Scheduling...
-									</LoadingButton>
-								) : (
-                                    <Button
-									appearance="primary"
-									onClick={openModal && SaveParameters}
-								>
-									Schedule
-								</Button>
-								)}
+            {isLoading ? (
+					<Spinner size={"large"} />
+				) : null
+            }
+				<Form
+					onSubmit={({ cost }) => {
+						console.log("Form Submitted: ", cost);
+						SaveParameters({ cost });
+						return new Promise((resolve) =>
+							setTimeout(resolve, 2000)
+						).then(() =>
+							data.username === "error"
+								? {
+										username: "IN_USE",
+								  }
+								: undefined
+						);
+					}}
+				>
+					{({ formProps, submitting }) => (
+						<form {...formProps}>
+							<Grid spacing="compact">
+                            <GridColumn medium={12}>
 
-								{/* LOADING MODAL BUTTON */}
-								<ModalTransition>
-									{isOpen && (
-										<Modal onClose={closeModal}>
-											<ModalBody>
-												<div
-													style={{
-														height: "120px",
-														marginTop: "10px",
-														display: "flex",
-														alignItems: "center",
-														justifyContent:
-															"center",
-													}}
-												>
-													<RecentIcon label=""></RecentIcon>
-													<p
+							<Field
+								isRequired
+								label="Expected Cost"
+								name="cost"
+								validate={(value) => validateNumberOnly(value)}
+							>
+								{({ fieldProps, error }) => (
+									<Fragment>
+										<Textfield
+											{...fieldProps}
+											placeholder="What expected maximize project's cost?"
+											elemBeforeInput={
+												<p style={{ marginLeft: 10, fontWeight: "bold" }}>
+													{budgetUnit}
+												</p>
+											}
+										/>
+										{error === "NOT_VALID" && (
+											<ErrorMessage>
+												Wrong input.
+											</ErrorMessage>
+										)}
+									</Fragment>
+								)}
+							</Field>
+                            </GridColumn>
+
+							{/* <Field
+								isRequired
+								label="Expected Duration (days)"
+								name="duration"
+								validate={(value) => validateNumberOnly(value)}
+							>
+								{({ fieldProps, error }) => (
+									<Fragment>
+										<Textfield
+											{...fieldProps}
+											placeholder="What expected maximize durations for completing project?"
+										/>
+										{error === "NOT_VALID" && (
+											<ErrorMessage>
+												Wrong input.
+											</ErrorMessage>
+										)}
+									</Fragment>
+								)}
+							</Field> */}
+								<GridColumn medium={6}>
+									<Field
+										name="startDate"
+										label="Start Date"
+										isRequired
+									>
+										{() => (
+											<Fragment>
+												<DatePicker
+													value={startDate}
+													onChange={
+														handleSetStartDate
+													}
+													dateFormat={DATE_FORMAT.DMY}
+													isRequired
+												/>
+											</Fragment>
+										)}
+									</Field>
+								</GridColumn>
+
+								<GridColumn medium={6}>
+									<Field
+										name="endDate"
+										label="End Date"
+										isRequired
+									>
+										{() => (
+											<Fragment>
+												<DatePicker
+													minDate={startDate}
+													value={endDate}
+													onChange={handleSetEndDate}
+													dateFormat={DATE_FORMAT.DMY}
+													isDisabled={!endDate}
+													isRequired
+												/>
+											</Fragment>
+										)}
+									</Field>
+								</GridColumn>
+							</Grid>
+
+							<FormFooter>
+								<div>
+									<Button onClick={() => handleChangeTab(1)}>
+										Back
+									</Button>
+									<LoadingButton
+										type="submit"
+										appearance="primary"
+										isLoading={submitting}
+									>
+										Scheduling
+									</LoadingButton>
+
+									{/* LOADING MODAL BUTTON */}
+									<ModalTransition>
+										{isOpen && (
+											<Modal onClose={closeModal}>
+												<ModalBody>
+													<div
 														style={{
-															fontSize: "18px",
+															height: "120px",
+															marginTop: "10px",
+															display: "flex",
+															alignItems:
+																"center",
+															justifyContent:
+																"center",
 														}}
 													>
-														This process will take
-														some minutes...
-													</p>
-												</div>
-												<ProgressBar
-													ariaLabel="Loading"
-													isIndeterminate
-												></ProgressBar>
-											</ModalBody>
-											<ModalFooter>
-												<Button
-													onClick={closeModal}
-													autoFocus
-												>
-													Cancel
-												</Button>
-												<Button
-													appearance="primary"
-													onClick={
-														closeModal &&
-														handleChangeTab(3)
-													}
-												>
-													DONE
-												</Button>
-											</ModalFooter>
-										</Modal>
-									)}
-								</ModalTransition>
-							</div>
-						</FormFooter>
-					</form>
-				)}
-			</Form>
+														<RecentIcon label=""></RecentIcon>
+														<p
+															style={{
+																fontSize:
+																	"18px",
+															}}
+														>
+															This process will
+															take some minutes...
+														</p>
+													</div>
+													<ProgressBar
+														ariaLabel="Loading"
+														isIndeterminate
+													></ProgressBar>
+												</ModalBody>
+												<ModalFooter>
+													<Button
+														onClick={closeModal}
+														autoFocus
+													>
+														Cancel
+													</Button>
+													<Button
+														appearance="primary"
+														onClick={
+															closeModal &&
+															handleChangeTab(3)
+														}
+													>
+														DONE
+													</Button>
+												</ModalFooter>
+											</Modal>
+										)}
+									</ModalTransition>
+								</div>
+							</FormFooter>
+						</form>
+					)}
+				</Form>
 		</div>
 	);
 }
