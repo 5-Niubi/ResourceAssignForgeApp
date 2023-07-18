@@ -1,5 +1,5 @@
 import { invoke } from "@forge/bridge";
-import moment from "moment";
+import moment, {diff} from "moment";
 
 /**
  * Using moment.js to get current date into format "YYYY-MM-DD"
@@ -31,4 +31,10 @@ export async function removeThreadInfo(threadId) {
 	} catch (error) {
 		Promise.reject(error);
 	}
+}
+
+export function calculateDuration({startDate, endDate}){
+    var a = moment(startDate);
+    var b = moment(endDate);
+    return (b.diff(a, 'days'));
 }
