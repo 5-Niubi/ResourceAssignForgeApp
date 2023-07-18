@@ -18,19 +18,17 @@ function TestModal() {
 	// --- state ---
 	const jiraExportModalState = useState(initModalExportState);
 	const [jiraExportState, setJiraExportState] = jiraExportModalState;
-	const openJiraExportModal = useCallback(
-		() => setJiraExportState((prev) => ({ ...prev, isModalOpen: true })),
-		[]
-	);
+	const openJiraExportModal = () =>
+		setJiraExportState((prev) => ({ ...prev, isModalOpen: true }));
+
 	// ------
 
 	// ----state ----
 	const otherExport = useState(initModalExportState);
 	const [otherExportState, setOtherExportState] = otherExport;
-	const openOtherExportModal = useCallback(
-		() => setOtherExportState((prev) => ({ ...prev, isModalOpen: true })),
-		[]
-	);
+	const openOtherExportModal = () =>
+		setOtherExportState((prev) => ({ ...prev, isModalOpen: true }));
+
 	// ------
 
 	return (

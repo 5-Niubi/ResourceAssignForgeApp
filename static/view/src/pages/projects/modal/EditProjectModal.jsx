@@ -21,11 +21,11 @@ import Spinner from "@atlaskit/spinner";
 const width = MODAL_WIDTH.M;
 const columns = 10;
 
-function EditProjectModal({ openState, setOpenState , setProjectsListState}) {
+function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 	const [project, setProject] = useState(openState.project);
-	const [projectName, setProjectName] = useState("");
-	const [startDate, setStartDate] = useState(getCurrentTime());
-	const [endDate, setEndDate] = useState(getCurrentTime());
+	const [projectName, setProjectName] = useState(project.name);
+	const [startDate, setStartDate] = useState(project.startDate);
+	const [endDate, setEndDate] = useState(startDate);
 	const [budget, setBudget] = useState(0);
 	const [unit, setUnit] = useState("");
 	// const [objTime, setObjTime] = useState(50);
@@ -33,54 +33,60 @@ function EditProjectModal({ openState, setOpenState , setProjectsListState}) {
 	// const [objQuality, setObjQuality] = useState(50);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
-	const closeModal = useCallback(
-		function () {
-			setOpenState({ project: {}, isOpen: false });
-		},
-		[setOpenState]
-	);
+	const closeModal = function () {
+		setOpenState({ project: {}, isOpen: false });
+	};
 
 	useEffect(function () {
 		invoke("getProjectDetail", { projectId: project.id })
 			.then(function (res) {
-				res.isLoaded = true;
-				setProject(res);
+				let project = res;
+				project.isLoaded = true;
+				setProjectName(project.name);
+				setStartDate(project.startDate);
+				setEndDate(project.deadline);
+				setBudget(project.budget);
+				setUnit(project.budgetUnit);
+				setProject(project);
 			})
 			.catch(function (error) {
 				Toastify.error(error.toString());
 			});
 	}, []);
 
-	useEffect(
-		function () {
-			setProjectName(project.name);
-			setStartDate(project.startDate);
-			setEndDate(project.deadline);
-			setBudget(project.budget);
-			setUnit(project.budgetUnit);
-		},
-		[project]
-	);
+	// useEffect(
+	// 	function () {
+	// 		setProjectName(project.name);
+	// 		setStartDate(project.startDate);
+	// 		setEndDate(project.deadline);
+	// 		setBudget(project.budget);
+	// 		setUnit(project.budgetUnit);
+	// 	},
+	// 	[project]
+	// );
 
-	const handleSetProjectName = useCallback(function (e) {
+	const handleSetProjectName = function (e) {
 		setProjectName(e.target.value);
-	}, []);
+	};
 
-	const handleSetStartDate = useCallback(function (value) {
+	const handleSetStartDate = function (value) {
 		setStartDate(value);
-	}, []);
+		if (value > endDate) {
+			setEndDate(value);
+		}
+	};
 
-	const handleSetEndDate = useCallback(function (value) {
+	const handleSetEndDate = function (value) {
 		setEndDate(value);
-	}, []);
+	};
 
-	const handleSetBudget = useCallback(function (e) {
+	const handleSetBudget = function (e) {
 		setBudget(e.target.value);
-	}, []);
+	};
 
-	const handleSetUnit = useCallback(function (e) {
+	const handleSetUnit = function (e) {
 		setUnit(e.target.value);
-	}, []);
+	};
 
 	// const handleSetObjTime = useCallback(function (e) {
 	// 	setObjTime(e.target.value);
@@ -105,7 +111,7 @@ function EditProjectModal({ openState, setOpenState , setProjectsListState}) {
 	// const handleRangeSetObjQuality = useCallback(function (value) {
 	// 	setObjQuality(value);
 	// }, []);
-
+	
 	function handleSubmitCreate() {
 		setIsSubmitting(true);
 		let projectObjRequest = {
@@ -125,7 +131,8 @@ function EditProjectModal({ openState, setOpenState , setProjectsListState}) {
 				closeModal();
 				openState.project.name = res.name;
 				openState.project.startDate = res.startDate;
-				setProjectsListState(prev => [...prev]);
+				setProjectsListState((prev) => [...prev]);
+				Toastify.success("Saved");
 			})
 			.catch(function (error) {
 				Toastify.error(error.toString());
@@ -186,7 +193,7 @@ function EditProjectModal({ openState, setOpenState , setProjectsListState}) {
 															value={endDate}
 															onChange={handleSetEndDate}
 															dateFormat={DATE_FORMAT.DMY}
-															isDisabled={!endDate}
+															isDisabled={!project.isLoaded}
 														/>
 													</Fragment>
 												)}
