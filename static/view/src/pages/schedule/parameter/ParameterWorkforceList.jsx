@@ -56,6 +56,7 @@ function ParameterWorkforceList() {
 	let { projectId } = useParams();
 	const [workforces, setWorkforces] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
+    const [skillDB, setSkillDB] = useState([]);
 	useEffect(function () {
 		invoke("getWorkforceParameter", { projectId })
 			.then(function (res) {
@@ -91,32 +92,20 @@ function ParameterWorkforceList() {
 				console.log(error);
 				Toastify.error(error.toString());
 			});
+
+            invoke("getAllSkills", {})
+			.then(function (res) {
+				console.log("all skills",res);
+                setSkillDB(res);
+			})
+			.catch(function (error) {
+				console.log(error);
+				Toastify.error(error.toString());
+			});
 	}, []);
 
-	const [selectedWorkforce, setSelectedWorkforce] = useState({
-		id: 0,
-		accountId: "",
-		email: "",
-		accountType: "",
-		name: "",
-		avatar: "",
-		displayName: "",
-		unitSalary: 0.0,
-		workingType: 0,
-		workingEffort: [],
-		skills: [
-			{
-				id: 0,
-				name: "",
-				level: 0,
-			},
-		],
-	});
-	const [skillsTable, setSkillsTable] = useState([{
-        id: 0,
-		name: "",
-		level: 0,
-	}]);
+	const [selectedWorkforce, setSelectedWorkforce] = useState(Object);
+	const [skillsTable, setSkillsTable] = useState([]);
 	const [isWorkforceOpen, setIsWorkforceOpen] = useState(false);
 	const openWorkforceModal = useCallback(() => setIsWorkforceOpen(true), []);
 	const closeWorkforceModal = useCallback(
@@ -129,20 +118,12 @@ function ParameterWorkforceList() {
 		{ label: "Part-time", value: 1 },
 	];
 
-    const onSelectedValue = (childValue) => {
+	const onSelectedValue = (childValue) => {
 		console.log("Received value from child:", childValue);
 		//LOAD DATA TO TABLE
 
-        // let skillInTable = [childValue.selectedValue?.map((skill) => ({
-        //     id: skill.value,
-        //     name: skill.value,
-        //     level: skill.level,
-        // }))];
-        // if(childValue.newOption != null){
-        //     childValue.selectedValue.push(childValue.newOption)
-        // }
 		setSkillsTable(childValue.selectedValue);
-		console.log("Received value display in table:",skillsTable);
+		console.log("Received value display in table:", skillsTable);
 	};
 
 	const buttonAddSkills = (
@@ -154,8 +135,6 @@ function ParameterWorkforceList() {
 		</>
 	);
 
-
-
 	const buttonActions = (
 		<>
 			<ParameterCreareWorkforceModal></ParameterCreareWorkforceModal>
@@ -165,6 +144,11 @@ function ParameterWorkforceList() {
 
 	const handleOpenWorkforceModal = (value) => {
 		var selected = findObj(workforces, value);
+        setSkillsTable(selected.skills?.map((skill) => ({
+            id: skill.id,
+            label: skill.name.toUpperCase(),
+            level: skill.level,
+        })));
 		setSelectedWorkforce({
 			id: selected.id,
 			accountId: selected.accountId,
@@ -189,8 +173,9 @@ function ParameterWorkforceList() {
 	};
 
 	const styleTextfield = {
-		marginLeft: 10,
+		marginLeft: 3,
 		fontWeight: "bold",
+		size: 12,
 	};
 
 	const validateEmail = (value) => {
@@ -252,12 +237,12 @@ function ParameterWorkforceList() {
 		],
 	};
 
-	const rows = skillsTable?.map((skill, index) => ({
+	const rows = (skillsTable)? skillsTable?.map((skill, index) => ({
 		key: skill.name?.toString(),
 		cells: [
 			{
-				key: skill.label?.toString(),
-				content: skill.label?.toString(),
+				key: skill.label?.toString().toUpperCase(),
+				content: skill.label?.toString().toUpperCase(),
 			},
 			{
 				key: skill.level?.toString(),
@@ -267,6 +252,10 @@ function ParameterWorkforceList() {
 							emptySymbol={<StarIcon />}
 							fullSymbol={<StarFilledIcon />}
 							initialRating={skill.level}
+                            onClick={(value)=>{
+                                skill.level = value;
+                                console.log("skill value: ", skill.label+", level" +skill.level)
+                            }}
 						></Rating>
 					</>
 				),
@@ -275,19 +264,15 @@ function ParameterWorkforceList() {
 				key: "actions",
 				content: (
 					<>
-						<Button
-							iconBefore={<EditIcon label="" size="medium" />}
-							appearance="subtle"
-						></Button>
-						<Button
+						{/* <Button
 							iconBefore={<TrashIcon label="" size="medium" />}
 							appearance="subtle"
-						></Button>
+						></Button> */}
 					</>
 				),
 			},
 		],
-	}));
+	})) : null;
 
 	return (
 		<div style={{ width: "100wh" }}>
@@ -606,9 +591,9 @@ function ParameterWorkforceList() {
 																			label="Monday"
 																			elemBeforeInput={
 																				<p
-																					style={{
-																						styleTextfield,
-																					}}
+																					style={
+																						styleTextfield
+																					}
 																				>
 																					Mon
 																				</p>
@@ -627,15 +612,12 @@ function ParameterWorkforceList() {
 																			autoComplete="off"
 																			elemBeforeInput={
 																				<p
-																					style={{
-																						styleTextfield,
-																					}}
+																					style={
+																						styleTextfield
+																					}
 																				>
 																					Tues
 																				</p>
-																			}
-																			width={
-																				90
 																			}
 																			defaultValue={
 																				selectedWorkforce
@@ -653,15 +635,12 @@ function ParameterWorkforceList() {
 																			autoComplete="off"
 																			elemBeforeInput={
 																				<p
-																					style={{
-																						styleTextfield,
-																					}}
+																					style={
+																						styleTextfield
+																					}
 																				>
 																					Wed
 																				</p>
-																			}
-																			width={
-																				90
 																			}
 																			isCompact
 																			defaultValue={
@@ -679,15 +658,12 @@ function ParameterWorkforceList() {
 																			autoComplete="off"
 																			elemBeforeInput={
 																				<p
-																					style={{
-																						styleTextfield,
-																					}}
+																					style={
+																						styleTextfield
+																					}
 																				>
 																					Thurs
 																				</p>
-																			}
-																			width={
-																				90
 																			}
 																			isCompact
 																			defaultValue={
@@ -708,15 +684,12 @@ function ParameterWorkforceList() {
 																			}
 																			elemBeforeInput={
 																				<p
-																					style={{
-																						styleTextfield,
-																					}}
+																					style={
+																						styleTextfield
+																					}
 																				>
 																					Fri
 																				</p>
-																			}
-																			width={
-																				90
 																			}
 																			isCompact
 																			autoComplete="off"
@@ -731,15 +704,12 @@ function ParameterWorkforceList() {
 																			autoComplete="off"
 																			elemBeforeInput={
 																				<p
-																					style={{
-																						styleTextfield,
-																					}}
+																					style={
+																						styleTextfield
+																					}
 																				>
 																					Sat
 																				</p>
-																			}
-																			width={
-																				90
 																			}
 																			isCompact
 																			defaultValue={
@@ -757,15 +727,12 @@ function ParameterWorkforceList() {
 																			autoComplete="off"
 																			elemBeforeInput={
 																				<p
-																					style={{
-																						styleTextfield,
-																					}}
+																					style={
+																						styleTextfield
+																					}
 																				>
 																					Sun
 																				</p>
-																			}
-																			width={
-																				90
 																			}
 																			isCompact
 																			defaultValue={
@@ -793,12 +760,13 @@ function ParameterWorkforceList() {
 															<Fragment>
 																<CreatableAdvanced
 																	isRequired
-																	defaultOptions={selectedWorkforce.skills?.map(
+																	defaultOptions={skillDB.map(
 																		(
 																			skill
 																		) => ({
-																			value: skill.name,
-																			label: skill.name,
+                                                                            id: skill.id,
+																			value: skill.name.toLowerCase(),
+																			label: skill.name.toUpperCase(),
 																			level: skill.level,
 																		})
 																	)}
@@ -806,8 +774,9 @@ function ParameterWorkforceList() {
 																		(
 																			skill
 																		) => ({
-																			value: skill.name,
-																			label: skill.name,
+                                                                            id: skill.id,
+																			value: skill.name.toLowerCase(),
+																			label: skill.name.toUpperCase(),
 																			level: skill.level,
 																		})
 																	)}
@@ -815,13 +784,17 @@ function ParameterWorkforceList() {
 																		onSelectedValue
 																	}
 																></CreatableAdvanced>
-																	<HelperMessage>
-																		<InfoIcon
-																			size="small"
-																			content=""
-																		></InfoIcon>
-																		Change skill's level in table
-																	</HelperMessage>
+																<HelperMessage>
+																	<InfoIcon
+																		size="small"
+																		content=""
+																	></InfoIcon>
+																	Change
+																	skill's
+																	level in
+																	table,
+                                                                    can not store non-word characters
+																</HelperMessage>
 															</Fragment>
 														)}
 													</Field>

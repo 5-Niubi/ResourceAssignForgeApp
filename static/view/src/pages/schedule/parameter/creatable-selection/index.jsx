@@ -3,7 +3,8 @@ import { Label } from "@atlaskit/form";
 import CreatableSelect from "react-select/creatable";
 
 const createOption = (label) => ({
-	label,
+    id: null,
+	label: label.toUpperCase().replace(/\W/g, ""),
 	value: label.toLowerCase().replace(/\W/g, ""),
 });
 
@@ -33,7 +34,7 @@ export default function CreatableAdvanced({
 		console.log(newOption);
 		console.groupEnd();
 		const optionExists = options.some(
-			(option) => option.value === newOption.value
+			(option) => option.value.toUpperCase().replace(/\W/g, "") === newOption.value.toUpperCase().replace(/\W/g, "")
 		);
 		if (!optionExists) {
 			setOptions([...options, newOption]);
