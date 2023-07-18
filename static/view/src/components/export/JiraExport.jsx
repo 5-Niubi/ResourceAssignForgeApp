@@ -83,6 +83,7 @@ function JiraExport({ state }) {
 				handleCreateThreadSuccess(res.threadId);
 			})
 			.catch((error) => {
+				setIsLoading(false);
 				Toastify.error(error.toString());
 			});
 	}, []);

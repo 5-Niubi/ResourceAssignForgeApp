@@ -10,7 +10,11 @@ import ProgressBar from "@atlaskit/progress-bar";
 import { invoke } from "@forge/bridge";
 import React, { useCallback, useEffect } from "react";
 import Toastify from "../common/Toastify";
-import { INTERVAL_FETCH, THREAD_ACTION, THREAD_STATUS } from "../common/contants";
+import {
+	INTERVAL_FETCH,
+	THREAD_ACTION,
+	THREAD_STATUS,
+} from "../common/contants";
 import { removeThreadInfo } from "../common/utils";
 
 function LoadingModalWithThread({ state }) {
@@ -48,14 +52,18 @@ function LoadingModalWithThread({ state }) {
 				// Specific action in here
 				if (modalState.threadAction === THREAD_ACTION.JIRA_EXPORT) {
 					debugger;
-					Toastify.success(`Export successfully: Project ${res.result.projectName} was created`);
+					Toastify.success(
+						`Export successfully: Project ${res.result.projectName} was created`
+					);
 				}
 
 				removeThreadInfo(res.threadId);
 				closeModal();
 				break;
 			case THREAD_STATUS.ERROR:
-				Toastify.error(res.result.message);
+				Toastify.error(
+					`${res.result.message} - ${JSON.parse(res.result.response).error}`
+				);
 
 				removeThreadInfo(res.threadId);
 				closeModal();
