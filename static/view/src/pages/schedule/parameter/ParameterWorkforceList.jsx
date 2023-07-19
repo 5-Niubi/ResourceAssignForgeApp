@@ -23,6 +23,7 @@ import Form, {
 	Field,
 	FormFooter,
 	FormHeader,
+	FormSection,
 	HelperMessage,
 	RequiredAsterisk,
 	ValidMessage,
@@ -44,17 +45,23 @@ import { Checkbox } from "@atlaskit/checkbox";
 import TextField from "@atlaskit/textfield";
 import { findObj } from "../pertchart/VisualizeTasks";
 import Rating from "react-rating";
+import CreatableAdvanced from "./creatable-selection";
 
 function ParameterWorkforceList() {
-	const SelectProps = {
-		value: 0,
-		label: "",
-	};
-
 	//GET LIST WORKFORCES
 	let { projectId } = useParams();
 	const [workforces, setWorkforces] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
+	const [skillDB, setSkillDB] = useState([]);
+	const [selectedWorkforce, setSelectedWorkforce] = useState(Object);
+	const [skillsTable, setSkillsTable] = useState([]);
+	const [isWorkforceOpen, setIsWorkforceOpen] = useState(false);
+	const openWorkforceModal = useCallback(() => setIsWorkforceOpen(true), []);
+	const closeWorkforceModal = useCallback(
+		() => setIsWorkforceOpen(false),
+		[]
+	);
+	const [isParttimeSelected, setIsParttimeSelected] = useState(false);
 	useEffect(function () {
 		invoke("getWorkforceParameter", { projectId })
 			.then(function (res) {
@@ -73,9 +80,10 @@ function ParameterWorkforceList() {
 						workingEffort: workforce.workingEffort,
 						skills: workforce.skills,
 					};
-					let castWorkforceEffort = itemWorkforce.workingEffort
-						.slice(1, -1)
-						.split(/[,]/);
+					//PARSE STRING ARRAY WORKING EFFORT TO ARRAY
+					let castWorkforceEffort = JSON.parse(
+						workforce.workingEffort
+					);
 					itemWorkforce.workingEffort = castWorkforceEffort;
 					workforces.push(itemWorkforce);
 				}
@@ -85,6 +93,16 @@ function ParameterWorkforceList() {
 					JSON.stringify(workforces)
 				);
 				setWorkforces(workforces);
+				console.log("Cac workforce", workforces);
+			})
+			.catch(function (error) {
+				console.log(error);
+				Toastify.error(error.toString());
+			});
+
+		invoke("getAllSkills", {})
+			.then(function (res) {
+				setSkillDB(res);
 			})
 			.catch(function (error) {
 				console.log(error);
@@ -92,102 +110,18 @@ function ParameterWorkforceList() {
 			});
 	}, []);
 
-	const [selectedWorkforce, setSelectedWorkforce] = useState({
-		id: 0,
-		accountId: "",
-		email: "",
-		accountType: "",
-		name: "",
-		avatar: "",
-		displayName: "",
-		unitSalary: 0.0,
-		workingType: 0,
-		workingEffort: [],
-		skills: [
-			{
-				id: 0,
-				name: "",
-				level: 0,
-			},
-		],
-	});
-	const [isWorkforceOpen, setIsWorkforceOpen] = useState(false);
-	const openWorkforceModal = useCallback(() => setIsWorkforceOpen(true), []);
-	const closeWorkforceModal = useCallback(
-		() => setIsWorkforceOpen(false),
-		[]
-	);
-	const [isParttimeSelected, setIsParttimeSelected] = useState(false);
 	const options = [
 		{ label: "Fulltime", value: 0 },
 		{ label: "Part-time", value: 1 },
 	];
 
-	const buttonAddSkills = (
-		<>
-			<Button
-				iconBefore={<AddCircle label="" size="medium" />}
-				appearance="subtle"
-			></Button>
-		</>
-	);
+	const onSelectedValue = (childValue) => {
+		console.log("Received value from child:", childValue);
+		//LOAD DATA TO TABLE
 
-	const head = {
-		cells: [
-			{
-				key: "skills",
-				content: "Skills",
-				width: 30,
-			},
-			{
-				key: "level",
-				content: "Level",
-				width: 60,
-			},
-			{
-				key: "action",
-				content: "Actions",
-				width: 10,
-			},
-		],
+		setSkillsTable(childValue.selectedValue);
+		console.log("Received value display in table:", skillsTable);
 	};
-
-	const rows = selectedWorkforce.skills?.map((skill, index) => ({
-		key: skill.name?.toString(),
-		cells: [
-			{
-				key: skill.name?.toString(),
-				content: skill.name?.toString(),
-			},
-			{
-				key: skill.level?.toString(),
-				content: (
-					<>
-						<Rating
-							emptySymbol={<StarIcon />}
-							fullSymbol={<StarFilledIcon />}
-							initialRating={skill.level}
-						></Rating>
-					</>
-				),
-			},
-			{
-				key: "actions",
-				content: (
-					<>
-						<Button
-							iconBefore={<EditIcon label="" size="medium" />}
-							appearance="subtle"
-						></Button>
-						<Button
-							iconBefore={<TrashIcon label="" size="medium" />}
-							appearance="subtle"
-						></Button>
-					</>
-				),
-			},
-		],
-	}));
 
 	const buttonActions = (
 		<>
@@ -198,6 +132,13 @@ function ParameterWorkforceList() {
 
 	const handleOpenWorkforceModal = (value) => {
 		var selected = findObj(workforces, value);
+		setSkillsTable(
+			selected.skills?.map((skill) => ({
+				id: skill.id,
+				label: skill.name,
+				level: skill.level,
+			}))
+		);
 		setSelectedWorkforce({
 			id: selected.id,
 			accountId: selected.accountId,
@@ -215,13 +156,18 @@ function ParameterWorkforceList() {
 				level: skill.level,
 			})),
 		});
+		console.log("workforce da chon: ", selectedWorkforce);
+		console.log("selected skill: ", selected.skills);
 		setIsWorkforceOpen(true);
-		selected.workingType == 1? setIsParttimeSelected(true) : setIsParttimeSelected(false);
+		selected.workingType == 1
+			? setIsParttimeSelected(true)
+			: setIsParttimeSelected(false);
 	};
 
 	const styleTextfield = {
-		marginLeft: 10,
+		marginLeft: 3,
 		fontWeight: "bold",
+		size: 12,
 	};
 
 	const validateEmail = (value) => {
@@ -263,17 +209,82 @@ function ParameterWorkforceList() {
 		return undefined;
 	};
 
+	const validateNumberWorkingEffort = (value) => {
+		//REQUIRES NUMBER ONLY AND NUMBER FROM 0.0 to 1.0 IN ARRAY
+        for (let element in value){
+			const numValue = parseFloat(element);
+			if (isNaN(numValue)) {
+				return "NOT_VALID";
+			}
+
+			if (numValue < 0.0 || numValue > 1.0) {
+				return "NOT_VALID";
+			}
+        }
+		return undefined;
+	};
+
+	const headSkillTable = {
+		cells: [
+			{
+				key: "skills",
+				content: "Skills",
+				width: 40,
+			},
+			{
+				key: "level",
+				content: "Level",
+				width: 60,
+			},
+		],
+	};
+
+	const rowsSkillTable = skillsTable
+		? skillsTable?.map((skill, index) => ({
+				key: skill.name?.toString(),
+				cells: [
+					{
+						key: skill.label?.toString(),
+						content: skill.label?.toString(),
+					},
+					{
+						key: skill.level?.toString(),
+						content: (
+							<>
+								<Rating
+									emptySymbol={<StarIcon />}
+									fullSymbol={<StarFilledIcon />}
+									initialRating={skill.level}
+									onClick={(value) => {
+										skill.level = value;
+										console.log(
+											"skill value: ",
+											skill.label +
+												", level" +
+												skill.level
+										);
+									}}
+								></Rating>
+							</>
+						),
+					},
+				],
+		  }))
+		: null;
+
 	return (
-		<div style={{ width: "100wh" }}>
+		<div>
 			<div>
 				<PageHeader actions={buttonActions}>Workforces</PageHeader>
 			</div>
+			{/* DISPLAY WORKFORCE PARMETER BUTTONS  */}
 			<div>
 				{isLoading ? (
 					<Spinner size={"large"} />
 				) : (
 					<>
 						{workforces?.map((workforce, index) => (
+							// BUTTON CLICK TO OPEN WORKFORCE INFORMATION DETAIL
 							<Button
 								style={{
 									marginRight: "8px",
@@ -290,8 +301,8 @@ function ParameterWorkforceList() {
 					</>
 				)}
 			</div>
+			{/* WORKFORCE INFORMATION MODAL */}
 			<div>
-				{/* WORKFORCE MODAL  */}
 				{isWorkforceOpen && (
 					<ModalTransition>
 						<Modal
@@ -325,6 +336,7 @@ function ParameterWorkforceList() {
 												layout="fluid"
 												spacing="compact"
 											>
+												{/* EMAIL TEXTFIELD */}
 												<GridColumn medium={12}>
 													<Field
 														name="email"
@@ -373,6 +385,7 @@ function ParameterWorkforceList() {
 														)}
 													</Field>
 												</GridColumn>
+												{/* USERNAME JIRA TEXTFIELD */}
 												<GridColumn medium={6}>
 													<Field
 														name="usernamejira"
@@ -411,6 +424,7 @@ function ParameterWorkforceList() {
 														)}
 													</Field>
 												</GridColumn>
+												{/* NAME TEXTFIELD */}
 												<GridColumn medium={6}>
 													<Field
 														name="name"
@@ -454,6 +468,7 @@ function ParameterWorkforceList() {
 														)}
 													</Field>
 												</GridColumn>
+												{/* SALARY TEXTFIELD */}
 												<GridColumn medium={12}>
 													<Field
 														name="salary"
@@ -498,6 +513,7 @@ function ParameterWorkforceList() {
 														)}
 													</Field>
 												</GridColumn>
+												{/* WORKING TYPE SELECT  */}
 												<GridColumn medium={3}>
 													<Field
 														label="Working Type"
@@ -518,24 +534,36 @@ function ParameterWorkforceList() {
 																		options
 																	}
 																	placeholder="Choose type..."
-																	onChange={(newValue)=>{
-                                                                        (newValue.value == 1)?setIsParttimeSelected(true):setIsParttimeSelected(false)
-                                                                        console.log("value Select moi",newValue)
-
-                                                                    }
-																	}
-                                                                    value={()=>{
-                                                                        selectedWorkforce.workingType
-                                                                        console.log("value Select",selectedWorkforce.workingType)
-                                                                    }
-                                                                    }
+																	onChange={(
+																		newValue
+																	) => {
+																		newValue.value ==
+																		1
+																			? setIsParttimeSelected(
+																					true
+																			  )
+																			: setIsParttimeSelected(
+																					false
+																			  );
+																		console.log(
+																			"value Select moi",
+																			newValue
+																		);
+																	}}
+																	value={() => {
+																		selectedWorkforce.workingType;
+																		console.log(
+																			"value Select",
+																			selectedWorkforce.workingType
+																		);
+																	}}
 																/>
 															</Fragment>
 														)}
 													</Field>
 												</GridColumn>
+												{/* WORKING EFFORT (FULL-TIME) */}
 												<GridColumn medium={9}>
-													{/* WOKRING EFFORTS IN WEEEK */}
 													{isParttimeSelected && (
 														<Field
 															name="workingEffort"
@@ -544,204 +572,207 @@ function ParameterWorkforceList() {
 															defaultValue={
 																selectedWorkforce.workingEffort
 															}
+															validate={(value) =>
+																validateNumberWorkingEffort(
+																	value
+																)
+															}
 														>
 															{({
 																fieldProps,
 																error,
 															}) => (
-																<Grid
-																	layout="fluid"
-																	spacing="compact"
-																>
-																	<GridColumn
-																		medium={
-																			1.25
-																		}
+																<>
+																	<Grid
+																		layout="fluid"
+																		spacing="compact"
 																	>
-																		<TextField
-                                                                            isCompact
-																			autoComplete="off"
-																			defaultValue={
-																				selectedWorkforce
-																					.workingEffort[0]
+																		<GridColumn
+																			medium={
+																				1.25
 																			}
-																			label="Monday"
-																			elemBeforeInput={
-																				<p
-																					style={{
-																						styleTextfield,
-																					}}
-																				>
-																					Mon
-																				</p>
+																		>
+																			<TextField
+																				isCompact
+																				autoComplete="off"
+																				{...fieldProps(0)}
+																				defaultValue={
+																					selectedWorkforce
+																						.workingEffort[0]
+																				}
+																				label="Monday"
+																				elemBeforeInput={
+																					<p
+																						style={
+																							styleTextfield
+																						}
+																					>
+																						Mon
+																					</p>
+																				}
+																			/>
+																		</GridColumn>
+																		<GridColumn
+																			medium={
+																				1.25
 																			}
-																		/>
-																	</GridColumn>
-																	<GridColumn
-																		medium={
-																			1.25
-																		}
-																	>
-																		<TextField
-																			style={{
-																				flex: 1,
-																			}}
-																			autoComplete="off"
-																			elemBeforeInput={
-																				<p
-																					style={{
-																						styleTextfield,
-																					}}
-																				>
-																					Tues
-																				</p>
+																		>
+																			<TextField
+																				style={{
+																					flex: 1,
+																				}}
+																				autoComplete="off"
+																				{...fieldProps(1)}
+																				elemBeforeInput={
+																					<p
+																						style={
+																							styleTextfield
+																						}
+																					>
+																						Tues
+																					</p>
+																				}
+																				defaultValue={
+																					selectedWorkforce
+																						.workingEffort[1]
+																				}
+																				isCompact
+																			/>
+																		</GridColumn>
+																		<GridColumn
+																			medium={
+																				1.25
 																			}
-																			width={
-																				90
+																		>
+																			<TextField
+																				autoComplete="off"
+																				{...fieldProps(2)}
+																				elemBeforeInput={
+																					<p
+																						style={
+																							styleTextfield
+																						}
+																					>
+																						Wed
+																					</p>
+																				}
+																				isCompact
+																				defaultValue={
+																					selectedWorkforce
+																						.workingEffort[2]
+																				}
+																			/>
+																		</GridColumn>
+																		<GridColumn
+																			medium={
+																				1.25
 																			}
-																			defaultValue={
-																				selectedWorkforce
-																					.workingEffort[1]
+																		>
+																			<TextField
+																				autoComplete="off"
+																				{...fieldProps(3)}
+																				elemBeforeInput={
+																					<p
+																						style={
+																							styleTextfield
+																						}
+																					>
+																						Thurs
+																					</p>
+																				}
+																				isCompact
+																				defaultValue={
+																					selectedWorkforce
+																						.workingEffort[3]
+																				}
+																			/>
+																		</GridColumn>
+																		<GridColumn
+																			medium={
+																				1.25
 																			}
-																			isCompact
-																		/>
-																	</GridColumn>
-																	<GridColumn
-																		medium={
-																			1.25
-																		}
-																	>
-																		<TextField
-																			autoComplete="off"
-																			elemBeforeInput={
-																				<p
-																					style={{
-																						styleTextfield,
-																					}}
-																				>
-																					Wed
-																				</p>
+																		>
+																			<TextField
+																				defaultValue={
+																					selectedWorkforce
+																						.workingEffort[4]
+																				}
+																				{...fieldProps(4)}
+																				elemBeforeInput={
+																					<p
+																						style={
+																							styleTextfield
+																						}
+																					>
+																						Fri
+																					</p>
+																				}
+																				isCompact
+																				autoComplete="off"
+																			/>
+																		</GridColumn>
+																		<GridColumn
+																			medium={
+																				1.25
 																			}
-																			width={
-																				90
+																		>
+																			<TextField
+																				autoComplete="off"
+																				{...fieldProps(5)}
+																				elemBeforeInput={
+																					<p
+																						style={
+																							styleTextfield
+																						}
+																					>
+																						Sat
+																					</p>
+																				}
+																				isCompact
+																				defaultValue={
+																					selectedWorkforce
+																						.workingEffort[5]
+																				}
+																			/>
+																		</GridColumn>
+																		<GridColumn
+																			medium={
+																				1.25
 																			}
-																			isCompact
-																			defaultValue={
-																				selectedWorkforce
-																					.workingEffort[2]
-																			}
-																		/>
-																	</GridColumn>
-																	<GridColumn
-																		medium={
-																			1.25
-																		}
-																	>
-																		<TextField
-																			autoComplete="off"
-																			elemBeforeInput={
-																				<p
-																					style={{
-																						styleTextfield,
-																					}}
-																				>
-																					Thurs
-																				</p>
-																			}
-																			width={
-																				90
-																			}
-																			isCompact
-																			defaultValue={
-																				selectedWorkforce
-																					.workingEffort[3]
-																			}
-																		/>
-																	</GridColumn>
-																	<GridColumn
-																		medium={
-																			1.25
-																		}
-																	>
-																		<TextField
-																			defaultValue={
-																				selectedWorkforce
-																					.workingEffort[4]
-																			}
-																			elemBeforeInput={
-																				<p
-																					style={{
-																						styleTextfield,
-																					}}
-																				>
-																					Fri
-																				</p>
-																			}
-																			width={
-																				90
-																			}
-																			isCompact
-																			autoComplete="off"
-																		/>
-																	</GridColumn>
-																	<GridColumn
-																		medium={
-																			1.25
-																		}
-																	>
-																		<TextField
-																			autoComplete="off"
-																			elemBeforeInput={
-																				<p
-																					style={{
-																						styleTextfield,
-																					}}
-																				>
-																					Sat
-																				</p>
-																			}
-																			width={
-																				90
-																			}
-																			isCompact
-																			defaultValue={
-																				selectedWorkforce
-																					.workingEffort[5]
-																			}
-																		/>
-																	</GridColumn>
-																	<GridColumn
-																		medium={
-																			1.25
-																		}
-																	>
-																		<TextField
-																			autoComplete="off"
-																			elemBeforeInput={
-																				<p
-																					style={{
-																						styleTextfield,
-																					}}
-																				>
-																					Sun
-																				</p>
-																			}
-																			width={
-																				90
-																			}
-																			isCompact
-																			defaultValue={
-																				selectedWorkforce
-																					.workingEffort[6]
-																			}
-																		/>
-																	</GridColumn>
-																</Grid>
+																		>
+																			<TextField
+																				autoComplete="off"
+																				{...fieldProps(6)}
+																				elemBeforeInput={
+																					<p
+																						style={
+																							styleTextfield
+																						}
+																					>
+																						Sun
+																					</p>
+																				}
+																				isCompact
+																				defaultValue={
+																					selectedWorkforce
+																						.workingEffort[6]
+																				}
+																			/>
+																		</GridColumn>
+																	</Grid>
+																	{error ===
+																		"NOT_VALID" && (
+																		<ErrorMessage>
+																			Wrong
+																			input.
+																		</ErrorMessage>
+																	)}
+																</>
 															)}
 														</Field>
 													)}
 												</GridColumn>
-
+												{/* SKILL CREATABLE MULTIPLE SELECT */}
 												<GridColumn medium={12}>
 													<Field
 														name="skills"
@@ -753,82 +784,52 @@ function ParameterWorkforceList() {
 															error,
 														}) => (
 															<Fragment>
-																<TextField
-																	autoComplete="off"
-																	elemAfterInput={
-																		buttonAddSkills
-																	}
-																	{...fieldProps}
-																	defaultValue={selectedWorkforce.skills?.map(
+																<CreatableAdvanced
+																	isRequired
+																	defaultOptions={skillDB.map(
 																		(
 																			skill
-																		) =>
-																			skill.name +
-																			"-level " +
-																			skill.level
+																		) => ({
+																			id: skill.id,
+																			value: skill.name,
+																			label: skill.name,
+																		})
 																	)}
-																/>
-																{!error && (
-																	<HelperMessage>
-																		<InfoIcon
-																			size="small"
-																			content=""
-																		></InfoIcon>
-																		Click
-																		add
-																		circle
-																		button
-																		in order
-																		to add
-																		skills
-																		into
-																		table
-																	</HelperMessage>
-																)}
-																{error && (
-																	<ErrorMessage>
-																		Wrong
-																		input.
-																	</ErrorMessage>
-																)}
+																	selectedValue={selectedWorkforce.skills?.map(
+																		(
+																			skill
+																		) => ({
+																			id: skill.id,
+																			value: skill.name,
+																			label: skill.name,
+																		})
+																	)}
+																	onSelectedValue={
+																		onSelectedValue
+																	}
+																></CreatableAdvanced>
+																<HelperMessage>
+																	<InfoIcon
+																		size="small"
+																		content=""
+																	></InfoIcon>
+																	Change
+																	skill's
+																	level in
+																	table, can
+																	not store
+																	non-word
+																	characters
+																</HelperMessage>
 															</Fragment>
 														)}
 													</Field>
 												</GridColumn>
-												{/* <GridColumn medium={12}>
-													<Field
-														label="Precedence tasks"
-														name="precedences"
-														defaultValue=""
-													>
-														{({ fieldProps }) => (
-															<Fragment>
-																<Select
-																	{...fieldProps}
-																	inputId="multi-select-example"
-																	className="multi-select"
-																	classNamePrefix="react-select"
-																	options={
-																		rows
-																	}
-																	value={taskValues}
-																	onChange={
-																		handleChangePrecedence
-																	}
-																	isMulti
-																	isSearchable={
-																		true
-																	}
-																	placeholder="Choose precedence tasks"
-																/>
-															</Fragment>
-														)}
-													</Field>
-												</GridColumn> */}
+												{/* SKILL DISPLAYING WITH LEVEL TABLE */}
 												<GridColumn medium={12}>
 													<DynamicTable
-														head={head}
-														rows={rows}
+														head={headSkillTable}
+														rows={rowsSkillTable}
 													/>
 												</GridColumn>
 
