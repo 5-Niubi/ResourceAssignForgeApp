@@ -6,6 +6,7 @@ import taskResolver from "./taskResolver";
 import workforceResolver from "./workforceResolver";
 import milestoneResolver from "./milestoneResolver";
 import parameterResolver from "./parameterResolver";
+import scheduleResolver from "./scheduleResolver";
 import threadResolver from "./threadResolver";
 
 /**
@@ -20,6 +21,7 @@ function resolverReg(resolver){
     exportResolver(resolver);
     milestoneResolver(resolver);
     parameterResolver(resolver);
+    scheduleResolver(resolver);
     threadResolver(resolver);
 }
 

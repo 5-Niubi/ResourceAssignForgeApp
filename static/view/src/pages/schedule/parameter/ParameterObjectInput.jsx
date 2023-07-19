@@ -43,6 +43,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 	const [budget, setBudget] = useState();
 	const [budgetUnit, setBudgetUnit] = useState("");
 	const [isLoading, setIsLoading] = useState(true);
+	const [isScheduling, setIsScheduling] = useState(false);
 
 	useEffect(function () {
 		invoke("getProjectDetail", { projectId })
@@ -114,6 +115,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 	};
 
 	function SaveParameters({ cost }) {
+		setIsScheduling(true);
 		var parameterResourcesLocal = JSON.parse(
 			localStorage.getItem("workforce_parameter")
 		);
@@ -138,14 +140,44 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 		invoke("saveParameters", { parameter: data })
 			.then(function (res) {
 				if (res) {
-					Toastify.info(res.toString());
-					handleChangeTab(3);
+					// Toastify.info("Save successfully.");
+					// handleChangeTab(3);
+					// setIsScheduling(false);
+
+					//call api to schedule
+					invoke("getThreadSchedule", { parameterId: res.id })
+						.then(function (res) {
+							if (res) {
+								//Getting result
+								var scheduleInterval = setInterval(function(){
+									invoke("schedule", { threadId: res.threadId })
+										.then(function (res) {
+											if (res && res.status == "success") {
+												clearInterval(scheduleInterval);
+
+												Toastify.info("Schedule successfully.");
+												localStorage.setItem("solutions", res.result);
+
+												handleChangeTab(3);
+												setIsScheduling(false);
+											}
+										})
+										.catch(function (error) {
+											Toastify.error(error.toString());
+										});
+								}, 5000);
+							}
+						})
+						.catch(function (error) {
+							Toastify.error(error.toString());
+						});
 				}
                 // DISPLAY SUCCESSFUL MESSAGE OR NEED MORE SKILL REQUIRED MESSAGE (NOT DONE)
 				Toastify.info(res);
                 console.log("message required skills in task", res);
 			})
 			.catch(function (error) {
+				// handleChangeTab(3);
 				Toastify.error(error.toString());
 			});
 	}
@@ -251,24 +283,78 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 									</Field>
 								</GridColumn>
 							</Grid>
-						</FormSection>
-						<FormFooter>
-							<ButtonGroup>
-								<Button onClick={() => handleChangeTab(1)}>
-									Back
-								</Button>
-								<LoadingButton
-									type="submit"
-									appearance="primary"
-									isLoading={submitting}
-								>
-									Scheduling
-								</LoadingButton>
-							</ButtonGroup>
-						</FormFooter>
-					</form>
-				)}
-			</Form>
+                        </FormSection>
+
+							<FormFooter>
+								<div>
+									<Button onClick={() => handleChangeTab(1)}>
+										Back
+									</Button>
+									<LoadingButton
+										type="submit"
+										appearance="primary"
+										isLoading={isScheduling}
+									>
+										Scheduling
+									</LoadingButton>
+
+									{/* LOADING MODAL BUTTON */}
+									<ModalTransition>
+										{isOpen && (
+											<Modal onClose={closeModal}>
+												<ModalBody>
+													<div
+														style={{
+															height: "120px",
+															marginTop: "10px",
+															display: "flex",
+															alignItems:
+																"center",
+															justifyContent:
+																"center",
+														}}
+													>
+														<RecentIcon label=""></RecentIcon>
+														<p
+															style={{
+																fontSize:
+																	"18px",
+															}}
+														>
+															This process will
+															take some minutes...
+														</p>
+													</div>
+													<ProgressBar
+														ariaLabel="Loading"
+														isIndeterminate
+													></ProgressBar>
+												</ModalBody>
+												<ModalFooter>
+													<Button
+														onClick={closeModal}
+														autoFocus
+													>
+														Cancel
+													</Button>
+													<Button
+														appearance="primary"
+														onClick={
+															closeModal &&
+															handleChangeTab(3)
+														}
+													>
+														DONE
+													</Button>
+												</ModalFooter>
+											</Modal>
+										)}
+									</ModalTransition>
+								</div>
+							</FormFooter>
+						</form>
+					)}
+				</Form>
 		</div>
 	);
 }

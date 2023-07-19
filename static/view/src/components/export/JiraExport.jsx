@@ -13,7 +13,7 @@ import Toastify from "../../common/Toastify";
 import JiraProjectExportTable from "./table/JiraProjectExportTable";
 import JiraAutoCreateProjectExport from "./gird/JiraAutoCreateProjectExport";
 import Heading from "@atlaskit/heading";
-import { ScheduleExportContext } from "../../pages/TestModal";
+import { ScheduleExportContext } from "../../pages/schedule/ganttchart/GanttChartPage";
 import { ThreadLoadingContext } from "../../App";
 import { useContext } from "react";
 import { saveThreadInfo } from "../../common/utils";
@@ -83,6 +83,7 @@ function JiraExport({ state }) {
 				handleCreateThreadSuccess(res.threadId);
 			})
 			.catch((error) => {
+				setIsLoading(false);
 				Toastify.error(error.toString());
 			});
 	}, []);
