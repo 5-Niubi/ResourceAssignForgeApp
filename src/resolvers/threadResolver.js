@@ -18,6 +18,7 @@ function threadResolver(resolver) {
 			await threadService.addThreadState(req.payload.threadInfo);
 			return Promise.resolve();
 		} catch (error) {
+			console.log("setThreadInfo");
 			return Promise.reject(error);
 		}
 	});
@@ -27,11 +28,12 @@ function threadResolver(resolver) {
 			await threadService.removeThreadState(req.payload.threadId);
 			return Promise.resolve();
 		} catch (error) {
+			console.log("removeThreadInfo");
 			return Promise.reject(error);
 		}
 	});
 
-    resolver.define("getThreadResult", async function (req) {
+	resolver.define("getThreadResult", async function (req) {
 		try {
 			return await threadService.getThreadResult(req.payload.threadId);
 		} catch (error) {

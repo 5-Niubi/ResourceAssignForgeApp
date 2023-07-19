@@ -4,13 +4,8 @@ import APIServices from "./common/APIServices";
 
 async function addThreadState(threadInfo) {
 	try {
-		let state = [];
-		state = await storage.get(STORAGE.THEAD_STATE);
-		if(!state){
-			state = [];
-		}
-		state.push(threadInfo);
-		await storage.set(STORAGE.THEAD_STATE, state);
+		let state = threadInfo;
+		await storage.set(STORAGE.THREAD_STATE, state);
 	} catch (error) {
 		return Promise.reject(error);
 	}
@@ -18,10 +13,9 @@ async function addThreadState(threadInfo) {
 
 async function getThreadState() {
 	try {
-		let state = [];
-		state = await storage.get(STORAGE.THEAD_STATE);
-		if(state || state.length === 0){
-			Promise.reject("Thread Queue Empty!");
+		let state = await storage.get(STORAGE.THREAD_STATE);
+		if (state) {
+			Promise.reject("Thread Empty!");
 		}
 		return state;
 	} catch (error) {
@@ -31,13 +25,7 @@ async function getThreadState() {
 
 async function removeThreadState(threadId) {
 	try {
-		let state = [];
-
-		state = await storage.get(STORAGE.THEAD_STATE);
-		state = state.filter(function (threadState) {
-			return threadState.threadId !== threadId;
-		});
-		await storage.set(STORAGE.THEAD_STATE, state);
+		await storage.delete(STORAGE.THREAD_STATE);
 	} catch (error) {
 		return Promise.reject(error);
 	}
