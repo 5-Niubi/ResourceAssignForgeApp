@@ -1,22 +1,49 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import TaskDetail from "./TaskDetail";
-import VisualizePageHeader from "./VisualizePageHeader";
 import { Field, Label } from "@atlaskit/form";
 import { DatePicker } from "@atlaskit/datetime-picker";
 import PertChart from "./PertChart";
 import { invoke } from "@forge/bridge";
 import { Content, Main, PageLayout, RightSidebar } from "@atlaskit/page-layout";
 import TasksCompact from "./TasksCompact";
-import { globalSelectedTasks, sample } from "../data";
 import Toastify from "../../../common/Toastify";
+import PageHeader from "@atlaskit/page-header";
+import Button, { ButtonGroup, LoadingButton } from "@atlaskit/button";
+import "./style.css";
 
-const startDate = (
-	<div>
-		<Label>Start date: </Label>
-		<DatePicker />
-	</div>
-);
+export const colorsBank = [
+	"#FF5733",
+	"#A569BD",
+	"#85C1E9",
+	"#F4D03F",
+	"#58D68D",
+	"#CD6155",
+	"#F7DC6F",
+	"#5DADE2",
+	"#F5B7B1",
+	"#48C9B0",
+	"#F8C471",
+	"#7FB3D5",
+	"#82E0AA",
+	"#EC7063",
+	"#F9E79F",
+	"#5499C7",
+	"#FAD7A0",
+	"#5DADE2",
+	"#F1948A",
+	"#ABEBC6",
+	"#F4D03F",
+	"#85C1E9",
+	"#E59866",
+	"#82E0AA",
+	"#F8C471",
+	"#E6B0AA",
+	"#5499C7",
+	"#F7DC6F",
+	"#A569BD",
+	"#FAD7A0",
+];
 
 /**
  * Find an object in a list of objects by its id
@@ -33,57 +60,159 @@ export const findObj = (arr, id) => {
 	return null;
 };
 
-// var tasksData = JSON.parse(localStorage.getItem("tasks"));
-// if (!tasksData) {
-// 	tasksData = [];
-// }
-
-var selectedData = JSON.parse(localStorage.getItem("selected"));
-if (!selectedData) {
-	selectedData = [];
-}
-
 /**
  * Using as Page to show pert chart and task dependences
  * @returns {import("react").ReactElement}
  */
-function VisualizeTasksPage() {
+function VisualizeTasksPage({ handleChangeTab }) {
 	let { projectId } = useParams();
-	// console.log(project);
-	// project;
-	//tasks represent list of all tasks in the pool of current project
-	//-which are shown in the right panel
-	const [tasks, setTasks] = useState([]);
-    // debugger;
-	useEffect(function () {
-		invoke("getTasksList", { projectId: Number(projectId) })
+
+	const [canEstimate, setCanEstimate] = useState(true);
+	const updateCanEstimate = (can) => {
+		setCanEstimate(can);
+	};
+
+	const [isSaving, setIsSaving] = useState(false);
+	const [isEstimating, setIsEstimating] = useState(false);
+
+	function handleEstimate() {
+		setIsEstimating(true);
+		invoke("estimate", { projectId })
 			.then(function (res) {
-                console.log(res);
-                let tasks = [];
-				for (let t of res) {
-                    tasks.push(t);
+				// console.log(res);
+				if (res.id || res.id === 0){
+					Toastify.info("Estimated successfully");
+					localStorage.setItem("estimation", JSON.stringify(res));
+					//move to next tab
+					handleChangeTab(1);
+					setIsEstimating(false);
+				} else {
+					Toastify.error("Error in estimate");
 				}
-				setTasks(tasks);
 			})
 			.catch(function (error) {
 				console.log(error);
-				Toastify.error(error);
+				Toastify.error(error.toString());
 			});
-		return setTasks([]);
+	}
+
+	function handleSave() {
+		setIsSaving(true);
+		var data = {
+			ProjectId: projectId,
+			TaskPrecedenceTasks: [],
+			TaskSkillsRequireds: [],
+		};
+
+		tasks.forEach((task) => {
+			let preArray = [];
+			task.precedences.forEach((pre) => preArray.push(pre.precedenceId));
+			data.TaskPrecedenceTasks.push({
+				TaskId: task.id,
+				TaskPrecedences: preArray,
+			});
+			data.TaskSkillsRequireds.push({
+				TaskId: task.id,
+				SkillsRequireds: task.skillRequireds,
+			});
+		});
+
+		invoke("saveTasks", { tasks: data })
+			.then(function (res) {
+				if (res) {
+					Toastify.info("Saved successfully");
+					setCanEstimate(true);
+					setIsSaving(false);
+				}
+			})
+			.catch(function (error) {
+				console.log(error);
+				Toastify.error(error.toString());
+			});
+	}
+
+	//get from Local Storage
+	var tasksData = JSON.parse(localStorage.getItem("tasks"));
+	if (!tasksData) {
+		tasksData = [];
+	}
+	var selectedData = JSON.parse(localStorage.getItem("selected"));
+	if (!selectedData) {
+		selectedData = [];
+	}
+
+	//tasks represent list of all tasks in the pool of current project
+	//-which are shown in the right panel
+	const [tasks, setTasks] = useState([]);
+	const [skills, setSkills] = useState([]);
+	const [milestones, setMilestones] = useState([]);
+	useEffect(function () {
+		invoke("getTasksList", { projectId: Number(projectId) })
+			.then(function (res) {
+				// if (!tasksData || tasksData.length === 0) {
+				// }
+				setTasks(res);
+
+				// storage.set("projectId", projectId);
+				// storage.set("tasks", JSON.stringify(tasks));
+			})
+			.catch(function (error) {
+				console.log(error);
+				Toastify.error(error.toString());
+			});
+		setTasks(tasksData);
+
+		invoke("getAllSkills", {})
+			.then(function (res) {
+				if (Object.keys(res).length !== 0) {
+					setSkills(res);
+				} else setSkills([]);
+			})
+			.catch(function (error) {
+				console.log(error);
+				Toastify.error(error.toString());
+			});
+		setSkills([]);
+
+		invoke("getAllMilestones", { projectId })
+			.then(function (res) {
+				if (Object.keys(res).length !== 0) {
+					setMilestones(res);
+				} else setMilestones([]);
+			})
+			.catch(function (error) {
+				console.log(error);
+				Toastify.error(error.toString());
+			});
+		setMilestones([]);
+		return;
 	}, []);
 
 	//currentTask represents the selected task to be shown in the bottom panel
 	const [currentTaskId, setCurrentTaskId] = useState(null);
-
-	//selectedTask represents the all the tasks that are currently selected for the pert chart
-	const [selectedIds, setSelectedIds] = useState(selectedData);
-
 	const updateCurrentTaskId = (taskId) => {
 		setCurrentTaskId(taskId);
 	};
 
+	//selectedTask represents the all the tasks that are currently selected for the pert chart
+	const [selectedIds, setSelectedIds] = useState(selectedData);
 	const updateSelectedTaskIds = (taskIds) => {
 		setSelectedIds(taskIds);
+	};
+
+	const [dependenciesChanged, setDependenciesChanged] = useState(null);
+	const updateDependenciesChanged = (dataChanged) => {
+		setDependenciesChanged(dataChanged);
+	};
+
+	const [taskSkillsChanged, setTaskSkillsChanged] = useState(null);
+	const updateTaskSkillsChanged = (dataChanged) => {
+		setTaskSkillsChanged(dataChanged);
+	};
+
+	const [taskMilestoneChanged, setTaskMilestoneChanged] = useState(null);
+	const updateTaskMilestoneChanged = (dataChanged) => {
+		setTaskMilestoneChanged(dataChanged);
 	};
 
 	const updateTasks = (tasks) => {
@@ -93,47 +222,72 @@ function VisualizeTasksPage() {
 	useEffect(() => {
 		localStorage.setItem("selected", JSON.stringify(selectedIds));
 		localStorage.setItem("tasks", JSON.stringify(tasks));
-	}, [selectedIds, tasks]);
+		localStorage.setItem("milestones", JSON.stringify(milestones));
+		localStorage.setItem("skills", JSON.stringify(skills));
+	}, [selectedIds, tasks, milestones, skills]);
 
-	const PertChartMemo = React.memo(
-		PertChart,
-		(prevProps, nextProps) =>
-			(prevProps.selectedTaskIds.length ===
-				nextProps.selectedTaskIds.length &&
-				prevProps.selectedTaskIds.every(
-					(value, index) => value == nextProps.selectedTaskIds[index]
-				)) ||
-			prevProps.tasks.every(
-				(value, index) =>
-					value.id == nextProps.tasks[index]?.id &&
-					value.precedence.length ===
-						nextProps.tasks[index].precedence.length &&
-					value.precedence.every(
-						(v, i) =>
-							v.precedenceId ==
-							nextProps.tasks[index].precedence[i].precedenceId
-					)
-			)
+	const actionsContent = (
+		<div
+			style={{
+				display: "flex",
+				justifyContent: "flex-start",
+				gap: "20px",
+				alignItems: "end",
+			}}
+		>
+			{canEstimate ? (
+				isEstimating ? (
+					<LoadingButton appearance="primary" isLoading>
+						Estimating...
+					</LoadingButton>
+				) : (
+					<Button appearance="primary" onClick={handleEstimate}>
+						Estimate
+					</Button>
+				)
+			) : isSaving ? (
+				<LoadingButton appearance="primary" isLoading>
+					Saving...
+				</LoadingButton>
+			) : (
+				<Button appearance="primary" onClick={handleSave}>
+					Save
+				</Button>
+			)}
+		</div>
 	);
 
 	return (
-		<div style={{ width: "100%" }}>
+		<div class="visualize-tasks" style={{ width: "100%", height: "90vh" }}>
+			{/* {console.log("Render")} */}
 			<PageLayout>
 				<Content>
 					<Main testId="main2" id="main2">
-						<VisualizePageHeader title="Visualize Tasks" />
-						{startDate}
-						<PertChartMemo
+						<PageHeader actions={actionsContent}>
+							Visualize Tasks
+						</PageHeader>
+						<PertChart
 							tasks={tasks}
+							milestones={milestones}
 							selectedTaskIds={selectedIds}
 							updateCurrentTaskId={updateCurrentTaskId}
 							updateTasks={updateTasks}
+							currentTaskId={currentTaskId}
+							updateCanEstimate={updateCanEstimate}
 						/>
 						<TaskDetail
 							tasks={tasks}
+							skills={skills}
+							milestones={milestones}
 							selectedTaskIds={selectedIds}
 							currentTaskId={currentTaskId}
 							updateTasks={updateTasks}
+							updateDependenciesChanged={
+								updateDependenciesChanged
+							}
+							updateTaskSkillsChanged={updateTaskSkillsChanged}
+							updateTaskMilestoneChanged={updateTaskMilestoneChanged}
+							updateCanEstimate={updateCanEstimate}
 						/>
 					</Main>
 					<div
@@ -161,9 +315,12 @@ function VisualizeTasksPage() {
 							>
 								<TasksCompact
 									tasks={tasks}
+									milestones={milestones}
+									skills={skills}
 									selectedIds={selectedIds}
 									setSelectedIds={updateSelectedTaskIds}
 									updateCurrentTaskId={updateCurrentTaskId}
+									updateTasks={updateTasks}
 								/>
 							</div>
 						</RightSidebar>

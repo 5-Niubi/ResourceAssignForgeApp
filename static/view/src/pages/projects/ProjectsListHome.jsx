@@ -19,9 +19,10 @@ import Button from "@atlaskit/button";
 const width = MODAL_WIDTH.M;
 const modalInitState = { project: {}, isOpen: false };
 export const ModalStateContext = createContext();
+const columns = 10;
 
 function ProjectListHome() {
-	const columns = 10;
+	
 	const [searchParams, setSearchParams] = useSearchParams();
 	const isDesktopOrLaptop = useMediaQuery({
 		query: `(min-width: ${MEDIA_QUERY.DESKTOP_LAPTOP.MIN}px)`,
@@ -44,7 +45,7 @@ function ProjectListHome() {
 		setProjectsForDisplay(
 			projects.filter((e) => e.name.toLowerCase().includes(query.toLowerCase()))
 		);
-	}, []);
+	}, [projects]);
 
 	useEffect(
 		function () {
@@ -64,7 +65,7 @@ function ProjectListHome() {
 						imageAvatar: project.imageAvatar,
 						name: project.name,
 						startDate: project.startDate,
-						tasks: project.tasksNumber,
+						tasks: project.taskCount,
 					};
 					projectsList.push(itemProject);
 				}
@@ -72,15 +73,14 @@ function ProjectListHome() {
 				filterProjectName(projectsList, searchBoxValue);
 			})
 			.catch(function (error) {
-				console.log(error);
-				Toastify.error(error);
+				setProjectTableLoadingState(false);
+				Toastify.error(error.toString());
 			});
 	}, []);
 
 	function handleOnSearchBoxChange(e) {
 		setSearchBoxValue(e.target.value);
 		setSearchParams({ q: e.target.value });
-		filterProjectName(projects, searchBoxValue);
 	}
 
 	function handleOnSearch() {
@@ -145,6 +145,7 @@ function ProjectListHome() {
 				<DeleteProjectModal
 					openState={modalDeleteState}
 					setOpenState={setModalDeleteState}
+					setProjectsListState={setProjects}
 				/>
 			) : (
 				""
@@ -154,6 +155,7 @@ function ProjectListHome() {
 				<EditProjectModal
 					openState={modalEditState}
 					setOpenState={setModalEditState}
+					setProjectsListState={setProjects}
 				/>
 			) : (
 				""

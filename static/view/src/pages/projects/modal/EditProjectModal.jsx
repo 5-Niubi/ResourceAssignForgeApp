@@ -1,4 +1,4 @@
-import Button, { ButtonGroup } from "@atlaskit/button";
+import Button, { ButtonGroup, LoadingButton } from "@atlaskit/button";
 import Modal, {
 	ModalBody,
 	ModalFooter,
@@ -16,191 +16,231 @@ import ObjectiveRange from "../form/ObjectiveRange";
 import { getCurrentTime } from "../../../common/utils";
 import { invoke } from "@forge/bridge";
 import { DATE_FORMAT, MODAL_WIDTH } from "../../../common/contants";
+import Toastify from "../../../common/Toastify";
+import Spinner from "@atlaskit/spinner";
 const width = MODAL_WIDTH.M;
 const columns = 10;
 
-function EditProjectModal({ openState, setOpenState }) {
-	const project = openState.project;
-	const [projectName, setProjectName] = useState("");
-	const [startDate, setStartDate] = useState(getCurrentTime());
-	const [endDate, setEndDate] = useState(getCurrentTime());
+function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
+	const [project, setProject] = useState(openState.project);
+	const [projectName, setProjectName] = useState(project.name);
+	const [startDate, setStartDate] = useState(project.startDate);
+	const [endDate, setEndDate] = useState(startDate);
 	const [budget, setBudget] = useState(0);
 	const [unit, setUnit] = useState("");
-	const [objTime, setObjTime] = useState(50);
-	const [objCost, setObjCost] = useState(50);
-	const [objQuality, setObjQuality] = useState(50);
+	// const [objTime, setObjTime] = useState(50);
+	// const [objCost, setObjCost] = useState(50);
+	// const [objQuality, setObjQuality] = useState(50);
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
-	const closeModal = useCallback(
-		function () {
-			setOpenState({ project: {}, isOpen: false });
-		},
-		[setOpenState]
-	);
-	useEffect(
-		function () {
-			setProjectName(project.name);
-			setStartDate(project.startDate);
+	const closeModal = function () {
+		setOpenState({ project: {}, isOpen: false });
+	};
 
-			invoke("getProjectDetail", { projectId: project.id })
-				.then(function (res) {})
-				.catch(function (error) {});
-		},
-		[project]
-	);
+	useEffect(function () {
+		invoke("getProjectDetail", { projectId: project.id })
+			.then(function (res) {
+				let project = res;
+				project.isLoaded = true;
+				setProjectName(project.name);
+				setStartDate(project.startDate);
+				setEndDate(project.deadline);
+				setBudget(project.budget);
+				setUnit(project.budgetUnit);
+				setProject(project);
+			})
+			.catch(function (error) {
+				Toastify.error(error.toString());
+			});
+	}, []);
 
-	const handleSetProjectName = useCallback(function (e) {
+	// useEffect(
+	// 	function () {
+	// 		setProjectName(project.name);
+	// 		setStartDate(project.startDate);
+	// 		setEndDate(project.deadline);
+	// 		setBudget(project.budget);
+	// 		setUnit(project.budgetUnit);
+	// 	},
+	// 	[project]
+	// );
+
+	const handleSetProjectName = function (e) {
 		setProjectName(e.target.value);
-	}, []);
+	};
 
-	const handleSetStartDate = useCallback(function (value) {
+	const handleSetStartDate = function (value) {
 		setStartDate(value);
-	}, []);
+		if (value > endDate) {
+			setEndDate(value);
+		}
+	};
 
-	const handleSetEndDate = useCallback(function (value) {
+	const handleSetEndDate = function (value) {
 		setEndDate(value);
-	}, []);
+	};
 
-	const handleSetBudget = useCallback(function (e) {
+	const handleSetBudget = function (e) {
 		setBudget(e.target.value);
-	}, []);
+	};
 
-	const handleSetUnit = useCallback(function (e) {
+	const handleSetUnit = function (e) {
 		setUnit(e.target.value);
-	}, []);
+	};
 
-	const handleSetObjTime = useCallback(function (e) {
-		setObjTime(e.target.value);
-	}, []);
+	// const handleSetObjTime = useCallback(function (e) {
+	// 	setObjTime(e.target.value);
+	// }, []);
 
-	const handleRangeSetObjTime = useCallback(function (value) {
-		setObjTime(value);
-	}, []);
+	// const handleRangeSetObjTime = useCallback(function (value) {
+	// 	setObjTime(value);
+	// }, []);
 
-	const handleSetObjCost = useCallback(function (e) {
-		setObjCost(e.target.value);
-	}, []);
+	// const handleSetObjCost = useCallback(function (e) {
+	// 	setObjCost(e.target.value);
+	// }, []);
 
-	const handleRangeSetObjCost = useCallback(function (value) {
-		setObjCost(value);
-	}, []);
+	// const handleRangeSetObjCost = useCallback(function (value) {
+	// 	setObjCost(value);
+	// }, []);
 
-	const handleSetObjQuality = useCallback(function (e) {
-		setObjQuality(e.target.value);
-	}, []);
+	// const handleSetObjQuality = useCallback(function (e) {
+	// 	setObjQuality(e.target.value);
+	// }, []);
 
-	const handleRangeSetObjQuality = useCallback(function (value) {
-		setObjQuality(value);
-	}, []);
-
+	// const handleRangeSetObjQuality = useCallback(function (value) {
+	// 	setObjQuality(value);
+	// }, []);
+	
 	function handleSubmitCreate() {
+		setIsSubmitting(true);
 		let projectObjRequest = {
+			id: project.id,
 			name: projectName,
 			startDate,
 			deadline: endDate,
 			budget,
 			budgetUnit: unit,
-			objectiveTime: objTime,
-			objectiveCost: objCost,
-			objectiveQuality: objQuality,
+			// objectiveTime: objTime,
+			// objectiveCost: objCost,
+			// objectiveQuality: objQuality,
 		};
-		invoke("createNewProjectProjectLists", { projectObjRequest })
+
+		invoke("editProject", { projectObjRequest })
 			.then(function (res) {
 				closeModal();
+				openState.project.name = res.name;
+				openState.project.startDate = res.startDate;
+				setProjectsListState((prev) => [...prev]);
+				Toastify.success("Saved");
 			})
-			.catch();
+			.catch(function (error) {
+				Toastify.error(error.toString());
+			});
 	}
 
 	return (
 		<ModalTransition>
-			{openState.isOpen && (
-				<Modal onClose={closeModal} width={width}>
-					<Form
-						onSubmit={(formState) => console.log("form submitted", formState)}
-					>
-						{({ formProps }) => (
-							<form id="form-with-id" {...formProps}>
-								<ModalHeader>
-									<ModalTitle>Create new Software Project</ModalTitle>
-								</ModalHeader>
-								<ModalBody>
-									<Grid layout="fluid" spacing="compact" columns={columns}>
-										<GridColumn medium={7}>
-											<FormSection>
-												<Field
-													aria-required={true}
-													name="projectName"
-													label="Project Name"
-												>
-													{() => (
-														<TextField
-															autoComplete="off"
-															value={projectName}
-															onChange={handleSetProjectName}
+			<Modal onClose={closeModal} width={width}>
+				<Form
+					onSubmit={(formState) => console.log("form submitted", formState)}
+				>
+					{({ formProps }) => (
+						<form id="form-with-id" {...formProps}>
+							<ModalHeader>
+								<ModalTitle>{project.name}</ModalTitle>
+								{project.isLoaded ? "" : <Spinner size={"medium"}></Spinner>}
+							</ModalHeader>
+							<ModalBody>
+								<Grid layout="fluid" spacing="compact" columns={columns}>
+									<GridColumn medium={7}>
+										<FormSection>
+											<Field
+												aria-required={true}
+												name="projectName"
+												label="Project Name"
+												isRequired
+											>
+												{() => (
+													<TextField
+														autoComplete="off"
+														value={projectName}
+														onChange={handleSetProjectName}
+														isDisabled={!project.isLoaded}
+														isRequired
+													/>
+												)}
+											</Field>
+										</FormSection>
+										<FormSection>
+											<Field name="startDate" label="Start Date">
+												{() => (
+													<Fragment>
+														<DatePicker
+															value={startDate}
+															onChange={handleSetStartDate}
+															dateFormat={DATE_FORMAT.DMY}
+															isDisabled={!project.isLoaded}
 														/>
-													)}
-												</Field>
-											</FormSection>
-											<FormSection>
-												<Field name="startDate" label="Start Date" isRequired>
-													{() => (
-														<Fragment>
-															<DatePicker
-																value={startDate}
-																onChange={handleSetStartDate}
-																dateFormat={DATE_FORMAT.DMY}
+													</Fragment>
+												)}
+											</Field>
+											<Field name="endDate" label="End Date">
+												{() => (
+													<Fragment>
+														<DatePicker
+															minDate={startDate}
+															value={endDate}
+															onChange={handleSetEndDate}
+															dateFormat={DATE_FORMAT.DMY}
+															isDisabled={!project.isLoaded}
+														/>
+													</Fragment>
+												)}
+											</Field>
+										</FormSection>
+										<FormSection>
+											<Grid spacing="compact" columns={columns}>
+												<GridColumn medium={8}>
+													<Field
+														aria-required={true}
+														name="budget"
+														label="Budget"
+														isRequired
+													>
+														{() => (
+															<TextField
+																autoComplete="off"
+																value={budget}
+																onChange={handleSetBudget}
+																type="number"
+																isDisabled={!project.isLoaded}
+																isRequired
 															/>
-														</Fragment>
-													)}
-												</Field>
-												<Field name="endDate" label="End Date" isRequired>
-													{() => (
-														<Fragment>
-															<DatePicker
-																minDate={startDate}
-																value={endDate}
-																onChange={handleSetEndDate}
-																dateFormat={DATE_FORMAT.DMY}
+														)}
+													</Field>
+												</GridColumn>
+												<GridColumn medium={2}>
+													<Field
+														aria-required={true}
+														name="budgetUnit"
+														label="Unit"
+														isRequired={true}
+													>
+														{() => (
+															<TextField
+																autoComplete="off"
+																value={unit}
+																onChange={handleSetUnit}
+																isDisabled={!project.isLoaded}
+																isRequired={true}
 															/>
-														</Fragment>
-													)}
-												</Field>
-											</FormSection>
-											<FormSection>
-												<Grid spacing="compact" columns={columns}>
-													<GridColumn medium={8}>
-														<Field
-															aria-required={true}
-															name="budget"
-															label="Budget"
-														>
-															{() => (
-																<TextField
-																	autoComplete="off"
-																	value={budget}
-																	onChange={handleSetBudget}
-																	type="number"
-																/>
-															)}
-														</Field>
-													</GridColumn>
-													<GridColumn medium={2}>
-														<Field
-															aria-required={true}
-															name="budgetUnit"
-															label="Unit"
-														>
-															{() => (
-																<TextField
-																	autoComplete="off"
-																	value={unit}
-																	onChange={handleSetUnit}
-																/>
-															)}
-														</Field>
-													</GridColumn>
-												</Grid>
-											</FormSection>
-											<FormSection>
+														)}
+													</Field>
+												</GridColumn>
+											</Grid>
+										</FormSection>
+										{/* <FormSection>
 												<ObjectiveRange
 													label="Objective Time"
 													name="ObjectiveTime"
@@ -222,30 +262,36 @@ function EditProjectModal({ openState, setOpenState }) {
 													onChange={handleSetObjQuality}
 													rangeOnChange={handleRangeSetObjQuality}
 												/>
-											</FormSection>
-										</GridColumn>
-									</Grid>
-								</ModalBody>
+											</FormSection> */}
+									</GridColumn>
+								</Grid>
+							</ModalBody>
 
-								<ModalFooter>
-									<ButtonGroup>
-										<Button appearance="default" onClick={closeModal}>
-											Cancel
-										</Button>
+							<ModalFooter>
+								<ButtonGroup>
+									<Button appearance="default" onClick={closeModal}>
+										Cancel
+									</Button>
+									{isSubmitting ? (
+										<LoadingButton appearance="primary" isLoading>
+											Create
+										</LoadingButton>
+									) : (
 										<Button
 											type="submit"
 											appearance="primary"
 											onClick={handleSubmitCreate}
+											isDisabled={!project.isLoaded}
 										>
-											Create
+											Save
 										</Button>
-									</ButtonGroup>
-								</ModalFooter>
-							</form>
-						)}
-					</Form>
-				</Modal>
-			)}
+									)}
+								</ButtonGroup>
+							</ModalFooter>
+						</form>
+					)}
+				</Form>
+			</Modal>
 		</ModalTransition>
 	);
 }

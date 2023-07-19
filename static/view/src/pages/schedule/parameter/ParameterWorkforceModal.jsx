@@ -1,4 +1,4 @@
-import { useCallback,useEffect, useState, Fragment } from "react";
+import { useCallback, useEffect, useState, Fragment } from "react";
 import { css, jsx } from "@emotion/react";
 import DynamicTable from "@atlaskit/dynamic-table";
 import Button, { ButtonGroup } from "@atlaskit/button";
@@ -8,6 +8,7 @@ import TrashIcon from "@atlaskit/icon/glyph/trash";
 import EditIcon from "@atlaskit/icon/glyph/edit";
 import StarIcon from "@atlaskit/icon/glyph/star";
 import InfoIcon from "@atlaskit/icon/glyph/info";
+import { useParams } from "react-router";
 import Modal, {
 	ModalBody,
 	ModalFooter,
@@ -17,11 +18,10 @@ import Modal, {
 } from "@atlaskit/modal-dialog";
 import { invoke } from "@forge/bridge";
 import Toastify from "../../../common/Toastify";
-
+import { RadioGroup } from "@atlaskit/radio";
 import LoadingButton from "@atlaskit/button";
 import { Checkbox } from "@atlaskit/checkbox";
 import TextField from "@atlaskit/textfield";
-
 import Form, {
 	CheckboxField,
 	ErrorMessage,
@@ -34,79 +34,167 @@ import Form, {
 } from "@atlaskit/form";
 import AddCircle from "@atlaskit/icon/glyph/add-circle";
 
+const options = [
+	{ name: "workingType", value: "0", label: "Fulltime" },
+	{ name: "workingType", value: "1", label: "Part-time" },
+];
+
 const boldStyles = css({
 	fontWeight: "bold",
 });
 
-export default function ParameterWorkforceModal() {
-	//CREATE WORKFORCE MODAL (CW)
-	const [isCWOpen, setIsCWOpen] = useState(false);
-	const openCWModal = useCallback(() => setIsCWOpen(true), []);
-	const closeCWModal = useCallback(() => setIsCWOpen(false), []);
-
+export function ParameterSelectWorkforceModal() {
 	//SELECT WORKFORCE MODAL (SW)
+    let { projectId } = useParams();
+    let workforce_local = JSON.parse(localStorage.getItem("workforce_parameter"));
 	const [isSWOpen, setIsSWOpen] = useState(false);
 	const openSWModal = useCallback(() => setIsSWOpen(true), []);
 	const closeSWModal = useCallback(() => setIsSWOpen(false), []);
+	const [TableLoadingState, setTableLoadingState] = useState(true);
+	const [searchInput, setSearchInput] = useState("");
+	const [workforces, setWorkforces] = useState([]);
+	useEffect(function () {
+		invoke("getAllWorkforces")
+			.then(function (res) {
+				let workforces = [];
+				for (let workforce of res) {
+					let itemWorkforce = {
+						id: workforce.id,
+						accountId: workforce.accountId,
+						email: workforce.email,
+						accountType: workforce.accountType,
+						name: workforce.name,
+						avatar: workforce.avatar,
+						displayName: workforce.displayName,
+						unitSalary: workforce.unitSalary,
+						workingType: workforce.workingType,
+						workingEffort: workforce.workingEffort,
+					};
+					workforces.push(itemWorkforce);
+				}
+				setTableLoadingState(false);
+				setWorkforces(workforces);
+			})
+			.catch(function (error) {
+				console.log(error);
+				Toastify.error(error.toString());
+			});
+	}, []);
+
+
+	//FILTER WORKFORCE SELECT TABLE
+	const [workforcesFilter, setWorkforcesFilter] = useState(workforces);
+    
+    
+	const filterWorkforceName = useCallback(function (workforces, query) {
+		setWorkforcesFilter(
+			workforces.filter((e) =>
+				e.name.toLowerCase().includes(query.toLowerCase())
+			)
+		);
+	}, []);
+
+	useEffect(
+		function () {
+			filterWorkforceName(workforces, searchInput);
+		},
+		[workforces]
+	);
+
+	function handleOnSearchBoxChange(e) {
+		setSearchInput(e.target.value);
+		if (e.target.value != null) {
+			filterWorkforceName(workforces, searchInput);
+		}
+	}
+
+    function CheckSelectedWorkforce(workforceId){
+        workforce_local.map((workforce, index)=> {
+            return (workforce.id.toString() == workforceId.toString())? true: false;
+        })
+        return false
+    }
+
+	const head = {
+		cells: [
+			{
+				key: "no",
+				content: "No",
+				width: 10,
+			},
+			{
+				key: "name",
+				content: "Name",
+				width: 90,
+			},
+		],
+	};
+
+	const rows = workforcesFilter?.map((workforce, index) => ({
+		key: workforce.id,
+		cells: [
+			{
+				key: "no",
+				content: (
+                    <Checkbox isChecked={CheckSelectedWorkforce(workforce.id)}></Checkbox>
+                ),
+			},
+			{
+				key: "name",
+				content: workforce.name,
+			},
+		],
+	}));
 
 	return (
 		<div>
-			<Button
-				iconBefore={<AddCircleIcon label="" size="large" />}
-				appearance="subtle"
-				onClick={openCWModal}
-			></Button>
 			<Button appearance="primary" onClick={openSWModal}>
 				Select
 			</Button>
-
-			{/* CREATE WORKFORCE MODAL (CW) */}
-			<ModalTransition>
-				{isCWOpen && (
-					<Modal
-						onClose={closeCWModal}
-						shouldScrollInViewport={true}
-						width={"large"}
-					>
-						<ModalHeader>
-							<ModalTitle>Add new workforce</ModalTitle>
-						</ModalHeader>
-						<ModalBody>
-							<ParameterCreareWorkforceModal></ParameterCreareWorkforceModal>
-						</ModalBody>
-						<ModalFooter>
-							<Button
-								appearance="subtle"
-								onClick={closeCWModal}
-								autoFocus
-							>
-								Cancel
-							</Button>
-							<Button
-								appearance="primary"
-								onClick={closeCWModal}
-								autoFocus
-							>
-								Create
-							</Button>
-						</ModalFooter>
-					</Modal>
-				)}
-			</ModalTransition>
-
 			{/* SELECT WORKFORCE MODAL (SW) */}
 			<ModalTransition>
 				{isSWOpen && (
 					<Modal
 						onClose={closeSWModal}
-						shouldScrollInViewport={true}
+						shouldScrollInViewport={false}
 						width={"medium"}
 					>
 						<ModalHeader>
 							<ModalTitle>Select Workforce</ModalTitle>
 						</ModalHeader>
 						<ModalBody>
-							<ParameterSelectWorkforcesTable></ParameterSelectWorkforcesTable>
+							<div style={{ display: "flex" }}>
+								<div style={{ flex: "0 0 300px" }}>
+									<TextField
+										isCompact
+										placeholder="Search Workforce Name"
+										aria-label="Filter"
+										onChange={handleOnSearchBoxChange}
+										value={searchInput}
+									/>
+								</div>
+								<div
+									style={{
+										flex: "0 0 300px",
+									}}
+								>
+									<Button
+										appearance="primary"
+										onClick={() => {
+											closeSWModal()
+										}}
+									>
+										Create new
+									</Button>
+								</div>
+							</div>
+							<DynamicTable
+								shouldScrollInViewport
+								head={head}
+								rows={rows}
+								isFixedSize
+								isLoading={TableLoadingState}
+							/>
 						</ModalBody>
 						<ModalFooter>
 							<Button
@@ -132,169 +220,29 @@ export default function ParameterWorkforceModal() {
 }
 
 export function ParameterCreareWorkforceModal() {
+	//CREATE WORKFORCE MODAL (CW)
+	const [isCWOpen, setIsCWOpen] = useState(false);
+	const openCWModal = useCallback(() => setIsCWOpen(true), []);
+	const closeCWModal = useCallback(() => setIsCWOpen(false), []);
+	const [isParttimeSelected, setIsParttimeSelected] = useState(false);
+
+	function handleOnSelected(e) {
+		if (e.currentTarget.value == "1") {
+			setIsParttimeSelected(true);
+		} else {
+			setIsParttimeSelected(false);
+		}
+	}
+
 	const buttonAddSkills = (
 		<>
 			<Button
 				iconBefore={<AddCircle label="" size="medium" />}
 				appearance="subtle"
-				// onClick={openModal}
 			></Button>
 		</>
 	);
-	return (
-		<>
-			<div
-				style={
-					{
-						// display: "flex",
-						// width: "400px",
-						// maxWidth: "100%",
-						// margin: "0 auto",
-						// flexDirection: "column",
-					}
-				}
-			>
-				<Form
-					onSubmit={(data) => {
-						console.log("form data", data);
-						return new Promise((resolve) =>
-							setTimeout(resolve, 2000)
-						).then(() =>
-							data.username === "error"
-								? { username: "IN_USE" }
-								: undefined
-						);
-					}}
-				>
-					{({ formProps, submitting }) => (
-						<form {...formProps}>
-							<Field
-								name="usernamejira"
-								label="Username Jira"
-								isRequired
-								defaultValue=""
-							>
-								{({ fieldProps, error }) => (
-									<Fragment>
-										<TextField
-											autoComplete="off"
-											{...fieldProps}
-											placeholder="You can use letters and numbers."
-										/>
-										{!error && (
-											<HelperMessage></HelperMessage>
-										)}
-										{error && (
-											<ErrorMessage>
-												This username is already in use,
-												try another one.
-											</ErrorMessage>
-										)}
-									</Fragment>
-								)}
-							</Field>
-							<Field
-								name="name"
-								label="Name"
-								isRequired
-								defaultValue=""
-							>
-								{({ fieldProps, error }) => (
-									<Fragment>
-										<TextField
-											autoComplete="off"
-											{...fieldProps}
-											placeholder="You can use letters and numbers."
-										/>
-										{!error && (
-											<HelperMessage></HelperMessage>
-										)}
-										{error && (
-											<ErrorMessage>
-												This username is already in use,
-												try another one.
-											</ErrorMessage>
-										)}
-									</Fragment>
-								)}
-							</Field>
-							<Field
-								name="salary"
-								label="Salary (Hour)"
-								isRequired
-								defaultValue=""
-							>
-								{({ fieldProps, error }) => (
-									<Fragment>
-										<TextField
-											autoComplete="off"
-											{...fieldProps}
-											placeholder="Number only"
-										/>
-										{!error && (
-											<HelperMessage></HelperMessage>
-										)}
-										{error && (
-											<ErrorMessage>
-												Wrong input.
-											</ErrorMessage>
-										)}
-									</Fragment>
-								)}
-							</Field>
-							<Field
-								name="skills"
-								label="Skills"
-								isRequired
-								defaultValue=""
-							>
-								{({ fieldProps, error }) => (
-									<Fragment>
-										<TextField
-											autoComplete="off"
-											elemAfterInput={buttonAddSkills}
-											{...fieldProps}
-										/>
-										{!error && (
-											<HelperMessage>
-												<InfoIcon
-													size="small"
-													content=""
-												></InfoIcon>
-												Click add circle button in order
-												to add skills into table
-											</HelperMessage>
-										)}
-										{error && (
-											<ErrorMessage>
-												Wrong input.
-											</ErrorMessage>
-										)}
-									</Fragment>
-								)}
-							</Field>
-							<ParameterSkillsTable></ParameterSkillsTable>
-							<FormFooter>
-								{/* <ButtonGroup>
-									<Button appearance="subtle">Cancel</Button>
-									<LoadingButton
-										type="submit"
-										appearance="primary"
-										isLoading={submitting}
-									>
-										Create
-									</LoadingButton>
-								</ButtonGroup> */}
-							</FormFooter>
-						</form>
-					)}
-				</Form>
-			</div>
-		</>
-	);
-}
 
-export function ParameterSkillsTable() {
 	const head = {
 		cells: [
 			{
@@ -316,19 +264,18 @@ export function ParameterSkillsTable() {
 	};
 
 	const rows = [
-		["SQL", "d"],
-		["JAVA", "c"],
-		["C#", "a"],
-		["Unity", "b"],
-	].map(([number, letter]) => ({
-		key: number.toString(),
+		{ name: "C#", level: "3" },
+		{ name: "Java", level: "5" },
+		{ name: "Unity", level: "2" },
+	].map((skill, index) => ({
+		key: skill.name?.toString(),
 		cells: [
 			{
-				key: number,
-				content: number,
+				key: skill.name?.toString(),
+				content: skill.name?.toString(),
 			},
 			{
-				key: letter,
+				key: skill.level?.toString(),
 				content: (
 					<>
 						<StarFilledIcon></StarFilledIcon>
@@ -361,128 +308,376 @@ export function ParameterSkillsTable() {
 
 	return (
 		<>
-			<DynamicTable head={head} rows={rows} />
-		</>
-	);
-}
-
-export function ParameterSelectWorkforcesTable() {
-        const [TableLoadingState, setTableLoadingState] = useState(true);
-        const [searchInput, setSearchInput] = useState("");
-        const [workforces, setWorkforces] = useState([]);
-
-        //FILTER WORKFORCE SELECT TABLE
-        const [workforcesFilter, setWorkforcesFilter] = useState(workforces);
-
-        const filterWorkforceName = useCallback(function (workforces, query) {
-            setWorkforcesFilter(
-                workforces.filter((e) => e.name.toLowerCase().includes(query.toLowerCase()))
-            );
-        }, []);
-    
-        useEffect(
-            function () {
-                filterWorkforceName(workforces, searchInput);
-            },
-            [workforces]
-        );
-
-        function handleOnSearchBoxChange(e) {
-            setSearchInput(e.target.value);
-            filterWorkforceName(workforces, searchInput);
-        }
-
-        function handleOnSearch() {
-            filterWorkforceName(workforces, searchInput);
-        }
-
-        //GET LIST WORKFORCES
-        useEffect(function () {
-            invoke("getAllWorkforces")
-                .then(function (res) {
-                    setTableLoadingState(false);
-                    let workforces = [];
-                    for (let workforce of res){
-                        let itemWorkforce = {
-                            id: workforce.id,
-                            accountId: workforce.accountId,
-                            email: workforce.email,
-                            accountType: workforce.accountType,
-                            name: workforce.name,
-                            avatar: workforce.avatar,
-                            displayName: workforce.displayName,
-                            unitSalary: workforce.unitSalary,
-                            workingType: workforce.workingType,
-                            workingEffort: workforce.workingEffort,
-                        };
-                        workforces.push(itemWorkforce);
-                    }
-                    setWorkforces(workforces);
-                    filterWorkforceName(workforces, searchInput);
-                })
-                .catch(function (error) {
-                    console.log(error);
-                    Toastify.error(error);
-                });
-        }, []);
-
-	const head = {
-		cells: [
-			{
-				key: "no",
-				content: "No",
-				width: 10,
-			},
-			{
-				key: "name",
-				content: "Name",
-				width: 90,
-			},
-		],
-	};
-
-	const rows = workforcesFilter?.map((workforce, index) => ({
-		key: workforce.id,
-		cells: [
-			{
-				key: "no",
-				content: <Checkbox isChecked></Checkbox>,
-			},
-			{
-				key: "name",
-				content: workforce.name,
-			},
-		],
-	}));
-
-	return (
-		<>
-			<div style={{ display: "flex" }}>
-				<div style={{ flex: "0 0 300px" }}>
-					<TextField
-						isCompact
-						placeholder="Search Workforce Name"
-						aria-label="Filter"
-                        onChange={handleOnSearchBoxChange}
-                        value={searchInput}
-                        onClick={handleOnSearch}
-					/>
-				</div>
-				<div
-					style={{
-						flex: "0 0 300px",
-					}}
-				>
-					<Button appearance="primary">Create new</Button>
-                </div>
-			</div>
-			<DynamicTable
-				shouldScrollInViewport
-				head={head}
-				rows={rows}
-				isFixedSize
-                isLoading={TableLoadingState}
-			/>
+            <Button
+				iconBefore={<AddCircleIcon label="" size="large" />}
+				appearance="subtle"
+				onClick={openCWModal}
+			></Button>
+			{/* CREATE WORKFORCE MODAL (CW) */}
+			<ModalTransition>
+				{isCWOpen && (
+					<Modal
+						onClose={closeCWModal}
+						shouldScrollInViewport={true}
+						width={"large"}
+					>
+						<ModalHeader>
+							<ModalTitle>Add new workforce</ModalTitle>
+						</ModalHeader>
+						<ModalBody>
+							<div>
+								<Form
+									onSubmit={(data) => {
+										console.log("form data", data);
+										return new Promise((resolve) =>
+											setTimeout(resolve, 2000)
+										).then(() =>
+											data.username === "error"
+												? { username: "IN_USE" }
+												: undefined
+										);
+									}}
+								>
+									{({ formProps, submitting }) => (
+										<form {...formProps}>
+											<Field
+												name="email"
+												label="Email"
+												isRequired
+												defaultValue=""
+											>
+												{({ fieldProps, error }) => (
+													<Fragment>
+														<TextField
+															autoComplete="off"
+															{...fieldProps}
+															placeholder="Email only."
+														/>
+														{!error && (
+															<HelperMessage></HelperMessage>
+														)}
+														{error && (
+															<ErrorMessage></ErrorMessage>
+														)}
+													</Fragment>
+												)}
+											</Field>
+											<Field
+												name="usernamejira"
+												label="Username Jira"
+												isRequired
+												defaultValue=""
+											>
+												{({ fieldProps, error }) => (
+													<Fragment>
+														<TextField
+															autoComplete="off"
+															{...fieldProps}
+															placeholder="You can use letters and numbers."
+														/>
+														{!error && (
+															<HelperMessage></HelperMessage>
+														)}
+														{error && (
+															<ErrorMessage>
+																This username is
+																already in use,
+																try another one.
+															</ErrorMessage>
+														)}
+													</Fragment>
+												)}
+											</Field>
+											<Field
+												name="name"
+												label="Name"
+												isRequired
+												defaultValue=""
+											>
+												{({ fieldProps, error }) => (
+													<Fragment>
+														<TextField
+															autoComplete="off"
+															{...fieldProps}
+															placeholder="You can use letters and numbers."
+														/>
+														{!error && (
+															<HelperMessage></HelperMessage>
+														)}
+														{error && (
+															<ErrorMessage>
+																This username is
+																already in use,
+																try another one.
+															</ErrorMessage>
+														)}
+													</Fragment>
+												)}
+											</Field>
+											<Field
+												name="salary"
+												label="Salary (Hour)"
+												isRequired
+												defaultValue=""
+											>
+												{({ fieldProps, error }) => (
+													<Fragment>
+														<TextField
+															autoComplete="off"
+															{...fieldProps}
+															placeholder="Number only"
+														/>
+														{!error && (
+															<HelperMessage></HelperMessage>
+														)}
+														{error && (
+															<ErrorMessage>
+																Wrong input.
+															</ErrorMessage>
+														)}
+													</Fragment>
+												)}
+											</Field>
+											<Field
+												label="Working Type"
+												name="workingType"
+												defaultValue=""
+												isRequired
+											>
+												{({ fieldProps }) => (
+													<RadioGroup
+														{...fieldProps}
+														options={options}
+														onChange={
+															handleOnSelected
+														}
+													/>
+												)}
+											</Field>
+											{/* WOKRING EFFORTS IN WEEEK */}
+											{isParttimeSelected && (
+												<Field
+													name="workingEffort"
+													label="Working Effort"
+													isRequired
+													defaultValue=""
+												>
+													{({
+														fieldProps,
+														error,
+													}) => (
+														<Fragment>
+															<TextField
+																autoComplete="off"
+																defaultValue={
+																	0.99
+																}
+																label="Monday"
+																elemBeforeInput={
+																	<p
+																		style={{
+																			fontWeight:
+																				"bold",
+																		}}
+																	>
+																		Mon
+																	</p>
+																}
+																width={90}
+																isCompact
+															/>
+															<TextField
+																style={{
+																	flex: 1,
+																}}
+																autoComplete="off"
+																elemBeforeInput={
+																	<p
+																		style={{
+																			fontWeight:
+																				"bold",
+																		}}
+																	>
+																		Tues
+																	</p>
+																}
+																width={90}
+																defaultValue={
+																	0.99
+																}
+																isCompact
+															/>
+															<TextField
+																autoComplete="off"
+																elemBeforeInput={
+																	<p
+																		style={{
+																			fontWeight:
+																				"bold",
+																		}}
+																	>
+																		Wed
+																	</p>
+																}
+																width={90}
+																isCompact
+																defaultValue={
+																	0.99
+																}
+															/>
+															<TextField
+																autoComplete="off"
+																elemBeforeInput={
+																	<p
+																		style={{
+																			fontWeight:
+																				"bold",
+																		}}
+																	>
+																		Thurs
+																	</p>
+																}
+																width={90}
+																isCompact
+																defaultValue={
+																	0.99
+																}
+															/>
+															<TextField
+																defaultValue={
+																	0.99
+																}
+																elemBeforeInput={
+																	<p
+																		style={{
+																			fontWeight:
+																				"bold",
+																		}}
+																	>
+																		Fri
+																	</p>
+																}
+																width={90}
+																isCompact
+																autoComplete="off"
+															/>{" "}
+															<TextField
+																autoComplete="off"
+																elemBeforeInput={
+																	<p
+																		style={{
+																			fontWeight:
+																				"bold",
+																		}}
+																	>
+																		Sat
+																	</p>
+																}
+																width={90}
+																isCompact
+																defaultValue={
+																	0.99
+																}
+															/>
+															<TextField
+																autoComplete="off"
+																elemBeforeInput={
+																	<p
+																		style={{
+																			fontWeight:
+																				"bold",
+																		}}
+																	>
+																		Sun
+																	</p>
+																}
+																width={90}
+																isCompact
+																defaultValue={
+																	0.99
+																}
+															/>
+														</Fragment>
+													)}
+												</Field>
+											)}
+											<Field
+												name="skills"
+												label="Skills"
+												isRequired
+												defaultValue=""
+											>
+												{({ fieldProps, error }) => (
+													<Fragment>
+														<TextField
+															autoComplete="off"
+															elemAfterInput={
+																buttonAddSkills
+															}
+															{...fieldProps}
+														/>
+														{!error && (
+															<HelperMessage>
+																<InfoIcon
+																	size="small"
+																	content=""
+																></InfoIcon>
+																Click add circle
+																button in order
+																to add skills
+																into table
+															</HelperMessage>
+														)}
+														{error && (
+															<ErrorMessage>
+																Wrong input.
+															</ErrorMessage>
+														)}
+													</Fragment>
+												)}
+											</Field>
+											<DynamicTable
+												head={head}
+												rows={rows}
+											/>
+											<FormFooter>
+												<ButtonGroup>
+													<Button appearance="subtle">
+														Cancel
+													</Button>
+													<LoadingButton
+														type="submit"
+														appearance="primary"
+														isLoading={submitting}
+													>
+														Create
+													</LoadingButton>
+												</ButtonGroup>
+											</FormFooter>
+										</form>
+									)}
+								</Form>
+							</div>
+						</ModalBody>
+						<ModalFooter>
+							<Button
+								appearance="subtle"
+								onClick={closeCWModal}
+								autoFocus
+							>
+								Cancel
+							</Button>
+							<Button
+								appearance="primary"
+								onClick={closeCWModal}
+								autoFocus
+							>
+								Create
+							</Button>
+						</ModalFooter>
+					</Modal>
+				)}
+			</ModalTransition>
 		</>
 	);
 }

@@ -282,14 +282,6 @@ const GanttChart = () => {
 								return s.assignTo;
 							}),
 						},
-						{
-							title: {
-								text: "Equipments",
-							},
-							categories: data.map(function (s) {
-								return s.equipments;
-							}),
-						},
 					],
 				},
 			},

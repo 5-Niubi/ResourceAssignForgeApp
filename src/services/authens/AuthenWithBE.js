@@ -17,7 +17,7 @@ class AuthenWithBE {
 		const grantAccessUrl =
 			`https://auth.atlassian.com/authorize?audience=api.atlassian.com` +
 			`&client_id=${this.clientId}` +
-			`&scope=manage%3Ajira-project%20write%3Ajira-work%20read%3Ajira-work%20manage%3Ajira-configuration%20offline_access` +
+			`&scope=manage%3Ajira-project%20write%3Ajira-work%20read%3Ajira-work%20manage%3Ajira-configuration%20read%3Ajira-user%20offline_access` +
 			`&redirect_uri=http%3A%2F%2Flocalhost%3A5126%2FAuthentication%2FCallback` +
 			`&state=${stateData}` +
 			`&response_type=code` +
@@ -34,6 +34,8 @@ class AuthenWithBE {
 	 * @param {Object} data
 	 */
 	async handleAuthenCallbackFromNET(data) {
+		// Fixed accessToken BE
+		data.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJKV1RTZXJ2aWNlQWNjZXNzVG9rZW4iLCJqdGkiOiIwNGQzYTkzMC1iNTliLTQ5ZWMtODk5Zi04NGIwNzVjOTQyOGQiLCJpYXQiOiI2LzI1LzIwMjMgMDg6MTI6NDQiLCJhY2NvdW50X2lkIjoiNjFlMWI3MmYwNTg2YTIwMDY5ZGUyOGZlIiwiY2xvdWRfaWQiOiJlYTQ4ZGRjNy1lZDU2LTRkNjAtOWI1NS0wMjY2NzcyNDg0OWQiLCJleHAiOjE3MTkzMDMxNjQsImlzcyI6IkpXVEF1dGhlbnRpY2F0aW9uU2VydmVyIiwiYXVkIjoiSmlyYUNsb3VkIn0.j7VXUPxU3OK7sfIfHsFtr3op4lfzTNAlXtJyJlpPnqY";
 		await storage.setSecret(STORAGE.TOKEN, data.token);
 		await storage.set(STORAGE.IS_AUTHENTICATED, true);
 	}
