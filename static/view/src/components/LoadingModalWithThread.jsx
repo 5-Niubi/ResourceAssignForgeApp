@@ -8,7 +8,7 @@ import Modal, {
 } from "@atlaskit/modal-dialog";
 import ProgressBar from "@atlaskit/progress-bar";
 import { invoke } from "@forge/bridge";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Toastify from "../common/Toastify";
 import {
 	INTERVAL_FETCH,
@@ -23,6 +23,7 @@ function LoadingModalWithThread({ state }) {
 		() => setModalState((prev) => ({ ...prev, isModalOpen: false })),
 		[]
 	);
+	const [progress, setProgress] = useState("...");
 
 	useEffect(() => {
 		const intervalId = setInterval(() => {
@@ -48,6 +49,9 @@ function LoadingModalWithThread({ state }) {
 
 		// Export thread success
 		switch (res.status) {
+			case THREAD_STATUS.RUNNING:
+				setProgress(res.progress);
+				break;
 			case THREAD_STATUS.SUCCESS:
 				// Specific action in here
 				if (modalState.threadAction === THREAD_ACTION.JIRA_EXPORT) {
@@ -86,6 +90,16 @@ function LoadingModalWithThread({ state }) {
 						<p style={{ fontSize: "18px" }}>
 							This process will take some minutes...
 						</p>
+					</div>
+					<div
+						style={{
+							marginBottom: "20px",
+							display: "flex",
+							alignItems: "center",
+							justifyContent: "center",
+						}}
+					>
+						<p style={{ fontSize: "16px" }}>({progress})</p>
 					</div>
 					<ProgressBar ariaLabel="Loading" isIndeterminate></ProgressBar>
 				</ModalBody>
