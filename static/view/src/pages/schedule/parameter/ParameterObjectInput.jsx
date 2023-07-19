@@ -42,6 +42,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 	const [budget, setBudget] = useState();
 	const [budgetUnit, setBudgetUnit] = useState("");
 	const [isLoading, setIsLoading] = useState(true);
+	const [isScheduling, setIsScheduling] = useState(false);
 
 
 	useEffect(function () {
@@ -109,6 +110,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 	};
 
 	function SaveParameters({ cost }) {
+		setIsScheduling(true);
 		var parameterResourcesLocal = JSON.parse(
 			localStorage.getItem("workforce_parameter")
 		);
@@ -133,12 +135,42 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 		invoke("saveParameters", { parameter: data })
 			.then(function (res) {
 				if (res) {
-					Toastify.info(res.toString());
-					handleChangeTab(3);
+					// Toastify.info("Save successfully.");
+					// handleChangeTab(3);
+					// setIsScheduling(false);
+
+					//call api to schedule
+					invoke("getThreadSchedule", { parameterId: res.id })
+						.then(function (res) {
+							if (res) {
+								//Getting result
+								var scheduleInterval = setInterval(function(){
+									invoke("schedule", { threadId: res.threadId })
+										.then(function (res) {
+											if (res && res.status == "success") {
+												clearInterval(scheduleInterval);
+
+												Toastify.info("Schedule successfully.");
+												localStorage.setItem("solutions", res.result);
+
+												handleChangeTab(3);
+												setIsScheduling(false);
+											}
+										})
+										.catch(function (error) {
+											Toastify.error(error.toString());
+										});
+								}, 5000);
+							}
+						})
+						.catch(function (error) {
+							Toastify.error(error.toString());
+						});
 				}
 				Toastify.info(res);
 			})
 			.catch(function (error) {
+				// handleChangeTab(3);
 				Toastify.error(error.toString());
 			});
 	}
@@ -267,7 +299,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 									<LoadingButton
 										type="submit"
 										appearance="primary"
-										isLoading={submitting}
+										isLoading={isScheduling}
 									>
 										Scheduling
 									</LoadingButton>
