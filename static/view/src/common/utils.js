@@ -1,5 +1,5 @@
 import { invoke } from "@forge/bridge";
-import moment, {diff} from "moment";
+import moment from "moment";
 
 /**
  * Using moment.js to get current date into format "YYYY-MM-DD"
