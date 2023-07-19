@@ -9,8 +9,8 @@ import Modal, {
 import React, { useCallback, useContext, useState } from "react";
 import { MODAL_WIDTH } from "../../common/contants";
 import { invoke, router } from "@forge/bridge";
-import { ScheduleExportContext } from "../../pages/TestModal";
 import MPXmlExportFile from "./gird/MPXmlExportFile";
+import { ScheduleExportContext } from "../../pages/schedule/ganttchart/GanttChartPage";
 
 const width = MODAL_WIDTH.M;
 
