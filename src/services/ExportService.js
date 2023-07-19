@@ -16,9 +16,14 @@ async function exportToJira(scheduleId) {
 
 async function getUrlexportToMSXml(scheduleId) {
 	try {
+		// Get Token
+		const result = await APIServices.get(`/Authentication/GetTokenForDownload`, null);
+		let token = result.token;
+
 		let apiDownload = "/api/Export/ExportToMicrosoftProject";
 		let url = new URL(`${BACKEND_dNET_DOMAIN}${apiDownload}`);
 		url.searchParams.append("scheduleId", scheduleId);
+		url.searchParams.append("token", token);
 		return url.toString();
 	} catch (error) {
 		return Promise.reject(error);
