@@ -63,7 +63,7 @@ function LoadingModalWithThread({ state }) {
 				Toastify.error(
 					`${res.result.message} - ${JSON.parse(res.result.response).error}`
 				);
-				
+
 				removeThreadInfo(res.threadId);
 				closeModal();
 				break;

@@ -1,5 +1,6 @@
 import { invoke } from "@forge/bridge";
 import moment from "moment";
+import { STORAGE } from "./contants";
 
 /**
  * Using moment.js to get current date into format "YYYY-MM-DD"
@@ -18,7 +19,7 @@ export function formatDateDMY(date) {
 export async function saveThreadInfo(threadInfo) {
 	try {
 		await invoke("setThreadInfo", { threadInfo });
-		localStorage.setItem("thread_info", JSON.stringify(threadInfo));
+		localStorage.setItem(STORAGE.THREAD_INFO, JSON.stringify(threadInfo));
 	} catch (error) {
 		Promise.reject(error);
 	}
@@ -27,7 +28,7 @@ export async function saveThreadInfo(threadInfo) {
 export async function removeThreadInfo(threadId) {
 	try {
 		await invoke("removeThreadInfo", { threadId });
-		localStorage.removeItem("thread_info");
+		localStorage.removeItem(STORAGE.THREAD_INFO);
 	} catch (error) {
 		Promise.reject(error);
 	}
