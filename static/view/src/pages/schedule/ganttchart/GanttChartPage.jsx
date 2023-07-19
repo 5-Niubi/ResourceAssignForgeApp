@@ -9,7 +9,6 @@ import ButtonGroup from "@atlaskit/button/button-group";
 import Button from "@atlaskit/button/standard-button";
 import __noop from "@atlaskit/ds-lib/noop";
 import PageHeader from "@atlaskit/page-header";
-import { ScheduleExportContext } from "../../TestModal";
 import JiraExport from "../../../components/export/JiraExport";
 import OtherExport from "../../../components/export/OtherExport";
 
@@ -21,7 +20,7 @@ const initModalExportState = {
 const scheduleExportDefaultValue = {
 	id: 0,
 };
-
+export const ScheduleExportContext = createContext(scheduleExportDefaultValue);
 /**
  * Using as Page to show gantt chart as a result
  * @returns {import("react").ReactElement}
@@ -71,7 +70,7 @@ function GanttChartPage({ setSelectedSolution, selectedSolution}) {
 			<GanttChartStats selectedSolution={selectedSolution} />
 			<GanttChart3 selectedSolution={selectedSolution} />
 
-			<ScheduleExportContext.Provider value={{ id: 42 }}>
+			<ScheduleExportContext.Provider value={{ id: selectedSolution }}>
 				{jiraExportState.isModalOpen && (
 					<JiraExport state={jiraExportModalState} />
 				)}

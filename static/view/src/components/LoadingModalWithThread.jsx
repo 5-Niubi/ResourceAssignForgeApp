@@ -51,7 +51,6 @@ function LoadingModalWithThread({ state }) {
 			case THREAD_STATUS.SUCCESS:
 				// Specific action in here
 				if (modalState.threadAction === THREAD_ACTION.JIRA_EXPORT) {
-					debugger;
 					Toastify.success(
 						`Export successfully: Project ${res.result.projectName} was created`
 					);

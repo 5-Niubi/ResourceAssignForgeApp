@@ -171,7 +171,7 @@ const GanttChart3 = ({ selectedSolution }) => {
 									// 		Object.keys(e.origin.points)[0]
 									// 	]?.point?.id
 									// );
-                                    // console.log(e);
+									// console.log(e);
 									// if (oldTask) {
 									// 	oldTask.workforce = oldResource;
 									// }
@@ -263,15 +263,45 @@ const GanttChart3 = ({ selectedSolution }) => {
 						},
 						{
 							title: {
-								text: "PIC",
+								text: "Duration",
 							},
 							categories: data.map(function (s) {
-								return s.assignTo.name;
+								return (s.end - s.start)/(1000*60*60*24) + " days";
 							}),
 							labels: {
 								align: "left",
 								style: {
-									width: "300px",
+									width: "200px",
+									textOverflow: "ellipsis",
+								},
+							},
+						},
+						{
+							title: {
+								text: "Start",
+							},
+							categories: data.map(function (s) {
+								return dateFormat("%e %b", s.start);
+							}),
+							labels: {
+								align: "left",
+								style: {
+									width: "200px",
+									textOverflow: "ellipsis",
+								},
+							},
+						},
+						{
+							title: {
+								text: "End",
+							},
+							categories: data.map(function (s) {
+								return dateFormat("%e %b", s.end);
+							}),
+							labels: {
+								align: "left",
+								style: {
+									width: "200px",
 									textOverflow: "ellipsis",
 								},
 							},
