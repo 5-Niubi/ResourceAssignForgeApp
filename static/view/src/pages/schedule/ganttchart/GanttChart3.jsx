@@ -4,7 +4,6 @@ import HighchartsReact from "highcharts-react-official";
 // import HighchartsDraggablePoints from "highcharts-draggable-points";
 import HighchartsDraggablePoints from "highcharts/modules/draggable-points";
 import HighchartsGantt from "highcharts/modules/gantt";
-import * as AnnotationsModule from "highcharts/modules/annotations";
 import { findObj } from "../pertchart/VisualizeTasks";
 import { sampleData } from "./data";
 

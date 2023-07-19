@@ -114,7 +114,7 @@ function ResultPage({ handleChangeTab }) {
 						Solution optimizations
 					</PageHeader>
 
-					<h2>Number of feasible solutions: {2}</h2>
+					<h3 style={{marginBottom: "20px"}}>Number of feasible solutions: {solutions.length}</h3>
 
 					<DynamicTable
 						head={head}
