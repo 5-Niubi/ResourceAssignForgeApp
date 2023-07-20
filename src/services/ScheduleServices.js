@@ -24,7 +24,18 @@ async function schedule(threadId) {
 	}
 }
 
+async function saveSolution(solutionReq) {
+	try {
+		let response = await APIServices.post(`/api/Schedule/CreateSolution`, null,
+			solutionReq);
+		return response;
+	} catch (error) {
+		return Promise.reject(error);
+	}
+}
+
 export {
 	getThreadSchedule,
-	schedule
+	schedule,
+	saveSolution
 };

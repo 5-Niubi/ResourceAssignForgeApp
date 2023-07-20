@@ -45,11 +45,24 @@ function GanttChartPage({ setSelectedSolution, selectedSolution}) {
 	// ------
 
 	const [isModified, setIsModified] = useState(false);
+	const [solutiontTasks, setSolutiontTasks] = useState([]);
+
+	useEffect(() => {
+		var solution = findObj(
+			JSON.parse(localStorage.getItem("solutions")),
+			selectedSolution
+		);
+		if (solution) {
+			setSolutiontTasks(JSON.parse(solution.tasks));
+		}
+	}, []);
 
 	const actionsContent = (
 		<ButtonGroup>
 			{isModified ? (
-				<Button appearance="subtle">Save as new solution</Button>
+				<Button appearance="subtle" onClick={handleSaveSolution}>
+					Save as new solution
+				</Button>
 			) : (
 				<>
 					<Button appearance="subtle" onClick={openOtherExportModal}>
@@ -77,7 +90,11 @@ function GanttChartPage({ setSelectedSolution, selectedSolution}) {
 			<GanttChartStats selectedSolution={selectedSolution} />
 
 			<PageHeader>Gantt chart</PageHeader>
-			<GanttChart3 selectedSolution={selectedSolution} />
+			<GanttChart3
+				solutiontTasks={solutiontTasks}
+				setSolutiontTasks={setSolutiontTasks}
+				setIsModified={setIsModified}
+			/>
 
 			<ScheduleExportContext.Provider value={{ id: selectedSolution }}>
 				{jiraExportState.isModalOpen && (

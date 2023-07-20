@@ -26,6 +26,17 @@ function scheduleResolver(resolver) {
 			return Promise.reject(error);
 		}
 	});
+
+	resolver.define("saveSolution", async function (req) {
+		try {
+			let response = await scheduleService.saveSolution(req.payload.solutionReq);
+			console.log(response);
+			return response;
+		} catch (error) {
+			console.log("Error in saveSolution: ", error);
+			return Promise.reject(error);
+		}
+	});
 }
 
 export default scheduleResolver;

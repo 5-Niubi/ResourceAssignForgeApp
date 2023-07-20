@@ -38,21 +38,9 @@ const findClosestNode = (arr, node) => {
 	return null;
 };
 
-const GanttChart3 = ({ selectedSolution }) => {
+const GanttChart3 = ({ solutiontTasks, setSolutiontTasks, setIsModified }) => {
 	HighchartsGantt(Highcharts);
 	HighchartsDraggablePoints(Highcharts);
-	const [tasks, setTasks] = useState([]);
-
-	useEffect(() => {
-		var solution = findObj(
-			JSON.parse(localStorage.getItem("solutions")),
-			selectedSolution
-		);
-		if (solution) {
-			console.log(JSON.parse(solution.tasks));
-			setTasks(JSON.parse(solution.tasks));
-		}
-	}, []);
 
 	const [isChangeResource, setIsChangeResource] = useState(false);
 
@@ -64,13 +52,13 @@ const GanttChart3 = ({ selectedSolution }) => {
 			dateFormat = Highcharts.dateFormat;
 
 		// Parse data into series.
-		var data = tasks.map(function (task, i) {
+		var data = solutiontTasks.map(function (task, i) {
 			return {
-				id: task.id+"",
+				id: task.id + "",
 				start: new Date(task.startDate).getTime(),
 				end: new Date(task.endDate).getTime(),
 				duration: task.duration,
-				dependency: task.taskIdPrecedences?.map((s) => s+""),
+				dependency: task.taskIdPrecedences?.map((s) => s + ""),
 				y: i,
 				name: task.name,
 				assignTo: task.workforce,
@@ -80,7 +68,7 @@ const GanttChart3 = ({ selectedSolution }) => {
 		});
 
 		// Parse data into series.
-		var data2 = tasks.map(function (task, i) {
+		var data2 = solutiontTasks.map(function (task, i) {
 			return {
 				id: task.id + "-2",
 				start: new Date(task.endDate).getTime(),
@@ -152,13 +140,13 @@ const GanttChart3 = ({ selectedSolution }) => {
 
 									var closestNode = findClosestNode(
 										data,
-										e.newPoint
+										e?.newPoint
 									);
 									if (closestNode) {
 										//update resource to the closest node
 										// console.log(closestNode);
 										var newTask = findObj(
-											tasks,
+											solutiontTasks,
 											closestNode.id
 										);
 										// var oldResource = newTask.workforce;
@@ -172,7 +160,7 @@ const GanttChart3 = ({ selectedSolution }) => {
 										}
 
 										// var oldTask = findObj(
-										// 	tasks,
+										// 	solutiontTasks,
 										// 	e.origin.points[
 										// 		Object.keys(e.origin.points)[0]
 										// 	]?.point?.id
@@ -182,8 +170,9 @@ const GanttChart3 = ({ selectedSolution }) => {
 										// 	oldTask.workforce = oldResource;
 										// }
 
-										setTasks(tasks);
+										setSolutiontTasks(solutiontTasks);
 										setIsChangeResource(!isChangeResource);
+										setIsModified(true);
 									}
 								},
 							},
@@ -220,11 +209,11 @@ const GanttChart3 = ({ selectedSolution }) => {
 					inputDateFormat: "%d/%m/%Y",
 					inputBoxHeight: 25,
 					buttonPosition: {
-                        y: -50,
-                    },
-                    inputPosition: {
-                        y: -50,
-                    },
+						y: -50,
+					},
+					inputPosition: {
+						y: -50,
+					},
 				},
 				navigator: {
 					enabled: true,
