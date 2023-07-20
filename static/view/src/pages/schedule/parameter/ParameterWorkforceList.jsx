@@ -110,6 +110,14 @@ function ParameterWorkforceList() {
 			});
 	}, []);
 
+    // const [selectedWorkforcesArray, setSelectedWorkforcesArray] = useState([]);
+
+    const handleSelectedWorkforces = (selectedWorkforcesArray) => {
+        setWorkforces(selectedWorkforcesArray);
+        console.log("Cac workforce moi", workforces);
+    };
+
+
 	const options = [
 		{ label: "Fulltime", value: 0 },
 		{ label: "Part-time", value: 1 },
@@ -126,7 +134,7 @@ function ParameterWorkforceList() {
 	const buttonActions = (
 		<>
 			<ParameterCreareWorkforceModal></ParameterCreareWorkforceModal>
-			<ParameterSelectWorkforceModal></ParameterSelectWorkforceModal>
+			<ParameterSelectWorkforceModal onSelectedWorkforces={handleSelectedWorkforces}></ParameterSelectWorkforceModal>
 		</>
 	);
 
