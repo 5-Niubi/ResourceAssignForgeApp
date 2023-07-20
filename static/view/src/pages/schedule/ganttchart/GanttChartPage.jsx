@@ -48,13 +48,18 @@ function GanttChartPage({ setSelectedSolution, selectedSolution}) {
 
 	const actionsContent = (
 		<ButtonGroup>
-			{!isModified ? <Button appearance="subtle">Save as new solution</Button> : ""}
-			<Button appearance="subtle" onClick={openOtherExportModal}>
-				Export to MS Project
-			</Button>
-			<Button appearance="primary" onClick={openJiraExportModal}>
-				Sync to Jira
-			</Button>
+			{isModified ? (
+				<Button appearance="subtle">Save as new solution</Button>
+			) : (
+				<>
+					<Button appearance="subtle" onClick={openOtherExportModal}>
+						Export to MS Project
+					</Button>
+					<Button appearance="primary" onClick={openJiraExportModal}>
+						Sync to Jira
+					</Button>
+				</>
+			)}
 		</ButtonGroup>
 	);
 	return (
@@ -66,8 +71,12 @@ function GanttChartPage({ setSelectedSolution, selectedSolution}) {
 				/>
 				<BreadcrumbsItem text={"Solution #" + selectedSolution} />
 			</Breadcrumbs>
-			<PageHeader actions={actionsContent}>Gantt chart</PageHeader>
+			<PageHeader actions={actionsContent}>
+				Solution evaluation:
+			</PageHeader>
 			<GanttChartStats selectedSolution={selectedSolution} />
+
+			<PageHeader>Gantt chart</PageHeader>
 			<GanttChart3 selectedSolution={selectedSolution} />
 
 			<ScheduleExportContext.Provider value={{ id: selectedSolution }}>
