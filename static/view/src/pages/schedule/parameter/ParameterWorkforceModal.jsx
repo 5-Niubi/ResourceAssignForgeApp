@@ -136,7 +136,8 @@ export function ParameterSelectWorkforceModal() {
 			{
 				key: "no",
 				content: (
-                    <Checkbox isChecked={CheckSelectedWorkforce(workforce.id)}></Checkbox>
+                    // <Checkbox isChecked={CheckSelectedWorkforce(workforce.id)}></Checkbox>
+                    <></>
                 ),
 			},
 			{

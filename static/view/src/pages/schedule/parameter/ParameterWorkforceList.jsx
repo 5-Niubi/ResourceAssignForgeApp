@@ -595,7 +595,6 @@ function ParameterWorkforceList() {
 																			<TextField
 																				isCompact
 																				autoComplete="off"
-																				{...fieldProps(0)}
 																				defaultValue={
 																					selectedWorkforce
 																						.workingEffort[0]
@@ -622,7 +621,6 @@ function ParameterWorkforceList() {
 																					flex: 1,
 																				}}
 																				autoComplete="off"
-																				{...fieldProps(1)}
 																				elemBeforeInput={
 																					<p
 																						style={
@@ -646,7 +644,6 @@ function ParameterWorkforceList() {
 																		>
 																			<TextField
 																				autoComplete="off"
-																				{...fieldProps(2)}
 																				elemBeforeInput={
 																					<p
 																						style={
@@ -670,7 +667,6 @@ function ParameterWorkforceList() {
 																		>
 																			<TextField
 																				autoComplete="off"
-																				{...fieldProps(3)}
 																				elemBeforeInput={
 																					<p
 																						style={
@@ -697,7 +693,6 @@ function ParameterWorkforceList() {
 																					selectedWorkforce
 																						.workingEffort[4]
 																				}
-																				{...fieldProps(4)}
 																				elemBeforeInput={
 																					<p
 																						style={
@@ -718,7 +713,6 @@ function ParameterWorkforceList() {
 																		>
 																			<TextField
 																				autoComplete="off"
-																				{...fieldProps(5)}
 																				elemBeforeInput={
 																					<p
 																						style={
@@ -742,7 +736,6 @@ function ParameterWorkforceList() {
 																		>
 																			<TextField
 																				autoComplete="off"
-																				{...fieldProps(6)}
 																				elemBeforeInput={
 																					<p
 																						style={
@@ -793,6 +786,7 @@ function ParameterWorkforceList() {
 																			id: skill.id,
 																			value: skill.name,
 																			label: skill.name,
+                                                                            level: skill.level,
 																		})
 																	)}
 																	selectedValue={selectedWorkforce.skills?.map(
@@ -802,6 +796,7 @@ function ParameterWorkforceList() {
 																			id: skill.id,
 																			value: skill.name,
 																			label: skill.name,
+                                                                            level: skill.level
 																		})
 																	)}
 																	onSelectedValue={
@@ -833,7 +828,7 @@ function ParameterWorkforceList() {
 													/>
 												</GridColumn>
 
-												<FormFooter>
+												{/* <FormFooter>
 													<ButtonGroup>
 														<Button appearance="subtle">
 															Cancel
@@ -848,7 +843,7 @@ function ParameterWorkforceList() {
 															Create
 														</LoadingButton>
 													</ButtonGroup>
-												</FormFooter>
+												</FormFooter> */}
 											</Grid>
 										</form>
 									)}
