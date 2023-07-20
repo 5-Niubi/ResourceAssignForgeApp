@@ -43,7 +43,7 @@ const boldStyles = css({
 	fontWeight: "bold",
 });
 
-export function ParameterSelectWorkforceModal() {
+export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 	//SELECT WORKFORCE MODAL (SW)
 	let { projectId } = useParams();
 	let workforce_local = JSON.parse(
@@ -79,12 +79,10 @@ export function ParameterSelectWorkforceModal() {
 				setTableLoadingState(false);
 				setWorkforces(workforces);
 
-				// Convert the workforce_local data into an array of workforce IDs
 				const localWorkforceIds = workforce_local.map((workforce) =>
 					workforce.id.toString()
 				);
 
-				// Set the initial selectedWorkforces state based on the localWorkforceIds
 				setSelectedWorkforces(localWorkforceIds);
 			})
 			.catch(function (error) {
@@ -190,6 +188,8 @@ export function ParameterSelectWorkforceModal() {
 			"selected_workforces",
 			JSON.stringify(selectedWorkforcesArray)
 		);
+
+        onSelectedWorkforces(selectedWorkforcesArray);
 	}
 
 	function handleConfirm() {
