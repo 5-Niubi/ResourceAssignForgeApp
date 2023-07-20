@@ -7,6 +7,7 @@ import Form, {
 	ErrorMessage,
 	RangeField,
 	ValidMessage,
+	FormSection,
 } from "@atlaskit/form";
 import Range from "@atlaskit/range";
 import { Grid, GridColumn } from "@atlaskit/page";
@@ -25,7 +26,7 @@ import ProgressBar from "@atlaskit/progress-bar";
 import { invoke } from "@forge/bridge";
 import __noop from "@atlaskit/ds-lib/noop";
 import Toastify from "../../../common/Toastify";
-import { LoadingButton } from "@atlaskit/button";
+import { ButtonGroup, LoadingButton } from "@atlaskit/button";
 import { DATE_FORMAT, MODAL_WIDTH } from "../../../common/contants";
 import { DatePicker } from "@atlaskit/datetime-picker";
 import { getCurrentTime, calculateDuration } from "../../../common/utils";
@@ -44,27 +45,31 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 	const [isLoading, setIsLoading] = useState(true);
 	const [isScheduling, setIsScheduling] = useState(false);
 
-
 	useEffect(function () {
 		invoke("getProjectDetail", { projectId })
 			.then(function (res) {
 				let project = {
 					startDate: res.startDate,
 					endDate: res.deadline,
-                    budgetUnit: res.budgetUnit,
-                    budget: res.budget,
+					budgetUnit: res.budgetUnit,
+					budget: res.budget,
 				};
 				setStartDate(project.startDate);
 				setEndDate(project.endDate);
-                setBudget(project.budget);
-                setBudgetUnit(project.budgetUnit);
+				setBudget(project.budget);
+				setBudgetUnit(project.budgetUnit);
 				console.log(
 					"PROJECT DATE: ",
-					project.startDate + ", " + project.endDate + ", "
-                    +project.budget +", "+ project.budgetUnit
+					project.startDate +
+						", " +
+						project.endDate +
+						", " +
+						project.budget +
+						", " +
+						project.budgetUnit
 				);
 
-                setIsLoading(false);
+				setIsLoading(false);
 			})
 			.catch(function (error) {
 				console.log("PROJECT DATE: ", error);
@@ -124,9 +129,9 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 		}
 		var data = {
 			ProjectId: Number(projectId),
-			Duration: calculateDuration({startDate,endDate}),
-            StartDate: startDate,
-            DeadLine: endDate,
+			Duration: calculateDuration({ startDate, endDate }),
+			StartDate: startDate,
+			DeadLine: endDate,
 			Budget: Number(cost),
 			ParameterResources: parameterResources,
 		};
@@ -167,7 +172,9 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 							Toastify.error(error.toString());
 						});
 				}
+                // DISPLAY SUCCESSFUL MESSAGE OR NEED MORE SKILL REQUIRED MESSAGE (NOT DONE)
 				Toastify.info(res);
+                console.log("message required skills in task", res);
 			})
 			.catch(function (error) {
 				// handleChangeTab(3);
@@ -177,78 +184,64 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 
 	return (
 		<div style={{ width: "100%" }}>
-            {isLoading ? (
-					<Spinner size={"large"} />
-				) : null
-            }
-				<Form
-					onSubmit={({ cost }) => {
-						console.log("Form Submitted: ", cost);
-						SaveParameters({ cost });
-						return new Promise((resolve) =>
-							setTimeout(resolve, 2000)
-						).then(() =>
-							data.username === "error"
-								? {
-										username: "IN_USE",
-								  }
-								: undefined
-						);
-					}}
-				>
-					{({ formProps, submitting }) => (
-						<form {...formProps}>
-							<Grid spacing="compact">
-                            <GridColumn medium={12}>
-
-							<Field
-								isRequired
-								label="Expected Cost"
-								name="cost"
-								validate={(value) => validateNumberOnly(value)}
-							>
-								{({ fieldProps, error }) => (
-									<Fragment>
-										<Textfield
-											{...fieldProps}
-											placeholder="What expected maximize project's cost?"
-											elemBeforeInput={
-												<p style={{ marginLeft: 10, fontWeight: "bold" }}>
-													{budgetUnit}
-												</p>
-											}
-										/>
-										{error === "NOT_VALID" && (
-											<ErrorMessage>
-												Wrong input.
-											</ErrorMessage>
+			{isLoading ? <Spinner size={"large"} /> : null}
+			<Form
+				onSubmit={({ cost }) => {
+					console.log("Form Submitted: ", cost);
+					SaveParameters({ cost });
+					return new Promise((resolve) =>
+						setTimeout(resolve, 2000)
+					).then(() =>
+						data.username === "error"
+							? {
+									username: "IN_USE",
+							  }
+							: undefined
+					);
+				}}
+			>
+				{({ formProps, submitting }) => (
+					<form {...formProps}>
+						<FormSection>
+							<Grid spacing="compact" columns={16}>
+								{/* EXPECTED COST TEXTFIELD */}
+								<GridColumn medium={16}>
+									<Field
+										isRequired
+										label="Expected Cost"
+										name="cost"
+										validate={(value) =>
+											validateNumberOnly(value)
+										}
+									>
+										{({ fieldProps, error }) => (
+											<Fragment>
+												<Textfield
+													{...fieldProps}
+													placeholder="What expected maximize project's cost?"
+													elemBeforeInput={
+														<p
+															style={{
+																marginLeft: 10,
+																fontWeight:
+																	"bold",
+															}}
+														>
+															{budgetUnit}
+														</p>
+													}
+												/>
+												{error === "NOT_VALID" && (
+													<ErrorMessage>
+														Wrong input.
+													</ErrorMessage>
+												)}
+											</Fragment>
 										)}
-									</Fragment>
-								)}
-							</Field>
-                            </GridColumn>
-
-							{/* <Field
-								isRequired
-								label="Expected Duration (days)"
-								name="duration"
-								validate={(value) => validateNumberOnly(value)}
-							>
-								{({ fieldProps, error }) => (
-									<Fragment>
-										<Textfield
-											{...fieldProps}
-											placeholder="What expected maximize durations for completing project?"
-										/>
-										{error === "NOT_VALID" && (
-											<ErrorMessage>
-												Wrong input.
-											</ErrorMessage>
-										)}
-									</Fragment>
-								)}
-							</Field> */}
-								<GridColumn medium={6}>
+									</Field>
+								</GridColumn>
+								{/* START DATE DATETIMEPICKER */}
+								<GridColumn medium={8}>
 									<Field
 										name="startDate"
 										label="Start Date"
@@ -268,8 +261,8 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 										)}
 									</Field>
 								</GridColumn>
-
-								<GridColumn medium={6}>
+								{/* END DATE DATETIMEPICKER */}
+								<GridColumn medium={8}>
 									<Field
 										name="endDate"
 										label="End Date"
@@ -290,6 +283,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 									</Field>
 								</GridColumn>
 							</Grid>
+                        </FormSection>
 
 							<FormFooter>
 								<div>

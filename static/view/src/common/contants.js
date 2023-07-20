@@ -33,6 +33,7 @@ export const ROW_PER_PAGE_MODAL_TABLE = 7;
 export const THREAD_STATUS = Object.freeze({
 	SUCCESS: "success",
 	ERROR: "error",
+	RUNNING: "running",
 });
 
 export const THREAD_ACTION = Object.freeze({
@@ -49,4 +50,4 @@ export const STORAGE = Object.freeze({
 	THREAD_INFO : "threadInfo",
 });
 
-export const INTERVAL_FETCH = 10000;
+export const INTERVAL_FETCH = 5000;
