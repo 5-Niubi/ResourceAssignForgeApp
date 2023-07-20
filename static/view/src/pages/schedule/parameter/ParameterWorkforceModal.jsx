@@ -43,16 +43,20 @@ const boldStyles = css({
 	fontWeight: "bold",
 });
 
-export function ParameterSelectWorkforceModal() {
+export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 	//SELECT WORKFORCE MODAL (SW)
-    let { projectId } = useParams();
-    let workforce_local = JSON.parse(localStorage.getItem("workforce_parameter"));
+	let { projectId } = useParams();
+	let workforce_local = JSON.parse(
+		localStorage.getItem("workforce_parameter")
+	);
 	const [isSWOpen, setIsSWOpen] = useState(false);
 	const openSWModal = useCallback(() => setIsSWOpen(true), []);
 	const closeSWModal = useCallback(() => setIsSWOpen(false), []);
 	const [TableLoadingState, setTableLoadingState] = useState(true);
 	const [searchInput, setSearchInput] = useState("");
 	const [workforces, setWorkforces] = useState([]);
+
+	const [selectedWorkforces, setSelectedWorkforces] = useState([]);
 	useEffect(function () {
 		invoke("getAllWorkforces")
 			.then(function (res) {
@@ -74,6 +78,12 @@ export function ParameterSelectWorkforceModal() {
 				}
 				setTableLoadingState(false);
 				setWorkforces(workforces);
+
+				const localWorkforceIds = workforce_local.map((workforce) =>
+					workforce.id.toString()
+				);
+
+				setSelectedWorkforces(localWorkforceIds);
 			})
 			.catch(function (error) {
 				console.log(error);
@@ -81,11 +91,9 @@ export function ParameterSelectWorkforceModal() {
 			});
 	}, []);
 
-
 	//FILTER WORKFORCE SELECT TABLE
 	const [workforcesFilter, setWorkforcesFilter] = useState(workforces);
-    
-    
+
 	const filterWorkforceName = useCallback(function (workforces, query) {
 		setWorkforcesFilter(
 			workforces.filter((e) =>
@@ -108,12 +116,26 @@ export function ParameterSelectWorkforceModal() {
 		}
 	}
 
-    function CheckSelectedWorkforce(workforceId){
-        workforce_local.map((workforce, index)=> {
-            return (workforce.id.toString() == workforceId.toString())? true: false;
-        })
-        return false
-    }
+	function CheckSelectedWorkforce(workforceId) {
+		workforce_local.map((workforce, index) => {
+			return workforce.id.toString() == workforceId.toString()
+				? true
+				: false;
+		});
+		return false;
+	}
+
+	function handleCheckboxChange(workforceId) {
+		setSelectedWorkforces((prevSelectedWorkforces) => {
+			if (prevSelectedWorkforces.includes(workforceId.toString())) {
+				return prevSelectedWorkforces.filter(
+					(id) => id !== workforceId.toString()
+				);
+			} else {
+				return [...prevSelectedWorkforces, workforceId.toString()];
+			}
+		});
+	}
 
 	const head = {
 		cells: [
@@ -136,8 +158,13 @@ export function ParameterSelectWorkforceModal() {
 			{
 				key: "no",
 				content: (
-                    <Checkbox isChecked={CheckSelectedWorkforce(workforce.id)}></Checkbox>
-                ),
+					<Checkbox
+						isChecked={selectedWorkforces.includes(
+							workforce.id.toString()
+						)}
+						onChange={() => handleCheckboxChange(workforce.id)}
+					/>
+				),
 			},
 			{
 				key: "name",
@@ -145,6 +172,34 @@ export function ParameterSelectWorkforceModal() {
 			},
 		],
 	}));
+
+	function saveSelectedWorkforces() {
+		const selectedWorkforcesArray = selectedWorkforces.map(
+			(workforceId) => {
+				return workforces.find(
+					(workforce) => workforce.id.toString() === workforceId
+				);
+			}
+		);
+
+		console.log("selected_workforces", selectedWorkforcesArray);
+
+		localStorage.setItem(
+			"selected_workforces",
+			JSON.stringify(selectedWorkforcesArray)
+		);
+
+        onSelectedWorkforces(selectedWorkforcesArray);
+	}
+
+	function handleConfirm() {
+		saveSelectedWorkforces();
+		closeSWModal();
+	}
+
+	function CheckSelectedWorkforce(workforceId) {
+		return selectedWorkforces.includes(workforceId.toString());
+	}
 
 	return (
 		<div>
@@ -181,7 +236,7 @@ export function ParameterSelectWorkforceModal() {
 									<Button
 										appearance="primary"
 										onClick={() => {
-											closeSWModal()
+											closeSWModal();
 										}}
 									>
 										Create new
@@ -206,7 +261,7 @@ export function ParameterSelectWorkforceModal() {
 							</Button>
 							<Button
 								appearance="primary"
-								onClick={closeSWModal}
+								onClick={handleConfirm}
 								autoFocus
 							>
 								Confirm
@@ -308,7 +363,7 @@ export function ParameterCreareWorkforceModal() {
 
 	return (
 		<>
-            <Button
+			<Button
 				iconBefore={<AddCircleIcon label="" size="large" />}
 				appearance="subtle"
 				onClick={openCWModal}
@@ -616,7 +671,7 @@ export function ParameterCreareWorkforceModal() {
 															}
 															{...fieldProps}
 														/>
-                                               
+
 														{!error && (
 															<HelperMessage>
 																<InfoIcon
