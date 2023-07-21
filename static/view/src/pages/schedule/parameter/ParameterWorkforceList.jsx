@@ -17,6 +17,8 @@ import InfoIcon from "@atlaskit/icon/glyph/info";
 import TrashIcon from "@atlaskit/icon/glyph/trash";
 import Select from "@atlaskit/select";
 import { Grid, GridColumn } from "@atlaskit/page";
+import { PiStarFill, PiStarBold } from "react-icons/pi";
+
 import Form, {
 	CheckboxField,
 	ErrorMessage,
@@ -46,6 +48,7 @@ import TextField from "@atlaskit/textfield";
 import { findObj } from "../pertchart/VisualizeTasks";
 import Rating from "react-rating";
 import CreatableAdvanced from "./creatable-selection";
+import { COLOR_SKILL_LEVEL } from "../../../common/contants";
 
 function ParameterWorkforceList() {
 	//GET LIST WORKFORCES
@@ -260,8 +263,16 @@ function ParameterWorkforceList() {
 						content: (
 							<>
 								<Rating
-									emptySymbol={<StarIcon />}
-									fullSymbol={<StarFilledIcon />}
+									emptySymbol={<PiStarBold size={25}   /> }
+									fullSymbol={
+                                        [
+                                            <PiStarFill size={25}   fill={COLOR_SKILL_LEVEL[0].color}  border/>,
+                                            <PiStarFill size={25}   fill={COLOR_SKILL_LEVEL[1].color} border/>,
+                                            <PiStarFill size={25}   fill={COLOR_SKILL_LEVEL[2].color}  border/>,
+                                            <PiStarFill size={25}   fill={COLOR_SKILL_LEVEL[3].color} border/>,
+                                            <PiStarFill size={25}   fill={COLOR_SKILL_LEVEL[4].color}  border/>,
+                                        ]
+                                    }
 									initialRating={skill.level}
 									onClick={(value) => {
 										skill.level = value;
