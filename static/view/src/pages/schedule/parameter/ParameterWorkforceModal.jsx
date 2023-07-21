@@ -21,6 +21,7 @@ import Toastify from "../../../common/Toastify";
 import { RadioGroup } from "@atlaskit/radio";
 import LoadingButton from "@atlaskit/button";
 import { Checkbox } from "@atlaskit/checkbox";
+import Lozenge from "@atlaskit/lozenge";
 import TextField from "@atlaskit/textfield";
 import Form, {
 	CheckboxField,
@@ -33,6 +34,7 @@ import Form, {
 	ValidMessage,
 } from "@atlaskit/form";
 import AddCircle from "@atlaskit/icon/glyph/add-circle";
+import { COLOR_SKILL_LEVEL } from "../../../common/contants";
 
 const options = [
 	{ name: "workingType", value: "0", label: "Fulltime" },
@@ -56,6 +58,7 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 	const [searchInput, setSearchInput] = useState("");
 	const [workforces, setWorkforces] = useState([]);
 
+
 	const [selectedWorkforces, setSelectedWorkforces] = useState([]);
 	useEffect(function () {
 		invoke("getAllWorkforces")
@@ -73,6 +76,7 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 						unitSalary: workforce.unitSalary,
 						workingType: workforce.workingType,
 						workingEffort: workforce.workingEffort,
+						skills: workforce.skills,
 					};
 					workforces.push(itemWorkforce);
 				}
@@ -93,7 +97,6 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 
 	//FILTER WORKFORCE SELECT TABLE
 	const [workforcesFilter, setWorkforcesFilter] = useState(workforces);
-
 	const filterWorkforceName = useCallback(function (workforces, query) {
 		setWorkforcesFilter(
 			workforces.filter((e) =>
@@ -147,7 +150,12 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 			{
 				key: "name",
 				content: "Name",
-				width: 90,
+				width: 35,
+			},
+			{
+				key: "skills",
+				content: "Skills",
+				width: 55,
 			},
 		],
 	};
@@ -159,6 +167,7 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 				key: "no",
 				content: (
 					<Checkbox
+						size="xlarge"
 						isChecked={selectedWorkforces.includes(
 							workforce.id.toString()
 						)}
@@ -169,6 +178,21 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 			{
 				key: "name",
 				content: workforce.name,
+			},
+			{
+				key: "skills",
+				content: (
+					<>
+						{workforce.skills?.map((skill, i) => (
+							<Lozenge key={i} 
+                                style={{
+                                    backgroundColor: COLOR_SKILL_LEVEL[skill.level - 1].color,
+                                    color: "white"
+                                }}
+                            >{skill.name}</Lozenge>
+						))}
+					</>
+				),
 			},
 		],
 	}));
@@ -189,7 +213,7 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 			JSON.stringify(selectedWorkforcesArray)
 		);
 
-        onSelectedWorkforces(selectedWorkforcesArray);
+		onSelectedWorkforces(selectedWorkforcesArray);
 	}
 
 	function handleConfirm() {
@@ -199,6 +223,33 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 
 	function CheckSelectedWorkforce(workforceId) {
 		return selectedWorkforces.includes(workforceId.toString());
+	}
+
+	//SELECT ALL BUTTON
+	const [selectAll, setSelectAll] = useState(false);
+	function handleSelectAll() {
+		if (selectAll) {
+			setSelectedWorkforces([]);
+		} else {
+			const allWorkforceIds = workforces.map((workforce) =>
+				workforce.id.toString()
+			);
+			setSelectedWorkforces(allWorkforceIds);
+		}
+		setSelectAll(!selectAll);
+	}
+
+	//HANDLE ROW SELECTED
+	function handleRowClick(workforceId) {
+		setSelectedWorkforces((prevSelectedWorkforces) => {
+			if (prevSelectedWorkforces.includes(workforceId.toString())) {
+				return prevSelectedWorkforces.filter(
+					(id) => id !== workforceId.toString()
+				);
+			} else {
+				return [...prevSelectedWorkforces, workforceId.toString()];
+			}
+		});
 	}
 
 	return (
@@ -240,6 +291,15 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 										}}
 									>
 										Create new
+									</Button>
+									{/* SELECT ALL BUTTON */}
+									<Button
+										appearance="primary"
+										onClick={handleSelectAll}
+									>
+										{selectAll
+											? "Deselect All"
+											: "Select All"}
 									</Button>
 								</div>
 							</div>

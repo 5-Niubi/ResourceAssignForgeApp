@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import TabsDefaultExample from "./ResourceTabs";
 import ResourceTabs from "./ResourceTabs";
+import WorkforcePageHeader from "./workforces/WorkforcePageHeader";
+import WorkforceDynamicTable from "./workforces/WorkforceDynamicTable";
 
 /**
  * Using as Demo Homepage
@@ -12,7 +14,10 @@ function ResourcesPage() {
 	let navigate = useNavigate();
 	return (
 		<>
-			<ResourceTabs></ResourceTabs>
+			<div style={{ width: "100%" }}>
+				<WorkforcePageHeader></WorkforcePageHeader>
+				<WorkforceDynamicTable></WorkforceDynamicTable>
+			</div>
 		</>
 	);
 }
