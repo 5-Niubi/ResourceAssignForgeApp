@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Highcharts, { find } from "highcharts";
-import HighchartsReact from "highcharts-react-official";
-// import HighchartsDraggablePoints from "highcharts-draggable-points";
 import HighchartsDraggablePoints from "highcharts/modules/draggable-points";
 import HighchartsGantt from "highcharts/modules/gantt";
-import { findObj } from "../pertchart/VisualizeTasks";
-import { sampleData } from "./data";
+import { colorsBank, findObj } from "../pertchart/VisualizeTasks";
 
 const findClosestNode = (arr, node) => {
 	//filter all task nodes in same row with target
@@ -69,17 +66,18 @@ const GanttChart3 = ({ selectedSolution }) => {
 		// Parse data into series.
 		var data = tasks.map(function (task, i) {
 			return {
-				id: task.id,
+				id: task.id+"",
 				start: new Date(task.startDate).getTime(),
 				end: new Date(task.endDate).getTime(),
-				dependency: task.taskIdPrecedences,
+				duration: task.duration,
+				dependency: task.taskIdPrecedences?.map((s) => s+""),
 				y: i,
 				name: task.name,
 				assignTo: task.workforce,
 				type: "task",
+				color: colorsBank[19],
 			};
 		});
-		console.log(data);
 
 		// Parse data into series.
 		var data2 = tasks.map(function (task, i) {
@@ -94,222 +92,311 @@ const GanttChart3 = ({ selectedSolution }) => {
 			};
 		});
 
-		Highcharts.ganttChart("gantt-chart-container", {
-			series: [
-				{
-					name: "",
-					data: data,
-					animation: false,
-					dragDrop: {
-						draggableX: true,
-						draggableY: false,
-						dragMinY: 0,
-						dragPrecisionX: day / 24, // Snap to eight hours
-					},
+		let chart = Highcharts.ganttChart(
+			"gantt-chart-container",
+			{
+				chart: {
+					height: 1, //initital value, changed based on the number of rows in series data, caculated after rendered
+					marginTop: 120,
 				},
-				{
-					name: "",
-					data: data2,
-					linkedTo: ":previous",
-					dragDrop: {
-						draggableX: true,
-						draggableY: true,
-						dragMinY: 0,
-						dragPrecisionX: day / 24, // Snap to eight hours
-					},
-					dataLabels: {
-						enabled: true,
-						draggable: true,
-						crop: false,
-						overflow: "none",
-						allowOverlap: true,
-						format: "{point.assignTo.name}",
-						align: "left",
-						style: {
-							fontWeight: "normal",
+				series: [
+					{
+						name: "Tasks",
+						data: data,
+						animation: false,
+						dragDrop: {
+							draggableX: true,
+							draggableY: false,
+							dragMinY: 0,
+							dragPrecisionX: day / 24, // Snap to eight hours
 						},
 					},
-					point: {
-						events: {
-							dragStart: function (e) {
-								// console.log("drag start");
+					{
+						name: "Resources",
+						data: data2,
+						linkedTo: ":previous",
+						dragDrop: {
+							draggableX: true,
+							draggableY: true,
+							dragMinY: 0,
+							dragPrecisionX: day / 24, // Snap to eight hours
+						},
+						dataLabels: {
+							enabled: true,
+							draggable: true,
+							crop: false,
+							overflow: "none",
+							allowOverlap: true,
+							format: "{point.assignTo.name}",
+							align: "left",
+							style: {
+								fontWeight: "normal",
 							},
-							drag: function (e) {
-								// console.log("drag");
-							},
-							drop: function (e) {
-								// console.log(e);
-								// console.log(e.newPoint);
-								// console.log(
-								// 	e.origin.points[
-								// 		Object.keys(e.origin.points)[0]
-								// 	]?.point?.id
-								// );
-
-								var closestNode = findClosestNode(
-									data,
-									e.newPoint
-								);
-								if (closestNode) {
-									//update resource to the closest node
-									// console.log(closestNode);
-									var newTask = findObj(
-										tasks,
-										closestNode.id
-									);
-									// var oldResource = newTask.workforce;
-									if (newTask) {
-										newTask.workforce =
-											e.origin.points[
-												Object.keys(e.origin.points)[0]
-											]?.point?.options?.assignTo;
-									}
-
-									// var oldTask = findObj(
-									// 	tasks,
+						},
+						point: {
+							events: {
+								dragStart: function (e) {
+									// console.log("drag start");
+								},
+								drag: function (e) {
+									// console.log("drag");
+								},
+								drop: function (e) {
+									// console.log(e);
+									// console.log(e.newPoint);
+									// console.log(
 									// 	e.origin.points[
 									// 		Object.keys(e.origin.points)[0]
 									// 	]?.point?.id
 									// );
-									// console.log(e);
-									// if (oldTask) {
-									// 	oldTask.workforce = oldResource;
-									// }
 
-									setTasks(tasks);
-									setIsChangeResource(!isChangeResource);
+									var closestNode = findClosestNode(
+										data,
+										e.newPoint
+									);
+									if (closestNode) {
+										//update resource to the closest node
+										// console.log(closestNode);
+										var newTask = findObj(
+											tasks,
+											closestNode.id
+										);
+										// var oldResource = newTask.workforce;
+										if (newTask) {
+											newTask.workforce =
+												e.origin.points[
+													Object.keys(
+														e.origin.points
+													)[0]
+												]?.point?.options?.assignTo;
+										}
+
+										// var oldTask = findObj(
+										// 	tasks,
+										// 	e.origin.points[
+										// 		Object.keys(e.origin.points)[0]
+										// 	]?.point?.id
+										// );
+										// console.log(e);
+										// if (oldTask) {
+										// 	oldTask.workforce = oldResource;
+										// }
+
+										setTasks(tasks);
+										setIsChangeResource(!isChangeResource);
+									}
+								},
+							},
+						},
+					},
+				],
+				plotOptions: {
+					series: {
+						connectors: {
+							lineWidth: 1,
+							radius: 5,
+							startMarker: {
+								enabled: true,
+							},
+						},
+					},
+				},
+				title: {
+					text: "",
+				},
+				tooltip: {
+					formatter: function () {
+						return false;
+					},
+					// 	pointFormat:
+					// 		"<span>Assigned To: {point.assignTo.name}</span><br/><span>From: {point.start:%e. %b}</span><span> To: {point.end:%e. %b}</span>",
+				},
+				scrollbar: {
+					enabled: true,
+				},
+				rangeSelector: {
+					enabled: true,
+					selected: 0,
+					inputDateFormat: "%d/%m/%Y",
+					inputBoxHeight: 25,
+					buttonPosition: {
+                        y: -50,
+                    },
+                    inputPosition: {
+                        y: -50,
+                    },
+				},
+				navigator: {
+					enabled: true,
+					liveRedraw: true,
+					height: 30,
+					top: 10,
+					series: {
+						type: "gantt",
+						pointPlacement: 0.5,
+						pointPadding: 0.25,
+						accessibility: {
+							enabled: false,
+						},
+					},
+				},
+				xAxis: [
+					{
+						grid: {
+							// borderWidth: 0,
+							borderColor: "#ccc",
+						},
+						currentDateIndicator: true,
+						dateTimeLabelFormats: {
+							day: '%e<br><span style="opacity: 0.7; font-size: 0.7em">%a</span>',
+						},
+						events: {
+							afterSetExtremes: function () {
+								const dateRange = this.max - this.min;
+
+								if (dateRange < 30 * day) {
+									this.update({
+										tickInterval: day,
+									});
 								}
 							},
 						},
 					},
-				},
-			],
-			plotOptions: {
-				connectors: {
-					lineWidth: 2,
-					radius: 5,
-					startMarker: {
-						enabled: false,
+					{
+						grid: {
+							borderColor: "#ccc",
+						},
+						dateTimeLabelFormats: {
+							month: "%B",
+						},
+						tickInterval: day * 30,
+						events: {
+							afterSetExtremes: function () {
+								const dateRange = this.max - this.min;
+
+								if (dateRange > 150 * day) {
+									this.update({
+										dateTimeLabelFormats: {
+											year: '%Y<br><span style="opacity: 0.7; font-size: 0.7em">&nbsp;</span>',
+										},
+										tickInterval: day * 365,
+									});
+								} else if (dateRange < 32 * day) {
+									this.update({
+										dateTimeLabelFormats: {
+											month: "%B",
+										},
+										tickInterval: day * 30,
+									});
+								} else {
+									this.update({
+										dateTimeLabelFormats: {
+											month: '%B<br><span style="opacity: 0.7; font-size: 0.7em">%Y</span>',
+										},
+										tickInterval: day * 30,
+									});
+								}
+							},
+						},
 					},
-				},
-			},
-			title: {
-				text: "",
-			},
-			tooltip: {
-				formatter: function () {
-					return false;
-				},
-				// 	pointFormat:
-				// 		"<span>Assigned To: {point.assignTo.name}</span><br/><span>From: {point.start:%e. %b}</span><span> To: {point.end:%e. %b}</span>",
-			},
-			scrollbar: {
-				enabled: true,
-			},
-			rangeSelector: {
-				enabled: true,
-				selected: 0,
-			},
-			navigator: {
-				enabled: true,
-				liveRedraw: true,
-				series: {
-					type: "gantt",
-					pointPlacement: 0.5,
-					pointPadding: 0.25,
-					accessibility: {
-						enabled: false,
-					},
-				},
-			},
-			xAxis: [
-				{
+				],
+				yAxis: {
+					type: "category",
 					grid: {
-						borderWidth: 0,
+						borderColor: "#ccc",
+						paddingLeft: "10px",
+						columns: [
+							{
+								title: {
+									useHTML: true,
+									text: `<div class='titleText' style='width: 174px;'>Tasks</div>`,
+									y: -83,
+									x: 0,
+								},
+								// categories: data.map(function (s) {
+								// 	return `<div style="padding: 10px">${s.name}</div>`;
+								// }),
+								labels: {
+									x: 20,
+									useHTML: true,
+									align: "left",
+									formatter: function () {
+										return data[this.value]?.name;
+									},
+									style: {
+										fontSize: "13px",
+										width: "300px",
+										textOverflow: "ellipsis",
+										paddingLeft: "10px",
+										boxSizing: "border-box",
+									},
+								},
+							},
+							{
+								title: {
+									useHTML: true,
+									text: `<div class='titleText' style='width: 86px; border-left: none;'>Duration</div>`,
+									y: -83,
+									x: 0,
+								},
+								categories: data.map(function (s) {
+									return s.duration + " days";
+								}),
+								labels: {
+									style: {
+										width: "200px",
+										textOverflow: "ellipsis",
+									},
+								},
+							},
+							{
+								title: {
+									useHTML: true,
+									text: `<div class='titleText' style='width: 100px; border-left: none;'>Start</div>`,
+									y: -83,
+									x: 0,
+								},
+								categories: data.map(function (s) {
+									return dateFormat("%d/%m/%Y", s.start);
+								}),
+								labels: {
+									style: {
+										width: "200px",
+										textOverflow: "ellipsis",
+									},
+								},
+							},
+							{
+								title: {
+									useHTML: true,
+									text: `<div class='titleText' style='width: 100px; border-left: none;'>End</div>`,
+									y: -83,
+									x: 0,
+								},
+								categories: data.map(function (s) {
+									return dateFormat("%d/%m/%Y", s.end);
+								}),
+								labels: {
+									style: {
+										width: "200px",
+										textOverflow: "ellipsis",
+									},
+								},
+							},
+						],
 					},
-					currentDateIndicator: true,
-					dateTimeLabelFormats: {
-						day: '%e<br><span style="opacity: 0.5; font-size: 0.7em">%a</span>',
-					},
-					tickInterval: day,
-				},
-				{
-					dateTimeLabelFormats: {
-						month: "%B",
-					},
-					tickInterval: day * 30,
-				},
-			],
-			yAxis: {
-				type: "category",
-				grid: {
-					columns: [
-						{
-							title: {
-								text: "Tasks",
-							},
-							categories: data.map(function (s) {
-								return `<div style='padding: '10px'>${
-									s.name
-								}<br> <span style="opacity: 0.5; font-size: 0.7em">${dateFormat("%e %b", s.start) + "-" + dateFormat("%e %b", s.end)}</span></div>`;
-							}),
-							labels: {
-								align: "left",
-								style: {
-									width: "300px",
-									textOverflow: "ellipsis",
-								},
-							},
-						},
-						{
-							title: {
-								text: "Duration",
-							},
-							categories: data.map(function (s) {
-								return (s.end - s.start)/(1000*60*60*24) + " days";
-							}),
-							labels: {
-								align: "left",
-								style: {
-									width: "200px",
-									textOverflow: "ellipsis",
-								},
-							},
-						},
-						{
-							title: {
-								text: "Start",
-							},
-							categories: data.map(function (s) {
-								return dateFormat("%e %b", s.start);
-							}),
-							labels: {
-								align: "left",
-								style: {
-									width: "200px",
-									textOverflow: "ellipsis",
-								},
-							},
-						},
-						{
-							title: {
-								text: "End",
-							},
-							categories: data.map(function (s) {
-								return dateFormat("%e %b", s.end);
-							}),
-							labels: {
-								align: "left",
-								style: {
-									width: "200px",
-									textOverflow: "ellipsis",
-								},
-							},
-						},
-					],
 				},
 			},
-		});
+			function (chart) {
+				//40 is a pixel value for one cell
+				let chartHeight = 40 * chart.series[0].data.length;
+				chart.update({
+					chart: {
+						height: chartHeight,
+					},
+				});
+			}
+		);
 	});
 
 	return <div id="gantt-chart-container" />;

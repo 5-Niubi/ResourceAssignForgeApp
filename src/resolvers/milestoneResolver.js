@@ -12,6 +12,16 @@ function milestoneResolver(resolver) {
 			console.log("Error in getAllMilestones: ", error);
 		}
 	});
+
+	resolver.define("createMilestone", async function (req) {
+		try {
+			let response = await milestoneService.createMilestone(req.payload.milestoneObjRequest);
+			return response;
+		} catch (error) {
+			console.log("Error in createMilestone: ", error);
+			return Promise.reject(error);
+		}
+	});
 }
 
 export default milestoneResolver;

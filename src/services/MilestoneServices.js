@@ -9,4 +9,17 @@ async function getAllMilestones(projectId) {
 	}
 }
 
-export { getAllMilestones };
+async function createMilestone(milestoneRequest) {
+	try {
+		let response = await APIServices.post(
+			`/api/Milestones/CreateMilestone`,
+			null,
+			milestoneRequest
+		);
+		return response;
+	} catch (error) {
+		return Promise.reject(error);
+	}
+}
+
+export { getAllMilestones, createMilestone };

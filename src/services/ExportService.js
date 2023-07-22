@@ -3,10 +3,20 @@ import APIJiraServices from "./common/APIJiraServices";
 import APIServices from "./common/APIServices";
 import { BACKEND_dNET_DOMAIN } from "../common/constants";
 
-async function exportToJira(scheduleId) {
+async function exportToJira(context, scheduleId, projectCreate) {
 	try {
+		let body = {};
+		body.key = projectCreate.projectKey;
+		body.leadAccountId = context.accountId;
+		body.name = projectCreate.projectName;
+		body.projectTemplateKey = "com.pyxis.greenhopper.jira:gh-simplified-basic";
+		body.projectTypeKey = "software";
+
+		let response = await APIJiraServices.post("/rest/api/3/project", null, body);
+		
 		const result = await APIServices.get(`/api/Export/ExportToJira`, {
 			scheduleId,
+			projectId: response.id
 		});
 		return result;
 	} catch (error) {
@@ -17,7 +27,10 @@ async function exportToJira(scheduleId) {
 async function getUrlexportToMSXml(scheduleId) {
 	try {
 		// Get Token
-		const result = await APIServices.get(`/Authentication/GetTokenForDownload`, null);
+		const result = await APIServices.get(
+			`/Authentication/GetTokenForDownload`,
+			null
+		);
 		let token = result.token;
 
 		let apiDownload = "/api/Export/ExportToMicrosoftProject";

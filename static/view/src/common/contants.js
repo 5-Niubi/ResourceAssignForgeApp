@@ -47,7 +47,7 @@ export const THREAD_STATE_DEFAULT = Object.freeze({
 });
 
 export const STORAGE = Object.freeze({
-	THREAD_INFO : "threadInfo",
+	THREAD_INFO: "threadInfo",
 });
 
 export const INTERVAL_FETCH = 5000;
