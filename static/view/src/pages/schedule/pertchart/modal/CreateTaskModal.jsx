@@ -7,13 +7,14 @@ import Modal, {
 	ModalTransition,
 	useModal,
 } from "@atlaskit/modal-dialog";
-import Select from "@atlaskit/select";
+import Select, { CreatableSelect } from "@atlaskit/select";
 import { Grid, GridColumn } from "@atlaskit/page";
 import React, { Fragment, useState, useCallback, useEffect } from "react";
 import TextField from "@atlaskit/textfield";
 import Form, { Field, FormSection } from "@atlaskit/form";
 import { invoke } from "@forge/bridge";
 import { findObj } from "../VisualizeTasks";
+import Toastify from "../../../../common/Toastify";
 
 function CreateTaskModal({
 	isOpen,
@@ -31,6 +32,7 @@ function CreateTaskModal({
 	const [reqSkills, setReqSkills] = useState([]);
 	const [precedences, setPrecedences] = useState([]);
 
+	const [ms, setMilestones] = useState(milestones);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	var milestoneOpts = [];
@@ -104,11 +106,48 @@ function CreateTaskModal({
 
 	const updatePrecedences = useCallback(function (values) {
 		var pres = [];
-		values?.forEach((item) =>
-			pres.push({ precedenceId: item.value })
-		);
+		values?.forEach((item) => pres.push({ precedenceId: item.value }));
 		setPrecedences(pres);
 	}, []);
+
+	const createMilestone = (name) => {
+		let reqMilestone = {
+			Name: name,
+			ProjectId: projectId,
+		};
+		invoke("createMilestone", { reqMilestone })
+			.then(function (res) {
+				console.log(res);
+				if (res.id) {
+					return res;
+				}
+			})
+			.catch();
+		return null;
+	};
+
+	const handleCreateMilestone = (inputValue) => {
+		let reqMilestone = {
+			Name: inputValue,
+			ProjectId: projectId,
+		};
+		invoke("createMilestone", { milestoneObjRequest: reqMilestone })
+			.then(function (res) {
+				console.log(res);
+				if (res.id) {
+					setMilestones([...ms, res]);
+					setMilestone({
+						value: res.id,
+						label: res.name,
+					});
+					return res;
+				}
+			})
+			.catch((error) => {
+				console.log(error);
+				Toastify.error(error.toString());
+			});
+	};
 
 	useEffect(function () {
 		setIsSubmitting(false);
@@ -135,7 +174,7 @@ function CreateTaskModal({
 			.then(function (res) {
 				// setProjectsDisplay((prevs) => [res, ...prevs]);
 				console.log(res);
-				if (res.id){
+				if (res.id) {
 					tasks.push(res);
 					updateTasks(tasks);
 					updateCurrentTaskId(res.id);
@@ -198,14 +237,18 @@ function CreateTaskModal({
 										>
 											{({ fieldProps }) => (
 												<Fragment>
-													<Select
+													<CreatableSelect
 														{...fieldProps}
 														inputId="select-milestone"
 														className="select-milestone"
+														isClearable
 														options={milestoneOpts}
 														value={milestone}
 														onChange={
 															updateMilestone
+														}
+														onCreateOption={
+															handleCreateMilestone
 														}
 														isSearchable={true}
 														placeholder="Choose milestone"
@@ -276,7 +319,9 @@ function CreateTaskModal({
 											<LoadingButton
 												appearance="primary"
 												isLoading
-											>Saving...</LoadingButton>
+											>
+												Saving...
+											</LoadingButton>
 										) : (
 											<Button
 												type="submit"
