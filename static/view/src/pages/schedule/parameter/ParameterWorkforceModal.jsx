@@ -9,6 +9,8 @@ import EditIcon from "@atlaskit/icon/glyph/edit";
 import StarIcon from "@atlaskit/icon/glyph/star";
 import InfoIcon from "@atlaskit/icon/glyph/info";
 import { useParams } from "react-router";
+import Avatar from "@atlaskit/avatar";
+import Select from '@atlaskit/select';
 import Modal, {
 	ModalBody,
 	ModalFooter,
@@ -57,7 +59,6 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 	const [TableLoadingState, setTableLoadingState] = useState(true);
 	const [searchInput, setSearchInput] = useState("");
 	const [workforces, setWorkforces] = useState([]);
-
 
 	const [selectedWorkforces, setSelectedWorkforces] = useState([]);
 	useEffect(function () {
@@ -184,12 +185,17 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 				content: (
 					<>
 						{workforce.skills?.map((skill, i) => (
-							<Lozenge key={i} 
-                                style={{
-                                    backgroundColor: COLOR_SKILL_LEVEL[skill.level - 1].color,
-                                    color: "white"
-                                }}
-                            >{skill.name}</Lozenge>
+							<Lozenge
+								key={i}
+								style={{
+									backgroundColor:
+										COLOR_SKILL_LEVEL[skill.level - 1]
+											.color,
+									color: "white",
+								}}
+							>
+								{skill.name}
+							</Lozenge>
 						))}
 					</>
 				),
@@ -341,6 +347,29 @@ export function ParameterCreareWorkforceModal() {
 	const closeCWModal = useCallback(() => setIsCWOpen(false), []);
 	const [isParttimeSelected, setIsParttimeSelected] = useState(false);
 
+	const [workforcesJiraAccount, setWorkforcesJiraAccount] = useState([]);
+
+	useEffect(function () {
+		invoke("getAllUserJira")
+			.then(function (jiraUsersResponse) {
+				const jiraUsers = jiraUsersResponse
+					.filter((user) => user.accountType === "atlassian")
+					.map((user) => ({
+						accountId: user.accountId,
+						email: user.emailAddress,
+						accountType: user.accountType,
+						name: user.displayName,
+						avatar: user.avatarUrls["48x48"],
+						displayName: user.displayName,
+					}));
+				setWorkforcesJiraAccount(jiraUsers);
+			})
+			.catch(function (error) {
+				console.log(error);
+				Toastify.error(error.toString());
+			});
+	}, []);
+
 	function handleOnSelected(e) {
 		if (e.currentTarget.value == "1") {
 			setIsParttimeSelected(true);
@@ -421,6 +450,15 @@ export function ParameterCreareWorkforceModal() {
 		],
 	}));
 
+    function formatOptionLabel(user) {
+        return (
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <Avatar src={user.avatar} alt={user.label} size="medium" />
+            <div style={{ marginLeft: '8px' }}>{user.label}</div>
+          </div>
+        );
+      }
+
 	return (
 		<>
 			<Button
@@ -455,6 +493,35 @@ export function ParameterCreareWorkforceModal() {
 								>
 									{({ formProps, submitting }) => (
 										<form {...formProps}>
+											<Field
+												name="jiraAccount"
+												label="Jira Account"
+												isRequired
+												defaultValue=""
+											>
+												{({ fieldProps, error }) => (
+													<Fragment>
+														<Select
+															inputId="single-select-example"
+															className="single-select"
+															classNamePrefix="react-select"
+															options={[workforcesJiraAccount.map((user)=>({
+                                                                label: user.displayName,
+                                                                value: user.displayName,
+                                                                avatar: user.avatar,
+                                                            }))]}
+                                                            formatOptionLabel={formatOptionLabel}
+															placeholder="Choose a Jira account"
+														/>
+														{!error && (
+															<HelperMessage></HelperMessage>
+														)}
+														{error && (
+															<ErrorMessage></ErrorMessage>
+														)}
+													</Fragment>
+												)}
+											</Field>
 											<Field
 												name="email"
 												label="Email"

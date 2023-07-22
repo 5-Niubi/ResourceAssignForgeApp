@@ -47,30 +47,39 @@ const overflow = css({
 function WorkforceDynamicTable() {
 	const [TableLoadingState, setTableLoadingState] = useState(true);
 	const [workforces, setWorkforces] = useState([]);
-	useEffect(function () {
-		invoke("getAllWorkforces")
-			.then(function (res) {
-				let workforces = [];
-				for (let workforce of res) {
-					let itemWorkforce = {
-						id: workforce.id,
-						accountId: workforce.accountId,
-						email: workforce.email,
-						accountType: workforce.accountType,
-						name: workforce.name,
-						avatar: workforce.avatar,
-						displayName: workforce.displayName,
-						unitSalary: workforce.unitSalary,
-						workingType: workforce.workingType,
-						workingEffort: workforce.workingEffort,
-						skills: workforce.skills,
-					};
-					workforces.push(itemWorkforce);
-				}
+	useEffect(() => {
+		Promise.all([invoke("getAllWorkforces"), invoke("getAllUserJira")])
+			.then(([workforcesResponse, jiraUsersResponse]) => {
+				const workforces = workforcesResponse.map((workforce) => ({
+					id: workforce.id,
+					accountId: workforce.accountId,
+					email: workforce.email,
+					accountType: workforce.accountType,
+					name: workforce.name,
+					avatar: workforce.avatar,
+					displayName: workforce.displayName,
+					unitSalary: workforce.unitSalary,
+					workingType: workforce.workingType,
+					workingEffort: workforce.workingEffort,
+					skills: workforce.skills,
+				}));
+
+				console.log("GetAllUserJira", jiraUsersResponse);
+				const jiraUsers = jiraUsersResponse
+					.filter((user) => user.accountType === "atlassian")
+					.map((user) => ({
+						accountId: user.accountId,
+						email: user.emailAddress,
+						accountType: user.accountType,
+						name: user.displayName,
+						avatar: user.avatarUrls["48x48"],
+						displayName: user.displayName,
+					}));
+
+				setWorkforces([...workforces, ...jiraUsers]);
 				setTableLoadingState(false);
-				setWorkforces(workforces);
 			})
-			.catch(function (error) {
+			.catch((error) => {
 				console.log(error);
 				Toastify.error(error.toString());
 			});
@@ -118,8 +127,9 @@ function WorkforceDynamicTable() {
 				},
 				{
 					key: "name",
-					content: "Name",
-					width: withWidth ? 17 : undefined,
+                    content: "Name",
+                    isSortable: true,
+                    width: withWidth ? 25 : undefined
 				},
 				{
 					key: "skill",
@@ -173,11 +183,13 @@ function WorkforceDynamicTable() {
 				content: (
 					<NameWrapper>
 						<AvatarWrapper>
-							<Avatar name={workforce.name} size="medium" />{" "}
-							<a href="https://atlassian.design">
-								{workforce.name}
-							</a>
+							<Avatar
+								src={workforce.avatar}
+								name={workforce.displayName}
+								size="medium"
+							/>
 						</AvatarWrapper>
+						<a href="">{workforce.name}</a>
 					</NameWrapper>
 				),
 			},
@@ -226,9 +238,7 @@ function WorkforceDynamicTable() {
 				<p>
 					<strong>NUMBER RECORDS</strong>
 				</p>
-				<p>
-                    We have total number {workforces.length} members
-				</p>
+				<p>We have total number {workforces.length} members</p>
 			</InlineMessage>
 			<div css={overflow}>
 				<DynamicTable
