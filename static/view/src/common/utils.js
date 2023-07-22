@@ -41,5 +41,5 @@ export function calculateDuration({ startDate, endDate }) {
 }
 
 export function extractProjectKey(str) {
-	return str.replace(/[^A-Z0-9^-]+/g, "");
+	return str.replace(/[^A-Z0-9]+/g, "");
 }

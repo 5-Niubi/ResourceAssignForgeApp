@@ -14,7 +14,9 @@ import { extractProjectKey } from "../../../common/utils";
 
 function JiraCreateProjectExport({ state, onCreateClick, isLoading }) {
 	const [modalState, setModalState] = state;
-	const [projectName, setProjectName] = useState(modalState.data.projectName);
+	const [projectName, setProjectName] = useState(
+		modalState.data.projectName ? modalState.data.projectName : ""
+	);
 	const [projectKey, setProjectKey] = useState(extractProjectKey(projectName));
 
 	function closeModal() {

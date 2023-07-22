@@ -15,7 +15,7 @@ import { ToastContainer, toast } from "react-toastify";
 import TestModal from "./pages/TestModal";
 import EstimationPage from "./pages/schedule/estimation";
 import LoadingModalWithThread from "./components/LoadingModalWithThread";
-import { THREAD_STATE_DEFAULT } from "./common/contants";
+import { STORAGE, THREAD_STATE_DEFAULT } from "./common/contants";
 import Toastify from "./common/Toastify";
 
 export const ThreadLoadingContext = createContext({ state: [] });
@@ -41,7 +41,7 @@ function App() {
 	}, []);
 
 	useEffect(function () {
-		let threadInfoRaw = localStorage.getItem("thread_info");
+		let threadInfoRaw = localStorage.getItem(STORAGE.THREAD_INFO);
 		let threadInfo = JSON.parse(threadInfoRaw);
 		if(threadInfo){
 			setThreadStateValue({

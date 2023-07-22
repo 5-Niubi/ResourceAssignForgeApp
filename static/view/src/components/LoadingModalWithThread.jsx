@@ -16,6 +16,7 @@ import {
 	THREAD_STATUS,
 } from "../common/contants";
 import { removeThreadInfo } from "../common/utils";
+import signal, { HubConnectionBuilder } from "@microsoft/signalr";
 
 function LoadingModalWithThread({ state }) {
 	const [modalState, setModalState] = state;
@@ -24,6 +25,9 @@ function LoadingModalWithThread({ state }) {
 		[]
 	);
 	const [progress, setProgress] = useState("...");
+
+	// Optional: Invoke hub methods on the server.
+	// connection.invoke("SomeHubMethod", someParameter);
 
 	useEffect(() => {
 		const intervalId = setInterval(() => {
