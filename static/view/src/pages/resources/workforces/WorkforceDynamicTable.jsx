@@ -1,10 +1,24 @@
-import { css, jsx } from "@emotion/react";
-
 import { token } from "@atlaskit/tokens";
-
+import React, { useEffect, useState, useCallback, Fragment } from "react";
 import DynamicTable from "@atlaskit/dynamic-table";
-
-import { head, rows } from "./table-content/sample-data";
+import { FC, ReactNode } from "react";
+import { invoke } from "@forge/bridge";
+import Toastify from "../../../common/Toastify";
+import Lozenge from "@atlaskit/lozenge";
+import { COLOR_SKILL_LEVEL } from "../../../common/contants";
+import InlineMessage from "@atlaskit/inline-message";
+import { css, jsx } from "@emotion/react";
+import TrashIcon from "@atlaskit/icon/glyph/trash";
+import EditIcon from "@atlaskit/icon/glyph/edit";
+import Avatar from "@atlaskit/avatar";
+import DropdownMenu, {
+	DropdownItem,
+	DropdownItemGroup,
+} from "@atlaskit/dropdown-menu";
+import WorkforceLozenge from "./WorkforceLozenge";
+import Button from "@atlaskit/button";
+import WorkforceModal from "./WorkforceModal";
+import MoreIcon from "@atlaskit/icon/glyph/more";
 
 const wrapperStyles = css({
 	position: "relative",
@@ -30,12 +44,201 @@ const overflow = css({
 	},
 });
 
-const WorkforceDynamicTable = () => (
-	<div css={wrapperStyles}>
-		<div css={overflow}>
-			<DynamicTable head={head} rows={rows} />
+function WorkforceDynamicTable() {
+	const [TableLoadingState, setTableLoadingState] = useState(true);
+	const [workforces, setWorkforces] = useState([]);
+	useEffect(function () {
+		invoke("getAllWorkforces")
+			.then(function (res) {
+				let workforces = [];
+				for (let workforce of res) {
+					let itemWorkforce = {
+						id: workforce.id,
+						accountId: workforce.accountId,
+						email: workforce.email,
+						accountType: workforce.accountType,
+						name: workforce.name,
+						avatar: workforce.avatar,
+						displayName: workforce.displayName,
+						unitSalary: workforce.unitSalary,
+						workingType: workforce.workingType,
+						workingEffort: workforce.workingEffort,
+						skills: workforce.skills,
+					};
+					workforces.push(itemWorkforce);
+				}
+				setTableLoadingState(false);
+				setWorkforces(workforces);
+			})
+			.catch(function (error) {
+				console.log(error);
+				Toastify.error(error.toString());
+			});
+	}, []);
+
+	function createKey(input) {
+		return input
+			? input.replace(/^(the|a|an)/, "").replace(/\s/g, "")
+			: input;
+	}
+
+	function iterateThroughLorem(index) {
+		return index > lorem.length ? index - lorem.length : index;
+	}
+
+	const nameWrapperStyles = css({
+		display: "flex",
+		alignItems: "center",
+	});
+
+	const NameWrapper = ({ children }) => (
+		<span css={nameWrapperStyles}>{children}</span>
+	);
+
+	const avatarWrapperStyles = css({
+		marginRight: token("space.100", "8px"),
+	});
+
+	const AvatarWrapper = ({ children }) => (
+		<div css={avatarWrapperStyles}>{children}</div>
+	);
+
+	const createHead = (withWidth) => {
+		return {
+			cells: [
+				{
+					key: "no",
+					content: "No",
+					width: 2,
+				},
+				{
+					key: "id",
+					content: "ID",
+					width: withWidth ? 8 : undefined,
+				},
+				{
+					key: "name",
+					content: "Name",
+					width: withWidth ? 17 : undefined,
+				},
+				{
+					key: "skill",
+					content: "Skills",
+					shouldTruncate: false,
+					width: withWidth ? 25 : undefined,
+				},
+				{
+					key: "salary",
+					content: "Salary (Hour)",
+					shouldTruncate: false,
+					width: withWidth ? 5 : undefined,
+				},
+				{
+					key: "type",
+					content: "Type",
+					shouldTruncate: false,
+					width: withWidth ? 5 : undefined,
+				},
+				{
+					key: "action",
+					content: "Action",
+					shouldTruncate: false,
+					width: withWidth ? 5 : undefined,
+				},
+			],
+		};
+	};
+
+	const head = createHead(true);
+
+	const rows = workforces.map((workforce, index) => ({
+		key: `row-${index}-${workforce.name}`,
+		isHighlighted: false,
+		cells: [
+			{
+				key: workforce.no,
+				content: index + 1,
+				width: 15,
+			},
+			{
+				key: workforce.id,
+				content: (
+					<NameWrapper>
+						<a href="">{workforce.id}</a>
+					</NameWrapper>
+				),
+			},
+			{
+				key: createKey(workforce.name),
+				content: (
+					<NameWrapper>
+						<AvatarWrapper>
+							<Avatar name={workforce.name} size="medium" />{" "}
+							<a href="https://atlassian.design">
+								{workforce.name}
+							</a>
+						</AvatarWrapper>
+					</NameWrapper>
+				),
+			},
+			{
+				key: workforce.skills,
+				content: (
+					<>
+						{workforce.skills?.map((skill, i) => (
+							<Lozenge
+								key={i}
+								style={{
+									backgroundColor:
+										COLOR_SKILL_LEVEL[skill.level - 1]
+											.color,
+									color: "white",
+								}}
+							>
+								{skill.name}
+							</Lozenge>
+						))}
+					</>
+				),
+			},
+			{
+				key: workforce.salary,
+				content: workforce.unitSalary,
+			},
+			{
+				key: "type",
+				content: workforce.workingType == 0 ? "Full-time" : "Part-time",
+			},
+			{
+				key: "action",
+				content: (
+					<div>
+						<MoreIcon></MoreIcon>
+					</div>
+				),
+			},
+		],
+	}));
+
+	return (
+		<div css={wrapperStyles}>
+			<InlineMessage appearance="info">
+				<p>
+					<strong>NUMBER RECORDS</strong>
+				</p>
+				<p>
+                    We have total number {workforces.length} members
+				</p>
+			</InlineMessage>
+			<div css={overflow}>
+				<DynamicTable
+					head={head}
+					rows={rows}
+					isLoading={TableLoadingState}
+				/>
+			</div>
 		</div>
-	</div>
-);
+	);
+}
 
 export default WorkforceDynamicTable;
