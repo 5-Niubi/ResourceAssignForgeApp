@@ -4,17 +4,37 @@ import ParameterPage from "./parameter/ParameterPage";
 import GanttChartPage from "./ganttchart/GanttChartPage";
 import Badge from '@atlaskit/badge';
 import EstimationPage from "./estimation";
-import { useCallback, useState } from "react";
+import { createContext, useCallback, useEffect, useState } from "react";
 import ResultPage from "./resultpage/ResultPage";
+import React from "react";
+import { invoke } from "@forge/bridge";
+import { useParams } from "react-router";
+import Toastify from "../../common/Toastify";
+
+const projectInfoContextInit = {};
+export const ProjectInfoContext = createContext(projectInfoContextInit);
 
 export default function ScheduleTabs() {
+	const {projectId} = useParams();
 	const [selected, setSelected] = useState(0);
+	const [project, setProject] = useState({});
 
 	const handleChangeTab = useCallback(
 		(index) => setSelected(index),
 		[setSelected]
 	);
+
+	useEffect(() => {
+		invoke("getProjectDetail", {projectId}).then((res) => {
+			setProject(res);
+		}).catch(error=> {
+			console.log(error);
+			Toastify.error(error.message);
+		})
+	}, []);
+	
 	return (
+		<ProjectInfoContext.Provider value={project}>
 		<Tabs onChange={handleChangeTab} selected={selected} id="default">
 			<TabList>
 				<Tab>
@@ -43,5 +63,6 @@ export default function ScheduleTabs() {
 				<ResultPage handleChangeTab={handleChangeTab} />
 			</TabPanel>
 		</Tabs>
+		</ProjectInfoContext.Provider>
 	);
 }

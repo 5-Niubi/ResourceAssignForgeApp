@@ -26,7 +26,7 @@ const descriptionContainerStyles = xcss({
 	display: "flex", alignItems: "center", justifyContent: "center", height: "3rem"
 });
 
-function JiraAutoCreateProjectExport({
+function JiraCreateProjectExportGrid({
 	isButtonExportLoading,
 	onButtonExportClick,
 }) {
@@ -56,7 +56,7 @@ function JiraAutoCreateProjectExport({
 						appearance="primary"
 						onClick={onButtonExportClick}
 					>
-						Export
+						Create
 					</LoadingButton>
 				</Box>
 			</GridColumn>
@@ -64,4 +64,4 @@ function JiraAutoCreateProjectExport({
 	);
 }
 
-export default JiraAutoCreateProjectExport;
+export default JiraCreateProjectExportGrid;
