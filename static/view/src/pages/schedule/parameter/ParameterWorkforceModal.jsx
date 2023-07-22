@@ -462,10 +462,8 @@ export function ParameterCreareWorkforceModal() {
 	return (
 		<>
 			<Button
-				iconBefore={<AddCircleIcon label="" size="large" />}
-				appearance="subtle"
 				onClick={openCWModal}
-			></Button>
+			>Create new</Button>
 			{/* CREATE WORKFORCE MODAL (CW) */}
 			<ModalTransition>
 				{isCWOpen && (

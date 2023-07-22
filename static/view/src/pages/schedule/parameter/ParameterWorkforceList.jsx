@@ -136,8 +136,10 @@ function ParameterWorkforceList() {
 
 	const buttonActions = (
 		<>
-			<ParameterCreareWorkforceModal></ParameterCreareWorkforceModal>
+        <ButtonGroup>
+            <ParameterCreareWorkforceModal></ParameterCreareWorkforceModal>
 			<ParameterSelectWorkforceModal onSelectedWorkforces={handleSelectedWorkforces}></ParameterSelectWorkforceModal>
+        </ButtonGroup>
 		</>
 	);
 
