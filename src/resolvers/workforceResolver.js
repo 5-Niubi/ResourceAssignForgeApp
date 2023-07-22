@@ -13,6 +13,16 @@ function workforceResolver(resolver){
             return Promise.reject(error);
         }
     });
+
+    resolver.define("getAllUserJira", async function () {
+		try {
+			return await workforceService.getAllUsersJira({});
+		} catch (error) {
+			console.log("Error in getAllUserJira: ", error);
+			return Promise.reject(error);
+		}
+	});
+
 }
 
 export default workforceResolver;
