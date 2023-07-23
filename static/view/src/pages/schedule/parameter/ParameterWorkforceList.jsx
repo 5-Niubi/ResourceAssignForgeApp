@@ -15,7 +15,7 @@ import EditIcon from "@atlaskit/icon/glyph/edit";
 import StarIcon from "@atlaskit/icon/glyph/star";
 import InfoIcon from "@atlaskit/icon/glyph/info";
 import TrashIcon from "@atlaskit/icon/glyph/trash";
-import Select from "@atlaskit/select";
+import Select, { AsyncSelect } from "@atlaskit/select";
 import { Grid, GridColumn } from "@atlaskit/page";
 import { PiStarFill, PiStarBold } from "react-icons/pi";
 
@@ -113,13 +113,12 @@ function ParameterWorkforceList() {
 			});
 	}, []);
 
-    // const [selectedWorkforcesArray, setSelectedWorkforcesArray] = useState([]);
+	// const [selectedWorkforcesArray, setSelectedWorkforcesArray] = useState([]);
 
-    const handleSelectedWorkforces = (selectedWorkforcesArray) => {
-        setWorkforces(selectedWorkforcesArray);
-        console.log("Cac workforce moi", workforces);
-    };
-
+	const handleSelectedWorkforces = (selectedWorkforcesArray) => {
+		setWorkforces(selectedWorkforcesArray);
+		console.log("Cac workforce moi", workforces);
+	};
 
 	const options = [
 		{ label: "Fulltime", value: 0 },
@@ -136,10 +135,12 @@ function ParameterWorkforceList() {
 
 	const buttonActions = (
 		<>
-        <ButtonGroup>
-            <ParameterCreareWorkforceModal></ParameterCreareWorkforceModal>
-			<ParameterSelectWorkforceModal onSelectedWorkforces={handleSelectedWorkforces}></ParameterSelectWorkforceModal>
-        </ButtonGroup>
+			<ButtonGroup>
+				<ParameterCreareWorkforceModal></ParameterCreareWorkforceModal>
+				<ParameterSelectWorkforceModal
+					onSelectedWorkforces={handleSelectedWorkforces}
+				></ParameterSelectWorkforceModal>
+			</ButtonGroup>
 		</>
 	);
 
@@ -224,7 +225,7 @@ function ParameterWorkforceList() {
 
 	const validateNumberWorkingEffort = (value) => {
 		//REQUIRES NUMBER ONLY AND NUMBER FROM 0.0 to 1.0 IN ARRAY
-        for (let element in value){
+		for (let element in value) {
 			const numValue = parseFloat(element);
 			if (isNaN(numValue)) {
 				return "NOT_VALID";
@@ -233,7 +234,7 @@ function ParameterWorkforceList() {
 			if (numValue < 0.0 || numValue > 1.0) {
 				return "NOT_VALID";
 			}
-        }
+		}
 		return undefined;
 	};
 
@@ -265,16 +266,34 @@ function ParameterWorkforceList() {
 						content: (
 							<>
 								<Rating
-									emptySymbol={<PiStarBold size={25}   /> }
-									fullSymbol={
-                                        [
-                                            <PiStarFill size={25}   fill={COLOR_SKILL_LEVEL[0].color}  border/>,
-                                            <PiStarFill size={25}   fill={COLOR_SKILL_LEVEL[1].color} border/>,
-                                            <PiStarFill size={25}   fill={COLOR_SKILL_LEVEL[2].color}  border/>,
-                                            <PiStarFill size={25}   fill={COLOR_SKILL_LEVEL[3].color} border/>,
-                                            <PiStarFill size={25}   fill={COLOR_SKILL_LEVEL[4].color}  border/>,
-                                        ]
-                                    }
+									emptySymbol={<PiStarBold size={25} />}
+									fullSymbol={[
+										<PiStarFill
+											size={25}
+											fill={COLOR_SKILL_LEVEL[0].color}
+											border
+										/>,
+										<PiStarFill
+											size={25}
+											fill={COLOR_SKILL_LEVEL[1].color}
+											border
+										/>,
+										<PiStarFill
+											size={25}
+											fill={COLOR_SKILL_LEVEL[2].color}
+											border
+										/>,
+										<PiStarFill
+											size={25}
+											fill={COLOR_SKILL_LEVEL[3].color}
+											border
+										/>,
+										<PiStarFill
+											size={25}
+											fill={COLOR_SKILL_LEVEL[4].color}
+											border
+										/>,
+									]}
 									initialRating={skill.level}
 									onClick={(value) => {
 										skill.level = value;
@@ -336,23 +355,24 @@ function ParameterWorkforceList() {
 									Workforce #{selectedWorkforce.id}
 								</ModalTitle>
 							</ModalHeader>
-							<ModalBody>
-								<Form
-									onSubmit={(data) => {
-										console.log("Form Data", data);
-										return new Promise((resolve) =>
-											setTimeout(resolve, 2000)
-										).then(() =>
-											data.username === "error"
-												? {
-														username: "IN_USE",
-												  }
-												: undefined
-										);
-									}}
-								>
-									{({ formProps, submitting }) => (
-										<form {...formProps}>
+							<Form
+								onSubmit={(data) => {
+									console.log("Form Data", data);
+                                    setIsWorkforceOpen(false);
+									return new Promise((resolve) =>
+										setTimeout(resolve, 2000)
+									).then(() =>
+										data.username === "error"
+											? {
+													username: "IN_USE",
+											  }
+											: undefined
+									);
+								}}
+							>
+								{({ formProps, submitting }) => (
+									<form {...formProps}>
+										<ModalBody>
 											<Grid
 												layout="fluid"
 												spacing="compact"
@@ -555,29 +575,10 @@ function ParameterWorkforceList() {
 																		options
 																	}
 																	placeholder="Choose type..."
-																	onChange={(
-																		newValue
-																	) => {
-																		newValue.value ==
-																		1
-																			? setIsParttimeSelected(
-																					true
-																			  )
-																			: setIsParttimeSelected(
-																					false
-																			  );
-																		console.log(
-																			"value Select moi",
-																			newValue
-																		);
-																	}}
-																	value={() => {
-																		selectedWorkforce.workingType;
-																		console.log(
-																			"value Select",
-																			selectedWorkforce.workingType
-																		);
-																	}}
+                                                                    onChange={(newValue) => {
+                                                                        setIsParttimeSelected(newValue.value === 1 ? true : false);
+                                                                    }}
+                                                                      value={options.find((option) => option.value === (isParttimeSelected ? 1 : 0))}
 																/>
 															</Fragment>
 														)}
@@ -807,7 +808,7 @@ function ParameterWorkforceList() {
 																			id: skill.id,
 																			value: skill.name,
 																			label: skill.name,
-                                                                            level: skill.level,
+																			level: skill.level,
 																		})
 																	)}
 																	selectedValue={selectedWorkforce.skills?.map(
@@ -817,7 +818,7 @@ function ParameterWorkforceList() {
 																			id: skill.id,
 																			value: skill.name,
 																			label: skill.name,
-                                                                            level: skill.level
+																			level: skill.level,
 																		})
 																	)}
 																	onSelectedValue={
@@ -848,44 +849,26 @@ function ParameterWorkforceList() {
 														rows={rowsSkillTable}
 													/>
 												</GridColumn>
-
-												{/* <FormFooter>
-													<ButtonGroup>
-														<Button appearance="subtle">
-															Cancel
-														</Button>
-														<LoadingButton
-															type="submit"
-															appearance="primary"
-															isLoading={
-																submitting
-															}
-														>
-															Create
-														</LoadingButton>
-													</ButtonGroup>
-												</FormFooter> */}
 											</Grid>
-										</form>
-									)}
-								</Form>
-							</ModalBody>
-							<ModalFooter>
-								<Button
-									appearance="subtle"
-									onClick={closeWorkforceModal}
-									autoFocus
-								>
-									Cancel
-								</Button>
-								<Button
-									appearance="primary"
-									onClick={closeWorkforceModal}
-									autoFocus
-								>
-									Create
-								</Button>
-							</ModalFooter>
+										</ModalBody>
+										<ModalFooter>
+                                            <Button appearance="subtle"
+                                            onClick={closeWorkforceModal}
+                                            autoFocus>
+														Cancel
+													</Button>
+													<LoadingButton
+														type="submit"
+														appearance="primary"
+														isLoading={submitting}
+												        autoFocus
+													>
+														Save
+													</LoadingButton>
+										</ModalFooter>
+									</form>
+								)}
+							</Form>
 						</Modal>
 					</ModalTransition>
 				)}
