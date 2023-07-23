@@ -38,7 +38,7 @@ const findClosestNode = (arr, node) => {
 	return null;
 };
 
-const GanttChart3 = ({ solutiontTasks, setSolutiontTasks, setIsModified }) => {
+const GanttChart3 = ({ solutionTasks, setSolutionTasks, setIsModified }) => {
 	HighchartsGantt(Highcharts);
 	HighchartsDraggablePoints(Highcharts);
 
@@ -52,7 +52,7 @@ const GanttChart3 = ({ solutiontTasks, setSolutiontTasks, setIsModified }) => {
 			dateFormat = Highcharts.dateFormat;
 
 		// Parse data into series.
-		var data = solutiontTasks.map(function (task, i) {
+		var data = solutionTasks.map(function (task, i) {
 			return {
 				id: task.id + "",
 				start: new Date(task.startDate).getTime(),
@@ -68,7 +68,7 @@ const GanttChart3 = ({ solutiontTasks, setSolutiontTasks, setIsModified }) => {
 		});
 
 		// Parse data into series.
-		var data2 = solutiontTasks.map(function (task, i) {
+		var data2 = solutionTasks.map(function (task, i) {
 			return {
 				id: task.id + "-2",
 				start: new Date(task.endDate).getTime(),
@@ -146,7 +146,7 @@ const GanttChart3 = ({ solutiontTasks, setSolutiontTasks, setIsModified }) => {
 										//update resource to the closest node
 										// console.log(closestNode);
 										var newTask = findObj(
-											solutiontTasks,
+											solutionTasks,
 											closestNode.id
 										);
 										// var oldResource = newTask.workforce;
@@ -160,7 +160,7 @@ const GanttChart3 = ({ solutiontTasks, setSolutiontTasks, setIsModified }) => {
 										}
 
 										// var oldTask = findObj(
-										// 	solutiontTasks,
+										// 	solutionTasks,
 										// 	e.origin.points[
 										// 		Object.keys(e.origin.points)[0]
 										// 	]?.point?.id
@@ -170,7 +170,7 @@ const GanttChart3 = ({ solutiontTasks, setSolutiontTasks, setIsModified }) => {
 										// 	oldTask.workforce = oldResource;
 										// }
 
-										setSolutiontTasks(solutiontTasks);
+										setSolutionTasks(solutionTasks);
 										setIsChangeResource(!isChangeResource);
 										setIsModified(true);
 									}

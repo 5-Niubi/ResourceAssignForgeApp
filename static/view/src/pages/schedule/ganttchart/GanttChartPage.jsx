@@ -11,6 +11,9 @@ import __noop from "@atlaskit/ds-lib/noop";
 import PageHeader from "@atlaskit/page-header";
 import JiraExport from "../../../components/export/JiraExport";
 import OtherExport from "../../../components/export/OtherExport";
+import { findObj } from "../pertchart/VisualizeTasks";
+import { invoke } from "@forge/bridge";
+import Toastify from "../../../common/Toastify";
 
 const initModalExportState = {
 	data: {},
@@ -45,7 +48,7 @@ function GanttChartPage({ setSelectedSolution, selectedSolution}) {
 	// ------
 
 	const [isModified, setIsModified] = useState(false);
-	const [solutiontTasks, setSolutiontTasks] = useState([]);
+	const [solutionTasks, setSolutionTasks] = useState([]);
 
 	useEffect(() => {
 		var solution = findObj(
@@ -53,9 +56,28 @@ function GanttChartPage({ setSelectedSolution, selectedSolution}) {
 			selectedSolution
 		);
 		if (solution) {
-			setSolutiontTasks(JSON.parse(solution.tasks));
+			setSolutionTasks(JSON.parse(solution.tasks));
 		}
 	}, []);
+
+	const handleSaveSolution = function() {
+		var solution = findObj(
+			JSON.parse(localStorage.getItem("solutions")),
+			selectedSolution
+		);
+		solution.tasks = JSON.stringify(solutionTasks);
+		invoke("saveSolution", { solutionReq: solution })
+			.then(function (res) {
+				if (res.id) {
+					Toastify.success("Saved");
+				}
+			})
+			.catch((error) => {
+				console.log(error);
+				Toastify.error(error.toString());
+			});
+
+	};
 
 	const actionsContent = (
 		<ButtonGroup>
@@ -91,8 +113,8 @@ function GanttChartPage({ setSelectedSolution, selectedSolution}) {
 
 			<PageHeader>Gantt chart</PageHeader>
 			<GanttChart3
-				solutiontTasks={solutiontTasks}
-				setSolutiontTasks={setSolutiontTasks}
+				solutionTasks={solutionTasks}
+				setSolutionTasks={setSolutionTasks}
 				setIsModified={setIsModified}
 			/>
 

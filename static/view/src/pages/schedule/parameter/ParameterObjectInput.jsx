@@ -143,6 +143,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 					// Toastify.info("Save successfully.");
 					// handleChangeTab(3);
 					// setIsScheduling(false);
+					localStorage.setItem("parameterId", res.id);
 
 					//call api to schedule
 					invoke("getThreadSchedule", { parameterId: res.id })
