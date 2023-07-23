@@ -74,3 +74,5 @@ export const COLOR_SKILL_LEVEL = [
         color: "#F14A5B",
     },
 ];
+
+export const RETRY_TIMES = 5;
