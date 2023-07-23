@@ -9,6 +9,8 @@ import EditIcon from "@atlaskit/icon/glyph/edit";
 import StarIcon from "@atlaskit/icon/glyph/star";
 import InfoIcon from "@atlaskit/icon/glyph/info";
 import { useParams } from "react-router";
+import Avatar from "@atlaskit/avatar";
+import Select from '@atlaskit/select';
 import Modal, {
 	ModalBody,
 	ModalFooter,
@@ -21,6 +23,7 @@ import Toastify from "../../../common/Toastify";
 import { RadioGroup } from "@atlaskit/radio";
 import LoadingButton from "@atlaskit/button";
 import { Checkbox } from "@atlaskit/checkbox";
+import Lozenge from "@atlaskit/lozenge";
 import TextField from "@atlaskit/textfield";
 import Form, {
 	CheckboxField,
@@ -33,6 +36,7 @@ import Form, {
 	ValidMessage,
 } from "@atlaskit/form";
 import AddCircle from "@atlaskit/icon/glyph/add-circle";
+import { COLOR_SKILL_LEVEL } from "../../../common/contants";
 
 const options = [
 	{ name: "workingType", value: "0", label: "Fulltime" },
@@ -73,6 +77,7 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 						unitSalary: workforce.unitSalary,
 						workingType: workforce.workingType,
 						workingEffort: workforce.workingEffort,
+						skills: workforce.skills,
 					};
 					workforces.push(itemWorkforce);
 				}
@@ -93,7 +98,6 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 
 	//FILTER WORKFORCE SELECT TABLE
 	const [workforcesFilter, setWorkforcesFilter] = useState(workforces);
-
 	const filterWorkforceName = useCallback(function (workforces, query) {
 		setWorkforcesFilter(
 			workforces.filter((e) =>
@@ -147,7 +151,12 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 			{
 				key: "name",
 				content: "Name",
-				width: 90,
+				width: 35,
+			},
+			{
+				key: "skills",
+				content: "Skills",
+				width: 55,
 			},
 		],
 	};
@@ -159,6 +168,7 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 				key: "no",
 				content: (
 					<Checkbox
+						size="xlarge"
 						isChecked={selectedWorkforces.includes(
 							workforce.id.toString()
 						)}
@@ -169,6 +179,26 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 			{
 				key: "name",
 				content: workforce.name,
+			},
+			{
+				key: "skills",
+				content: (
+					<>
+						{workforce.skills?.map((skill, i) => (
+							<Lozenge
+								key={i}
+								style={{
+									backgroundColor:
+										COLOR_SKILL_LEVEL[skill.level - 1]
+											.color,
+									color: "white",
+								}}
+							>
+								{skill.name}
+							</Lozenge>
+						))}
+					</>
+				),
 			},
 		],
 	}));
@@ -189,7 +219,7 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 			JSON.stringify(selectedWorkforcesArray)
 		);
 
-        onSelectedWorkforces(selectedWorkforcesArray);
+		onSelectedWorkforces(selectedWorkforcesArray);
 	}
 
 	function handleConfirm() {
@@ -199,6 +229,33 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 
 	function CheckSelectedWorkforce(workforceId) {
 		return selectedWorkforces.includes(workforceId.toString());
+	}
+
+	//SELECT ALL BUTTON
+	const [selectAll, setSelectAll] = useState(false);
+	function handleSelectAll() {
+		if (selectAll) {
+			setSelectedWorkforces([]);
+		} else {
+			const allWorkforceIds = workforces.map((workforce) =>
+				workforce.id.toString()
+			);
+			setSelectedWorkforces(allWorkforceIds);
+		}
+		setSelectAll(!selectAll);
+	}
+
+	//HANDLE ROW SELECTED
+	function handleRowClick(workforceId) {
+		setSelectedWorkforces((prevSelectedWorkforces) => {
+			if (prevSelectedWorkforces.includes(workforceId.toString())) {
+				return prevSelectedWorkforces.filter(
+					(id) => id !== workforceId.toString()
+				);
+			} else {
+				return [...prevSelectedWorkforces, workforceId.toString()];
+			}
+		});
 	}
 
 	return (
@@ -241,6 +298,15 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 									>
 										Create new
 									</Button>
+									{/* SELECT ALL BUTTON */}
+									<Button
+										appearance="primary"
+										onClick={handleSelectAll}
+									>
+										{selectAll
+											? "Deselect All"
+											: "Select All"}
+									</Button>
 								</div>
 							</div>
 							<DynamicTable
@@ -280,6 +346,29 @@ export function ParameterCreareWorkforceModal() {
 	const openCWModal = useCallback(() => setIsCWOpen(true), []);
 	const closeCWModal = useCallback(() => setIsCWOpen(false), []);
 	const [isParttimeSelected, setIsParttimeSelected] = useState(false);
+
+	const [workforcesJiraAccount, setWorkforcesJiraAccount] = useState([]);
+
+	useEffect(function () {
+		invoke("getAllUserJira")
+			.then(function (jiraUsersResponse) {
+				const jiraUsers = jiraUsersResponse
+					.filter((user) => user.accountType === "atlassian")
+					.map((user) => ({
+						accountId: user.accountId,
+						email: user.emailAddress,
+						accountType: user.accountType,
+						name: user.displayName,
+						avatar: user.avatarUrls["48x48"],
+						displayName: user.displayName,
+					}));
+				setWorkforcesJiraAccount(jiraUsers);
+			})
+			.catch(function (error) {
+				console.log(error);
+				Toastify.error(error.toString());
+			});
+	}, []);
 
 	function handleOnSelected(e) {
 		if (e.currentTarget.value == "1") {
@@ -361,13 +450,20 @@ export function ParameterCreareWorkforceModal() {
 		],
 	}));
 
+    function formatOptionLabel(user) {
+        return (
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <Avatar src={user.avatar} alt={user.label} size="medium" />
+            <div style={{ marginLeft: '8px' }}>{user.label}</div>
+          </div>
+        );
+      }
+
 	return (
 		<>
 			<Button
-				iconBefore={<AddCircleIcon label="" size="large" />}
-				appearance="subtle"
 				onClick={openCWModal}
-			></Button>
+			>Create new</Button>
 			{/* CREATE WORKFORCE MODAL (CW) */}
 			<ModalTransition>
 				{isCWOpen && (
@@ -395,6 +491,35 @@ export function ParameterCreareWorkforceModal() {
 								>
 									{({ formProps, submitting }) => (
 										<form {...formProps}>
+											<Field
+												name="jiraAccount"
+												label="Jira Account"
+												isRequired
+												defaultValue=""
+											>
+												{({ fieldProps, error }) => (
+													<Fragment>
+														<Select
+															inputId="single-select-example"
+															className="single-select"
+															classNamePrefix="react-select"
+															options={[workforcesJiraAccount.map((user)=>({
+                                                                label: user.displayName,
+                                                                value: user.displayName,
+                                                                avatar: user.avatar,
+                                                            }))]}
+                                                            formatOptionLabel={formatOptionLabel}
+															placeholder="Choose a Jira account"
+														/>
+														{!error && (
+															<HelperMessage></HelperMessage>
+														)}
+														{error && (
+															<ErrorMessage></ErrorMessage>
+														)}
+													</Fragment>
+												)}
+											</Field>
 											<Field
 												name="email"
 												label="Email"
