@@ -12,10 +12,13 @@ import React, { useCallback, useEffect, useState } from "react";
 import Toastify from "../common/Toastify";
 import {
 	INTERVAL_FETCH,
+	RETRY_TIMES,
+	STORAGE,
 	THREAD_ACTION,
 	THREAD_STATUS,
 } from "../common/contants";
 import { removeThreadInfo } from "../common/utils";
+import signal, { HubConnectionBuilder } from "@microsoft/signalr";
 
 function LoadingModalWithThread({ state }) {
 	const [modalState, setModalState] = state;
@@ -25,25 +28,35 @@ function LoadingModalWithThread({ state }) {
 	);
 	const [progress, setProgress] = useState("...");
 
-	useEffect(() => {
-		const intervalId = setInterval(() => {
-			//assign interval to a variable to clear it.
-			invoke("getThreadResult", { threadId: modalState.threadId })
-				.then((res) => {
-					handleThreadSuccess(res);
-				})
-				.catch((error) => {
+	// --- Handle Loading
+	let retryNumber = RETRY_TIMES;
+	function checkingThread(intervalId) {	
+		invoke("getThreadResult", { threadId: modalState.threadId })
+			.then((res) => {
+				retryNumber = RETRY_TIMES;
+				handleThreadSuccess(res);
+			})
+			.catch((error) => {
+				Toastify.error(error.toString());
+				if (!--retryNumber) {
 					removeThreadInfo(modalState.threadId);
-					localStorage.removeItem("thread_info");
-					Toastify.error(error.toString());
+					localStorage.removeItem(STORAGE.THREAD_INFO);
 					closeModal();
-					clearInterval(intervalId);
-				});
+					if (intervalId) {
+						clearInterval(intervalId);
+					}
+				}
+			});
+	}
+	useEffect(() => {
+		checkingThread();
+		//assign interval to a variable to clear it.
+		const intervalId = setInterval(() => {
+			checkingThread(intervalId);
 		}, INTERVAL_FETCH);
 
 		return () => clearInterval(intervalId); //This is important
 	}, []);
-
 	const handleThreadSuccess = useCallback((res) => {
 		console.log(res);
 
@@ -56,10 +69,9 @@ function LoadingModalWithThread({ state }) {
 				// Specific action in here
 				if (modalState.threadAction === THREAD_ACTION.JIRA_EXPORT) {
 					Toastify.success(
-						`Export successfully: Project ${res.result.projectName} was created`
+						`Export successfully: ${res.result.projectName} was created`
 					);
 				}
-
 				removeThreadInfo(res.threadId);
 				closeModal();
 				break;
@@ -73,6 +85,7 @@ function LoadingModalWithThread({ state }) {
 				break;
 		}
 	}, []);
+	// ----------------
 
 	return (
 		<ModalTransition>

@@ -50,7 +50,7 @@ export const STORAGE = Object.freeze({
 	THREAD_INFO: "threadInfo",
 });
 
-export const INTERVAL_FETCH = 5000;
+export const INTERVAL_FETCH = 10000;
 
 export const COLOR_SKILL_LEVEL = [
     {
@@ -74,3 +74,5 @@ export const COLOR_SKILL_LEVEL = [
         color: "#F14A5B",
     },
 ];
+
+export const RETRY_TIMES = 5;
