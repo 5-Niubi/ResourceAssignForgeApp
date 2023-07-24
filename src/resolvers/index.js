@@ -8,6 +8,7 @@ import milestoneResolver from "./milestoneResolver";
 import parameterResolver from "./parameterResolver";
 import scheduleResolver from "./scheduleResolver";
 import threadResolver from "./threadResolver";
+import subscriptionResolver from "./subscriptionResolver";
 
 /**
  * @param {import("@forge/resolver").default} resolver
@@ -23,6 +24,7 @@ function resolverReg(resolver){
     parameterResolver(resolver);
     scheduleResolver(resolver);
     threadResolver(resolver);
+    subscriptionResolver(resolver);
 }
 
 export default resolverReg;

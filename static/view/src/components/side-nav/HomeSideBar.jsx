@@ -62,8 +62,8 @@ function HomeSideBar(rootPath) {
 					/>
 					<ButtonItemSideBar
 						rootPath={rootPath}
-						text={"Settings"}
-						pathTo={"settings"}
+						text={"More"}
+						pathTo={"more"}
 						iconBefore={<SettingsIcon label="" />}
 					/>
 				</Section>
