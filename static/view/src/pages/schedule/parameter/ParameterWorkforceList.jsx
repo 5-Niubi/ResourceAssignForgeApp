@@ -679,6 +679,16 @@ function ParameterWorkforceList() {
 															</Fragment>
 														)}
 													</Field>
+													{isParttimeSelected && (
+														<HelperMessage>
+															<InfoIcon
+																size="small"
+																content=""
+															></InfoIcon>
+															Working percentage
+															per day
+														</HelperMessage>
+													)}
 												</GridColumn>
 												{/* WORKING EFFORT (PART-TIME) */}
 												<GridColumn medium={9}>

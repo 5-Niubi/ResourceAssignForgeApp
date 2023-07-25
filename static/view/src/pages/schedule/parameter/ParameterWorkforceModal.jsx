@@ -49,7 +49,6 @@ const boldStyles = css({
 
 export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 	//SELECT WORKFORCE MODAL (SW)
-	let { projectId } = useParams();
 	let workforce_local = JSON.parse(
 		localStorage.getItem("workforce_parameter")
 	);
@@ -83,11 +82,9 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 				}
 				setTableLoadingState(false);
 				setWorkforces(workforces);
-
 				const localWorkforceIds = workforce_local.map((workforce) =>
 					workforce.id.toString()
 				);
-
 				setSelectedWorkforces(localWorkforceIds);
 			})
 			.catch(function (error) {
@@ -118,15 +115,6 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 		if (e.target.value != null) {
 			filterWorkforceName(workforces, searchInput);
 		}
-	}
-
-	function CheckSelectedWorkforce(workforceId) {
-		workforce_local.map((workforce, index) => {
-			return workforce.id.toString() == workforceId.toString()
-				? true
-				: false;
-		});
-		return false;
 	}
 
 	function handleCheckboxChange(workforceId) {
@@ -188,6 +176,7 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 							<Lozenge
 								key={i}
 								style={{
+                                    marginLeft: "8px",
 									backgroundColor:
 										COLOR_SKILL_LEVEL[skill.level - 1]
 											.color,
@@ -225,10 +214,6 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 		closeSWModal();
 	}
 
-	function CheckSelectedWorkforce(workforceId) {
-		return selectedWorkforces.includes(workforceId.toString());
-	}
-
 	//SELECT ALL BUTTON
 	const [selectAll, setSelectAll] = useState(false);
 	function handleSelectAll() {
@@ -241,19 +226,6 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 			setSelectedWorkforces(allWorkforceIds);
 		}
 		setSelectAll(!selectAll);
-	}
-
-	//HANDLE ROW SELECTED
-	function handleRowClick(workforceId) {
-		setSelectedWorkforces((prevSelectedWorkforces) => {
-			if (prevSelectedWorkforces.includes(workforceId.toString())) {
-				return prevSelectedWorkforces.filter(
-					(id) => id !== workforceId.toString()
-				);
-			} else {
-				return [...prevSelectedWorkforces, workforceId.toString()];
-			}
-		});
 	}
 
 	return (
