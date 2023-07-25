@@ -12,11 +12,7 @@ import InfoIcon from "@atlaskit/icon/glyph/info";
 import Select from "@atlaskit/select";
 import { Grid, GridColumn } from "@atlaskit/page";
 import { PiStarFill, PiStarBold } from "react-icons/pi";
-import Form, {
-	ErrorMessage,
-	Field,
-	HelperMessage,
-} from "@atlaskit/form";
+import Form, { ErrorMessage, Field, HelperMessage } from "@atlaskit/form";
 import Spinner from "@atlaskit/spinner";
 import DynamicTable from "@atlaskit/dynamic-table";
 import Modal, {
@@ -205,7 +201,7 @@ function ParameterWorkforceList() {
 		}
 
 		if (value < 0.0 || value > 1.0) {
-			return "NOT_VALID";
+			return "OUT_SCOPE";
 		}
 
 		const regex = /^\d*\.?\d*$/;
@@ -232,9 +228,11 @@ function ParameterWorkforceList() {
 		invoke("updateWorkforce", { workforce_request })
 			.then(function (res) {
 				if (res) {
-                    console.log("updated workforce", res);
-                    let workforce_name_display = res.name;
-					Toastify.info("Workforce '"+ workforce_name_display + "' is saved successfully");
+					console.log("updated workforce", res);
+					let workforce_name_display = res.name;
+					Toastify.success(
+						"Workforce '" + workforce_name_display + "' is saved"
+					);
 					setLoadingSubmit(false);
 					setIsWorkforceOpen(false);
 				}
@@ -332,10 +330,14 @@ function ParameterWorkforceList() {
 							// BUTTON CLICK TO OPEN WORKFORCE INFORMATION DETAIL
 							loadingDetail &&
 							loadingDetailId === workforce.id ? (
-								<LoadingButton style={{
-                                    marginRight: "8px",
-                                }} appearance="primary" isLoading>
-									Opening...
+								<LoadingButton
+									style={{
+										marginRight: "8px",
+									}}
+									appearance="primary"
+									isLoading
+								>
+									Loading...
 								</LoadingButton>
 							) : (
 								<LoadingButton
@@ -696,6 +698,17 @@ function ParameterWorkforceList() {
 																				input.
 																			</ErrorMessage>
 																		)}
+																		{error ===
+																			"OUT_SCOPE" && (
+																			<ErrorMessage>
+																				Value
+																				raging
+																				from
+																				0.0
+																				to
+																				1.0
+																			</ErrorMessage>
+																		)}
 																	</Fragment>
 																)}
 															</Field>
@@ -731,6 +744,17 @@ function ParameterWorkforceList() {
 																			<ErrorMessage>
 																				Wrong
 																				input.
+																			</ErrorMessage>
+																		)}
+																		{error ===
+																			"OUT_SCOPE" && (
+																			<ErrorMessage>
+																				Value
+																				raging
+																				from
+																				0.0
+																				to
+																				1.0
 																			</ErrorMessage>
 																		)}
 																	</Fragment>
@@ -770,6 +794,17 @@ function ParameterWorkforceList() {
 																				input.
 																			</ErrorMessage>
 																		)}
+																		{error ===
+																			"OUT_SCOPE" && (
+																			<ErrorMessage>
+																				Value
+																				raging
+																				from
+																				0.0
+																				to
+																				1.0
+																			</ErrorMessage>
+																		)}
 																	</Fragment>
 																)}
 															</Field>
@@ -805,6 +840,17 @@ function ParameterWorkforceList() {
 																			<ErrorMessage>
 																				Wrong
 																				input.
+																			</ErrorMessage>
+																		)}
+																		{error ===
+																			"OUT_SCOPE" && (
+																			<ErrorMessage>
+																				Value
+																				raging
+																				from
+																				0.0
+																				to
+																				1.0
 																			</ErrorMessage>
 																		)}
 																	</Fragment>
@@ -844,6 +890,17 @@ function ParameterWorkforceList() {
 																				input.
 																			</ErrorMessage>
 																		)}
+																		{error ===
+																			"OUT_SCOPE" && (
+																			<ErrorMessage>
+																				Value
+																				raging
+																				from
+																				0.0
+																				to
+																				1.0
+																			</ErrorMessage>
+																		)}
 																	</Fragment>
 																)}
 															</Field>
@@ -881,6 +938,17 @@ function ParameterWorkforceList() {
 																				input.
 																			</ErrorMessage>
 																		)}
+																		{error ===
+																			"OUT_SCOPE" && (
+																			<ErrorMessage>
+																				Value
+																				raging
+																				from
+																				0.0
+																				to
+																				1.0
+																			</ErrorMessage>
+																		)}
 																	</Fragment>
 																)}
 															</Field>
@@ -916,6 +984,17 @@ function ParameterWorkforceList() {
 																			<ErrorMessage>
 																				Wrong
 																				input.
+																			</ErrorMessage>
+																		)}
+																		{error ===
+																			"OUT_SCOPE" && (
+																			<ErrorMessage>
+																				Value
+																				raging
+																				from
+																				0.0
+																				to
+																				1.0
 																			</ErrorMessage>
 																		)}
 																	</Fragment>
