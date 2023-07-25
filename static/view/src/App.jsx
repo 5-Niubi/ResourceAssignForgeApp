@@ -21,7 +21,7 @@ import MorePage from "./pages/more";
 
 export const ThreadLoadingContext = createContext({ state: [] });
 export const AppContext = createContext({
-	subscription: {}
+	subscription: {},
 });
 
 function App() {
@@ -44,14 +44,19 @@ function App() {
 		});
 	}, []);
 
-	useEffect(function () {
-		invoke("getCurrentSubscriptionPlan")
-			.then(function (res) {
-				console.log(res);
-				setAppContextState((prev) => ({ ...prev, subscription: res }));
-			})
-			.catch(() => {});
-	}, []);
+	useEffect(
+		function () {
+			if (isAuthenticated) {
+				invoke("getCurrentSubscriptionPlan")
+					.then(function (res) {
+						console.log(res);
+						setAppContextState((prev) => ({ ...prev, subscription: res }));
+					})
+					.catch(() => {});
+			}
+		},
+		[isAuthenticated]
+	);
 
 	useEffect(
 		function () {
