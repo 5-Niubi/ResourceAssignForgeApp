@@ -5,13 +5,14 @@ import React, { useContext } from "react";
 import { AppContext } from "../../../App";
 import "../styles.css";
 import { formatDateDMY } from "../../../common/utils";
+import Spinner from "@atlaskit/spinner";
 
 const columns = 12;
 function UserInfoGrid() {
 	const appContext = useContext(AppContext);
 	let subscription = appContext.subscription;
 
-	return (
+	return subscription ? (
 		<>
 			<Grid spacing="compact" columns={columns}>
 				<GridColumn medium={10}>
@@ -69,6 +70,8 @@ function UserInfoGrid() {
 				<Button appearance="primary">Change Plan</Button>
 			</Grid>
 		</>
+	) : (
+		<Spinner size={"large"} />
 	);
 }
 
