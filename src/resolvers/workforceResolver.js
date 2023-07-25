@@ -23,6 +23,24 @@ function workforceResolver(resolver){
 		}
 	});
 
+    resolver.define("updateWorkforce", async function (req) {
+		try {
+			return await workforceService.updateWorkforce(req.payload.workforce_request);
+		} catch (error) {
+			console.log("Error in UpdateWorkforce: ", error);
+			return Promise.reject(error);
+		}
+	});
+
+    resolver.define("getWorkforceById", async function (req) {
+		try {
+			return await workforceService.getWorkforceById(req.payload.id);
+		} catch (error) {
+			console.log("Error in Get Workforce ID: ", error);
+			return Promise.reject(error);
+		}
+	});
+
 }
 
 export default workforceResolver;
