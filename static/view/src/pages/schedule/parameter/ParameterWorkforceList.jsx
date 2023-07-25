@@ -1,38 +1,19 @@
 import React, { useEffect, useState, useCallback, Fragment } from "react";
 import { useParams } from "react-router";
-
 import Button, { ButtonGroup } from "@atlaskit/button";
-import { workforces } from "../../resources/workforces/table-content/workforces";
-import ParameterWorkforceModal, {
+import {
 	ParameterCreareWorkforceModal,
 	ParameterSelectWorkforceModal,
 } from "./ParameterWorkforceModal";
 import PageHeader from "@atlaskit/page-header";
 import { invoke } from "@forge/bridge";
 import Toastify from "../../../common/Toastify";
-import StarFilledIcon from "@atlaskit/icon/glyph/star-filled";
-import EditIcon from "@atlaskit/icon/glyph/edit";
-import StarIcon from "@atlaskit/icon/glyph/star";
 import InfoIcon from "@atlaskit/icon/glyph/info";
-import TrashIcon from "@atlaskit/icon/glyph/trash";
 import Select from "@atlaskit/select";
 import { Grid, GridColumn } from "@atlaskit/page";
 import { PiStarFill, PiStarBold } from "react-icons/pi";
-
-import Form, {
-	CheckboxField,
-	ErrorMessage,
-	Field,
-	FormFooter,
-	FormHeader,
-	FormSection,
-	HelperMessage,
-	RequiredAsterisk,
-	ValidMessage,
-} from "@atlaskit/form";
+import Form, { ErrorMessage, Field, HelperMessage } from "@atlaskit/form";
 import Spinner from "@atlaskit/spinner";
-import AddCircle from "@atlaskit/icon/glyph/add-circle";
-
 import DynamicTable from "@atlaskit/dynamic-table";
 import Modal, {
 	ModalBody,
@@ -41,17 +22,13 @@ import Modal, {
 	ModalTitle,
 	ModalTransition,
 } from "@atlaskit/modal-dialog";
-import { RadioGroup } from "@atlaskit/radio";
 import LoadingButton from "@atlaskit/button";
-import { Checkbox } from "@atlaskit/checkbox";
 import TextField from "@atlaskit/textfield";
-import { findObj } from "../pertchart/VisualizeTasks";
 import Rating from "react-rating";
 import CreatableAdvanced from "./creatable-selection";
 import { COLOR_SKILL_LEVEL } from "../../../common/contants";
 
 function ParameterWorkforceList() {
-	//GET LIST WORKFORCES
 	let { projectId } = useParams();
 	const [workforces, setWorkforces] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
@@ -59,12 +36,18 @@ function ParameterWorkforceList() {
 	const [selectedWorkforce, setSelectedWorkforce] = useState(Object);
 	const [skillsTable, setSkillsTable] = useState([]);
 	const [isWorkforceOpen, setIsWorkforceOpen] = useState(false);
-	const openWorkforceModal = useCallback(() => setIsWorkforceOpen(true), []);
+	const [loadingSubmit, setLoadingSubmit] = useState(false);
+	const [loadingDetail, setLoadingDetail] = useState(false);
+	const [loadingDetailId, setLoadingDetailId] = useState();
+	const [isParttimeSelected, setIsParttimeSelected] = useState(false);
 	const closeWorkforceModal = useCallback(
 		() => setIsWorkforceOpen(false),
 		[]
 	);
-	const [isParttimeSelected, setIsParttimeSelected] = useState(false);
+	const handleSelectedWorkforces = (selectedWorkforcesArray) => {
+		setWorkforces(selectedWorkforcesArray);
+	};
+
 	useEffect(function () {
 		invoke("getWorkforceParameter", { projectId })
 			.then(function (res) {
@@ -80,14 +63,9 @@ function ParameterWorkforceList() {
 						displayName: workforce.displayName,
 						unitSalary: workforce.unitSalary,
 						workingType: workforce.workingType,
-						workingEffort: workforce.workingEffort,
+						workingEfforts: workforce.workingEfforts,
 						skills: workforce.skills,
 					};
-					//PARSE STRING ARRAY WORKING EFFORT TO ARRAY
-					let castWorkforceEffort = JSON.parse(
-						workforce.workingEffort
-					);
-					itemWorkforce.workingEffort = castWorkforceEffort;
 					workforces.push(itemWorkforce);
 				}
 				setIsLoading(false);
@@ -113,14 +91,6 @@ function ParameterWorkforceList() {
 			});
 	}, []);
 
-    // const [selectedWorkforcesArray, setSelectedWorkforcesArray] = useState([]);
-
-    const handleSelectedWorkforces = (selectedWorkforcesArray) => {
-        setWorkforces(selectedWorkforcesArray);
-        console.log("Cac workforce moi", workforces);
-    };
-
-
 	const options = [
 		{ label: "Fulltime", value: 0 },
 		{ label: "Part-time", value: 1 },
@@ -128,7 +98,6 @@ function ParameterWorkforceList() {
 
 	const onSelectedValue = (childValue) => {
 		console.log("Received value from child:", childValue);
-		//LOAD DATA TO TABLE
 
 		setSkillsTable(childValue.selectedValue);
 		console.log("Received value display in table:", skillsTable);
@@ -136,51 +105,62 @@ function ParameterWorkforceList() {
 
 	const buttonActions = (
 		<>
-        <ButtonGroup>
-            <ParameterCreareWorkforceModal></ParameterCreareWorkforceModal>
-			<ParameterSelectWorkforceModal onSelectedWorkforces={handleSelectedWorkforces}></ParameterSelectWorkforceModal>
-        </ButtonGroup>
+			<ButtonGroup>
+				<ParameterCreareWorkforceModal></ParameterCreareWorkforceModal>
+				<ParameterSelectWorkforceModal
+					onSelectedWorkforces={handleSelectedWorkforces}
+				></ParameterSelectWorkforceModal>
+			</ButtonGroup>
 		</>
 	);
 
-	const handleOpenWorkforceModal = (value) => {
-		var selected = findObj(workforces, value);
-		setSkillsTable(
-			selected.skills?.map((skill) => ({
-				id: skill.id,
-				label: skill.name,
-				level: skill.level,
-			}))
-		);
-		setSelectedWorkforce({
-			id: selected.id,
-			accountId: selected.accountId,
-			email: selected.email,
-			accountType: selected.accountType,
-			name: selected.name,
-			avatar: selected.avatar,
-			displayName: selected.displayName,
-			unitSalary: selected.unitSalary,
-			workingType: selected.workingType,
-			workingEffort: selected.workingEffort,
-			skills: selected.skills?.map((skill) => ({
-				id: skill.id,
-				name: skill.name,
-				level: skill.level,
-			})),
-		});
-		console.log("workforce da chon: ", selectedWorkforce);
-		console.log("selected skill: ", selected.skills);
+	const handleOpenWorkforceModal = (id) => {
+		//SET BUTTON LOADING
+		setLoadingDetail(true);
+		setLoadingDetailId(id);
 		setIsWorkforceOpen(true);
-		selected.workingType == 1
-			? setIsParttimeSelected(true)
-			: setIsParttimeSelected(false);
-	};
 
-	const styleTextfield = {
-		marginLeft: 3,
-		fontWeight: "bold",
-		size: 12,
+		invoke("getWorkforceById", { id })
+			.then(function (res) {
+				if (res) {
+					var selected = res;
+					setSkillsTable(
+						selected.skills?.map((skill) => ({
+							id: skill.id,
+							label: skill.name,
+							level: skill.level,
+						}))
+					);
+					setSelectedWorkforce({
+						id: selected.id,
+						accountId: selected.accountId,
+						email: selected.email,
+						accountType: selected.accountType,
+						name: selected.name,
+						avatar: selected.avatar,
+						displayName: selected.displayName,
+						unitSalary: selected.unitSalary,
+						workingType: selected.workingType,
+						workingEfforts: selected.workingEfforts,
+						skills: selected.skills?.map((skill) => ({
+							id: skill.id,
+							name: skill.name,
+							level: skill.level,
+						})),
+					});
+					selected.workingType == 1
+						? setIsParttimeSelected(true)
+						: setIsParttimeSelected(false);
+
+					//CLOSE BUTTON LOADING
+					setLoadingDetail(false);
+					setIsWorkforceOpen(true);
+				}
+			})
+			.catch(function (error) {
+				console.log(error);
+				Toastify.error(error.toString());
+			});
 	};
 
 	const validateEmail = (value) => {
@@ -210,6 +190,27 @@ function ParameterWorkforceList() {
 		return undefined;
 	};
 
+	const validateWorkingEffort = (value) => {
+		//REQUIRES NOT NULL, NUMBER ONLY, FROM 0.0 TO 1.1
+		if (!value) {
+			return "NOT_VALID";
+		}
+
+		if (isNaN(parseFloat(value))) {
+			return "NOT_VALID";
+		}
+
+		if (value < 0.0 || value > 1.0) {
+			return "OUT_SCOPE";
+		}
+
+		const regex = /^\d*\.?\d*$/;
+		if (!regex.test(value)) {
+			return "NOT_VALID";
+		}
+		return undefined;
+	};
+
 	const validateName = (value) => {
 		//REQUIRES NOT NULL, LETTER ONLY, 6 CHARACTERS AT LEAST
 		if (!value) {
@@ -222,20 +223,26 @@ function ParameterWorkforceList() {
 		return undefined;
 	};
 
-	const validateNumberWorkingEffort = (value) => {
-		//REQUIRES NUMBER ONLY AND NUMBER FROM 0.0 to 1.0 IN ARRAY
-        for (let element in value){
-			const numValue = parseFloat(element);
-			if (isNaN(numValue)) {
-				return "NOT_VALID";
-			}
-
-			if (numValue < 0.0 || numValue > 1.0) {
-				return "NOT_VALID";
-			}
-        }
-		return undefined;
-	};
+	function updateWorkforce(workforce_request) {
+		setLoadingSubmit(true);
+		invoke("updateWorkforce", { workforce_request })
+			.then(function (res) {
+				if (res) {
+					console.log("updated workforce", res);
+					let workforce_name_display = res.name;
+					Toastify.success(
+						"Workforce '" + workforce_name_display + "' is saved"
+					);
+					setLoadingSubmit(false);
+					setIsWorkforceOpen(false);
+				}
+			})
+			.catch(function (error) {
+				console.log(error);
+				Toastify.error(error.toString());
+				setLoadingSubmit(false);
+			});
+	}
 
 	const headSkillTable = {
 		cells: [
@@ -265,25 +272,40 @@ function ParameterWorkforceList() {
 						content: (
 							<>
 								<Rating
-									emptySymbol={<PiStarBold size={25}   /> }
-									fullSymbol={
-                                        [
-                                            <PiStarFill size={25}   fill={COLOR_SKILL_LEVEL[0].color}  border/>,
-                                            <PiStarFill size={25}   fill={COLOR_SKILL_LEVEL[1].color} border/>,
-                                            <PiStarFill size={25}   fill={COLOR_SKILL_LEVEL[2].color}  border/>,
-                                            <PiStarFill size={25}   fill={COLOR_SKILL_LEVEL[3].color} border/>,
-                                            <PiStarFill size={25}   fill={COLOR_SKILL_LEVEL[4].color}  border/>,
-                                        ]
-                                    }
-									initialRating={skill.level}
+									emptySymbol={<PiStarBold size={25} />}
+									fullSymbol={[
+										<PiStarFill
+											size={25}
+											fill={COLOR_SKILL_LEVEL[0].color}
+											border
+										/>,
+										<PiStarFill
+											size={25}
+											fill={COLOR_SKILL_LEVEL[1].color}
+											border
+										/>,
+										<PiStarFill
+											size={25}
+											fill={COLOR_SKILL_LEVEL[2].color}
+											border
+										/>,
+										<PiStarFill
+											size={25}
+											fill={COLOR_SKILL_LEVEL[3].color}
+											border
+										/>,
+										<PiStarFill
+											size={25}
+											fill={COLOR_SKILL_LEVEL[4].color}
+											border
+										/>,
+									]}
+									initialRating={
+										skill.level === null ? 1 : skill.level
+									}
 									onClick={(value) => {
-										skill.level = value;
-										console.log(
-											"skill value: ",
-											skill.label +
-												", level" +
-												skill.level
-										);
+										skill.level =
+											value === null ? 1 : value;
 									}}
 								></Rating>
 							</>
@@ -304,21 +326,33 @@ function ParameterWorkforceList() {
 					<Spinner size={"large"} />
 				) : (
 					<>
-						{workforces?.map((workforce, index) => (
+						{workforces?.map((workforce, index) =>
 							// BUTTON CLICK TO OPEN WORKFORCE INFORMATION DETAIL
-							<Button
-								style={{
-									marginRight: "8px",
-									marginBottom: "5px",
-								}}
-								value={workforce.id}
-								onClick={() =>
-									handleOpenWorkforceModal(workforce.id)
-								}
-							>
-								{workforce.name}
-							</Button>
-						))}
+							loadingDetail &&
+							loadingDetailId === workforce.id ? (
+								<LoadingButton
+									style={{
+										marginRight: "8px",
+									}}
+									appearance="primary"
+									isLoading
+								>
+									Loading...
+								</LoadingButton>
+							) : (
+								<LoadingButton
+									style={{
+										marginRight: "8px",
+									}}
+									value={workforce.id}
+									onClick={() =>
+										handleOpenWorkforceModal(workforce.id)
+									}
+								>
+									{workforce.name}
+								</LoadingButton>
+							)
+						)}
 					</>
 				)}
 			</div>
@@ -335,24 +369,79 @@ function ParameterWorkforceList() {
 								<ModalTitle>
 									Workforce #{selectedWorkforce.id}
 								</ModalTitle>
+								{loadingDetail ? (
+									<Spinner size={"medium"}></Spinner>
+								) : (
+									""
+								)}
 							</ModalHeader>
-							<ModalBody>
-								<Form
-									onSubmit={(data) => {
-										console.log("Form Data", data);
-										return new Promise((resolve) =>
-											setTimeout(resolve, 2000)
-										).then(() =>
-											data.username === "error"
-												? {
-														username: "IN_USE",
-												  }
-												: undefined
-										);
-									}}
-								>
-									{({ formProps, submitting }) => (
-										<form {...formProps}>
+							<Form
+								onSubmit={(data) => {
+									setLoadingSubmit(true);
+									let workforce_request = {
+										id: selectedWorkforce.id,
+										accountId: selectedWorkforce.accountId,
+										email: data.email,
+										accountType:
+											selectedWorkforce.accountType,
+										name: data.name,
+										avatar: selectedWorkforce.avatar,
+										displayName: data.usernamejira,
+										unitSalary: data.salary,
+										workingType:
+											isParttimeSelected === true ? 1 : 0,
+										workingEfforts:
+											isParttimeSelected === true
+												? [
+														data.mon,
+														data.tues,
+														data.wed,
+														data.thurs,
+														data.fri,
+														data.sat,
+														data.sun,
+												  ].map((value) =>
+														parseFloat(value)
+												  )
+												: null,
+										Skills: skillsTable
+											.filter((s) => s.id != null)
+											.map((skill) => ({
+												skillId: skill.id,
+												level: parseInt(
+													skill.level === null
+														? 1
+														: skill.level
+												),
+											})),
+										newSkills: skillsTable
+											.filter((s) => s.id == null)
+											.map((skill) => ({
+												name: skill.value,
+												level: parseInt(
+													skill.level === null
+														? 1
+														: skill.level
+												),
+											})),
+									};
+
+									console.log("Form data", workforce_request);
+									updateWorkforce(workforce_request);
+									return new Promise((resolve) =>
+										setTimeout(resolve, 2000)
+									).then(() =>
+										data.username === "error"
+											? {
+													username: "IN_USE",
+											  }
+											: undefined
+									);
+								}}
+							>
+								{({ formProps, submitting }) => (
+									<form {...formProps}>
+										<ModalBody>
 											<Grid
 												layout="fluid"
 												spacing="compact"
@@ -368,6 +457,9 @@ function ParameterWorkforceList() {
 														}
 														validate={(v) =>
 															validateEmail(v)
+														}
+														isDisabled={
+															loadingDetail
 														}
 													>
 														{({
@@ -415,6 +507,9 @@ function ParameterWorkforceList() {
 														defaultValue={
 															selectedWorkforce.displayName
 														}
+														isDisabled={
+															loadingDetail
+														}
 													>
 														{({
 															fieldProps,
@@ -456,6 +551,9 @@ function ParameterWorkforceList() {
 														}
 														validate={(v) =>
 															validateName(v)
+														}
+														isDisabled={
+															loadingDetail
 														}
 													>
 														{({
@@ -503,6 +601,9 @@ function ParameterWorkforceList() {
 																value
 															)
 														}
+														isDisabled={
+															loadingDetail
+														}
 													>
 														{({
 															fieldProps,
@@ -540,17 +641,17 @@ function ParameterWorkforceList() {
 														label="Working Type"
 														name="workingType"
 														isRequired
+														isDisabled={
+															loadingDetail
+														}
 													>
 														{({
-															fieldProps: {
-																id,
-																...rest
-															},
+															fieldProps,
+															error,
 														}) => (
 															<Fragment>
 																<Select
-																	inputId={id}
-																	{...rest}
+																	{...fieldProps}
 																	options={
 																		options
 																	}
@@ -558,334 +659,504 @@ function ParameterWorkforceList() {
 																	onChange={(
 																		newValue
 																	) => {
-																		newValue.value ==
-																		1
-																			? setIsParttimeSelected(
-																					true
-																			  )
-																			: setIsParttimeSelected(
-																					false
-																			  );
-																		console.log(
-																			"value Select moi",
-																			newValue
+																		setIsParttimeSelected(
+																			newValue.value ===
+																				1
+																				? true
+																				: false
 																		);
 																	}}
-																	value={() => {
-																		selectedWorkforce.workingType;
-																		console.log(
-																			"value Select",
-																			selectedWorkforce.workingType
-																		);
-																	}}
+																	value={options.find(
+																		(
+																			option
+																		) =>
+																			option.value ===
+																			(isParttimeSelected
+																				? 1
+																				: 0)
+																	)}
 																/>
 															</Fragment>
 														)}
 													</Field>
-												</GridColumn>
-												{/* WORKING EFFORT (FULL-TIME) */}
-												<GridColumn medium={9}>
 													{isParttimeSelected && (
-														<Field
-															name="workingEffort"
-															label="Working Effort"
-															isRequired
-															defaultValue={
-																selectedWorkforce.workingEffort
-															}
-															validate={(value) =>
-																validateNumberWorkingEffort(
-																	value
-																)
-															}
-														>
-															{({
-																fieldProps,
-																error,
-															}) => (
-																<>
-																	<Grid
-																		layout="fluid"
-																		spacing="compact"
-																	>
-																		<GridColumn
-																			medium={
-																				1.25
-																			}
-																		>
-																			<TextField
-																				isCompact
-																				autoComplete="off"
-																				defaultValue={
-																					selectedWorkforce
-																						.workingEffort[0]
-																				}
-																				label="Monday"
-																				elemBeforeInput={
-																					<p
-																						style={
-																							styleTextfield
-																						}
-																					>
-																						Mon
-																					</p>
-																				}
-																			/>
-																		</GridColumn>
-																		<GridColumn
-																			medium={
-																				1.25
-																			}
-																		>
-																			<TextField
-																				style={{
-																					flex: 1,
-																				}}
-																				autoComplete="off"
-																				elemBeforeInput={
-																					<p
-																						style={
-																							styleTextfield
-																						}
-																					>
-																						Tues
-																					</p>
-																				}
-																				defaultValue={
-																					selectedWorkforce
-																						.workingEffort[1]
-																				}
-																				isCompact
-																			/>
-																		</GridColumn>
-																		<GridColumn
-																			medium={
-																				1.25
-																			}
-																		>
-																			<TextField
-																				autoComplete="off"
-																				elemBeforeInput={
-																					<p
-																						style={
-																							styleTextfield
-																						}
-																					>
-																						Wed
-																					</p>
-																				}
-																				isCompact
-																				defaultValue={
-																					selectedWorkforce
-																						.workingEffort[2]
-																				}
-																			/>
-																		</GridColumn>
-																		<GridColumn
-																			medium={
-																				1.25
-																			}
-																		>
-																			<TextField
-																				autoComplete="off"
-																				elemBeforeInput={
-																					<p
-																						style={
-																							styleTextfield
-																						}
-																					>
-																						Thurs
-																					</p>
-																				}
-																				isCompact
-																				defaultValue={
-																					selectedWorkforce
-																						.workingEffort[3]
-																				}
-																			/>
-																		</GridColumn>
-																		<GridColumn
-																			medium={
-																				1.25
-																			}
-																		>
-																			<TextField
-																				defaultValue={
-																					selectedWorkforce
-																						.workingEffort[4]
-																				}
-																				elemBeforeInput={
-																					<p
-																						style={
-																							styleTextfield
-																						}
-																					>
-																						Fri
-																					</p>
-																				}
-																				isCompact
-																				autoComplete="off"
-																			/>
-																		</GridColumn>
-																		<GridColumn
-																			medium={
-																				1.25
-																			}
-																		>
-																			<TextField
-																				autoComplete="off"
-																				elemBeforeInput={
-																					<p
-																						style={
-																							styleTextfield
-																						}
-																					>
-																						Sat
-																					</p>
-																				}
-																				isCompact
-																				defaultValue={
-																					selectedWorkforce
-																						.workingEffort[5]
-																				}
-																			/>
-																		</GridColumn>
-																		<GridColumn
-																			medium={
-																				1.25
-																			}
-																		>
-																			<TextField
-																				autoComplete="off"
-																				elemBeforeInput={
-																					<p
-																						style={
-																							styleTextfield
-																						}
-																					>
-																						Sun
-																					</p>
-																				}
-																				isCompact
-																				defaultValue={
-																					selectedWorkforce
-																						.workingEffort[6]
-																				}
-																			/>
-																		</GridColumn>
-																	</Grid>
-																	{error ===
-																		"NOT_VALID" && (
-																		<ErrorMessage>
-																			Wrong
-																			input.
-																		</ErrorMessage>
-																	)}
-																</>
-															)}
-														</Field>
+														<HelperMessage>
+															<InfoIcon
+																size="small"
+																content=""
+															></InfoIcon>
+															Working percentage
+															per day
+														</HelperMessage>
 													)}
 												</GridColumn>
-												{/* SKILL CREATABLE MULTIPLE SELECT */}
-												<GridColumn medium={12}>
-													<Field
-														name="skills"
-														label="Skills"
-														isRequired
-													>
-														{({
-															fieldProps,
-															error,
-														}) => (
-															<Fragment>
-																<CreatableAdvanced
-																	isRequired
-																	defaultOptions={skillDB.map(
-																		(
-																			skill
-																		) => ({
-																			id: skill.id,
-																			value: skill.name,
-																			label: skill.name,
-                                                                            level: skill.level,
-																		})
-																	)}
-																	selectedValue={selectedWorkforce.skills?.map(
-																		(
-																			skill
-																		) => ({
-																			id: skill.id,
-																			value: skill.name,
-																			label: skill.name,
-                                                                            level: skill.level
-																		})
-																	)}
-																	onSelectedValue={
-																		onSelectedValue
-																	}
-																></CreatableAdvanced>
-																<HelperMessage>
-																	<InfoIcon
-																		size="small"
-																		content=""
-																	></InfoIcon>
-																	Change
-																	skill's
-																	level in
-																	table, can
-																	not store
-																	non-word
-																	characters
-																</HelperMessage>
-															</Fragment>
-														)}
-													</Field>
+												{/* WORKING EFFORT (PART-TIME) */}
+												<GridColumn medium={9}>
+													{isParttimeSelected && (
+														<>
+															{/* MONDAY*/}
+															<Field
+																name="mon"
+																label="Monday"
+																isRequired
+																defaultValue={
+																	selectedWorkforce
+																		.workingEfforts[0]
+																}
+																validate={(
+																	value
+																) =>
+																	validateWorkingEffort(
+																		value
+																	)
+																}
+																isDisabled={
+																	loadingDetail
+																}
+															>
+																{({
+																	fieldProps,
+																	error,
+																}) => (
+																	<Fragment>
+																		<TextField
+																			autoComplete="off"
+																			{...fieldProps}
+																			placeholder="Number only"
+																		/>
+																		{error ===
+																			"NOT_VALID" && (
+																			<ErrorMessage>
+																				Wrong
+																				input.
+																			</ErrorMessage>
+																		)}
+																		{error ===
+																			"OUT_SCOPE" && (
+																			<ErrorMessage>
+																				Value
+																				raging
+																				from
+																				0.0
+																				to
+																				1.0
+																			</ErrorMessage>
+																		)}
+																	</Fragment>
+																)}
+															</Field>
+															{/* TUESDAY */}
+															<Field
+																name="tues"
+																label="Tuesday"
+																isRequired
+																defaultValue={
+																	selectedWorkforce
+																		.workingEfforts[1]
+																}
+																validate={(
+																	value
+																) =>
+																	validateWorkingEffort(
+																		value
+																	)
+																}
+																isDisabled={
+																	loadingDetail
+																}
+															>
+																{({
+																	fieldProps,
+																	error,
+																}) => (
+																	<Fragment>
+																		<TextField
+																			autoComplete="off"
+																			{...fieldProps}
+																			placeholder="Number only"
+																		/>
+																		{error ===
+																			"NOT_VALID" && (
+																			<ErrorMessage>
+																				Wrong
+																				input.
+																			</ErrorMessage>
+																		)}
+																		{error ===
+																			"OUT_SCOPE" && (
+																			<ErrorMessage>
+																				Value
+																				raging
+																				from
+																				0.0
+																				to
+																				1.0
+																			</ErrorMessage>
+																		)}
+																	</Fragment>
+																)}
+															</Field>
+															{/* WEDNESDAY */}
+															<Field
+																name="wed"
+																label="Wednesday"
+																isRequired
+																defaultValue={
+																	selectedWorkforce
+																		.workingEfforts[2]
+																}
+																validate={(
+																	value
+																) =>
+																	validateWorkingEffort(
+																		value
+																	)
+																}
+																isDisabled={
+																	loadingDetail
+																}
+															>
+																{({
+																	fieldProps,
+																	error,
+																}) => (
+																	<Fragment>
+																		<TextField
+																			autoComplete="off"
+																			{...fieldProps}
+																			placeholder="Number only"
+																		/>
+																		{error ===
+																			"NOT_VALID" && (
+																			<ErrorMessage>
+																				Wrong
+																				input.
+																			</ErrorMessage>
+																		)}
+																		{error ===
+																			"OUT_SCOPE" && (
+																			<ErrorMessage>
+																				Value
+																				raging
+																				from
+																				0.0
+																				to
+																				1.0
+																			</ErrorMessage>
+																		)}
+																	</Fragment>
+																)}
+															</Field>
+															{/* THURSDAY */}
+															<Field
+																name="thurs"
+																label="Thursday"
+																isRequired
+																defaultValue={
+																	selectedWorkforce
+																		.workingEfforts[3]
+																}
+																validate={(
+																	value
+																) =>
+																	validateWorkingEffort(
+																		value
+																	)
+																}
+																isDisabled={
+																	loadingDetail
+																}
+															>
+																{({
+																	fieldProps,
+																	error,
+																}) => (
+																	<Fragment>
+																		<TextField
+																			autoComplete="off"
+																			{...fieldProps}
+																			placeholder="Number only"
+																		/>
+																		{error ===
+																			"NOT_VALID" && (
+																			<ErrorMessage>
+																				Wrong
+																				input.
+																			</ErrorMessage>
+																		)}
+																		{error ===
+																			"OUT_SCOPE" && (
+																			<ErrorMessage>
+																				Value
+																				raging
+																				from
+																				0.0
+																				to
+																				1.0
+																			</ErrorMessage>
+																		)}
+																	</Fragment>
+																)}
+															</Field>
+															{/* FRIDAY */}
+															<Field
+																name="fri"
+																label="Friday"
+																isRequired
+																defaultValue={
+																	selectedWorkforce
+																		.workingEfforts[4]
+																}
+																validate={(
+																	value
+																) =>
+																	validateWorkingEffort(
+																		value
+																	)
+																}
+																isDisabled={
+																	loadingDetail
+																}
+															>
+																{({
+																	fieldProps,
+																	error,
+																}) => (
+																	<Fragment>
+																		<TextField
+																			autoComplete="off"
+																			{...fieldProps}
+																			placeholder="Number only"
+																		/>
+																		{error ===
+																			"NOT_VALID" && (
+																			<ErrorMessage>
+																				Wrong
+																				input.
+																			</ErrorMessage>
+																		)}
+																		{error ===
+																			"OUT_SCOPE" && (
+																			<ErrorMessage>
+																				Value
+																				raging
+																				from
+																				0.0
+																				to
+																				1.0
+																			</ErrorMessage>
+																		)}
+																	</Fragment>
+																)}
+															</Field>
+															{/* SATURDAY */}
+															<Field
+																name="sat"
+																label="Saturday"
+																isRequired
+																defaultValue={
+																	selectedWorkforce
+																		.workingEfforts[5]
+																}
+																validate={(
+																	value
+																) =>
+																	validateWorkingEffort(
+																		value
+																	)
+																}
+																isDisabled={
+																	loadingDetail
+																}
+															>
+																{({
+																	fieldProps,
+																	error,
+																}) => (
+																	<Fragment>
+																		<TextField
+																			autoComplete="off"
+																			{...fieldProps}
+																			placeholder="Number only"
+																		/>
+																		{error ===
+																			"NOT_VALID" && (
+																			<ErrorMessage>
+																				Wrong
+																				input.
+																			</ErrorMessage>
+																		)}
+																		{error ===
+																			"OUT_SCOPE" && (
+																			<ErrorMessage>
+																				Value
+																				raging
+																				from
+																				0.0
+																				to
+																				1.0
+																			</ErrorMessage>
+																		)}
+																	</Fragment>
+																)}
+															</Field>
+															{/* SUNDAY */}
+															<Field
+																name="sun"
+																label="Sunday"
+																isRequired
+																defaultValue={
+																	selectedWorkforce
+																		.workingEfforts[6]
+																}
+																validate={(
+																	value
+																) =>
+																	validateWorkingEffort(
+																		value
+																	)
+																}
+																isDisabled={
+																	loadingDetail
+																}
+															>
+																{({
+																	fieldProps,
+																	error,
+																}) => (
+																	<Fragment>
+																		<TextField
+																			autoComplete="off"
+																			{...fieldProps}
+																			placeholder="Number only"
+																		/>
+																		{error ===
+																			"NOT_VALID" && (
+																			<ErrorMessage>
+																				Wrong
+																				input.
+																			</ErrorMessage>
+																		)}
+																		{error ===
+																			"OUT_SCOPE" && (
+																			<ErrorMessage>
+																				Value
+																				raging
+																				from
+																				0.0
+																				to
+																				1.0
+																			</ErrorMessage>
+																		)}
+																	</Fragment>
+																)}
+															</Field>
+														</>
+													)}
 												</GridColumn>
-												{/* SKILL DISPLAYING WITH LEVEL TABLE */}
-												<GridColumn medium={12}>
-													<DynamicTable
-														head={headSkillTable}
-														rows={rowsSkillTable}
-													/>
-												</GridColumn>
-
-												{/* <FormFooter>
-													<ButtonGroup>
-														<Button appearance="subtle">
-															Cancel
-														</Button>
-														<LoadingButton
-															type="submit"
-															appearance="primary"
-															isLoading={
-																submitting
-															}
-														>
-															Create
-														</LoadingButton>
-													</ButtonGroup>
-												</FormFooter> */}
+												{!loadingDetail && (
+													<>
+														{/* SKILL CREATABLE MULTIPLE SELECT */}
+														<GridColumn medium={12}>
+															<Field
+																name="skills"
+																label="Skills"
+																isRequired
+															>
+																{({
+																	fieldProps,
+																	error,
+																}) => (
+																	<Fragment>
+																		<CreatableAdvanced
+																			isRequired
+																			defaultOptions={skillDB.map(
+																				(
+																					skill
+																				) => ({
+																					id: skill.id,
+																					value: skill.name,
+																					label: skill.name,
+																					level: skill.level,
+																				})
+																			)}
+																			selectedValue={selectedWorkforce.skills?.map(
+																				(
+																					skill
+																				) => ({
+																					id: skill.id,
+																					value: skill.name,
+																					label: skill.name,
+																					level: skill.level,
+																				})
+																			)}
+																			onSelectedValue={
+																				onSelectedValue
+																			}
+																		></CreatableAdvanced>
+																		<HelperMessage>
+																			<InfoIcon
+																				size="small"
+																				content=""
+																			></InfoIcon>
+																			Change
+																			skill's
+																			level
+																			in
+																			table,
+																			can
+																			not
+																			store
+																			non-word
+																			characters
+																		</HelperMessage>
+																	</Fragment>
+																)}
+															</Field>
+														</GridColumn>
+														{/* SKILL DISPLAYING WITH LEVEL TABLE */}
+														<GridColumn medium={12}>
+															<DynamicTable
+																head={
+																	headSkillTable
+																}
+																rows={
+																	rowsSkillTable
+																}
+															/>
+														</GridColumn>
+													</>
+												)}
 											</Grid>
-										</form>
-									)}
-								</Form>
-							</ModalBody>
-							<ModalFooter>
-								<Button
-									appearance="subtle"
-									onClick={closeWorkforceModal}
-									autoFocus
-								>
-									Cancel
-								</Button>
-								<Button
-									appearance="primary"
-									onClick={closeWorkforceModal}
-									autoFocus
-								>
-									Create
-								</Button>
-							</ModalFooter>
+										</ModalBody>
+										<ModalFooter>
+											<Button
+												appearance="subtle"
+												onClick={closeWorkforceModal}
+												autoFocus
+											>
+												Cancel
+											</Button>
+											{loadingSubmit ? (
+												<LoadingButton
+													appearance="primary"
+													isLoading
+												>
+													Saving...
+												</LoadingButton>
+											) : (
+												<LoadingButton
+													type="submit"
+													appearance="primary"
+													autoFocus
+												>
+													Save
+												</LoadingButton>
+											)}
+										</ModalFooter>
+									</form>
+								)}
+							</Form>
 						</Modal>
 					</ModalTransition>
 				)}

@@ -4,9 +4,18 @@ import CreatableSelect from "react-select/creatable";
 
 const createOption = (label) => ({
     id: null,
-	label: label.toUpperCase().replace(/\W/g, ""),
-	value: label.toLowerCase().replace(/\W/g, ""),
+	label: formatText(label),
+	value: formatText(label),
 });
+
+export function formatText(input) {
+    //UPPERCASE AND REMOVE ANY NON-WORD CHARACTER
+    const formattedText = input.toUpperCase().replace(/\W+/g, ' ');
+  
+    //REPLACE SPACES WITH "-"
+    const result = formattedText.replace(/\s+/g, '-').trim();
+    return result;
+  }
 
 export default function CreatableAdvanced({
 	defaultOptions,
@@ -28,13 +37,10 @@ export default function CreatableAdvanced({
 
 	const handleCreate = (inputValue) => {
 		setIsLoading(true);
-		console.group("Option created");
-		console.log("Wait a moment...");
 		const newOption = createOption(inputValue);
-		console.log(newOption);
 		console.groupEnd();
 		const optionExists = options.some(
-			(option) => option.value.toUpperCase().replace(/\W/g, "") === newOption.value.toUpperCase().replace(/\W/g, "")
+			(option) => formatText(option.value) === formatText(newOption.value)
 		);
 		if (!optionExists) {
 			setOptions([...options, newOption]);
