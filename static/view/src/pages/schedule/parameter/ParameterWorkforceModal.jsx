@@ -76,7 +76,7 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 						displayName: workforce.displayName,
 						unitSalary: workforce.unitSalary,
 						workingType: workforce.workingType,
-						workingEffort: workforce.workingEffort,
+						workingEfforts: workforce.workingEfforts,
 						skills: workforce.skills,
 					};
 					workforces.push(itemWorkforce);
@@ -212,10 +212,8 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 			}
 		);
 
-		console.log("selected_workforces", selectedWorkforcesArray);
-
 		localStorage.setItem(
-			"selected_workforces",
+			"workforce_parameter",
 			JSON.stringify(selectedWorkforcesArray)
 		);
 

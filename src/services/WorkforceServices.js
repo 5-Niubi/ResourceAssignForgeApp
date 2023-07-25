@@ -2,9 +2,20 @@
 import APIJiraServices from "./common/APIJiraServices";
 import APIServices from "./common/APIServices";
 
-async function getAllWorkforces(workforceId) {
+async function getAllWorkforces() {
 	try {
 		let response = await APIServices.get(`/api/Workforces/GetAllWorkforces`, null);
+		return response;
+	} catch (error) {
+		return Promise.reject(error);
+	}
+}
+
+async function getWorkforceById(id) {
+	try {
+		let response = await APIServices.get(`/api/Workforces/GetWorkforceById`, {
+			id,
+		});
 		return response;
 	} catch (error) {
 		return Promise.reject(error);
@@ -21,4 +32,17 @@ async function getAllUsersJira(params) {
 	}
 }
 
-export {getAllWorkforces, getAllUsersJira};
+async function updateWorkforce(workforce_request) {
+	try {
+		let response = await APIServices.put(
+			`/api/Workforces/UpdateWorkforce`,
+			null,
+			workforce_request
+		);
+		return response;
+	} catch (error) {
+		return Promise.reject(error);
+	}
+}
+
+export {getAllWorkforces, getAllUsersJira, updateWorkforce, getWorkforceById};
