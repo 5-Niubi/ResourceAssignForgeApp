@@ -118,6 +118,7 @@ function ParameterWorkforceList() {
 		//SET BUTTON LOADING
 		setLoadingDetail(true);
 		setLoadingDetailId(id);
+		setIsWorkforceOpen(true);
 
 		invoke("getWorkforceById", { id })
 			.then(function (res) {
@@ -147,7 +148,6 @@ function ParameterWorkforceList() {
 							level: skill.level,
 						})),
 					});
-					setIsWorkforceOpen(true);
 					selected.workingType == 1
 						? setIsParttimeSelected(true)
 						: setIsParttimeSelected(false);
@@ -369,6 +369,11 @@ function ParameterWorkforceList() {
 								<ModalTitle>
 									Workforce #{selectedWorkforce.id}
 								</ModalTitle>
+								{loadingDetail ? (
+									<Spinner size={"medium"}></Spinner>
+								) : (
+									""
+								)}
 							</ModalHeader>
 							<Form
 								onSubmit={(data) => {
@@ -453,6 +458,9 @@ function ParameterWorkforceList() {
 														validate={(v) =>
 															validateEmail(v)
 														}
+														isDisabled={
+															loadingDetail
+														}
 													>
 														{({
 															fieldProps,
@@ -499,6 +507,9 @@ function ParameterWorkforceList() {
 														defaultValue={
 															selectedWorkforce.displayName
 														}
+														isDisabled={
+															loadingDetail
+														}
 													>
 														{({
 															fieldProps,
@@ -540,6 +551,9 @@ function ParameterWorkforceList() {
 														}
 														validate={(v) =>
 															validateName(v)
+														}
+														isDisabled={
+															loadingDetail
 														}
 													>
 														{({
@@ -587,6 +601,9 @@ function ParameterWorkforceList() {
 																value
 															)
 														}
+														isDisabled={
+															loadingDetail
+														}
 													>
 														{({
 															fieldProps,
@@ -624,6 +641,9 @@ function ParameterWorkforceList() {
 														label="Working Type"
 														name="workingType"
 														isRequired
+														isDisabled={
+															loadingDetail
+														}
 													>
 														{({
 															fieldProps,
@@ -680,6 +700,9 @@ function ParameterWorkforceList() {
 																		value
 																	)
 																}
+																isDisabled={
+																	loadingDetail
+																}
 															>
 																{({
 																	fieldProps,
@@ -727,6 +750,9 @@ function ParameterWorkforceList() {
 																	validateWorkingEffort(
 																		value
 																	)
+																}
+																isDisabled={
+																	loadingDetail
 																}
 															>
 																{({
@@ -776,6 +802,9 @@ function ParameterWorkforceList() {
 																		value
 																	)
 																}
+																isDisabled={
+																	loadingDetail
+																}
 															>
 																{({
 																	fieldProps,
@@ -823,6 +852,9 @@ function ParameterWorkforceList() {
 																	validateWorkingEffort(
 																		value
 																	)
+																}
+																isDisabled={
+																	loadingDetail
 																}
 															>
 																{({
@@ -872,6 +904,9 @@ function ParameterWorkforceList() {
 																		value
 																	)
 																}
+																isDisabled={
+																	loadingDetail
+																}
 															>
 																{({
 																	fieldProps,
@@ -919,6 +954,9 @@ function ParameterWorkforceList() {
 																	validateWorkingEffort(
 																		value
 																	)
+																}
+																isDisabled={
+																	loadingDetail
 																}
 															>
 																{({
@@ -968,6 +1006,9 @@ function ParameterWorkforceList() {
 																		value
 																	)
 																}
+																isDisabled={
+																	loadingDetail
+																}
 															>
 																{({
 																	fieldProps,
@@ -1003,68 +1044,79 @@ function ParameterWorkforceList() {
 														</>
 													)}
 												</GridColumn>
-												{/* SKILL CREATABLE MULTIPLE SELECT */}
-												<GridColumn medium={12}>
-													<Field
-														name="skills"
-														label="Skills"
-														isRequired
-													>
-														{({
-															fieldProps,
-															error,
-														}) => (
-															<Fragment>
-																<CreatableAdvanced
-																	isRequired
-																	defaultOptions={skillDB.map(
-																		(
-																			skill
-																		) => ({
-																			id: skill.id,
-																			value: skill.name,
-																			label: skill.name,
-																			level: skill.level,
-																		})
-																	)}
-																	selectedValue={selectedWorkforce.skills?.map(
-																		(
-																			skill
-																		) => ({
-																			id: skill.id,
-																			value: skill.name,
-																			label: skill.name,
-																			level: skill.level,
-																		})
-																	)}
-																	onSelectedValue={
-																		onSelectedValue
-																	}
-																></CreatableAdvanced>
-																<HelperMessage>
-																	<InfoIcon
-																		size="small"
-																		content=""
-																	></InfoIcon>
-																	Change
-																	skill's
-																	level in
-																	table, can
-																	not store
-																	non-word
-																	characters
-																</HelperMessage>
-															</Fragment>
-														)}
-													</Field>
-												</GridColumn>
-												{/* SKILL DISPLAYING WITH LEVEL TABLE */}
-												<GridColumn medium={12}>
-													<DynamicTable
-														head={headSkillTable}
-														rows={rowsSkillTable}
-													/>
-												</GridColumn>
+												{!loadingDetail && (
+													<>
+														{/* SKILL CREATABLE MULTIPLE SELECT */}
+														<GridColumn medium={12}>
+															<Field
+																name="skills"
+																label="Skills"
+																isRequired
+															>
+																{({
+																	fieldProps,
+																	error,
+																}) => (
+																	<Fragment>
+																		<CreatableAdvanced
+																			isRequired
+																			defaultOptions={skillDB.map(
+																				(
+																					skill
+																				) => ({
+																					id: skill.id,
+																					value: skill.name,
+																					label: skill.name,
+																					level: skill.level,
+																				})
+																			)}
+																			selectedValue={selectedWorkforce.skills?.map(
+																				(
+																					skill
+																				) => ({
+																					id: skill.id,
+																					value: skill.name,
+																					label: skill.name,
+																					level: skill.level,
+																				})
+																			)}
+																			onSelectedValue={
+																				onSelectedValue
+																			}
+																		></CreatableAdvanced>
+																		<HelperMessage>
+																			<InfoIcon
+																				size="small"
+																				content=""
+																			></InfoIcon>
+																			Change
+																			skill's
+																			level
+																			in
+																			table,
+																			can
+																			not
+																			store
+																			non-word
+																			characters
+																		</HelperMessage>
+																	</Fragment>
+																)}
+															</Field>
+														</GridColumn>
+														{/* SKILL DISPLAYING WITH LEVEL TABLE */}
+														<GridColumn medium={12}>
+															<DynamicTable
+																head={
+																	headSkillTable
+																}
+																rows={
+																	rowsSkillTable
+																}
+															/>
+														</GridColumn>
+													</>
+												)}
 											</Grid>
 										</ModalBody>
 										<ModalFooter>

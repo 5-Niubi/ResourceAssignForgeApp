@@ -72,6 +72,7 @@ function LoadingModalWithThread({ state }) {
 						`Export successfully: ${res.result.projectName} was created`
 					);
 				}
+                
 				removeThreadInfo(res.threadId);
 				closeModal();
 				break;
