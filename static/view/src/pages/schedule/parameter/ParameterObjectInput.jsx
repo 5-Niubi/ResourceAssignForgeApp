@@ -37,44 +37,47 @@ const boldStyles = css({
 });
 
 export default function ParameterObjectInput({ handleChangeTab }) {
+    let project_detail = JSON.parse(
+		localStorage.getItem("project_detail")
+	);
 	const { projectId } = useParams();
-	const [startDate, setStartDate] = useState(getCurrentTime());
-	const [endDate, setEndDate] = useState(getCurrentTime());
-	const [budget, setBudget] = useState();
-	const [budgetUnit, setBudgetUnit] = useState("");
-	const [isLoading, setIsLoading] = useState(true);
+	const [startDate, setStartDate] = useState(project_detail.startDate);
+	const [endDate, setEndDate] = useState(project_detail.DeadLine);
+	const [budget, setBudget] = useState(project_detail.budget);
+	const [budgetUnit, setBudgetUnit] = useState(project_detail.budgetUnit);
+	const [isLoading, setIsLoading] = useState(false);
 	const [isScheduling, setIsScheduling] = useState(false);
 
-	useEffect(function () {
-		invoke("getProjectDetail", { projectId })
-			.then(function (res) {
-				let project = {
-					startDate: res.startDate,
-					endDate: res.deadline,
-					budgetUnit: res.budgetUnit,
-					budget: res.budget,
-				};
-				setStartDate(project.startDate);
-				setEndDate(project.endDate);
-				setBudget(project.budget);
-				setBudgetUnit(project.budgetUnit);
-				console.log(
-					"PROJECT DATE: ",
-					project.startDate +
-						", " +
-						project.endDate +
-						", " +
-						project.budget +
-						", " +
-						project.budgetUnit
-				);
+	// useEffect(function () {
+	// 	invoke("getProjectDetail", { projectId })
+	// 		.then(function (res) {
+	// 			let project = {
+	// 				startDate: res.startDate,
+	// 				endDate: res.deadline,
+	// 				budgetUnit: res.budgetUnit,
+	// 				budget: res.budget,
+	// 			};
+	// 			setStartDate(project.startDate);
+	// 			setEndDate(project.endDate);
+	// 			setBudget(project.budget);
+	// 			setBudgetUnit(project.budgetUnit);
+	// 			console.log(
+	// 				"PROJECT DATE: ",
+	// 				project.startDate +
+	// 					", " +
+	// 					project.endDate +
+	// 					", " +
+	// 					project.budget +
+	// 					", " +
+	// 					project.budgetUnit
+	// 			);
 
-				setIsLoading(false);
-			})
-			.catch(function (error) {
-				console.log("PROJECT DATE: ", error);
-			});
-	}, []);
+	// 			setIsLoading(false);
+	// 		})
+	// 		.catch(function (error) {
+	// 			console.log("PROJECT DATE: ", error);
+	// 		});
+	// }, []);
 
 	const handleSetStartDate = useCallback(function (value) {
 		setStartDate(value);
@@ -213,6 +216,8 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 										validate={(value) =>
 											validateNumberOnly(value)
 										}
+                                        defaultValue={budget}
+                                        isDisabled
 									>
 										{({ fieldProps, error }) => (
 											<Fragment>
