@@ -17,10 +17,12 @@ import { getCurrentTime } from "../../../common/utils";
 import { invoke } from "@forge/bridge";
 import { DATE_FORMAT, MODAL_WIDTH } from "../../../common/contants";
 import Toastify from "../../../common/Toastify";
+import { useNavigate } from "react-router";
 
 const width = MODAL_WIDTH.M;
 function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 	const columns = 10;
+	const navigate = useNavigate();
 
 	const [projectName, setProjectName] = useState("");
 	const [startDate, setStartDate] = useState(getCurrentTime());
@@ -101,6 +103,7 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 				res.tasks = 0;
 				setProjectsDisplay((prevs) => [res, ...prevs]);
 				closeModal();
+				navigate(`${res.id}/schedule`);
 			})
 			.catch((error) => {
 				setIsSubmitting(false);
