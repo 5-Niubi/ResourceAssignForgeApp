@@ -145,6 +145,10 @@ function App() {
 															element={<HomeSideBar rootPath="/" />}
 														></Route>
 														<Route
+															path="/skills"
+															element={<HomeSideBar rootPath="/" />}
+														></Route>
+														<Route
 															path="/more"
 															element={<HomeSideBar rootPath="/" />}
 														></Route>
@@ -174,6 +178,10 @@ function App() {
 													<Route
 														path="/resources"
 														element={<ResourcesPage />}
+													></Route>
+													<Route
+														path="/skills"
+														element={<div>Skills</div>}
 													></Route>
 													<Route path="/more" element={<MorePage />}></Route>
 													<Route path="/modals" element={<TestModal />}></Route>

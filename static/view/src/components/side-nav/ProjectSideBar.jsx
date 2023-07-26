@@ -75,10 +75,10 @@ function ProjectSideBar(rootPath = "") {
 						iconBefore={<IssuesIcon label="" />}
 					/>
 					<ButtonItemSideBar
-						key="reports"
+						key="task-group"
 						rootPath={rootPath}
-						text={"Reports"}
-						pathTo={"reports"}
+						text={"Task Group"}
+						pathTo={"taskgroups"}
 						iconBefore={<GraphLineIcon label="" />}
 					/>
 				</Section>

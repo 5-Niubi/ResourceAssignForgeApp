@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 import SettingsIcon from "@atlaskit/icon/glyph/settings";
 import ActivityIcon from "@atlaskit/icon/glyph/activity";
 import PeopleGroupIcon from "@atlaskit/icon/glyph/people-group";
+import LightBulb from "@atlaskit/icon/glyph/lightbulb";
 import SignOutIcon from "@atlaskit/icon/glyph/sign-out";
 import { AtlassianIcon } from "@atlaskit/logo";
 
@@ -59,6 +60,12 @@ function HomeSideBar(rootPath) {
 						text={"Resources"}
 						pathTo={"resources"}
 						iconBefore={<PeopleGroupIcon label="" />}
+					/>
+					<ButtonItemSideBar
+						rootPath={rootPath}
+						text={"Skills"}
+						pathTo={"skills"}
+						iconBefore={<LightBulb label="" />}
 					/>
 					<ButtonItemSideBar
 						rootPath={rootPath}
