@@ -259,6 +259,7 @@ function CreateTaskModal({
 													autoComplete="off"
 													value={duration}
 													onChange={updateDuration}
+													elemAfterInput={<span style={{paddingRight: "10px"}}>DAYS</span>}
 												/>
 											)}
 										</Field>
