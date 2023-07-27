@@ -6,11 +6,16 @@ import { AppContext } from "../../../App";
 import "../styles.css";
 import { formatDateDMY } from "../../../common/utils";
 import Spinner from "@atlaskit/spinner";
+import { router } from "@forge/bridge";
 
 const columns = 12;
 function UserInfoGrid() {
 	const appContext = useContext(AppContext);
 	let subscription = appContext.subscription;
+
+	function handleChangePlanClick() {
+		router.open("http://localhost:5242/Upgrade");
+	}
 
 	return subscription ? (
 		<>
@@ -67,7 +72,9 @@ function UserInfoGrid() {
 				</GridColumn>
 			</Grid>
 			<Grid spacing="compact" columns={columns}>
-				<Button appearance="primary">Change Plan</Button>
+				<Button appearance="primary" onClick={handleChangePlanClick}>
+					Change Plan
+				</Button>
 			</Grid>
 		</>
 	) : (
