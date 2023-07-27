@@ -18,7 +18,6 @@ function ParameterPage({handleChangeTab}) {
 		<div style={{width:"100%"}}>
 			<ParameterPageHeader name={"Resource Estimation"}></ParameterPageHeader>
 			<ParameterEstimateMessage></ParameterEstimateMessage>
-			<ParameterPageHeader name={"Parameter"}></ParameterPageHeader>
 			<ParameterObjectInput handleChangeTab={handleChangeTab}></ParameterObjectInput>
 			<ParameterWorkforceList></ParameterWorkforceList>
 		</div>

@@ -8,7 +8,7 @@ import Form, {
 	RangeField,
 	ValidMessage,
 	FormSection,
-    FormHeader,
+	FormHeader,
 } from "@atlaskit/form";
 import Range from "@atlaskit/range";
 import { Grid, GridColumn } from "@atlaskit/page";
@@ -34,6 +34,7 @@ import { getCurrentTime, calculateDuration } from "../../../common/utils";
 import Spinner from "@atlaskit/spinner";
 import { RadioGroup } from "@atlaskit/radio";
 import Page from "@atlaskit/page";
+import PageHeader from "@atlaskit/page-header";
 
 const boldStyles = css({
 	fontWeight: "bold",
@@ -183,24 +184,43 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 											}
 										})
 										.catch(function (error) {
+											setIsScheduling(false);
 											Toastify.error(error.toString());
 										});
 								}, 5000);
 							}
 						})
 						.catch(function (error) {
+							setIsScheduling(false);
 							Toastify.error(error.toString());
 						});
 				}
 				// DISPLAY SUCCESSFUL MESSAGE OR NEED MORE SKILL REQUIRED MESSAGE (NOT DONE)
 				Toastify.info(res);
 				console.log("message required skills in task", res);
+				setIsScheduling(false);
 			})
 			.catch(function (error) {
 				// handleChangeTab(3);
 				Toastify.error(error.toString());
+				setIsScheduling(false);
 			});
 	}
+
+	const actionsContent = (
+		<ButtonGroup>
+			<LoadingButton onClick={() => handleChangeTab(1)}>
+				Back
+			</LoadingButton>
+			<LoadingButton
+				type="submit"
+				appearance="primary"
+				isLoading={isScheduling}
+			>
+				Scheduling
+			</LoadingButton>
+		</ButtonGroup>
+	);
 
 	return (
 		<div style={{ width: "100%" }}>
@@ -222,128 +242,108 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 			>
 				{({ formProps, submitting }) => (
 					<form {...formProps}>
+						<PageHeader actions={actionsContent}>
+							<div style={{ width: "100%" }}>Parameters</div>
+						</PageHeader>
 						<FormSection>
-							<Page>
-								<Grid layout="fluid" medium={0}>
-									{/* EXPECTED COST TEXTFIELD */}
-									<GridColumn medium={0}>
-										<Field
-											isRequired
-											label="Expected Cost"
-											name="cost"
-											validate={(value) =>
-												validateNumberOnly(value)
-											}
-											defaultValue={budget}
-											isDisabled
-										>
-											{({ fieldProps, error }) => (
-												<Fragment>
-													<Textfield
-														{...fieldProps}
-														placeholder="What expected maximize project's cost?"
-														elemBeforeInput={
-															<p
-																style={{
-																	marginLeft: 10,
-																	fontWeight:
-																		"bold",
-																}}
-															>
-																{budgetUnit}
-															</p>
-														}
-													/>
-													{error === "NOT_VALID" && (
-														<ErrorMessage>
-															Wrong input.
-														</ErrorMessage>
-													)}
-												</Fragment>
-											)}
-										</Field>
-									</GridColumn>
-									{/* START DATE DATETIMEPICKER */}
-									<GridColumn medium={0}>
-										<Field
-											name="startDate"
-											label="Start Date"
-											isRequired
-										>
-											{() => (
-												<Fragment>
-													<DatePicker
-														value={startDate}
-														onChange={
-															handleSetStartDate
-														}
-														dateFormat={
-															DATE_FORMAT.DMY
-														}
-														isRequired
-													/>
-												</Fragment>
-											)}
-										</Field>
-									</GridColumn>
-									{/* END DATE DATETIMEPICKER */}
-									<GridColumn medium={0}>
-										<Field
-											name="endDate"
-											label="End Date"
-											isRequired
-										>
-											{() => (
-												<Fragment>
-													<DatePicker
-														minDate={startDate}
-														value={endDate}
-														onChange={
-															handleSetEndDate
-														}
-														dateFormat={
-															DATE_FORMAT.DMY
-														}
-														isRequired
-													/>
-												</Fragment>
-											)}
-										</Field>
-									</GridColumn>
-									{/* SLECT OBJECT RADIO */}
-									<GridColumn medium={18}>
-										<Field
-											label="Objective Estimation"
-											name="objectives"
-											defaultValue="neutral"
-											isRequired
-										>
-											{({ fieldProps }) => (
-												<RadioGroup
+							<Grid layout="fluid" medium={0}>
+								{/* EXPECTED COST TEXTFIELD */}
+								<GridColumn medium={0}>
+									<Field
+										isRequired
+										label="Expected Cost"
+										name="cost"
+										validate={(value) =>
+											validateNumberOnly(value)
+										}
+										defaultValue={budget}
+										isDisabled
+									>
+										{({ fieldProps, error }) => (
+											<Fragment>
+												<Textfield
 													{...fieldProps}
-													options={objectiveItems}
+													placeholder="What expected maximize project's cost?"
+													elemBeforeInput={
+														<p
+															style={{
+																marginLeft: 10,
+																fontWeight:
+																	"bold",
+															}}
+														>
+															{budgetUnit}
+														</p>
+													}
 												/>
-											)}
-										</Field>
-									</GridColumn>
-								</Grid>
-							</Page>
+												{error === "NOT_VALID" && (
+													<ErrorMessage>
+														Wrong input.
+													</ErrorMessage>
+												)}
+											</Fragment>
+										)}
+									</Field>
+								</GridColumn>
+								{/* START DATE DATETIMEPICKER */}
+								<GridColumn medium={0}>
+									<Field
+										name="startDate"
+										label="Start Date"
+										isRequired
+									>
+										{() => (
+											<Fragment>
+												<DatePicker
+													value={startDate}
+													onChange={
+														handleSetStartDate
+													}
+													dateFormat={DATE_FORMAT.DMY}
+													isRequired
+												/>
+											</Fragment>
+										)}
+									</Field>
+								</GridColumn>
+								{/* END DATE DATETIMEPICKER */}
+								<GridColumn medium={0}>
+									<Field
+										name="endDate"
+										label="End Date"
+										isRequired
+									>
+										{() => (
+											<Fragment>
+												<DatePicker
+													minDate={startDate}
+													value={endDate}
+													onChange={handleSetEndDate}
+													dateFormat={DATE_FORMAT.DMY}
+													isRequired
+												/>
+											</Fragment>
+										)}
+									</Field>
+								</GridColumn>
+								{/* SLECT OBJECT RADIO */}
+								<GridColumn medium={18}>
+									<Field
+										label="Objective Estimation"
+										name="objectives"
+										defaultValue="neutral"
+										isRequired
+									>
+										{({ fieldProps }) => (
+											<RadioGroup
+												{...fieldProps}
+												options={objectiveItems}
+											/>
+										)}
+									</Field>
+								</GridColumn>
+							</Grid>
 						</FormSection>
-
-						<FormFooter>
-							<div>
-								<Button onClick={() => handleChangeTab(1)}>
-									Back
-								</Button>
-								<LoadingButton
-									type="submit"
-									appearance="primary"
-									isLoading={isScheduling}
-								>
-									Scheduling
-								</LoadingButton>
-							</div>
-						</FormFooter>
 					</form>
 				)}
 			</Form>
