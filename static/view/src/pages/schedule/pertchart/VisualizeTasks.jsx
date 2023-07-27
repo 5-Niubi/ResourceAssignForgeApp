@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import TaskDetail from "./TaskDetail";
-import { Field, Label } from "@atlaskit/form";
-import { DatePicker } from "@atlaskit/datetime-picker";
 import PertChart from "./PertChart";
 import { invoke } from "@forge/bridge";
 import { Content, Main, PageLayout, RightSidebar } from "@atlaskit/page-layout";
 import TasksCompact from "./TasksCompact";
 import Toastify from "../../../common/Toastify";
 import PageHeader from "@atlaskit/page-header";
-import Button, { ButtonGroup, LoadingButton } from "@atlaskit/button";
+import Button, { LoadingButton } from "@atlaskit/button";
 import "./style.css";
 import { cache, getCache } from "../../../common/utils";
 

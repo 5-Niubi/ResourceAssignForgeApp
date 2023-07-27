@@ -133,8 +133,6 @@ function ResultPage({ handleChangeTab }) {
 	// }));
 
 	const handleChangePage = (e) => {
-		// console.log(e);
-		// console.log(e.currentTarget.getAttribute("page"));
 		setPageLoading(true);
 		setPageIndex(e.currentTarget.getAttribute("page"));
 	};

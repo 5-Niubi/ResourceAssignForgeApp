@@ -121,6 +121,7 @@ const TasksCompact = ({
 					rows={rows}
 					loadingSpinnerSize="large"
 					isFixedSize
+					isLoading={tasks.length <= 0}
 				/>
 			</div>
 

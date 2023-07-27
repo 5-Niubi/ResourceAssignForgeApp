@@ -1,7 +1,6 @@
 import Tabs, { Tab, TabList, TabPanel } from "@atlaskit/tabs";
 import VisualizeTasksPage from "./pertchart/VisualizeTasks";
 import ParameterPage from "./parameter/ParameterPage";
-import GanttChartPage from "./ganttchart/GanttChartPage";
 import Badge from '@atlaskit/badge';
 import EstimationPage from "./estimation";
 import { createContext, useCallback, useEffect, useState } from "react";
@@ -10,7 +9,7 @@ import React from "react";
 import { invoke } from "@forge/bridge";
 import { useParams } from "react-router";
 import Toastify from "../../common/Toastify";
-import { cache, clearAllCache, clearProjectBasedCache, getCache } from "../../common/utils";
+import { cache, clearProjectBasedCache, getCache } from "../../common/utils";
 
 const projectInfoContextInit = {};
 export const ProjectInfoContext = createContext(projectInfoContextInit);
@@ -19,42 +18,40 @@ export default function ScheduleTabs() {
 	const {projectId} = useParams();
 	const [selected, setSelected] = useState(0);
 
-	var projectCache = getCache("project");
-	if (!projectCache) {
+	var project = getCache("project");
+	if (!project) {
 		clearProjectBasedCache();
-		projectCache = {};
+		project = {};
 	} else {
-		var projectCacheParsed = JSON.parse(projectCache);
-		if (!projectCacheParsed || projectCacheParsed.id != projectId) {
+		var project = JSON.parse(project);
+		if (!project || project.id != projectId) {
 			clearProjectBasedCache();
-			projectCache = {};
-		} else {
-			projectCache = projectCacheParsed;
+			project = {};
 		}
 	}
-	const [project, setProject] = useState(projectCache);
+	// const [project, setProject] = useState(projectCache);
 
 	const handleChangeTab = useCallback(
 		(index) => setSelected(index),
 		[setSelected]
 	);
 
-	useEffect(() => {
-		var projectCache = getCache("project");
-		if (!projectCache) {
-			invoke("getProjectDetail", { projectId })
-				.then((res) => {
-					if (res){
-						setProject(res);
-						cache("project", JSON.stringify(res));
-					}
-				})
-				.catch((error) => {
-					console.log(error);
-					Toastify.error(error.message);
-				});
-		}
-	}, []);
+	// useEffect(() => {
+	// 	var projectCache = getCache("project");
+	// 	if (!projectCache) {
+	// 		invoke("getProjectDetail", { projectId })
+	// 			.then((res) => {
+	// 				if (res){
+	// 					setProject(res);
+	// 					cache("project", JSON.stringify(res));
+	// 				}
+	// 			})
+	// 			.catch((error) => {
+	// 				console.log(error);
+	// 				Toastify.error(error.message);
+	// 			});
+	// 	}
+	// }, []);
 	
 	return (
 		<ProjectInfoContext.Provider value={project}>

@@ -18,42 +18,46 @@ function SchedulePage() {
 	useEffect(function () {
 		invoke("getProjectDetail", { projectId })
 			.then(function (res) {
+				setIsLoading(false);
 				if (res.id) {
 					cache("project", JSON.stringify(res));
 				}
 			})
 			.catch(function (error) {
+				setIsLoading(false);
 				console.log(error);
 				Toastify.error(error.toString());
 			});
-		invoke("getTasksList", { projectId })
-			.then(function (res) {
-				cache("tasks", JSON.stringify(res));
-			})
-			.catch(function (error) {
-				console.log(error);
-				Toastify.error(error.toString());
-			});
+		// invoke("getTasksList", { projectId })
+		// 	.then(function (res) {
+		// 		if(res && res.length){
+		// 			cache("tasks", JSON.stringify(res));
+		// 		}
+		// 	})
+		// 	.catch(function (error) {
+		// 		console.log(error);
+		// 		Toastify.error(error.toString());
+		// 	});
 
-		invoke("getAllSkills", {})
-			.then(function (res) {
-				cache("skills", JSON.stringify(res));
-			})
-			.catch(function (error) {
-				console.log(error);
-				Toastify.error(error.toString());
-			});
+		// invoke("getAllSkills", {})
+		// 	.then(function (res) {
+		// 		cache("skills", JSON.stringify(res));
+		// 	})
+		// 	.catch(function (error) {
+		// 		console.log(error);
+		// 		Toastify.error(error.toString());
+		// 	});
 
-		invoke("getAllMilestones", { projectId })
-			.then(function (res) {
-				cache("milestones", JSON.stringify(res));
-			})
-			.catch(function (error) {
-				console.log(error);
-				Toastify.error(error.toString());
-			});
+		// invoke("getAllMilestones", { projectId })
+		// 	.then(function (res) {
+		// 		cache("milestones", JSON.stringify(res));
+		// 	})
+		// 	.catch(function (error) {
+		// 		console.log(error);
+		// 		Toastify.error(error.toString());
+		// 	});
 
-		setIsLoading(false);
+		
 	}, []);
 
 	return <>{isLoading ? <Spinner size="xlarge" /> : <ScheduleTabs />}</>;

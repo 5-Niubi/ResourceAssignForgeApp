@@ -157,8 +157,6 @@ const GanttChart = ({
 												]?.point?.options?.assignTo;
 										}
 
-										
-
 										// var oldTask = findObj(
 										// 	solutionTasks,
 										// 	e.origin.points[
@@ -275,7 +273,6 @@ const GanttChart = ({
 							count: 1,
 							text: "1y",
 						},
-						
 					],
 				},
 				navigator: {
@@ -393,12 +390,16 @@ const GanttChart = ({
 									x: 0,
 								},
 								categories: data.map(function (s) {
-									return s.duration + " days";
+									var duration = s.duration < 10 ? "0" + s.duration : s.duration;
+									var unit = s.duration == 1 ? "&nbsp; day" : " days";
+									return duration + unit;
 								}),
 								labels: {
 									style: {
 										width: "100px",
+										minWidth: "100px",
 										textOverflow: "ellipsis",
+										boxSizing: "border-box",
 									},
 								},
 							},
@@ -415,7 +416,9 @@ const GanttChart = ({
 								labels: {
 									style: {
 										width: "200px",
+										minWidth: "200px",
 										textOverflow: "ellipsis",
+										boxSizing: "border-box",
 									},
 								},
 							},
@@ -432,7 +435,9 @@ const GanttChart = ({
 								labels: {
 									style: {
 										width: "200px",
+										minWidth: "200px",
 										textOverflow: "ellipsis",
+										boxSizing: "border-box",
 									},
 								},
 							},
@@ -442,7 +447,7 @@ const GanttChart = ({
 			},
 			function (chart) {
 				//40 is a pixel value for one cell
-				let chartHeight = 40 * chart.series[0].data.length;
+				let chartHeight = 40 * chart.series[0].data.length + 280;
 				chart.update({
 					chart: {
 						height: chartHeight,
