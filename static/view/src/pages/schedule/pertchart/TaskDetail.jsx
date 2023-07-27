@@ -132,6 +132,10 @@ const TaskDetail = ({
 		updateCanEstimate(false);
 	};
 
+	const handleUpdateTask = (event) => {
+		console.log(event);
+	}
+
 	return (
 		<div
 			class="task-details"
@@ -165,7 +169,10 @@ const TaskDetail = ({
 									>
 										{({ fieldProps }) => (
 											<Fragment>
-												<Textfield {...fieldProps} />
+												<Textfield
+													{...fieldProps}
+													onChange={handleUpdateTask}
+												/>
 											</Fragment>
 										)}
 									</Field>
@@ -188,6 +195,9 @@ const TaskDetail = ({
 													<Fragment>
 														<Textfield
 															{...fieldProps}
+															onChange={
+																handleUpdateTask
+															}
 														/>
 													</Fragment>
 												)}

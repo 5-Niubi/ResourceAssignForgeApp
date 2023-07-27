@@ -153,22 +153,24 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 								var scheduleInterval = setInterval(function(){
 									invoke("schedule", { threadId: res.threadId })
 										.then(function (res) {
+											setIsScheduling(false);
 											if (res && res.status == "success") {
 												clearInterval(scheduleInterval);
 
 												Toastify.success("Schedule successfully.");
 
 												handleChangeTab(3);
-												setIsScheduling(false);
 											}
 										})
 										.catch(function (error) {
+											setIsScheduling(false);
 											Toastify.error(error.toString());
 										});
 								}, 5000);
 							}
 						})
 						.catch(function (error) {
+							setIsScheduling(false);
 							Toastify.error(error.toString());
 						});
 				}
@@ -178,6 +180,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 			})
 			.catch(function (error) {
 				// handleChangeTab(3);
+				setIsScheduling(false);
 				Toastify.error(error.toString());
 			});
 	}

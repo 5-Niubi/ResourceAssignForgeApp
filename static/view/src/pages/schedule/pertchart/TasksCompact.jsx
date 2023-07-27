@@ -19,6 +19,8 @@ const TasksCompact = ({
 	setSelectedIds,
 	updateCurrentTaskId,
 	updateTasks,
+	updateSkills,
+	updateMilestones,
 }) => {
 	const [isModalCreateOpen, setIsModalCreateOpen] = useState(false);
 	let { projectId } = useParams();
@@ -97,10 +99,7 @@ const TasksCompact = ({
 
 	const actionsContent = (
 		<ButtonGroup>
-			<Button
-				appearance="subtle"
-				onClick={() => setIsModalCreateOpen(true)}
-			>
+			<Button onClick={() => setIsModalCreateOpen(true)}>
 				Create task
 			</Button>
 		</ButtonGroup>
@@ -135,6 +134,8 @@ const TasksCompact = ({
 					skills={skills}
 					updateTasks={updateTasks}
 					updateCurrentTaskId={updateCurrentTaskId}
+					updateSkills={updateSkills}
+					updateMilestones={updateMilestones}
 				/>
 			) : (
 				""

@@ -12,6 +12,14 @@ function skillResolver(resolver) {
 			console.log("Error in getAllSkills: ", error);
 		}
 	});
+
+	resolver.define("createSkill", async function (req) {
+		try {               
+			return await skillService.createSkill(req.payload.skillReq);
+		} catch (error) {
+			console.log("Error in createSkill: ", error);
+		}
+	});
 }
 
 export default skillResolver;

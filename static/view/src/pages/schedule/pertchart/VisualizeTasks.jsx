@@ -32,18 +32,19 @@ function VisualizeTasksPage({ handleChangeTab }) {
 		setIsEstimating(true);
 		invoke("estimate", { projectId })
 			.then(function (res) {
-				// console.log(res);
-				if (res.id || res.id === 0){
+				if (res.id || res.id === 0) {
 					Toastify.info("Estimated successfully");
 					localStorage.setItem("estimation", JSON.stringify(res));
 					//move to next tab
 					handleChangeTab(1);
 					setIsEstimating(false);
 				} else {
+					setIsEstimating(false);
 					Toastify.error("Error in estimate");
 				}
 			})
 			.catch(function (error) {
+				setIsEstimating(false);
 				console.log(error);
 				Toastify.error(error.toString());
 			});
@@ -72,13 +73,14 @@ function VisualizeTasksPage({ handleChangeTab }) {
 
 		invoke("saveTasks", { tasks: data })
 			.then(function (res) {
+				setIsSaving(false);
+				setCanEstimate(true);
 				if (res) {
-					Toastify.info("Saved successfully");
-					setCanEstimate(true);
-					setIsSaving(false);
+					Toastify.success("Saved successfully");
 				}
 			})
 			.catch(function (error) {
+				setIsSaving(false);
 				console.log(error);
 				Toastify.error(error.toString());
 			});
@@ -96,15 +98,35 @@ function VisualizeTasksPage({ handleChangeTab }) {
 
 	//tasks represent list of all tasks in the pool of current project
 	//-which are shown in the right panel
-	const [tasks, setTasks] = useState([]);
-	const [skills, setSkills] = useState([]);
-	const [milestones, setMilestones] = useState([]);
+	var tasksCache = getCache("tasks");
+	if (!tasksCache) {
+		tasksCache = [];
+	} else {
+		tasksCache = JSON.parse(tasksCache);
+	}
+
+	var skillsCache = getCache("skills");
+	if (!skillsCache) {
+		skillsCache = [];
+	} else {
+		skillsCache = JSON.parse(skillsCache);
+	}
+
+	var milestonesCache = getCache("milestones");
+	if (!milestonesCache) {
+		milestonesCache = [];
+	} else {
+		milestonesCache = JSON.parse(milestonesCache);
+	}
+	const [tasks, setTasks] = useState(tasksCache);
+	const [skills, setSkills] = useState(skillsCache);
+	const [milestones, setMilestones] = useState(milestonesCache);
 	useEffect(function () {
 		var tasksCache = getCache("tasks");
 		if (!tasksCache) {
 			invoke("getTasksList", { projectId })
 				.then(function (res) {
-					if (res){
+					if (res) {
 						setTasks(res);
 						cache("tasks", JSON.stringify(res));
 					}
@@ -113,8 +135,6 @@ function VisualizeTasksPage({ handleChangeTab }) {
 					console.log(error);
 					Toastify.error(error.toString());
 				});
-		} else {
-			setTasks(JSON.parse(tasksCache));
 		}
 
 		var skillsCache = getCache("skills");
@@ -129,13 +149,11 @@ function VisualizeTasksPage({ handleChangeTab }) {
 					console.log(error);
 					Toastify.error(error.toString());
 				});
-		} else {
-			setSkills(JSON.parse(skillsCache));
 		}
 
 		var milestonesCache = getCache("milestones");
 		if (!milestonesCache) {
-			invoke("getAllMilestones", {})
+			invoke("getAllMilestones", { projectId })
 				.then(function (res) {
 					if (Object.keys(res).length !== 0) {
 						setMilestones(res);
@@ -145,8 +163,6 @@ function VisualizeTasksPage({ handleChangeTab }) {
 					console.log(error);
 					Toastify.error(error.toString());
 				});
-		} else {
-			setMilestones(JSON.parse(milestonesCache));
 		}
 	}, []);
 
@@ -180,12 +196,18 @@ function VisualizeTasksPage({ handleChangeTab }) {
 	const updateTasks = (tasks) => {
 		setTasks(tasks);
 	};
+	const updateSkills = (skills) => {
+		setSkills(skills);
+	};
+	const updateMilestones = (milestones) => {
+		setMilestones(milestones);
+	};
 
-	useEffect(() => {
-		localStorage.setItem("tasks", JSON.stringify(tasks));
-		localStorage.setItem("milestones", JSON.stringify(milestones));
-		localStorage.setItem("skills", JSON.stringify(skills));
-	}, [tasks, milestones, skills]);
+	// useEffect(() => {
+	// 	localStorage.setItem("tasks", JSON.stringify(tasks));
+	// 	localStorage.setItem("milestones", JSON.stringify(milestones));
+	// 	localStorage.setItem("skills", JSON.stringify(skills));
+	// }, [tasks, milestones, skills]);
 
 	const actionsContent = (
 		<div
@@ -196,23 +218,22 @@ function VisualizeTasksPage({ handleChangeTab }) {
 				alignItems: "end",
 			}}
 		>
-			{canEstimate ? (
-				isEstimating ? (
-					<LoadingButton appearance="primary" isLoading>
-						Estimating...
-					</LoadingButton>
-				) : (
-					<Button appearance="primary" onClick={handleEstimate}>
-						Estimate
-					</Button>
-				)
-			) : isSaving ? (
-				<LoadingButton appearance="primary" isLoading>
+			{canEstimate ? "" : isSaving ? (
+				<LoadingButton isLoading>
 					Saving...
 				</LoadingButton>
 			) : (
-				<Button appearance="primary" onClick={handleSave}>
+				<Button onClick={handleSave}>
 					Save
+				</Button>
+			)}
+			{isEstimating ? (
+				<LoadingButton appearance="primary" isLoading>
+					Estimating...
+				</LoadingButton>
+			) : (
+				<Button appearance="primary" onClick={handleEstimate}>
+					Estimate
 				</Button>
 			)}
 		</div>
@@ -220,7 +241,6 @@ function VisualizeTasksPage({ handleChangeTab }) {
 
 	return (
 		<div class="visualize-tasks" style={{ width: "100%", height: "90vh" }}>
-			{/* {console.log("Render")} */}
 			<PageLayout>
 				<Content>
 					<Main testId="main2" id="main2">
@@ -247,7 +267,9 @@ function VisualizeTasksPage({ handleChangeTab }) {
 								updateDependenciesChanged
 							}
 							updateTaskSkillsChanged={updateTaskSkillsChanged}
-							updateTaskMilestoneChanged={updateTaskMilestoneChanged}
+							updateTaskMilestoneChanged={
+								updateTaskMilestoneChanged
+							}
 							updateCanEstimate={updateCanEstimate}
 						/>
 					</Main>
@@ -265,7 +287,7 @@ function VisualizeTasksPage({ handleChangeTab }) {
 							id="right-sidebar"
 							skipLinkTitle="Right Sidebar"
 							isFixed={false}
-							width={400}
+							width={300}
 						>
 							<div
 								style={{
@@ -283,6 +305,8 @@ function VisualizeTasksPage({ handleChangeTab }) {
 									setSelectedIds={updateSelectedTaskIds}
 									updateCurrentTaskId={updateCurrentTaskId}
 									updateTasks={updateTasks}
+									updateSkills={updateSkills}
+									updateMilestones={updateMilestones}
 								/>
 							</div>
 						</RightSidebar>

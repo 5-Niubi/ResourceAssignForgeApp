@@ -61,6 +61,14 @@ export function clearAllCache(){
 	localStorage.clear();
 }
 
+export function clearProjectBasedCache(){
+	clearCache("project");
+	clearCache("milestones");
+	clearCache("tasks");
+	clearCache("estimation");
+	return;
+}
+
 /**
  * @desc Get a specific object in the array by its id
  * @param {Array} arr 

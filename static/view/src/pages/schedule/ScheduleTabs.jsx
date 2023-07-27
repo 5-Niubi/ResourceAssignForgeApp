@@ -10,7 +10,7 @@ import React from "react";
 import { invoke } from "@forge/bridge";
 import { useParams } from "react-router";
 import Toastify from "../../common/Toastify";
-import { cache, clearAllCache, getCache } from "../../common/utils";
+import { cache, clearAllCache, clearProjectBasedCache, getCache } from "../../common/utils";
 
 const projectInfoContextInit = {};
 export const ProjectInfoContext = createContext(projectInfoContextInit);
@@ -18,7 +18,21 @@ export const ProjectInfoContext = createContext(projectInfoContextInit);
 export default function ScheduleTabs() {
 	const {projectId} = useParams();
 	const [selected, setSelected] = useState(0);
-	const [project, setProject] = useState({});
+
+	var projectCache = getCache("project");
+	if (!projectCache) {
+		clearProjectBasedCache();
+		projectCache = {};
+	} else {
+		var projectCacheParsed = JSON.parse(projectCache);
+		if (!projectCacheParsed || projectCacheParsed.id != projectId) {
+			clearProjectBasedCache();
+			projectCache = {};
+		} else {
+			projectCache = projectCacheParsed;
+		}
+	}
+	const [project, setProject] = useState(projectCache);
 
 	const handleChangeTab = useCallback(
 		(index) => setSelected(index),
@@ -27,11 +41,7 @@ export default function ScheduleTabs() {
 
 	useEffect(() => {
 		var projectCache = getCache("project");
-		if (projectCache){
-			projectCache = JSON.parse(projectCache);
-		}
-		if ((projectCache && projectCache.id != projectId) || !projectCache) {
-			clearAllCache();
+		if (!projectCache) {
 			invoke("getProjectDetail", { projectId })
 				.then((res) => {
 					if (res){
@@ -43,8 +53,6 @@ export default function ScheduleTabs() {
 					console.log(error);
 					Toastify.error(error.message);
 				});
-		} else {
-			setProject(projectCache);
 		}
 	}, []);
 	
