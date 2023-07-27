@@ -315,8 +315,8 @@ function ParameterWorkforceList() {
 		  }))
 		: null;
 
-	const [displayedWorkforces, setDisplayedWorkforces] = useState(10); 
-	const [showAllWorkforces, setShowAllWorkforces] = useState(false); 
+	const [displayedWorkforces, setDisplayedWorkforces] = useState(10);
+	const [showAllWorkforces, setShowAllWorkforces] = useState(false);
 
 	const handleShowMore = () => {
 		if (showAllWorkforces) {
@@ -341,6 +341,7 @@ function ParameterWorkforceList() {
 					<Spinner size={"large"} />
 				) : (
 					<>
+						<h5>Total number: {workforces.length}</h5>
 						{workforces
 							.slice(0, displayedWorkforces)
 							.map((workforce, index) =>
@@ -374,14 +375,16 @@ function ParameterWorkforceList() {
 									</LoadingButton>
 								)
 							)}
-                        {/* BUTTON CLICK TO SHOW ALL/SHOW LESS WORKFORCE */}
-						<Button
-							appearance="primary"
-							onClick={handleShowMore}
-							disabled={isLoading}
-						>
-							{showAllWorkforces ? "Show Less" : "Show More"}
-						</Button>
+						{/* BUTTON CLICK TO SHOW ALL/SHOW LESS WORKFORCE */}
+						{workforces.length > 10 && (
+							<Button
+								appearance="primary"
+								onClick={handleShowMore}
+								disabled={isLoading}
+							>
+								{showAllWorkforces ? "Show Less" : "Show More"}
+							</Button>
+						)}
 					</>
 				)}
 			</div>
