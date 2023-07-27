@@ -42,7 +42,7 @@ export default function MilestonesTimeline({ milestones, skills, handleChangeTab
 									}}
 								>
 									<h3 className="vertical-timeline-element-title">
-										#Milestone {index + 1}{" "}
+										#Group {index + 1}{" "}
 										<FlagFilledIcon size="medium"></FlagFilledIcon>
 									</h3>
 									<h4 className="vertical-timeline-element-subtitle">

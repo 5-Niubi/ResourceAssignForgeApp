@@ -317,7 +317,7 @@ const TaskDetail = ({
 												)}
 											</Field>
 											<Field
-												label="Milestone"
+												label="Group"
 												name="milestone"
 												defaultValue=""
 												isRequired={true}

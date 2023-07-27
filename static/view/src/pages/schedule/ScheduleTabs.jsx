@@ -58,7 +58,7 @@ export default function ScheduleTabs() {
 		<Tabs onChange={handleChangeTab} selected={selected} id="default">
 			<TabList>
 				<Tab>
-					<Badge>{1}</Badge> Define tasks dependencies
+					<Badge>{1}</Badge> Tasks dependencies
 				</Tab>
 				<Tab>
 					<Badge>{2}</Badge> Resource suggestion

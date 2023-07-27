@@ -264,7 +264,7 @@ function CreateTaskModal({
 											)}
 										</Field>
 										<Field
-											label="Milestone"
+											label="Group"
 											name="milestone"
 											defaultValue=""
 											isRequired
