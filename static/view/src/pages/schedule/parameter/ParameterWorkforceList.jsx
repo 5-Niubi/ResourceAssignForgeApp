@@ -332,6 +332,7 @@ function ParameterWorkforceList() {
 							loadingDetailId === workforce.id ? (
 								<LoadingButton
 									style={{
+                                        marginTop: "5px",
 										marginRight: "8px",
 									}}
 									appearance="primary"
@@ -342,6 +343,7 @@ function ParameterWorkforceList() {
 							) : (
 								<LoadingButton
 									style={{
+                                        marginTop: "5px",
 										marginRight: "8px",
 									}}
 									value={workforce.id}
