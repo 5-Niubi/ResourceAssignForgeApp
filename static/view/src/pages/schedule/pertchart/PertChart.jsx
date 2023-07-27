@@ -266,7 +266,7 @@ const PertChart = ({
 					let color = "#fff";
 					for (let i = 0; i < milestones.length; i++) {
 						if (milestones[i].id == id) {
-							color = getColor(i);
+							color = getColor(milestones[i].id);
 							break;
 						}
 					}
@@ -335,7 +335,7 @@ const PertChart = ({
 					let color = blue;
 					for (let i = 0; i < milestones.length; i++) {
 						if (milestones[i].id == obj.part.data.id) {
-							color = getColor(i);
+							color = getColor(milestones[i].id);
 							break;
 						}
 					}
@@ -347,7 +347,7 @@ const PertChart = ({
 					let color = blue;
 					for (let i = 0; i < milestones.length; i++) {
 						if (milestones[i].id == part.data.id) {
-							color = getColor(i);
+							color = getColor(milestones[i].id);
 							break;
 						}
 					}

@@ -5,10 +5,17 @@ import {
 import FlagFilledIcon from "@atlaskit/icon/glyph/flag-filled";
 import PeopleGroupIcon from "@atlaskit/icon/glyph/people-group";
 import TrayIcon from "@atlaskit/icon/glyph/tray";
-import { findObj, getColor } from "../../../common/utils";
+import { findObj, getCache, getColor } from "../../../common/utils";
 
-export default function MilestonesTimeline({ milestones, skills }) {
-	var estimation = JSON.parse(localStorage.getItem("estimation"));
+export default function MilestonesTimeline({ milestones, skills, handleChangeTab }) {
+	var estimation = getCache("estimation");
+	if (estimation){
+		estimation = JSON.parse(estimation);
+	} else {
+		handleChangeTab(0);
+		return "";
+	}
+
 	return (
 		<>
 			<VerticalTimeline lineColor="#172B4D">
@@ -21,7 +28,7 @@ export default function MilestonesTimeline({ milestones, skills }) {
 									className="vertical-timeline-element--work"
 									contentStyle={{
 										background: getColor(milestone.id),
-										color: "#fff",
+										color: "#444",
 									}}
 									contentArrowStyle={{
 										borderRight:
