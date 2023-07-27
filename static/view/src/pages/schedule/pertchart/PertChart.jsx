@@ -3,7 +3,7 @@ import * as go from "gojs";
 import "gojs/extensions/DrawCommandHandler";
 import "gojs/extensions/Figures";
 import "gojs/extensions/GeometryReshapingTool";
-import { colorsBank, findObj } from "./VisualizeTasks";
+import { findObj, getColor } from "../../../common/utils";
 import { color } from "highcharts";
 
 const PertChart = ({
@@ -266,7 +266,7 @@ const PertChart = ({
 					let color = "#fff";
 					for (let i = 0; i < milestones.length; i++) {
 						if (milestones[i].id == id) {
-							color = colorsBank[i % 30];
+							color = getColor(i);
 							break;
 						}
 					}
@@ -335,7 +335,7 @@ const PertChart = ({
 					let color = blue;
 					for (let i = 0; i < milestones.length; i++) {
 						if (milestones[i].id == obj.part.data.id) {
-							color = colorsBank[i % 30];
+							color = getColor(i);
 							break;
 						}
 					}
@@ -347,7 +347,7 @@ const PertChart = ({
 					let color = blue;
 					for (let i = 0; i < milestones.length; i++) {
 						if (milestones[i].id == part.data.id) {
-							color = colorsBank[i % 30];
+							color = getColor(i);
 							break;
 						}
 					}

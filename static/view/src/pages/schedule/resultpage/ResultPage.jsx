@@ -4,6 +4,9 @@ import DynamicTable from "@atlaskit/dynamic-table";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import GanttChartPage from "../ganttchart/GanttChartPage";
+import { invoke } from "@forge/bridge";
+import Toastify from "../../../common/Toastify";
+import { Grid, GridColumn } from "@atlaskit/page";
 
 /**
  * Using as Page to show pert chart and task dependences
@@ -19,14 +22,24 @@ function ResultPage({ handleChangeTab }) {
 	);
 
 	const [solutions, setSolutions] = useState([]);
-	useEffect(function(){
-		var solutionCache = localStorage.getItem("solutions");
-		if (solutionCache){
-			setSolutions(JSON.parse(solutionCache));
-		}
-	}, [])
+	useEffect(function () {
+		// var solutionCache = localStorage.getItem("solutions");
+		// if (solutionCache){
+		// 	setSolutions(JSON.parse(solutionCache));
+		// }
+		invoke("getSolutionsByProject", { projectId })
+			.then(function (res) {
+				if (res) {
+					setSolutions(res);
+				}
+			})
+			.catch((error) => {
+				console.log(error);
+				Toastify.error(error.toString());
+			});
+	}, []);
 
-    const [selectedSolution, setSelectedSolution] = useState(null)
+	const [selectedSolution, setSelectedSolution] = useState(null);
 
 	const head = {
 		cells: [
@@ -54,6 +67,7 @@ function ResultPage({ handleChangeTab }) {
 				key: "quality",
 				content: "Quality",
 				shouldTruncate: true,
+				isSortable: true,
 				width: 25,
 			},
 			{
@@ -63,7 +77,7 @@ function ResultPage({ handleChangeTab }) {
 		],
 	};
 
-    // var content = [{id: 1, name: "s1"}];
+	// var content = [{id: 1, name: "s1"}];
 	const rows = solutions.map((s, index) => ({
 		key: `row-${s.id}`,
 		isHighlighted: false,
@@ -73,7 +87,7 @@ function ResultPage({ handleChangeTab }) {
 				content: (
 					<Button
 						appearance="subtle-link"
-						onClick={() => setSelectedSolution(s.id)}
+						onClick={() => setSelectedSolution(s)}
 					>
 						{"Solution #" + s.id}
 					</Button>
@@ -85,7 +99,7 @@ function ResultPage({ handleChangeTab }) {
 			},
 			{
 				key: index,
-				content: "$"+s.cost,
+				content: "$" + s.cost,
 			},
 			{
 				key: index,
@@ -94,12 +108,7 @@ function ResultPage({ handleChangeTab }) {
 			{
 				key: "option",
 				content: (
-					<Button
-						appearance="primary"
-						onClick={() => setSelectedSolution(s.id)}
-					>
-						View
-					</Button>
+					<Button onClick={() => setSelectedSolution(s)}>View</Button>
 				),
 			},
 		],
@@ -107,16 +116,21 @@ function ResultPage({ handleChangeTab }) {
 	return (
 		<div style={{ width: "100%", height: "90vh" }}>
 			{selectedSolution !== null ? (
-				<GanttChartPage setSelectedSolution={setSelectedSolution} selectedSolution={selectedSolution} />
+				<GanttChartPage
+					setSelectedSolution={setSelectedSolution}
+					selectedSolution={selectedSolution}
+				/>
 			) : (
 				<>
 					<PageHeader actions={actionsContent}>
 						Solution optimizations
 					</PageHeader>
 
-					<h3 style={{marginBottom: "20px"}}>Number of feasible solutions: {solutions.length}</h3>
+					<h3 style={{ marginBottom: "20px" }}>
+						Number of feasible solutions: {solutions.length}
+					</h3>
 
-					<DynamicTable
+					{/* <DynamicTable
 						head={head}
 						rows={rows}
 						isFixedSize
@@ -125,7 +139,54 @@ function ResultPage({ handleChangeTab }) {
 						onSort={() => console.log("onSort")}
 						// isLoading={isLoading}
 						emptyView={<h2>No feasible solutions!</h2>}
-					/>
+					/> */}
+
+					<Grid layout="fluid" spacing="comfortable" columns={12}>
+						{solutions.map((solution) => {
+							return (
+								<GridColumn medium={3}>
+									<div
+										style={{
+											padding: "20px",
+											marginBottom: "20px",
+											boxShadow: "2px 2px 2px #e3e3e3",
+											border: "1px solid #e3e3e3",
+											borderRadius: "8px",
+										}}
+									>
+										<h3
+											style={{ cursor: "pointer" }}
+											onClick={() =>
+												setSelectedSolution(solution)
+											}
+										>
+											Solution #{solution.id}
+										</h3>
+										<div>
+											Duration: <b>{solution.duration}</b>{" "}
+											days
+										</div>
+										<div>
+											Total cost: $<b>{solution.cost}</b>
+										</div>
+										<div>
+											Quality: <b>{solution.quality}</b>%
+										</div>
+
+										<Button
+											style={{ marginTop: "10px" }}
+											appearance="primary"
+											onClick={() =>
+												setSelectedSolution(solution)
+											}
+										>
+											View
+										</Button>
+									</div>
+								</GridColumn>
+							);
+						})}
+					</Grid>
 				</>
 			)}
 		</div>

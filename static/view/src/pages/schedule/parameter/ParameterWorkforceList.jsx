@@ -45,7 +45,7 @@ import { RadioGroup } from "@atlaskit/radio";
 import LoadingButton from "@atlaskit/button";
 import { Checkbox } from "@atlaskit/checkbox";
 import TextField from "@atlaskit/textfield";
-import { findObj } from "../pertchart/VisualizeTasks";
+import { findObj } from "../../../common/utils";
 import Rating from "react-rating";
 import CreatableAdvanced from "./creatable-selection";
 import { COLOR_SKILL_LEVEL } from "../../../common/contants";

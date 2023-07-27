@@ -1,6 +1,6 @@
 import { Grid, GridColumn } from "@atlaskit/page";
 import React, { useState, useEffect } from "react";
-import { findObj } from "../pertchart/VisualizeTasks";
+import { findObj } from "../../../common/utils";
 
 const GanttChartStat = ({ title, value, info }) => {
 	return (
@@ -9,7 +9,7 @@ const GanttChartStat = ({ title, value, info }) => {
 				width: "100%",
 				height: "100px",
 				backgroundColor: "#ebebeb",
-				borderRadius: "30px",
+				borderRadius: "12px",
 			}}
 		>
 			<div
@@ -44,32 +44,25 @@ const GanttChartStat = ({ title, value, info }) => {
 };
 
 const GanttChartStats = ({ selectedSolution }) => {
-	const [solution, setSolution] = useState([]);
-	useEffect(() => {
-		var s = findObj(
-			JSON.parse(localStorage.getItem("solutions")),
-			selectedSolution
-		);
-		if (s) {
-			setSolution(s);
-		}
-	}, []);
-	return solution ? (
+	return selectedSolution ? (
 		<Grid spacing="comfortable" columns={12}>
 			<GridColumn medium={4}>
 				<GanttChartStat
 					title="Duration"
-					value={solution.duration + " days"}
+					value={selectedSolution.duration + " days"}
 					info={"9/12/2022 - 8/6/2023"}
 				/>
 			</GridColumn>
 			<GridColumn medium={4}>
-				<GanttChartStat title="Cost" value={"$" + solution.cost} />
+				<GanttChartStat
+					title="Cost"
+					value={"$" + selectedSolution.cost}
+				/>
 			</GridColumn>
 			<GridColumn medium={4}>
 				<GanttChartStat
 					title="Quality"
-					value={solution.quality + "%"}
+					value={selectedSolution.quality + "%"}
 				/>
 			</GridColumn>
 		</Grid>

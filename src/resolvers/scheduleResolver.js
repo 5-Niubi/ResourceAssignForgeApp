@@ -37,6 +37,17 @@ function scheduleResolver(resolver) {
 			return Promise.reject(error);
 		}
 	});
+
+	resolver.define("getSolutionsByProject", async function (req) {
+		try {
+			let response = await scheduleService.getSolutionsByProject(req.payload.projectId);
+			console.log(response);
+			return response;
+		} catch (error) {
+			console.log("Error in getSolutionsByProject: ", error);
+			return Promise.reject(error);
+		}
+	});
 }
 
 export default scheduleResolver;

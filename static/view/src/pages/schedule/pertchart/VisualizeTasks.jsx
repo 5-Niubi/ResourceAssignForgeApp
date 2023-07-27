@@ -11,54 +11,7 @@ import Toastify from "../../../common/Toastify";
 import PageHeader from "@atlaskit/page-header";
 import Button, { ButtonGroup, LoadingButton } from "@atlaskit/button";
 import "./style.css";
-
-export const colorsBank = [
-	"#FF5733",
-	"#A569BD",
-	"#85C1E9",
-	"#F4D03F",
-	"#58D68D",
-	"#CD6155",
-	"#F7DC6F",
-	"#5DADE2",
-	"#F5B7B1",
-	"#48C9B0",
-	"#F8C471",
-	"#7FB3D5",
-	"#82E0AA",
-	"#EC7063",
-	"#F9E79F",
-	"#5499C7",
-	"#FAD7A0",
-	"#5DADE2",
-	"#F1948A",
-	"#ABEBC6",
-	"#F4D03F",
-	"#85C1E9",
-	"#E59866",
-	"#82E0AA",
-	"#F8C471",
-	"#E6B0AA",
-	"#5499C7",
-	"#F7DC6F",
-	"#A569BD",
-	"#FAD7A0",
-];
-
-/**
- * Find an object in a list of objects by its id
- * @param {array} arr
- * @param {*} id
- * @returns object | null
- */
-export const findObj = (arr, id) => {
-	for (let i = 0; i < arr.length; i++) {
-		if (arr[i].id == id) {
-			return arr[i];
-		}
-	}
-	return null;
-};
+import { cache, getCache } from "../../../common/utils";
 
 /**
  * Using as Page to show pert chart and task dependences
@@ -147,45 +100,54 @@ function VisualizeTasksPage({ handleChangeTab }) {
 	const [skills, setSkills] = useState([]);
 	const [milestones, setMilestones] = useState([]);
 	useEffect(function () {
-		invoke("getTasksList", { projectId: Number(projectId) })
-			.then(function (res) {
-				// if (!tasksData || tasksData.length === 0) {
-				// }
-				setTasks(res);
+		var tasksCache = getCache("tasks");
+		if (!tasksCache) {
+			invoke("getTasksList", { projectId })
+				.then(function (res) {
+					if (res){
+						setTasks(res);
+						cache("tasks", JSON.stringify(res));
+					}
+				})
+				.catch(function (error) {
+					console.log(error);
+					Toastify.error(error.toString());
+				});
+		} else {
+			setTasks(JSON.parse(tasksCache));
+		}
 
-				// storage.set("projectId", projectId);
-				// storage.set("tasks", JSON.stringify(tasks));
-			})
-			.catch(function (error) {
-				console.log(error);
-				Toastify.error(error.toString());
-			});
-		setTasks(tasksData);
+		var skillsCache = getCache("skills");
+		if (!skillsCache) {
+			invoke("getAllSkills", {})
+				.then(function (res) {
+					if (Object.keys(res).length !== 0) {
+						setSkills(res);
+					}
+				})
+				.catch(function (error) {
+					console.log(error);
+					Toastify.error(error.toString());
+				});
+		} else {
+			setSkills(JSON.parse(skillsCache));
+		}
 
-		invoke("getAllSkills", {})
-			.then(function (res) {
-				if (Object.keys(res).length !== 0) {
-					setSkills(res);
-				} else setSkills([]);
-			})
-			.catch(function (error) {
-				console.log(error);
-				Toastify.error(error.toString());
-			});
-		setSkills([]);
-
-		invoke("getAllMilestones", { projectId })
-			.then(function (res) {
-				if (Object.keys(res).length !== 0) {
-					setMilestones(res);
-				} else setMilestones([]);
-			})
-			.catch(function (error) {
-				console.log(error);
-				Toastify.error(error.toString());
-			});
-		setMilestones([]);
-		return;
+		var milestonesCache = getCache("milestones");
+		if (!milestonesCache) {
+			invoke("getAllMilestones", {})
+				.then(function (res) {
+					if (Object.keys(res).length !== 0) {
+						setMilestones(res);
+					}
+				})
+				.catch(function (error) {
+					console.log(error);
+					Toastify.error(error.toString());
+				});
+		} else {
+			setMilestones(JSON.parse(milestonesCache));
+		}
 	}, []);
 
 	//currentTask represents the selected task to be shown in the bottom panel
@@ -220,11 +182,10 @@ function VisualizeTasksPage({ handleChangeTab }) {
 	};
 
 	useEffect(() => {
-		localStorage.setItem("selected", JSON.stringify(selectedIds));
 		localStorage.setItem("tasks", JSON.stringify(tasks));
 		localStorage.setItem("milestones", JSON.stringify(milestones));
 		localStorage.setItem("skills", JSON.stringify(skills));
-	}, [selectedIds, tasks, milestones, skills]);
+	}, [tasks, milestones, skills]);
 
 	const actionsContent = (
 		<div
@@ -318,6 +279,7 @@ function VisualizeTasksPage({ handleChangeTab }) {
 									milestones={milestones}
 									skills={skills}
 									selectedIds={selectedIds}
+									currentTaskId={currentTaskId}
 									setSelectedIds={updateSelectedTaskIds}
 									updateCurrentTaskId={updateCurrentTaskId}
 									updateTasks={updateTasks}

@@ -4,8 +4,7 @@ import Form, { Field, FormFooter } from "@atlaskit/form";
 import Textfield from "@atlaskit/textfield";
 import PageHeader from "@atlaskit/page-header";
 import Button, { ButtonGroup } from "@atlaskit/button";
-import { findObj } from "./VisualizeTasks";
-import { sampleSkills } from "../data";
+import { findObj } from "../../../common/utils";
 import { invoke } from "@forge/bridge";
 import Toastify from "../../../common/Toastify";
 
@@ -143,7 +142,11 @@ const TaskDetail = ({
 			}}
 		>
 			{/* <PageHeader actions={actionsContent}>Task details:</PageHeader> */}
-			<PageHeader>Task details:</PageHeader>
+			<PageHeader>
+				{currentTask
+					? `Task ${currentTask.id} details:`
+					: "Task details:"}
+			</PageHeader>
 			<div style={{ width: "100%" }}>
 				<pre>
 					{currentTask ? (
@@ -154,51 +157,64 @@ const TaskDetail = ({
 						>
 							{({ formProps }) => (
 								<form {...formProps} name="form">
+									<Field
+										label="Task name"
+										name="name"
+										defaultValue={currentTask.name}
+										isRequired={true}
+									>
+										{({ fieldProps }) => (
+											<Fragment>
+												<Textfield {...fieldProps} />
+											</Fragment>
+										)}
+									</Field>
 									<div
 										style={{
 											display: "flex",
 											justifyContent: "space-between ",
 										}}
 									>
-										<div style={{ width: "30%" }}>
-											<Field
-												label="Task id"
-												name="id"
-												isDisabled
-												defaultValue={currentTask.id}
-											>
-												{({ fieldProps }) => (
-													<Fragment>
-														<Textfield
-															{...fieldProps}
-														/>
-													</Fragment>
-												)}
-											</Field>
-											<Field
-												label="Task name"
-												name="name"
-												defaultValue={currentTask.name}
-											>
-												{({ fieldProps }) => (
-													<Fragment>
-														<Textfield
-															{...fieldProps}
-														/>
-													</Fragment>
-												)}
-											</Field>
+										<div style={{ width: "35%" }}>
 											<Field
 												label="Duration"
 												name="duration"
 												defaultValue={
 													currentTask.duration
 												}
+												isRequired={true}
 											>
 												{({ fieldProps }) => (
 													<Fragment>
 														<Textfield
 															{...fieldProps}
+														/>
+													</Fragment>
+												)}
+											</Field>
+											<Field
+												label="Milestone"
+												name="milestone"
+												defaultValue=""
+												isRequired={true}
+											>
+												{({ fieldProps }) => (
+													<Fragment>
+														<Select
+															{...fieldProps}
+															inputId="select-milestone"
+															className="select-milestone"
+															options={
+																milestoneOpts
+															}
+															value={
+																milestoneValue
+															}
+															onChange={
+																handleChangeMilestone
+															}
+															isSearchable={true}
+															placeholder="Choose milestone"
 														/>
 													</Fragment>
 												)}
@@ -210,6 +226,7 @@ const TaskDetail = ({
 												label="Required skills"
 												name="skills"
 												defaultValue=""
+												isRequired={true}
 											>
 												{({ fieldProps }) => (
 													<Fragment>
@@ -230,26 +247,6 @@ const TaskDetail = ({
 													</Fragment>
 												)}
 											</Field>
-											{/* <Field
-												label="Required equipments"
-												name="equipments"
-												defaultValue=""
-											>
-												{({ fieldProps }) => (
-													<Fragment>
-														<Select
-															{...fieldProps}
-															inputId="multi-select-example"
-															className="multi-select"
-															classNamePrefix="react-select"
-															options={skillOpts}
-															isMulti
-															isSearchable={false}
-															placeholder="Choose equipments"
-														/>
-													</Fragment>
-												)}
-											</Field> */}
 											<Field
 												label="Precedence tasks"
 												name="precedences"
@@ -270,32 +267,6 @@ const TaskDetail = ({
 															isMulti
 															isSearchable={true}
 															placeholder="Choose precedence tasks"
-														/>
-													</Fragment>
-												)}
-											</Field>
-											<Field
-												label="Milestone"
-												name="milestone"
-												defaultValue=""
-											>
-												{({ fieldProps }) => (
-													<Fragment>
-														<Select
-															{...fieldProps}
-															inputId="select-milestone"
-															className="select-milestone"
-															options={
-																milestoneOpts
-															}
-															value={
-																milestoneValue
-															}
-															onChange={
-																handleChangeMilestone
-															}
-															isSearchable={true}
-															placeholder="Choose milestone"
 														/>
 													</Fragment>
 												)}

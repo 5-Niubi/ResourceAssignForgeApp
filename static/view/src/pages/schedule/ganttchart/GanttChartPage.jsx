@@ -1,17 +1,15 @@
 import React, { createContext, useCallback, useEffect, useState } from "react";
-import GanttChart from "./GanttChart";
 import { render } from "react-dom";
 import GanttChartStats from "./GanttChartStat";
 import Breadcrumbs, { BreadcrumbsItem } from "@atlaskit/breadcrumbs";
-import GanttChart2 from "./GanttChart2";
-import GanttChart3 from "./GanttChart3";
+import GanttChart from "./GanttChart";
 import ButtonGroup from "@atlaskit/button/button-group";
 import Button from "@atlaskit/button/standard-button";
 import __noop from "@atlaskit/ds-lib/noop";
 import PageHeader from "@atlaskit/page-header";
 import JiraExport from "../../../components/export/JiraExport";
 import OtherExport from "../../../components/export/OtherExport";
-import { findObj } from "../pertchart/VisualizeTasks";
+import { findObj } from "../../../common/utils";
 import { invoke } from "@forge/bridge";
 import Toastify from "../../../common/Toastify";
 
@@ -50,23 +48,18 @@ function GanttChartPage({ setSelectedSolution, selectedSolution}) {
 	const [isModified, setIsModified] = useState(false);
 	const [solutionTasks, setSolutionTasks] = useState([]);
 
+	var tasksChanged = solutionTasks;
+	const updateTasksChanged = (tasks) => tasksChanged = tasks;
+
 	useEffect(() => {
-		var solution = findObj(
-			JSON.parse(localStorage.getItem("solutions")),
-			selectedSolution
-		);
-		if (solution) {
-			setSolutionTasks(JSON.parse(solution.tasks));
+		if (selectedSolution) {
+			setSolutionTasks(JSON.parse(selectedSolution.tasks));
 		}
 	}, []);
 
 	const handleSaveSolution = function() {
-		var solution = findObj(
-			JSON.parse(localStorage.getItem("solutions")),
-			selectedSolution
-		);
-		solution.tasks = JSON.stringify(solutionTasks);
-		invoke("saveSolution", { solutionReq: solution })
+		selectedSolution.tasks = JSON.stringify(tasksChanged);
+		invoke("saveSolution", { solutionReq: selectedSolution })
 			.then(function (res) {
 				if (res.id) {
 					Toastify.success("Saved");
@@ -104,7 +97,7 @@ function GanttChartPage({ setSelectedSolution, selectedSolution}) {
 					onClick={() => setSelectedSolution(null)}
 					text="All solutions"
 				/>
-				<BreadcrumbsItem text={"Solution #" + selectedSolution} />
+				<BreadcrumbsItem text={"Solution #" + selectedSolution?.id} />
 			</Breadcrumbs>
 			<PageHeader actions={actionsContent}>
 				Solution evaluation:
@@ -112,10 +105,11 @@ function GanttChartPage({ setSelectedSolution, selectedSolution}) {
 			<GanttChartStats selectedSolution={selectedSolution} />
 
 			<PageHeader>Gantt chart</PageHeader>
-			<GanttChart3
+			<GanttChart
 				solutionTasks={solutionTasks}
 				setSolutionTasks={setSolutionTasks}
 				setIsModified={setIsModified}
+				updateTasksChanged={updateTasksChanged}
 			/>
 
 			<ScheduleExportContext.Provider value={{ id: selectedSolution }}>

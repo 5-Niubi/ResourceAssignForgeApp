@@ -10,6 +10,7 @@ import React from "react";
 import { invoke } from "@forge/bridge";
 import { useParams } from "react-router";
 import Toastify from "../../common/Toastify";
+import { cache, clearAllCache, getCache } from "../../common/utils";
 
 const projectInfoContextInit = {};
 export const ProjectInfoContext = createContext(projectInfoContextInit);
@@ -25,12 +26,26 @@ export default function ScheduleTabs() {
 	);
 
 	useEffect(() => {
-		invoke("getProjectDetail", {projectId}).then((res) => {
-			setProject(res);
-		}).catch(error=> {
-			console.log(error);
-			Toastify.error(error.message);
-		})
+		var projectCache = getCache("project");
+		if (projectCache){
+			projectCache = JSON.parse(projectCache);
+		}
+		if ((projectCache && projectCache.id != projectId) || !projectCache) {
+			clearAllCache();
+			invoke("getProjectDetail", { projectId })
+				.then((res) => {
+					if (res){
+						setProject(res);
+						cache("project", JSON.stringify(res));
+					}
+				})
+				.catch((error) => {
+					console.log(error);
+					Toastify.error(error.message);
+				});
+		} else {
+			setProject(projectCache);
+		}
 	}, []);
 	
 	return (

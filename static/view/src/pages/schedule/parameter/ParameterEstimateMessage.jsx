@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import { findObj } from "../pertchart/VisualizeTasks";
+import { findObj } from "../../../common/utils";
 import { useNavigate, useParams } from "react-router";
 import SectionMessage from "@atlaskit/section-message";
 import { invoke } from "@forge/bridge";

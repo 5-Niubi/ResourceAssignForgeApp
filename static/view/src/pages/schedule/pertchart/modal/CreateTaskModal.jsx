@@ -13,7 +13,7 @@ import React, { Fragment, useState, useCallback, useEffect } from "react";
 import TextField from "@atlaskit/textfield";
 import Form, { Field, FormSection } from "@atlaskit/form";
 import { invoke } from "@forge/bridge";
-import { findObj } from "../VisualizeTasks";
+import { findObj } from "../../../../common/utils";
 import Toastify from "../../../../common/Toastify";
 
 function CreateTaskModal({

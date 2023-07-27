@@ -156,8 +156,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 											if (res && res.status == "success") {
 												clearInterval(scheduleInterval);
 
-												Toastify.info("Schedule successfully.");
-												localStorage.setItem("solutions", res.result);
+												Toastify.success("Schedule successfully.");
 
 												handleChangeTab(3);
 												setIsScheduling(false);
