@@ -28,6 +28,11 @@ function ProjectSideBar(rootPath = "") {
 		invoke("getProjectDetail", { projectId })
 			.then(function (res) {
 				setProjectSidebar(res);
+                localStorage.setItem(
+                    "project_detail",
+                    JSON.stringify(res)
+                );
+
 			})
 			.catch(function (error) {});
 	}, []);

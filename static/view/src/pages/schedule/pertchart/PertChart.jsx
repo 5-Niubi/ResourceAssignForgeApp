@@ -438,7 +438,9 @@ const PertChart = ({
 			}
 			task.precedences?.forEach((pre) => {
 				var preObj = findObj(tasks, pre.precedenceId);
-				preObj.isNotEnd = true;
+                if(preObj){
+                    preObj.isNotEnd = true;
+                }
 			});
 		});
 		tasks.forEach((task) => {

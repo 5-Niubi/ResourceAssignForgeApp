@@ -8,6 +8,7 @@ import Form, {
 	RangeField,
 	ValidMessage,
 	FormSection,
+	FormHeader,
 } from "@atlaskit/form";
 import Range from "@atlaskit/range";
 import { Grid, GridColumn } from "@atlaskit/page";
@@ -31,50 +32,60 @@ import { DATE_FORMAT, MODAL_WIDTH } from "../../../common/contants";
 import { DatePicker } from "@atlaskit/datetime-picker";
 import { getCurrentTime, calculateDuration } from "../../../common/utils";
 import Spinner from "@atlaskit/spinner";
+import { RadioGroup } from "@atlaskit/radio";
+import Page from "@atlaskit/page";
+import PageHeader from "@atlaskit/page-header";
 
 const boldStyles = css({
 	fontWeight: "bold",
 });
+const objectiveItems = [
+	{ name: "time", value: "time", label: "Time" },
+	{ name: "cost", value: "cost", label: "Cost" },
+	{ name: "experience", value: "quality", label: "Experience" },
+	{ name: "none", value: "neutral", label: "Neutral" },
+];
 
 export default function ParameterObjectInput({ handleChangeTab }) {
+	let project_detail = JSON.parse(localStorage.getItem("project_detail"));
 	const { projectId } = useParams();
-	const [startDate, setStartDate] = useState(getCurrentTime());
-	const [endDate, setEndDate] = useState(getCurrentTime());
-	const [budget, setBudget] = useState();
-	const [budgetUnit, setBudgetUnit] = useState("");
-	const [isLoading, setIsLoading] = useState(true);
+	const [startDate, setStartDate] = useState(project_detail.startDate);
+	const [endDate, setEndDate] = useState(project_detail.DeadLine);
+	const [budget, setBudget] = useState(project_detail.budget);
+	const [budgetUnit, setBudgetUnit] = useState(project_detail.budgetUnit);
+	const [isLoading, setIsLoading] = useState(false);
 	const [isScheduling, setIsScheduling] = useState(false);
 
-	useEffect(function () {
-		invoke("getProjectDetail", { projectId })
-			.then(function (res) {
-				let project = {
-					startDate: res.startDate,
-					endDate: res.deadline,
-					budgetUnit: res.budgetUnit,
-					budget: res.budget,
-				};
-				setStartDate(project.startDate);
-				setEndDate(project.endDate);
-				setBudget(project.budget);
-				setBudgetUnit(project.budgetUnit);
-				console.log(
-					"PROJECT DATE: ",
-					project.startDate +
-						", " +
-						project.endDate +
-						", " +
-						project.budget +
-						", " +
-						project.budgetUnit
-				);
+	// useEffect(function () {
+	// 	invoke("getProjectDetail", { projectId })
+	// 		.then(function (res) {
+	// 			let project = {
+	// 				startDate: res.startDate,
+	// 				endDate: res.deadline,
+	// 				budgetUnit: res.budgetUnit,
+	// 				budget: res.budget,
+	// 			};
+	// 			setStartDate(project.startDate);
+	// 			setEndDate(project.endDate);
+	// 			setBudget(project.budget);
+	// 			setBudgetUnit(project.budgetUnit);
+	// 			console.log(
+	// 				"PROJECT DATE: ",
+	// 				project.startDate +
+	// 					", " +
+	// 					project.endDate +
+	// 					", " +
+	// 					project.budget +
+	// 					", " +
+	// 					project.budgetUnit
+	// 			);
 
-				setIsLoading(false);
-			})
-			.catch(function (error) {
-				console.log("PROJECT DATE: ", error);
-			});
-	}, []);
+	// 			setIsLoading(false);
+	// 		})
+	// 		.catch(function (error) {
+	// 			console.log("PROJECT DATE: ", error);
+	// 		});
+	// }, []);
 
 	const handleSetStartDate = useCallback(function (value) {
 		setStartDate(value);
@@ -149,38 +160,67 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 						.then(function (res) {
 							if (res) {
 								//Getting result
-								var scheduleInterval = setInterval(function(){
-									invoke("schedule", { threadId: res.threadId })
+								var scheduleInterval = setInterval(function () {
+									invoke("schedule", {
+										threadId: res.threadId,
+									})
 										.then(function (res) {
-											if (res && res.status == "success") {
+											if (
+												res &&
+												res.status == "success"
+											) {
 												clearInterval(scheduleInterval);
 
-												Toastify.info("Schedule successfully.");
-												localStorage.setItem("solutions", res.result);
+												Toastify.info(
+													"Schedule successfully."
+												);
+												localStorage.setItem(
+													"solutions",
+													res.result
+												);
 
 												handleChangeTab(3);
 												setIsScheduling(false);
 											}
 										})
 										.catch(function (error) {
+											setIsScheduling(false);
 											Toastify.error(error.toString());
 										});
 								}, 5000);
 							}
 						})
 						.catch(function (error) {
+							setIsScheduling(false);
 							Toastify.error(error.toString());
 						});
 				}
-                // DISPLAY SUCCESSFUL MESSAGE OR NEED MORE SKILL REQUIRED MESSAGE (NOT DONE)
+				// DISPLAY SUCCESSFUL MESSAGE OR NEED MORE SKILL REQUIRED MESSAGE (NOT DONE)
 				Toastify.info(res);
-                console.log("message required skills in task", res);
+				console.log("message required skills in task", res);
+				setIsScheduling(false);
 			})
 			.catch(function (error) {
 				// handleChangeTab(3);
 				Toastify.error(error.toString());
+				setIsScheduling(false);
 			});
 	}
+
+	const actionsContent = (
+		<ButtonGroup>
+			<LoadingButton onClick={() => handleChangeTab(1)}>
+				Back
+			</LoadingButton>
+			<LoadingButton
+				type="submit"
+				appearance="primary"
+				isLoading={isScheduling}
+			>
+				Scheduling
+			</LoadingButton>
+		</ButtonGroup>
+	);
 
 	return (
 		<div style={{ width: "100%" }}>
@@ -202,10 +242,13 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 			>
 				{({ formProps, submitting }) => (
 					<form {...formProps}>
+						<PageHeader actions={actionsContent}>
+							<div style={{ width: "100%" }}>Parameters</div>
+						</PageHeader>
 						<FormSection>
-							<Grid spacing="compact" columns={16}>
+							<Grid layout="fluid" medium={0}>
 								{/* EXPECTED COST TEXTFIELD */}
-								<GridColumn medium={16}>
+								<GridColumn medium={0}>
 									<Field
 										isRequired
 										label="Expected Cost"
@@ -213,6 +256,8 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 										validate={(value) =>
 											validateNumberOnly(value)
 										}
+										defaultValue={budget}
+										isDisabled
 									>
 										{({ fieldProps, error }) => (
 											<Fragment>
@@ -241,7 +286,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 									</Field>
 								</GridColumn>
 								{/* START DATE DATETIMEPICKER */}
-								<GridColumn medium={8}>
+								<GridColumn medium={0}>
 									<Field
 										name="startDate"
 										label="Start Date"
@@ -262,7 +307,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 									</Field>
 								</GridColumn>
 								{/* END DATE DATETIMEPICKER */}
-								<GridColumn medium={8}>
+								<GridColumn medium={0}>
 									<Field
 										name="endDate"
 										label="End Date"
@@ -275,86 +320,33 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 													value={endDate}
 													onChange={handleSetEndDate}
 													dateFormat={DATE_FORMAT.DMY}
-													isDisabled={!endDate}
 													isRequired
 												/>
 											</Fragment>
 										)}
 									</Field>
 								</GridColumn>
-							</Grid>
-                        </FormSection>
-
-							<FormFooter>
-								<div>
-									<Button onClick={() => handleChangeTab(1)}>
-										Back
-									</Button>
-									<LoadingButton
-										type="submit"
-										appearance="primary"
-										isLoading={isScheduling}
+								{/* SLECT OBJECT RADIO */}
+								<GridColumn medium={18}>
+									<Field
+										label="Objective Estimation"
+										name="objectives"
+										defaultValue="neutral"
+										isRequired
 									>
-										Scheduling
-									</LoadingButton>
-
-									{/* LOADING MODAL BUTTON */}
-									<ModalTransition>
-										{isOpen && (
-											<Modal onClose={closeModal}>
-												<ModalBody>
-													<div
-														style={{
-															height: "120px",
-															marginTop: "10px",
-															display: "flex",
-															alignItems:
-																"center",
-															justifyContent:
-																"center",
-														}}
-													>
-														<RecentIcon label=""></RecentIcon>
-														<p
-															style={{
-																fontSize:
-																	"18px",
-															}}
-														>
-															This process will
-															take some minutes...
-														</p>
-													</div>
-													<ProgressBar
-														ariaLabel="Loading"
-														isIndeterminate
-													></ProgressBar>
-												</ModalBody>
-												<ModalFooter>
-													<Button
-														onClick={closeModal}
-														autoFocus
-													>
-														Cancel
-													</Button>
-													<Button
-														appearance="primary"
-														onClick={
-															closeModal &&
-															handleChangeTab(3)
-														}
-													>
-														DONE
-													</Button>
-												</ModalFooter>
-											</Modal>
+										{({ fieldProps }) => (
+											<RadioGroup
+												{...fieldProps}
+												options={objectiveItems}
+											/>
 										)}
-									</ModalTransition>
-								</div>
-							</FormFooter>
-						</form>
-					)}
-				</Form>
+									</Field>
+								</GridColumn>
+							</Grid>
+						</FormSection>
+					</form>
+				)}
+			</Form>
 		</div>
 	);
 }

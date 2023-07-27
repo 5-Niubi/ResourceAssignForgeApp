@@ -315,6 +315,21 @@ function ParameterWorkforceList() {
 		  }))
 		: null;
 
+	const [displayedWorkforces, setDisplayedWorkforces] = useState(10);
+	const [showAllWorkforces, setShowAllWorkforces] = useState(false);
+
+	const handleShowMore = () => {
+		if (showAllWorkforces) {
+			// SHOW ONLY 10 WORKFORCE WHEN CLICK ON "SHOW LESS" BUTTON
+			setDisplayedWorkforces(10);
+			setShowAllWorkforces(false);
+		} else {
+			// DISPLAY ALL WORKFORCE WHEN CLICK ON "SHOW ALL" BUTTON
+			setDisplayedWorkforces(workforces.length);
+			setShowAllWorkforces(true);
+		}
+	};
+
 	return (
 		<div>
 			<div>
@@ -326,32 +341,49 @@ function ParameterWorkforceList() {
 					<Spinner size={"large"} />
 				) : (
 					<>
-						{workforces?.map((workforce, index) =>
-							// BUTTON CLICK TO OPEN WORKFORCE INFORMATION DETAIL
-							loadingDetail &&
-							loadingDetailId === workforce.id ? (
-								<LoadingButton
-									style={{
-										marginRight: "8px",
-									}}
-									appearance="primary"
-									isLoading
-								>
-									Loading...
-								</LoadingButton>
-							) : (
-								<LoadingButton
-									style={{
-										marginRight: "8px",
-									}}
-									value={workforce.id}
-									onClick={() =>
-										handleOpenWorkforceModal(workforce.id)
-									}
-								>
-									{workforce.name}
-								</LoadingButton>
-							)
+						<h5>Total number: {workforces.length}</h5>
+						{workforces
+							.slice(0, displayedWorkforces)
+							.map((workforce, index) =>
+								// BUTTON CLICK TO OPEN WORKFORCE INFORMATION DETAIL
+								loadingDetail &&
+								loadingDetailId === workforce.id ? (
+									<LoadingButton
+										style={{
+											marginTop: "5px",
+											marginRight: "8px",
+										}}
+										appearance="primary"
+										isLoading
+									>
+										Loading...
+									</LoadingButton>
+								) : (
+									<LoadingButton
+										style={{
+											marginTop: "5px",
+											marginRight: "8px",
+										}}
+										value={workforce.id}
+										onClick={() =>
+											handleOpenWorkforceModal(
+												workforce.id
+											)
+										}
+									>
+										{workforce.name}
+									</LoadingButton>
+								)
+							)}
+						{/* BUTTON CLICK TO SHOW ALL/SHOW LESS WORKFORCE */}
+						{workforces.length > 10 && (
+							<Button
+								appearance="primary"
+								onClick={handleShowMore}
+								disabled={isLoading}
+							>
+								{showAllWorkforces ? "Show Less" : "Show More"}
+							</Button>
 						)}
 					</>
 				)}

@@ -10,7 +10,7 @@ import StarIcon from "@atlaskit/icon/glyph/star";
 import InfoIcon from "@atlaskit/icon/glyph/info";
 import { useParams } from "react-router";
 import Avatar from "@atlaskit/avatar";
-import Select from '@atlaskit/select';
+import Select from "@atlaskit/select";
 import Modal, {
 	ModalBody,
 	ModalFooter,
@@ -37,6 +37,8 @@ import Form, {
 } from "@atlaskit/form";
 import AddCircle from "@atlaskit/icon/glyph/add-circle";
 import { COLOR_SKILL_LEVEL } from "../../../common/contants";
+import { PiStarFill } from "react-icons/pi";
+import InfoMessageColor from "./ParameterInfoMessage";
 
 const options = [
 	{ name: "workingType", value: "0", label: "Fulltime" },
@@ -86,6 +88,11 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 					workforce.id.toString()
 				);
 				setSelectedWorkforces(localWorkforceIds);
+
+                //CHECK BUTTON SELECT ALL
+                if(workforces.length == localWorkforceIds.length){
+                    setSelectAll(true);
+                }
 			})
 			.catch(function (error) {
 				console.log(error);
@@ -134,17 +141,17 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 			{
 				key: "no",
 				content: "No",
-				width: 10,
+				width: 8,
 			},
 			{
 				key: "name",
 				content: "Name",
-				width: 35,
+				width: 30,
 			},
 			{
 				key: "skills",
 				content: "Skills",
-				width: 55,
+				width: 62,
 			},
 		],
 	};
@@ -171,22 +178,25 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 			{
 				key: "skills",
 				content: (
-					<>
+					<div>
 						{workforce.skills?.map((skill, i) => (
-							<Lozenge
-								key={i}
-								style={{
-                                    marginLeft: "8px",
-									backgroundColor:
-										COLOR_SKILL_LEVEL[skill.level - 1]
-											.color,
-									color: "white",
-								}}
-							>
-								{skill.name}
-							</Lozenge>
+							<span style={{ marginRight: "2px" }}>
+								<Lozenge
+									key={i}
+									style={{
+										marginLeft: "8px",
+										backgroundColor:
+											COLOR_SKILL_LEVEL[skill.level - 1]
+												.color,
+										color: "white",
+									}}
+                                    isBold
+								>
+									{skill.name} - {skill.level}<PiStarFill/>
+								</Lozenge>
+							</span>
 						))}
-					</>
+					</div>
 				),
 			},
 		],
@@ -242,11 +252,22 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 						width={"medium"}
 					>
 						<ModalHeader>
+                            <div 
+                                style={{ flexWrap: "wrap",}}
+                            >
 							<ModalTitle>Select Workforce</ModalTitle>
-						</ModalHeader>
-						<ModalBody>
-							<div style={{ display: "flex" }}>
-								<div style={{ flex: "0 0 300px" }}>
+                            <div
+								style={{
+									display: "flex",
+									marginTop: "10px",
+								}}
+							>
+								<div
+									style={{
+										flex: "0 0 320px",
+										marginRight: "10px",
+									}}
+								>
 									<TextField
 										isCompact
 										placeholder="Search Workforce Name"
@@ -260,25 +281,31 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 										flex: "0 0 300px",
 									}}
 								>
-									<Button
-										appearance="primary"
-										onClick={() => {
-											closeSWModal();
-										}}
-									>
-										Create new
-									</Button>
-									{/* SELECT ALL BUTTON */}
-									<Button
-										appearance="primary"
-										onClick={handleSelectAll}
-									>
-										{selectAll
-											? "Deselect All"
-											: "Select All"}
-									</Button>
+									<ButtonGroup>
+										<Button
+											appearance="primary"
+											onClick={() => {
+												closeSWModal();
+											}}
+										>
+											Create new
+										</Button>
+										{/* SELECT ALL BUTTON */}
+										<Button
+											appearance="primary"
+											onClick={handleSelectAll}
+										>
+											{selectAll
+												? "Deselect All"
+												: "Select All"}
+										</Button>
+                                        <InfoMessageColor/>
+									</ButtonGroup>
 								</div>
 							</div>
+                            </div>
+						</ModalHeader>
+						<ModalBody>
 							<DynamicTable
 								shouldScrollInViewport
 								head={head}
@@ -420,20 +447,18 @@ export function ParameterCreareWorkforceModal() {
 		],
 	}));
 
-    function formatOptionLabel(user) {
-        return (
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <Avatar src={user.avatar} alt={user.label} size="medium" />
-            <div style={{ marginLeft: '8px' }}>{user.label}</div>
-          </div>
-        );
-      }
+	function formatOptionLabel(user) {
+		return (
+			<div style={{ display: "flex", alignItems: "center" }}>
+				<Avatar src={user.avatar} alt={user.label} size="medium" />
+				<div style={{ marginLeft: "8px" }}>{user.label}</div>
+			</div>
+		);
+	}
 
 	return (
 		<>
-			<Button
-				onClick={openCWModal}
-			>Create new</Button>
+			<Button onClick={openCWModal}>Create new</Button>
 			{/* CREATE WORKFORCE MODAL (CW) */}
 			<ModalTransition>
 				{isCWOpen && (
@@ -473,12 +498,18 @@ export function ParameterCreareWorkforceModal() {
 															inputId="single-select-example"
 															className="single-select"
 															classNamePrefix="react-select"
-															options={[workforcesJiraAccount.map((user)=>({
-                                                                label: user.displayName,
-                                                                value: user.displayName,
-                                                                avatar: user.avatar,
-                                                            }))]}
-                                                            formatOptionLabel={formatOptionLabel}
+															options={[
+																workforcesJiraAccount.map(
+																	(user) => ({
+																		label: user.displayName,
+																		value: user.displayName,
+																		avatar: user.avatar,
+																	})
+																),
+															]}
+															formatOptionLabel={
+																formatOptionLabel
+															}
 															placeholder="Choose a Jira account"
 														/>
 														{!error && (
