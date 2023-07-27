@@ -84,16 +84,6 @@ function VisualizeTasksPage({ handleChangeTab }) {
 			});
 	}
 
-	//get from Local Storage
-	var tasksData = JSON.parse(localStorage.getItem("tasks"));
-	if (!tasksData) {
-		tasksData = [];
-	}
-	var selectedData = JSON.parse(localStorage.getItem("selected"));
-	if (!selectedData) {
-		selectedData = [];
-	}
-
 	//tasks represent list of all tasks in the pool of current project
 	//-which are shown in the right panel
 	var tasksCache = getCache("tasks");
@@ -165,13 +155,15 @@ function VisualizeTasksPage({ handleChangeTab }) {
 	}, []);
 
 	//currentTask represents the selected task to be shown in the bottom panel
-	const [currentTaskId, setCurrentTaskId] = useState(null);
+	const [currentTaskId, setCurrentTaskId] = useState(
+		tasks.length ? tasks[0].id : null
+	);
 	const updateCurrentTaskId = (taskId) => {
 		setCurrentTaskId(taskId);
 	};
 
 	//selectedTask represents the all the tasks that are currently selected for the pert chart
-	const [selectedIds, setSelectedIds] = useState(selectedData);
+	const [selectedIds, setSelectedIds] = useState([]);
 	const updateSelectedTaskIds = (taskIds) => {
 		setSelectedIds(taskIds);
 	};
@@ -191,6 +183,11 @@ function VisualizeTasksPage({ handleChangeTab }) {
 		setTaskMilestoneChanged(dataChanged);
 	};
 
+	const [currentTaskChanged, setCurrentTaskChanged] = useState(null);
+	const updateCurrentTaskChanged = (dataChanged) => {
+		setCurrentTaskChanged(dataChanged);
+	};
+
 	const updateTasks = (tasks) => {
 		setTasks(tasks);
 	};
@@ -201,12 +198,6 @@ function VisualizeTasksPage({ handleChangeTab }) {
 		setMilestones(milestones);
 	};
 
-	// useEffect(() => {
-	// 	localStorage.setItem("tasks", JSON.stringify(tasks));
-	// 	localStorage.setItem("milestones", JSON.stringify(milestones));
-	// 	localStorage.setItem("skills", JSON.stringify(skills));
-	// }, [tasks, milestones, skills]);
-
 	const actionsContent = (
 		<div
 			style={{
@@ -216,24 +207,20 @@ function VisualizeTasksPage({ handleChangeTab }) {
 				alignItems: "end",
 			}}
 		>
-			{canEstimate ? "" : isSaving ? (
-				<LoadingButton isLoading>
-					Saving...
-				</LoadingButton>
+			{canEstimate ? (
+				""
 			) : (
-				<Button onClick={handleSave}>
+				<LoadingButton isLoading={isSaving} onClick={handleSave}>
 					Save
-				</Button>
-			)}
-			{isEstimating ? (
-				<LoadingButton appearance="primary" isLoading>
-					Estimating...
 				</LoadingButton>
-			) : (
-				<Button appearance="primary" onClick={handleEstimate}>
-					Estimate
-				</Button>
 			)}
+			<LoadingButton
+				appearance="primary"
+				isLoading={isEstimating}
+				onClick={handleEstimate}
+			>
+				Estimate
+			</LoadingButton>
 		</div>
 	);
 
@@ -265,6 +252,7 @@ function VisualizeTasksPage({ handleChangeTab }) {
 								updateDependenciesChanged
 							}
 							updateTaskSkillsChanged={updateTaskSkillsChanged}
+							updateCurrentTaskChanged={updateCurrentTaskChanged}
 							updateTaskMilestoneChanged={
 								updateTaskMilestoneChanged
 							}

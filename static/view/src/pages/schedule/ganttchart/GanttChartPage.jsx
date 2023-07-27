@@ -115,7 +115,7 @@ function GanttChartPage({ setSelectedSolution, selectedSolution}) {
 			<PageHeader actions={actionsContent}>
 				Solution evaluation:
 			</PageHeader>
-			<GanttChartStats selectedSolution={selectedSolution} />
+			<GanttChartStats selectedSolution={selectedSolution} solutionTasks={solutionTasks}/>
 
 			<PageHeader>Gantt chart</PageHeader>
 			<GanttChart

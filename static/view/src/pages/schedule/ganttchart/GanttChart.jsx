@@ -60,7 +60,7 @@ const GanttChart = ({
 				name: task.name,
 				assignTo: task.workforce,
 				type: "task",
-				color: getColor(19),
+				color: getColor(1),
 			};
 		});
 

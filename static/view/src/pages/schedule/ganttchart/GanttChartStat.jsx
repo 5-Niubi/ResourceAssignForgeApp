@@ -1,6 +1,6 @@
 import { Grid, GridColumn } from "@atlaskit/page";
 import React, { useState, useEffect } from "react";
-import { findObj } from "../../../common/utils";
+import { findObj, getCache } from "../../../common/utils";
 
 const GanttChartStat = ({ title, value, info }) => {
 	return (
@@ -43,20 +43,40 @@ const GanttChartStat = ({ title, value, info }) => {
 	);
 };
 
-const GanttChartStats = ({ selectedSolution }) => {
+const GanttChartStats = ({ selectedSolution, solutionTasks }) => {
+	var project = JSON.parse(getCache("project"));
+	
+	var start = solutionTasks[0]?.startDate;
+	var end = solutionTasks[0]?.endDate;
+	solutionTasks.forEach((t) => {
+		if (t.startDate < start) {
+			start = t.startDate;
+		}
+		if (t.endDate > end) {
+			end= t.endDate;
+		}
+	});
+
+	start = new Date(start);
+	end = new Date(end);
+
 	return selectedSolution ? (
 		<Grid spacing="comfortable" columns={12}>
 			<GridColumn medium={4}>
 				<GanttChartStat
 					title="Duration"
 					value={selectedSolution.duration + " days"}
-					info={"9/12/2022 - 8/6/2023"}
+					info={
+						start.toLocaleDateString("en-US") +
+						" to " +
+						end.toLocaleDateString("en-US")
+					}
 				/>
 			</GridColumn>
 			<GridColumn medium={4}>
 				<GanttChartStat
 					title="Cost"
-					value={"$" + selectedSolution.cost}
+					value={selectedSolution.cost + " " + project.budgetUnit}
 				/>
 			</GridColumn>
 			<GridColumn medium={4}>

@@ -53,7 +53,7 @@ function taskResolver(resolver) {
 			console.log(response);
 			return response;
 		} catch (error) {
-			console.log("Error in getTaskDetail: ", error);
+			console.log("Error in updateTask: ", error);
 			return Promise.reject(error);
 		}
 	});

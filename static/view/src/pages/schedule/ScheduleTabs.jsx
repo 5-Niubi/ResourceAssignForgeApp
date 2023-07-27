@@ -23,7 +23,7 @@ export default function ScheduleTabs() {
 		clearProjectBasedCache();
 		project = {};
 	} else {
-		var project = JSON.parse(project);
+		project = JSON.parse(project);
 		if (!project || project.id != projectId) {
 			clearProjectBasedCache();
 			project = {};

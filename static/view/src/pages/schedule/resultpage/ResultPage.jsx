@@ -9,6 +9,7 @@ import Toastify from "../../../common/Toastify";
 import { Grid, GridColumn } from "@atlaskit/page";
 import Pagination from "@atlaskit/pagination";
 import Spinner from "@atlaskit/spinner";
+import { getCache } from "../../../common/utils";
 
 /**
  * Using as Page to show pert chart and task dependences
@@ -16,6 +17,13 @@ import Spinner from "@atlaskit/spinner";
  */
 function ResultPage({ handleChangeTab }) {
 	let { projectId } = useParams();
+
+	var project = getCache("project");
+	if (!project) {
+		
+	} else {
+		project = JSON.parse(project);
+	}
 
 	const actionsContent = (
 		<ButtonGroup>
@@ -179,9 +187,9 @@ function ResultPage({ handleChangeTab }) {
 									>
 										<h3
 											style={{ cursor: "pointer" }}
-											onClick={() =>
-												setSelectedSolution(solution)
-											}
+											// onClick={() =>
+											// 	setSelectedSolution(solution)
+											// }
 										>
 											Solution #{solution.id}
 										</h3>
@@ -194,7 +202,8 @@ function ResultPage({ handleChangeTab }) {
 											days
 										</div>
 										<div>
-											Total cost: $<b>{solution.cost}</b>
+											Total cost: <b>{solution.cost}</b>{" "}
+											{project.budgetUnit}
 										</div>
 										<div>
 											Quality: <b>{solution.quality}</b>%

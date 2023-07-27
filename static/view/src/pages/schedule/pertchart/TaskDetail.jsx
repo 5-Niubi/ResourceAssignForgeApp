@@ -3,7 +3,7 @@ import Select, { CreatableSelect } from "@atlaskit/select";
 import Form, { Field, FormFooter } from "@atlaskit/form";
 import Textfield from "@atlaskit/textfield";
 import PageHeader from "@atlaskit/page-header";
-import Button, { ButtonGroup } from "@atlaskit/button";
+import Button, { ButtonGroup, LoadingButton } from "@atlaskit/button";
 import { cache, findObj } from "../../../common/utils";
 import { invoke } from "@forge/bridge";
 import Toastify from "../../../common/Toastify";
@@ -21,15 +21,17 @@ const TaskDetail = ({
 	updateTasks,
 	updateDependenciesChanged,
 	updateTaskSkillsChanged,
+	updateCurrentTaskChanged,
 	updateTaskMilestoneChanged,
 	updateCanEstimate,
 	updateSkills,
-	updateMilestones
+	updateMilestones,
 }) => {
-	const {projectId} = useParams();
+	const { projectId } = useParams();
 	const [milestoneCreating, setMilestoneCreating] = useState(false);
 	const [skillCreating, setSkillCreating] = useState(false);
-
+	const [isInfoChanged, setIsInfoChanged] = useState(false);
+	const [isSavingInfo, setIsSavingInfo] = useState(false);
 
 	var currentTask = findObj(tasks, currentTaskId);
 	var selectedTasks = [];
@@ -144,16 +146,26 @@ const TaskDetail = ({
 		updateTaskSkillsChanged(skills);
 		updateCanEstimate(false);
 	};
-	
-	const handleChangeMilestone = (objValue) => {
-		currentTask.milestoneId = objValue?.value || null;
-		updateTaskMilestoneChanged(objValue);
-		updateCanEstimate(false);
-	};
 
-	const handleUpdateTask = (event) => {
-		console.log(event);
-	}
+	const handleUpdateTask = () => {
+		setIsSavingInfo(true);
+		currentTask.projectId = projectId;
+		invoke("updateTask", { task: currentTask })
+			.then(function (res) {
+				setIsSavingInfo(false);
+				setIsInfoChanged(false);
+				if (res.id) {
+					updateCurrentTaskChanged(currentTask);
+					Toastify.success("Task updated successfully");
+				}
+			})
+			.catch((error) => {
+				setIsSavingInfo(false);
+				setIsInfoChanged(false);
+				console.log(error);
+				Toastify.error(error.toString());
+			});
+	};
 
 	const handleCreateMilestone = (inputValue) => {
 		let reqMilestone = {
@@ -184,7 +196,10 @@ const TaskDetail = ({
 				if (res.id) {
 					cache("skills", JSON.stringify([...skills, res]));
 					updateSkills([...skills, res]);
-					currentTask.skillRequireds.push({skillId: res.id, level: 1});
+					currentTask.skillRequireds.push({
+						skillId: res.id,
+						level: 1,
+					});
 					updateTaskSkillsChanged([
 						...currentTask.skillRequireds,
 						{ skillId: res.id, level: 1 },
@@ -198,6 +213,20 @@ const TaskDetail = ({
 			});
 	};
 
+	const actionsContent = isInfoChanged ? (
+		<ButtonGroup>
+			<LoadingButton
+				isLoading={isSavingInfo}
+				appearance="primary"
+				onClick={() => handleUpdateTask()}
+			>
+				Save task info
+			</LoadingButton>
+		</ButtonGroup>
+	) : (
+		""
+	);
+
 	return (
 		<div
 			class="task-details"
@@ -207,12 +236,16 @@ const TaskDetail = ({
 				overflowY: "auto",
 			}}
 		>
-			{/* <PageHeader actions={actionsContent}>Task details:</PageHeader> */}
-			<PageHeader>
+			<PageHeader actions={actionsContent}>
 				{currentTask
 					? `Task ${currentTask.id} details:`
 					: "Task details:"}
 			</PageHeader>
+			{/* <PageHeader>
+				{currentTask
+					? `Task ${currentTask.id} details:`
+					: "Task details:"}
+			</PageHeader> */}
 			<div style={{ width: "100%" }}>
 				<pre>
 					{currentTask ? (
@@ -228,12 +261,20 @@ const TaskDetail = ({
 										name="name"
 										defaultValue={currentTask.name}
 										isRequired={true}
+										isDisabled={isSavingInfo}
 									>
 										{({ fieldProps }) => (
 											<Fragment>
 												<Textfield
 													{...fieldProps}
-													onChange={handleUpdateTask}
+													onChange={(event) => {
+														fieldProps.onChange(
+															event
+														);
+														setIsInfoChanged(true);
+														currentTask.name =
+															event.currentTarget.value;
+													}}
 												/>
 											</Fragment>
 										)}
@@ -252,14 +293,25 @@ const TaskDetail = ({
 													currentTask.duration
 												}
 												isRequired={true}
+												isDisabled={isSavingInfo}
 											>
 												{({ fieldProps }) => (
 													<Fragment>
 														<Textfield
 															{...fieldProps}
-															onChange={
-																handleUpdateTask
-															}
+															type="number"
+															onChange={(
+																event
+															) => {
+																fieldProps.onChange(
+																	event
+																);
+																setIsInfoChanged(
+																	true
+																);
+																currentTask.duration =
+																	event.currentTarget.value;
+															}}
 														/>
 													</Fragment>
 												)}
@@ -269,6 +321,7 @@ const TaskDetail = ({
 												name="milestone"
 												defaultValue=""
 												isRequired={true}
+												isDisabled={isSavingInfo}
 											>
 												{({ fieldProps }) => (
 													<Fragment>
@@ -280,10 +333,24 @@ const TaskDetail = ({
 															options={
 																milestoneOpts
 															}
-															value={milestoneValue}
-															onChange={
-																handleChangeMilestone
+															value={
+																milestoneValue
 															}
+															onChange={(
+																event
+															) => {
+																fieldProps.onChange(
+																	event
+																);
+																setIsInfoChanged(true);
+																currentTask.milestoneId =
+																	event?.value ||
+																	null;
+																updateTaskMilestoneChanged(
+																	currentTask.milestoneId
+																);
+																
+															}}
 															onCreateOption={
 																handleCreateMilestone
 															}
@@ -322,7 +389,9 @@ const TaskDetail = ({
 															}
 															isMulti
 															isSearchable={true}
-															isLoading={skillCreating}
+															isLoading={
+																skillCreating
+															}
 															placeholder="Choose skills"
 														/>
 													</Fragment>
