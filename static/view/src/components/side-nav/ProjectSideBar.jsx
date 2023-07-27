@@ -1,6 +1,7 @@
 import RoadmapIcon from "@atlaskit/icon/glyph/roadmap";
 import IssuesIcon from "@atlaskit/icon/glyph/issues";
 import GraphLineIcon from "@atlaskit/icon/glyph/graph-line";
+import Subtask from "@atlaskit/icon/glyph/subtask";
 import ArrowLeftCircleIcon from "@atlaskit/icon/glyph/arrow-left-circle";
 import { ButtonItem } from "@atlaskit/side-navigation";
 import { invoke } from "@forge/bridge";
@@ -79,7 +80,7 @@ function ProjectSideBar(rootPath = "") {
 						rootPath={rootPath}
 						text={"Task Group"}
 						pathTo={"taskgroups"}
-						iconBefore={<GraphLineIcon label="" />}
+						iconBefore={<Subtask label="" />}
 					/>
 				</Section>
 			</NestableNavigationContent>

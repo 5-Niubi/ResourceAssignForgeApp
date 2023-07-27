@@ -18,6 +18,7 @@ import LoadingModalWithThread from "./components/LoadingModalWithThread";
 import { STORAGE, THREAD_STATE_DEFAULT } from "./common/contants";
 import Toastify from "./common/Toastify";
 import MorePage from "./pages/more";
+import { useEffectOnlyOnUpdate } from "./common/effects";
 
 export const ThreadLoadingContext = createContext({ state: [] });
 export const AppContext = createContext({
@@ -38,54 +39,47 @@ function App() {
 	// Check authenticate every time reload page
 	useEffect(function () {
 		invoke("getIsAuthenticated").then(function (res) {
-			if (!res.isAuthenticated) {
+			if (res.isAuthenticated) {
+				getSubscription();
+				getThreadStateInfo();
+			} else {
 				setIsAuthenticated(false);
 			}
 		});
 	}, []);
 
-	useEffect(
-		function () {
-			if (isAuthenticated) {
-				invoke("getCurrentSubscriptionPlan")
-					.then(function (res) {
-						console.log(res);
-						setAppContextState((prev) => ({ ...prev, subscription: res }));
-					})
-					.catch(() => {});
-			}
-		},
-		[isAuthenticated]
-	);
+	function getSubscription() {
+		invoke("getCurrentSubscriptionPlan")
+			.then(function (res) {
+				console.log(res);
+				setAppContextState((prev) => ({ ...prev, subscription: res }));
+			})
+			.catch(() => {});
+	}
 
-	useEffect(
-		function () {
-			if (isAuthenticated) {
-				let threadInfoRaw = localStorage.getItem(STORAGE.THREAD_INFO);
-				let threadInfo = JSON.parse(threadInfoRaw);
-				if (threadInfo) {
-					setThreadStateValue({
-						threadId: threadInfo.threadId,
-						threadAction: threadInfo.threadAction,
-						isModalOpen: true,
-					});
-				}
-				invoke("getThreadStateInfo")
-					.then(function (res) {
-						console.log(res);
-						setThreadStateValue({
-							threadId: res[0].threadId,
-							threadAction: res[0].threadAction,
-							isModalOpen: true,
-						});
-					})
-					.catch((error) => {
-						Toastify.error(error);
-					});
-			}
-		},
-		[isAuthenticated]
-	);
+	function getThreadStateInfo() {
+		let threadInfoRaw = localStorage.getItem(STORAGE.THREAD_INFO);
+		let threadInfo = JSON.parse(threadInfoRaw);
+		if (threadInfo) {
+			setThreadStateValue({
+				threadId: threadInfo.threadId,
+				threadAction: threadInfo.threadAction,
+				isModalOpen: true,
+			});
+		}
+		invoke("getThreadStateInfo")
+			.then(function (res) {
+				console.log(res);
+				setThreadStateValue({
+					threadId: res[0].threadId,
+					threadAction: res[0].threadAction,
+					isModalOpen: true,
+				});
+			})
+			.catch((error) => {
+				Toastify.error(error);
+			});
+	}
 
 	// --- Config React Router ---
 	useEffect(() => {

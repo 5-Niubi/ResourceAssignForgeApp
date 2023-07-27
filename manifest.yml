@@ -39,8 +39,8 @@ permissions:
         - "*.ngrok-free.app"
         - "https://be.ai4cert.com"
     images:
-      - https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Microsoft_Project_%282019%E2%80%93present%29.svg/2346px-Microsoft_Project_%282019%E2%80%93present%29.svg.png
-      - https://logos-world.net/wp-content/uploads/2021/02/Jira-Emblem.png
+      - https://i.ibb.co/znTzdzQ/2346px-Microsoft-Project-2019-present-svg.png
+      - https://i.ibb.co/wR3CZ6v/Jira-Emblem.png
   content:
     styles:
       - unsafe-inline
