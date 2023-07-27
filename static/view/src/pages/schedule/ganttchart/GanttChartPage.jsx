@@ -51,11 +51,11 @@ function GanttChartPage({ setSelectedSolution, selectedSolution}) {
 	var tasksChanged = solutionTasks;
 	const updateTasksChanged = (tasks) => tasksChanged = tasks;
 
-	useEffect(() => {
-		if (selectedSolution) {
-			setSolutionTasks(JSON.parse(selectedSolution.tasks));
-		}
-	}, []);
+	// useEffect(() => {
+	// 	if (selectedSolution) {
+	// 		setSolutionTasks(JSON.parse(selectedSolution.tasks));
+	// 	}
+	// }, []);
 
 	const handleSaveSolution = function() {
 		selectedSolution.tasks = JSON.stringify(tasksChanged);
@@ -71,6 +71,19 @@ function GanttChartPage({ setSelectedSolution, selectedSolution}) {
 			});
 
 	};
+
+	useEffect(() => {
+		invoke("getSchedule", { scheduleId: selectedSolution.id })
+			.then(function (res) {
+				if (res) {
+					setSolutionTasks(JSON.parse(res.tasks));
+				}
+			})
+			.catch((error) => {
+				console.log(error);
+				Toastify.error(error.toString());
+			});
+	}, []);
 
 	const actionsContent = (
 		<ButtonGroup>

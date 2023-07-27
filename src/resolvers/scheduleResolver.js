@@ -40,11 +40,22 @@ function scheduleResolver(resolver) {
 
 	resolver.define("getSolutionsByProject", async function (req) {
 		try {
-			let response = await scheduleService.getSolutionsByProject(req.payload.projectId);
+			let response = await scheduleService.getSolutionsByProject(req.payload.projectId, req.payload.page);
 			console.log(response);
 			return response;
 		} catch (error) {
 			console.log("Error in getSolutionsByProject: ", error);
+			return Promise.reject(error);
+		}
+	});
+
+	resolver.define("getSchedule", async function (req) {
+		try {
+			let response = await scheduleService.getSchedule(req.payload.scheduleId);
+			console.log(response);
+			return response;
+		} catch (error) {
+			console.log("Error in getSchedule: ", error);
 			return Promise.reject(error);
 		}
 	});

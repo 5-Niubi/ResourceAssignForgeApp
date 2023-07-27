@@ -7,6 +7,8 @@ import GanttChartPage from "../ganttchart/GanttChartPage";
 import { invoke } from "@forge/bridge";
 import Toastify from "../../../common/Toastify";
 import { Grid, GridColumn } from "@atlaskit/page";
+import Pagination from "@atlaskit/pagination";
+import Spinner from "@atlaskit/spinner";
 
 /**
  * Using as Page to show pert chart and task dependences
@@ -22,22 +24,38 @@ function ResultPage({ handleChangeTab }) {
 	);
 
 	const [solutions, setSolutions] = useState([]);
-	useEffect(function () {
-		// var solutionCache = localStorage.getItem("solutions");
-		// if (solutionCache){
-		// 	setSolutions(JSON.parse(solutionCache));
-		// }
-		invoke("getSolutionsByProject", { projectId })
-			.then(function (res) {
-				if (res) {
-					setSolutions(res);
-				}
-			})
-			.catch((error) => {
-				console.log(error);
-				Toastify.error(error.toString());
-			});
-	}, []);
+	const [total, setTotal] = useState(0);
+	const [pageSize, setPageSize] = useState(10);
+	const [pageIndex, setPageIndex] = useState(1);
+	const [pageLoading, setPageLoading] = useState(true);
+
+	var totalPages =
+		total % pageSize > 0 ? total / pageSize + 1 : total / pageSize;
+	var pages = [];
+	for (let i = 0; i < totalPages; i++) {
+		pages.push(i + 1);
+	}
+	useEffect(
+		function () {
+			invoke("getSolutionsByProject", { projectId, page: pageIndex })
+				.then(function (res) {
+					setPageLoading(false);
+					if (res) {
+						console.log(res);
+						setSolutions(res.values);
+						setTotal(res.total);
+						setPageSize(res.pageSize);
+						setPageIndex(res.pageIndex);
+					}
+				})
+				.catch((error) => {
+					setPageLoading(false);
+					console.log(error);
+					Toastify.error(error.toString());
+				});
+		},
+		[pageIndex]
+	);
 
 	const [selectedSolution, setSelectedSolution] = useState(null);
 
@@ -78,41 +96,49 @@ function ResultPage({ handleChangeTab }) {
 	};
 
 	// var content = [{id: 1, name: "s1"}];
-	const rows = solutions.map((s, index) => ({
-		key: `row-${s.id}`,
-		isHighlighted: false,
-		cells: [
-			{
-				key: index,
-				content: (
-					<Button
-						appearance="subtle-link"
-						onClick={() => setSelectedSolution(s)}
-					>
-						{"Solution #" + s.id}
-					</Button>
-				),
-			},
-			{
-				key: index,
-				content: s.duration + " days",
-			},
-			{
-				key: index,
-				content: "$" + s.cost,
-			},
-			{
-				key: index,
-				content: s.quality + "%",
-			},
-			{
-				key: "option",
-				content: (
-					<Button onClick={() => setSelectedSolution(s)}>View</Button>
-				),
-			},
-		],
-	}));
+	// const rows = solutions.map((s, index) => ({
+	// 	key: `row-${s.id}`,
+	// 	isHighlighted: false,
+	// 	cells: [
+	// 		{
+	// 			key: index,
+	// 			content: (
+	// 				<Button
+	// 					appearance="subtle-link"
+	// 					onClick={() => setSelectedSolution(s)}
+	// 				>
+	// 					{"Solution #" + s.id}
+	// 				</Button>
+	// 			),
+	// 		},
+	// 		{
+	// 			key: index,
+	// 			content: s.duration + " days",
+	// 		},
+	// 		{
+	// 			key: index,
+	// 			content: "$" + s.cost,
+	// 		},
+	// 		{
+	// 			key: index,
+	// 			content: s.quality + "%",
+	// 		},
+	// 		{
+	// 			key: "option",
+	// 			content: (
+	// 				<Button onClick={() => setSelectedSolution(s)}>View</Button>
+	// 			),
+	// 		},
+	// 	],
+	// }));
+
+	const handleChangePage = (e) => {
+		// console.log(e);
+		// console.log(e.currentTarget.getAttribute("page"));
+		setPageLoading(true);
+		setPageIndex(e.currentTarget.getAttribute("page"));
+	};
+
 	return (
 		<div style={{ width: "100%", height: "90vh" }}>
 			{selectedSolution !== null ? (
@@ -125,11 +151,9 @@ function ResultPage({ handleChangeTab }) {
 					<PageHeader actions={actionsContent}>
 						Solution optimizations
 					</PageHeader>
-
 					<h3 style={{ marginBottom: "20px" }}>
-						Number of feasible solutions: {solutions.length}
+						Number of feasible solutions: {total}
 					</h3>
-
 					{/* <DynamicTable
 						head={head}
 						rows={rows}
@@ -140,7 +164,8 @@ function ResultPage({ handleChangeTab }) {
 						// isLoading={isLoading}
 						emptyView={<h2>No feasible solutions!</h2>}
 					/> */}
-
+					{pageLoading ? (
+					<Spinner size="large" />) : (
 					<Grid layout="fluid" spacing="comfortable" columns={12}>
 						{solutions.map((solution) => {
 							return (
@@ -162,6 +187,10 @@ function ResultPage({ handleChangeTab }) {
 										>
 											Solution #{solution.id}
 										</h3>
+										<div>
+											Generated at:{" "}
+											<b>{solution.since}</b>
+										</div>
 										<div>
 											Duration: <b>{solution.duration}</b>{" "}
 											days
@@ -187,6 +216,16 @@ function ResultPage({ handleChangeTab }) {
 							);
 						})}
 					</Grid>
+					)}
+					<Pagination
+						nextLabel="Next"
+						label="Page"
+						pageLabel="Page"
+						pages={pages}
+						previousLabel="Previous"
+						onChange={handleChangePage}
+						selectedIndex={pageIndex - 1}
+					/>
 				</>
 			)}
 		</div>

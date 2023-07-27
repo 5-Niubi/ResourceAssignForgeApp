@@ -247,6 +247,10 @@ const GanttChart = ({
 					},
 					buttons: [
 						{
+							type: "all",
+							text: "All",
+						},
+						{
 							type: "month",
 							count: 1,
 							text: "1m",
@@ -271,10 +275,7 @@ const GanttChart = ({
 							count: 1,
 							text: "1y",
 						},
-						{
-							type: "all",
-							text: "All",
-						},
+						
 					],
 				},
 				navigator: {

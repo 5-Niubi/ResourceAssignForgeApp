@@ -34,9 +34,18 @@ async function saveSolution(solutionReq) {
 	}
 }
 
-async function getSolutionsByProject(projectId) {
+async function getSolutionsByProject(projectId, page) {
 	try {
-		let response = await APIServices.get(`/api/Schedule/GetSchedulesByProject`, { projectId } );
+		let response = await APIServices.get(`/api/Schedule/GetSchedulesByProject`, { projectId, page } );
+		return response;
+	} catch (error) {
+		return Promise.reject(error);
+	}
+}
+
+async function getSchedule(scheduleId) {
+	try {
+		let response = await APIServices.get(`/api/Schedule/GetSchedule`, { scheduleId } );
 		return response;
 	} catch (error) {
 		return Promise.reject(error);
@@ -47,5 +56,6 @@ export {
 	getThreadSchedule,
 	schedule,
 	saveSolution,
-	getSolutionsByProject
+	getSolutionsByProject,
+	getSchedule
 };

@@ -106,6 +106,7 @@ function VisualizeTasksPage({ handleChangeTab }) {
 	}
 
 	var skillsCache = getCache("skills");
+	console.log(skillsCache == true);
 	if (!skillsCache) {
 		skillsCache = [];
 	} else {
