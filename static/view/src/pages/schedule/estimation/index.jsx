@@ -65,6 +65,7 @@ function EstimationPage({ handleChangeTab }) {
 			<MilestonesTimeline
 				milestones={milestones}
 				skills={skills}
+				handleChangeTab={handleChangeTab}
 			></MilestonesTimeline>
 		</div>
 	);

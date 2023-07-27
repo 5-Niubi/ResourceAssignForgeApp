@@ -24,7 +24,38 @@ async function schedule(threadId) {
 	}
 }
 
+async function saveSolution(solutionReq) {
+	try {
+		let response = await APIServices.post(`/api/Schedule/CreateSolution`, null,
+			solutionReq);
+		return response;
+	} catch (error) {
+		return Promise.reject(error);
+	}
+}
+
+async function getSolutionsByProject(projectId, page) {
+	try {
+		let response = await APIServices.get(`/api/Schedule/GetSchedulesByProject`, { projectId, page } );
+		return response;
+	} catch (error) {
+		return Promise.reject(error);
+	}
+}
+
+async function getSchedule(scheduleId) {
+	try {
+		let response = await APIServices.get(`/api/Schedule/GetSchedule`, { scheduleId } );
+		return response;
+	} catch (error) {
+		return Promise.reject(error);
+	}
+}
+
 export {
 	getThreadSchedule,
-	schedule
+	schedule,
+	saveSolution,
+	getSolutionsByProject,
+	getSchedule
 };

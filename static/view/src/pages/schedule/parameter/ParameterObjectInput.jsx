@@ -154,6 +154,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 					// Toastify.info("Save successfully.");
 					// handleChangeTab(3);
 					// setIsScheduling(false);
+					localStorage.setItem("parameterId", res.id);
 
 					//call api to schedule
 					invoke("getThreadSchedule", { parameterId: res.id })
@@ -165,22 +166,13 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 										threadId: res.threadId,
 									})
 										.then(function (res) {
-											if (
-												res &&
-												res.status == "success"
-											) {
+											setIsScheduling(false);
+											if (res && res.status == "success") {
 												clearInterval(scheduleInterval);
 
-												Toastify.info(
-													"Schedule successfully."
-												);
-												localStorage.setItem(
-													"solutions",
-													res.result
-												);
+												Toastify.success("Schedule successfully.");
 
 												handleChangeTab(3);
-												setIsScheduling(false);
 											}
 										})
 										.catch(function (error) {
@@ -202,6 +194,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 			})
 			.catch(function (error) {
 				// handleChangeTab(3);
+				setIsScheduling(false);
 				Toastify.error(error.toString());
 				setIsScheduling(false);
 			});

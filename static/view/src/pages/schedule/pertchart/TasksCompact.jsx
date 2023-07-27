@@ -3,13 +3,7 @@ import PageHeader from "@atlaskit/page-header";
 import Button, { ButtonGroup } from "@atlaskit/button";
 import { Checkbox } from "@atlaskit/checkbox";
 import DynamicTable from "@atlaskit/dynamic-table";
-import {
-	globalSelectedTasks,
-	selectedTasks,
-	updateGlobalSelectedTasks,
-	updateSelectedTasks,
-} from "../data";
-import { findObj } from "./VisualizeTasks";
+import { findObj } from "../../../common/utils";
 import CreateTaskModal from "./modal/CreateTaskModal";
 import { useParams } from "react-router";
 
@@ -21,9 +15,12 @@ const TasksCompact = ({
 	milestones,
 	skills,
 	selectedIds,
+	currentTaskId,
 	setSelectedIds,
 	updateCurrentTaskId,
 	updateTasks,
+	updateSkills,
+	updateMilestones,
 }) => {
 	const [isModalCreateOpen, setIsModalCreateOpen] = useState(false);
 	let { projectId } = useParams();
@@ -60,13 +57,13 @@ const TasksCompact = ({
 	});
 
 	const rows = tasks.map((item, index) => {
-		let checked = false;
-		for (let i = 0; i < selectedIds.length; i++) {
-			if (selectedIds[i] == item.id) {
-				checked = true;
-				break;
-			}
-		}
+		// let checked = false;
+		// for (let i = 0; i < selectedIds.length; i++) {
+		// 	if (selectedIds[i] == item.id) {
+		// 		checked = true;
+		// 		break;
+		// 	}
+		// }
 		return {
 			key: `row-${index}-${item.id}`,
 			isHighlighted: false,
@@ -86,7 +83,13 @@ const TasksCompact = ({
 							data-id={item.id}
 							onClick={handleSelectTask}
 						>
-							{item.name}
+							{item.id == currentTaskId ? (
+								<b>
+									{index + 1}. {item.name}
+								</b>
+							) : (
+								`${index + 1}. ${item.name}`
+							)}
 						</div>
 					),
 				},
@@ -96,10 +99,7 @@ const TasksCompact = ({
 
 	const actionsContent = (
 		<ButtonGroup>
-			<Button
-				appearance="subtle"
-				onClick={() => setIsModalCreateOpen(true)}
-			>
+			<Button onClick={() => setIsModalCreateOpen(true)}>
 				Create task
 			</Button>
 		</ButtonGroup>
@@ -121,6 +121,7 @@ const TasksCompact = ({
 					rows={rows}
 					loadingSpinnerSize="large"
 					isFixedSize
+					isLoading={tasks.length <= 0}
 				/>
 			</div>
 
@@ -134,6 +135,8 @@ const TasksCompact = ({
 					skills={skills}
 					updateTasks={updateTasks}
 					updateCurrentTaskId={updateCurrentTaskId}
+					updateSkills={updateSkills}
+					updateMilestones={updateMilestones}
 				/>
 			) : (
 				""

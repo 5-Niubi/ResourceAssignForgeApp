@@ -19,7 +19,7 @@ const EstimationPageHeader = ({ handleChangeTab }) => {
 		</ButtonGroup>
 	);
 	return (
-		<PageHeader actions={actionsContent}>Resource Estimation</PageHeader>
+		<PageHeader actions={actionsContent}>Resource Suggestion</PageHeader>
 	);
 };
 

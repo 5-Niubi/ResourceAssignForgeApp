@@ -1,6 +1,7 @@
 import RoadmapIcon from "@atlaskit/icon/glyph/roadmap";
 import IssuesIcon from "@atlaskit/icon/glyph/issues";
 import GraphLineIcon from "@atlaskit/icon/glyph/graph-line";
+import FolderIcon from "@atlaskit/icon/glyph/folder";
 import ArrowLeftCircleIcon from "@atlaskit/icon/glyph/arrow-left-circle";
 import { ButtonItem } from "@atlaskit/side-navigation";
 import { invoke } from "@forge/bridge";
@@ -80,11 +81,11 @@ function ProjectSideBar(rootPath = "") {
 						iconBefore={<IssuesIcon label="" />}
 					/>
 					<ButtonItemSideBar
-						key="reports"
+						key="task-group"
 						rootPath={rootPath}
-						text={"Reports"}
-						pathTo={"reports"}
-						iconBefore={<GraphLineIcon label="" />}
+						text={"Task Groups"}
+						pathTo={"groups"}
+						iconBefore={<FolderIcon label="" />}
 					/>
 				</Section>
 			</NestableNavigationContent>

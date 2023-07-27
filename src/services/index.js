@@ -17,5 +17,5 @@ export {
 	exportService,
 	parameterService,
 	scheduleService,
-	threadService
+	threadService,
 };
