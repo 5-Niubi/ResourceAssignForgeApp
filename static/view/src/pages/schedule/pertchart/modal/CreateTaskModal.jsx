@@ -313,20 +313,6 @@ function CreateTaskModal({
 														isSearchable={true}
 														placeholder="Choose skills"
 													/>
-													{/* <Select
-														{...fieldProps}
-														inputId="multi-select-example"
-														className="multi-select"
-														classNamePrefix="react-select"
-														options={skillOpts}
-														value={skillValues}
-														isMulti
-														isSearchable={true}
-														onChange={
-															updateReqSkills
-														}
-														placeholder="Choose skills"
-													/> */}
 												</Fragment>
 											)}
 										</Field>

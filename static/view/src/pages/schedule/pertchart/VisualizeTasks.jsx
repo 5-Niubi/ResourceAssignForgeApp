@@ -104,7 +104,6 @@ function VisualizeTasksPage({ handleChangeTab }) {
 	}
 
 	var skillsCache = getCache("skills");
-	console.log(skillsCache == true);
 	if (!skillsCache) {
 		skillsCache = [];
 	} else {
@@ -270,6 +269,8 @@ function VisualizeTasksPage({ handleChangeTab }) {
 								updateTaskMilestoneChanged
 							}
 							updateCanEstimate={updateCanEstimate}
+							updateSkills={updateSkills}
+							updateMilestones={updateMilestones}
 						/>
 					</Main>
 					<div

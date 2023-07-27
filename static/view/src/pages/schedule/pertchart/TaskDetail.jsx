@@ -1,12 +1,13 @@
 import React, { Fragment, useEffect, useState } from "react";
-import Select from "@atlaskit/select";
+import Select, { CreatableSelect } from "@atlaskit/select";
 import Form, { Field, FormFooter } from "@atlaskit/form";
 import Textfield from "@atlaskit/textfield";
 import PageHeader from "@atlaskit/page-header";
 import Button, { ButtonGroup } from "@atlaskit/button";
-import { findObj } from "../../../common/utils";
+import { cache, findObj } from "../../../common/utils";
 import { invoke } from "@forge/bridge";
 import Toastify from "../../../common/Toastify";
+import { useParams } from "react-router-dom";
 
 /**
  * Using as part of visualize task page. To show dependences of a specific task
@@ -22,7 +23,14 @@ const TaskDetail = ({
 	updateTaskSkillsChanged,
 	updateTaskMilestoneChanged,
 	updateCanEstimate,
+	updateSkills,
+	updateMilestones
 }) => {
+	const {projectId} = useParams();
+	const [milestoneCreating, setMilestoneCreating] = useState(false);
+	const [skillCreating, setSkillCreating] = useState(false);
+
+
 	var currentTask = findObj(tasks, currentTaskId);
 	var selectedTasks = [];
 	// selectedTaskIds?.forEach((id) => {
@@ -118,7 +126,18 @@ const TaskDetail = ({
 		values?.forEach((item) => {
 			var items = item.value.split("-");
 			if (items.length != 2) return;
-			skills.push({ skillId: items[0], level: items[1] });
+
+			//check duplicate skill; update level if needed
+			let existed = false;
+			skills?.forEach((s) => {
+				if (s.skillId == items[0]) {
+					s.level = items[1];
+					existed = true;
+				}
+			});
+			if (!existed) {
+				skills.push({ skillId: items[0], level: items[1] });
+			}
 		});
 
 		currentTask.skillRequireds = skills;
@@ -127,7 +146,7 @@ const TaskDetail = ({
 	};
 	
 	const handleChangeMilestone = (objValue) => {
-		currentTask.milestoneId = objValue.value;
+		currentTask.milestoneId = objValue?.value || null;
 		updateTaskMilestoneChanged(objValue);
 		updateCanEstimate(false);
 	};
@@ -135,6 +154,49 @@ const TaskDetail = ({
 	const handleUpdateTask = (event) => {
 		console.log(event);
 	}
+
+	const handleCreateMilestone = (inputValue) => {
+		let reqMilestone = {
+			Name: inputValue,
+			ProjectId: projectId,
+		};
+		setMilestoneCreating(true);
+		invoke("createMilestone", { milestoneObjRequest: reqMilestone })
+			.then(function (res) {
+				setMilestoneCreating(false);
+				if (res.id) {
+					cache("milestones", JSON.stringify([...milestones, res]));
+					updateMilestones([...milestones, res]);
+				}
+			})
+			.catch((error) => {
+				setMilestoneCreating(false);
+				console.log(error);
+				Toastify.error(error.toString());
+			});
+	};
+
+	const handleCreateSkill = (inputValue) => {
+		setSkillCreating(true);
+		invoke("createSkill", { skillReq: { name: inputValue } })
+			.then(function (res) {
+				setSkillCreating(false);
+				if (res.id) {
+					cache("skills", JSON.stringify([...skills, res]));
+					updateSkills([...skills, res]);
+					currentTask.skillRequireds.push({skillId: res.id, level: 1});
+					updateTaskSkillsChanged([
+						...currentTask.skillRequireds,
+						{ skillId: res.id, level: 1 },
+					]);
+				}
+			})
+			.catch((error) => {
+				setSkillCreating(false);
+				console.log(error);
+				Toastify.error(error.toString());
+			});
+	};
 
 	return (
 		<div
@@ -210,20 +272,25 @@ const TaskDetail = ({
 											>
 												{({ fieldProps }) => (
 													<Fragment>
-														<Select
+														<CreatableSelect
 															{...fieldProps}
 															inputId="select-milestone"
 															className="select-milestone"
+															isClearable
 															options={
 																milestoneOpts
 															}
-															value={
-																milestoneValue
-															}
+															value={milestoneValue}
 															onChange={
 																handleChangeMilestone
 															}
+															onCreateOption={
+																handleCreateMilestone
+															}
 															isSearchable={true}
+															isLoading={
+																milestoneCreating
+															}
 															placeholder="Choose milestone"
 														/>
 													</Fragment>
@@ -240,18 +307,22 @@ const TaskDetail = ({
 											>
 												{({ fieldProps }) => (
 													<Fragment>
-														<Select
+														<CreatableSelect
 															{...fieldProps}
-															inputId="multi-select-example"
-															className="multi-select"
-															classNamePrefix="react-select"
+															inputId="select-skills"
+															className="select-skills"
+															isClearable
 															options={skillOpts}
 															value={skillValues}
-															isMulti
-															isSearchable={true}
 															onChange={
 																handleChangeSkill
 															}
+															onCreateOption={
+																handleCreateSkill
+															}
+															isMulti
+															isSearchable={true}
+															isLoading={skillCreating}
 															placeholder="Choose skills"
 														/>
 													</Fragment>
