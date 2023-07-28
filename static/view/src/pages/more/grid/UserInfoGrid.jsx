@@ -14,7 +14,7 @@ function UserInfoGrid() {
 	let subscription = appContext.subscription;
 
 	function handleChangePlanClick() {
-		router.open("http://localhost:5242/Upgrade");
+		router.open(`https://localhost:5242/Upgrade?token=${subscription.token}`);
 	}
 
 	return subscription ? (
