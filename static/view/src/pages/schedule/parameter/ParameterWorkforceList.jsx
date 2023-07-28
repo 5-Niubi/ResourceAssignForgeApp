@@ -55,16 +55,7 @@ function ParameterWorkforceList() {
 				for (let workforce of res) {
 					let itemWorkforce = {
 						id: workforce.id,
-						accountId: workforce.accountId,
-						email: workforce.email,
-						accountType: workforce.accountType,
 						name: workforce.name,
-						avatar: workforce.avatar,
-						displayName: workforce.displayName,
-						unitSalary: workforce.unitSalary,
-						workingType: workforce.workingType,
-						workingEfforts: workforce.workingEfforts,
-						skills: workforce.skills,
 					};
 					workforces.push(itemWorkforce);
 				}
