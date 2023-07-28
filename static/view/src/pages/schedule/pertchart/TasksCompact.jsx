@@ -6,12 +6,15 @@ import DynamicTable from "@atlaskit/dynamic-table";
 import { findObj } from "../../../common/utils";
 import CreateTaskModal from "./modal/CreateTaskModal";
 import { useParams } from "react-router";
+import Tooltip from "@atlaskit/tooltip";
+import ErrorIcon from "@atlaskit/icon/glyph/error";
 
 /**
  * List of tasks with only name; use for select task to appeared in the pertchart
  */
 const TasksCompact = ({
 	tasks,
+	tasksError,
 	milestones,
 	skills,
 	selectedIds,
@@ -55,7 +58,6 @@ const TasksCompact = ({
 		var task = findObj(tasks, id);
 		if (task) selectedTasks.push(task);
 	});
-
 	const rows = tasks.map((item, index) => {
 		// let checked = false;
 		// for (let i = 0; i < selectedIds.length; i++) {
@@ -64,6 +66,22 @@ const TasksCompact = ({
 		// 		break;
 		// 	}
 		// }
+
+		let errClass = "";
+		let errIcon = "";
+		for (let i = 0; i < tasksError.length; i++) {
+			if (tasksError[i].taskId == item.id) {
+				errClass = "red thick";
+				errIcon = (
+					<Tooltip content={tasksError[i].messages}>
+						{(tooltipProps) => (
+							<ErrorIcon {...tooltipProps}></ErrorIcon>
+						)}
+					</Tooltip>
+				);
+				break;
+			}
+		}
 		return {
 			key: `row-${index}-${item.id}`,
 			isHighlighted: false,
@@ -79,6 +97,7 @@ const TasksCompact = ({
 						// 	label={item.name}
 						// ></Checkbox>
 						<div
+							className={"" + errClass}
 							style={{ padding: "5px", cursor: "pointer" }}
 							data-id={item.id}
 							onClick={handleSelectTask}
@@ -90,6 +109,7 @@ const TasksCompact = ({
 							) : (
 								`${index + 1}. ${item.name}`
 							)}
+							{errIcon}
 						</div>
 					),
 				},
@@ -108,6 +128,7 @@ const TasksCompact = ({
 	return (
 		<div id="tasks">
 			<PageHeader actions={actionsContent}>Tasks list:</PageHeader>
+			{(tasksError && tasksError.length > 0) ? <div className="red">There are some incomplete tasks need your attention!</div> : ""}
 			<div
 				class="inner"
 				style={{

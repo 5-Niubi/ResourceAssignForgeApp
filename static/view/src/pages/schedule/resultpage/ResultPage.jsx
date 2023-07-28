@@ -157,8 +157,8 @@ function ResultPage({ handleChangeTab }) {
 					<PageHeader actions={actionsContent}>
 						Solution optimizations
 					</PageHeader>
-					<h3 style={{ marginBottom: "20px" }}>
-						Number of feasible solutions: {total}
+					<h3 style={{ marginBottom: "15px" }}>
+						Total number of solutions: {total}
 					</h3>
 					{/* <DynamicTable
 						head={head}
@@ -174,6 +174,7 @@ function ResultPage({ handleChangeTab }) {
 					<Spinner size="large" />) : (
 					<Grid layout="fluid" spacing="comfortable" columns={12}>
 						{solutions.map((solution) => {
+							let since = solution.since ? new Date(solution.since) : null;
 							return (
 								<GridColumn medium={3}>
 									<div
@@ -194,8 +195,7 @@ function ResultPage({ handleChangeTab }) {
 											Solution #{solution.id}
 										</h3>
 										<div>
-											Generated at:{" "}
-											<b>{solution.since}</b>
+											 {since ? "Generated at: " + since.toLocaleTimeString() + " " + since.toDateString() : ""}
 										</div>
 										<div>
 											Duration: <b>{solution.duration}</b>{" "}
