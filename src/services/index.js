@@ -7,6 +7,7 @@ import * as milestoneService from "./MilestoneServices";
 import * as parameterService from "./ParameterServices";
 import * as scheduleService from "./ScheduleServices";
 import * as threadService from "./ThreadService";
+import * as subscriptionService from "./SubscriptionService";
 
 export {
 	projectService,
@@ -18,4 +19,5 @@ export {
 	parameterService,
 	scheduleService,
 	threadService,
+	subscriptionService
 };

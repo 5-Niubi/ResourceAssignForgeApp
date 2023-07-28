@@ -28,6 +28,8 @@ const descriptionContainerStyles = xcss({
 	height: "3rem",
 });
 
+const MSPLogo = "https://i.ibb.co/znTzdzQ/2346px-Microsoft-Project-2019-present-svg.png";
+
 function MPXmlExportFile({ isButtonExportLoading, onButtonExportClick }) {
 	return (
 		<Grid layout="fluid" spacing="compact" columns={columns}>
@@ -35,7 +37,7 @@ function MPXmlExportFile({ isButtonExportLoading, onButtonExportClick }) {
 				<Box xcss={containerStyles}>
 					<Image
 						src={
-							"https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Microsoft_Project_%282019%E2%80%93present%29.svg/2346px-Microsoft_Project_%282019%E2%80%93present%29.svg.png"
+							MSPLogo
 						}
 						alt="Project logo"
 						testId="image"

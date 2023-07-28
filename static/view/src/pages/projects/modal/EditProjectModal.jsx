@@ -199,7 +199,7 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 												)}
 											</Field>
 										</FormSection>
-										<FormSection>
+										{/* <FormSection>
 											<Grid spacing="compact" columns={columns}>
 												<GridColumn medium={8}>
 													<Field
@@ -239,7 +239,7 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 													</Field>
 												</GridColumn>
 											</Grid>
-										</FormSection>
+										</FormSection> */}
 										{/* <FormSection>
 												<ObjectiveRange
 													label="Objective Time"
