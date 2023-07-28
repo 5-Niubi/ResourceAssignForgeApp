@@ -43,7 +43,8 @@ function taskResolver(resolver) {
 			return response;
 		} catch (error) {
 			console.log("Error in saveTasks: ", error);
-			return Promise.reject(error);
+			Promise.reject(error);
+			return error;
 		}
 	});
 

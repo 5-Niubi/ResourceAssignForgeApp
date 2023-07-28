@@ -25,19 +25,19 @@ function VisualizeTasksPage({ handleChangeTab }) {
 
 	const [isSaving, setIsSaving] = useState(false);
 	const [isEstimating, setIsEstimating] = useState(false);
+	const [tasksError, setTasksError] = useState([]);
 
 	function handleEstimate() {
 		setIsEstimating(true);
 		invoke("estimate", { projectId })
 			.then(function (res) {
+				setIsEstimating(false);
 				if (res.id || res.id === 0) {
-					Toastify.info("Estimated successfully");
+					Toastify.success("Estimated successfully");
 					localStorage.setItem("estimation", JSON.stringify(res));
 					//move to next tab
 					handleChangeTab(1);
-					setIsEstimating(false);
 				} else {
-					setIsEstimating(false);
 					Toastify.error("Error in estimate");
 				}
 			})
@@ -72,12 +72,24 @@ function VisualizeTasksPage({ handleChangeTab }) {
 		invoke("saveTasks", { tasks: data })
 			.then(function (res) {
 				setIsSaving(false);
-				setCanEstimate(true);
-				if (res) {
+				//function return true or list of error task
+				if (res == true) {
+					setCanEstimate(true);
+					setTasksError([]);
 					Toastify.success("Saved successfully");
+				} else {
+					// console.log(res);\
+					setTasksError(res);
+					setCanEstimate(false);
+					res.forEach((taskErr) =>
+						Toastify.error(
+							"Task " + taskErr.taskId + ": " + taskErr.messages
+						)
+					);
 				}
 			})
 			.catch(function (error) {
+				setCanEstimate(false);
 				setIsSaving(false);
 				console.log(error);
 				Toastify.error(error.toString());
@@ -208,19 +220,19 @@ function VisualizeTasksPage({ handleChangeTab }) {
 			}}
 		>
 			{canEstimate ? (
-				""
-			) : (
-				<LoadingButton isLoading={isSaving} onClick={handleSave}>
-					Save
-				</LoadingButton>
-			)}
-			<LoadingButton
+				<LoadingButton
 				appearance="primary"
 				isLoading={isEstimating}
 				onClick={handleEstimate}
 			>
 				Estimate
 			</LoadingButton>
+			) : (
+				<LoadingButton isLoading={isSaving} onClick={handleSave}>
+					Save
+				</LoadingButton>
+			)}
+			
 		</div>
 	);
 
@@ -286,6 +298,7 @@ function VisualizeTasksPage({ handleChangeTab }) {
 							>
 								<TasksCompact
 									tasks={tasks}
+									tasksError={tasksError}
 									milestones={milestones}
 									skills={skills}
 									selectedIds={selectedIds}
