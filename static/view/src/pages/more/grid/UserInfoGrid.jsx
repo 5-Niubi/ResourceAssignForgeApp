@@ -73,13 +73,13 @@ function UserInfoGrid() {
 				</GridColumn>
 			</Grid>
 			<Grid spacing="compact" columns={columns}>
-				{subscription.plan.id == SUBSCRIPTION.FREE_ID ? (
-					<Button appearance="primary" onClick={handleChangePlanClick}>
-						Change Plan
-					</Button>
-				) : (
-					""
-				)}
+				<Button
+					appearance="primary"
+					onClick={handleChangePlanClick}
+					isDisabled={subscription.plan.id != SUBSCRIPTION.FREE_ID}
+				>
+					Change Plan
+				</Button>
 			</Grid>
 		</>
 	) : (
