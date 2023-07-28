@@ -9,6 +9,7 @@ import TextField from '@atlaskit/textfield';
 import { token } from '@atlaskit/tokens';
 import PageHeader from '@atlaskit/page-header';
 import WorkforceLozenge from './WorkforceLozenge';
+import InfoMessageColor from '../../../components/InfoMessageColor';
 
 const barContent = (
   <div style={{ display: 'flex' }}>
@@ -22,6 +23,10 @@ const barContent = (
         aria-label="Choose an option"
       />
     </div>
+    <div style={{ flex: '0 0 200px', paddingTop: "5px", paddingLeft:"5px" }}>
+    <InfoMessageColor/>
+    </div>
+
   </div>
 );
 
@@ -30,7 +35,7 @@ const WorkforcePageHeader = () => {
     <PageHeader
       bottomBar={barContent}
     >
-      Workforces
+      Employee List
     </PageHeader>
   );
 };

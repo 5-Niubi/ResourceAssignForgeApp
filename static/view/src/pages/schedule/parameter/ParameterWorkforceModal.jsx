@@ -38,7 +38,7 @@ import Form, {
 import AddCircle from "@atlaskit/icon/glyph/add-circle";
 import { COLOR_SKILL_LEVEL } from "../../../common/contants";
 import { PiStarFill } from "react-icons/pi";
-import InfoMessageColor from "./ParameterInfoMessage";
+import InfoMessageColor from "../../../components/InfoMessageColor";
 
 const options = [
 	{ name: "workingType", value: "0", label: "Fulltime" },

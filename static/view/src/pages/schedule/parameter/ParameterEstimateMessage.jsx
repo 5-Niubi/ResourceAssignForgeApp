@@ -1,5 +1,4 @@
 import React, {useState, useEffect} from "react";
-import { findObj } from "../../../common/utils";
 import { useNavigate, useParams } from "react-router";
 import SectionMessage from "@atlaskit/section-message";
 import { invoke } from "@forge/bridge";
@@ -8,16 +7,28 @@ import StarFilledIcon from "@atlaskit/icon/glyph/star-filled";
 import Lozenge from "@atlaskit/lozenge";
 import { COLOR_SKILL_LEVEL } from "../../../common/contants";
 import { PiStarFill } from "react-icons/pi";
+import { findObj, getCache } from "../../../common/utils";
 
 export default function ParameterEstimateMessage() {
-	var estimation = JSON.parse(localStorage.getItem("estimation"));
+	var estimation = getCache("estimation");
+	if (estimation){
+		estimation = JSON.parse(estimation);
+	}
+    console.log("cache estimation", estimation);
+
 	let { projectId } = useParams();
-	var milestones = JSON.parse(localStorage.getItem("milestones"));
+    var milestonesCache = getCache("milestones");
+	if (!milestonesCache) {
+		milestonesCache = [];
+	} else {
+		milestonesCache = JSON.parse(milestonesCache);
+	}
+    console.log("cache milestone", milestonesCache);
 
 	return (
 		<SectionMessage title="We need these resources:" appearance="warning">
 			{estimation.workforceWithMilestoneList?.map((ml, index) => {
-				let obj = findObj(milestones, ml.id);
+				let obj = findObj(milestonesCache, ml.id);
 				if (obj) {
 					return (
 						<ul>
