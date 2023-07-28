@@ -165,7 +165,7 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 												)}
 											</Field>
 										</FormSection>
-										<FormSection>
+										{/* <FormSection>
 											<Grid spacing="compact" columns={columns}>
 												<GridColumn medium={8}>
 													<Field
@@ -199,7 +199,7 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 													</Field>
 												</GridColumn>
 											</Grid>
-										</FormSection>
+										</FormSection> */}
 										{/* <FormSection>
 												<ObjectiveRange
 													label="Objective Time"

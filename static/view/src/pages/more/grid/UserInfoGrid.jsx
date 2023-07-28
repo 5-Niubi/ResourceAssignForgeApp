@@ -7,6 +7,7 @@ import "../styles.css";
 import { formatDateDMY } from "../../../common/utils";
 import Spinner from "@atlaskit/spinner";
 import { router } from "@forge/bridge";
+import { SUBSCRIPTION } from "../../../common/contants";
 
 const columns = 12;
 function UserInfoGrid() {
@@ -72,9 +73,13 @@ function UserInfoGrid() {
 				</GridColumn>
 			</Grid>
 			<Grid spacing="compact" columns={columns}>
-				<Button appearance="primary" onClick={handleChangePlanClick}>
-					Change Plan
-				</Button>
+				{subscription.plan.id == SUBSCRIPTION.FREE_ID ? (
+					<Button appearance="primary" onClick={handleChangePlanClick}>
+						Change Plan
+					</Button>
+				) : (
+					""
+				)}
 			</Grid>
 		</>
 	) : (

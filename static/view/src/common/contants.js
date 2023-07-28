@@ -76,3 +76,7 @@ export const COLOR_SKILL_LEVEL = [
 ];
 
 export const RETRY_TIMES = 5;
+export const SUBSCRIPTION = Object.freeze({
+	FREE_ID : 1,
+	PLUS_ID : 2
+});
