@@ -25,7 +25,7 @@ const buttonContainerStyles = xcss({
 const descriptionContainerStyles = xcss({
 	display: "flex", alignItems: "center", justifyContent: "center", height: "3rem"
 });
-
+const jiraSoftwarelogo = "https://i.ibb.co/wR3CZ6v/Jira-Emblem.png"
 function JiraCreateProjectExportGrid({
 	isButtonExportLoading,
 	onButtonExportClick,
@@ -36,7 +36,7 @@ function JiraCreateProjectExportGrid({
 				<Box xcss={containerStyles}>
 					<Image
 						src={
-							"https://logos-world.net/wp-content/uploads/2021/02/Jira-Emblem.png"
+							jiraSoftwarelogo
 						}
 						alt="JiraSoftware Logo"
 					/>

@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React, { createContext, useEffect, useState } from "react";
-import { invoke, router, view } from "@forge/bridge";
+import { invoke, view } from "@forge/bridge";
 import { Route, Router, Routes, useNavigate } from "react-router";
 import { LeftSidebar, Main, PageLayout, Content } from "@atlaskit/page-layout";
 import HomeSideBar from "./components/side-nav/HomeSideBar";
@@ -17,8 +17,13 @@ import EstimationPage from "./pages/schedule/estimation";
 import LoadingModalWithThread from "./components/LoadingModalWithThread";
 import { STORAGE, THREAD_STATE_DEFAULT } from "./common/contants";
 import Toastify from "./common/Toastify";
+import MorePage from "./pages/more";
+import { useEffectOnlyOnUpdate } from "./common/effects";
 
 export const ThreadLoadingContext = createContext({ state: [] });
+export const AppContext = createContext({
+	subscription: {},
+});
 
 function App() {
 	// Enable auto change theme Dark/light mode within Jira
@@ -30,24 +35,36 @@ function App() {
 
 	const threadState = useState(THREAD_STATE_DEFAULT);
 	const [threadStateValue, setThreadStateValue] = threadState;
-
+	const [appContextState, setAppContextState] = useState({});
 	// Check authenticate every time reload page
 	useEffect(function () {
 		invoke("getIsAuthenticated").then(function (res) {
-			if (!res.isAuthenticated) {
+			if (res.isAuthenticated) {
+				getSubscription();
+				getThreadStateInfo();
+			} else {
 				setIsAuthenticated(false);
 			}
 		});
 	}, []);
 
-	useEffect(function () {
+	function getSubscription() {
+		invoke("getCurrentSubscriptionPlan")
+			.then(function (res) {
+				console.log(res);
+				setAppContextState((prev) => ({ ...prev, subscription: res }));
+			})
+			.catch(() => {});
+	}
+
+	function getThreadStateInfo() {
 		let threadInfoRaw = localStorage.getItem(STORAGE.THREAD_INFO);
 		let threadInfo = JSON.parse(threadInfoRaw);
-		if(threadInfo){
+		if (threadInfo) {
 			setThreadStateValue({
 				threadId: threadInfo.threadId,
 				threadAction: threadInfo.threadAction,
-				isModalOpen: true
+				isModalOpen: true,
 			});
 		}
 		invoke("getThreadStateInfo")
@@ -56,18 +73,13 @@ function App() {
 				setThreadStateValue({
 					threadId: res[0].threadId,
 					threadAction: res[0].threadAction,
-					isModalOpen: true
+					isModalOpen: true,
 				});
 			})
 			.catch((error) => {
 				Toastify.error(error);
 			});
-	}, []);
-
-	// // Set this app context to storage
-	// useEffect(() => {
-	// 	invoke("setContextToGlobal").then().catch();
-	// }, []);
+	}
 
 	// --- Config React Router ---
 	useEffect(() => {
@@ -99,100 +111,110 @@ function App() {
 	return (
 		<>
 			{isAuthenticated ? (
-				<ThreadLoadingContext.Provider value={{ state: threadState }}>
-					<PageLayout>
-						{history && historyState ? (
-							<Content>
-								<LeftSidebar>
-									<div style={{ height: "100vh" }}>
-										<Router
-											navigator={history}
-											navigationType={historyState.action}
-											location={historyState.location}
-										>
-											<Routes>
-												{/* Path with * take effect in all route after current */}
-												<Route path="/" element={<HomeSideBar rootPath="/" />}>
-													<Route></Route>
+				<AppContext.Provider value={appContextState}>
+					<ThreadLoadingContext.Provider value={{ state: threadState }}>
+						<PageLayout>
+							{history && historyState ? (
+								<Content>
+									<LeftSidebar>
+										<div style={{ height: "100vh" }}>
+											<Router
+												navigator={history}
+												navigationType={historyState.action}
+												location={historyState.location}
+											>
+												<Routes>
+													{/* Path with * take effect in all route after current */}
 													<Route
-														path="/projects"
+														path="/"
 														element={<HomeSideBar rootPath="/" />}
+													>
+														<Route></Route>
+														<Route
+															path="/projects"
+															element={<HomeSideBar rootPath="/" />}
+														></Route>
+														<Route
+															path="/resources"
+															element={<HomeSideBar rootPath="/" />}
+														></Route>
+														<Route
+															path="/skills"
+															element={<HomeSideBar rootPath="/" />}
+														></Route>
+														<Route
+															path="/more"
+															element={<HomeSideBar rootPath="/" />}
+														></Route>
+													</Route>
+													<Route
+														path="/:projectId/*"
+														element={<ProjectSideBar rootPath="/:projectId/" />}
 													></Route>
+												</Routes>
+											</Router>
+										</div>
+									</LeftSidebar>
+									<Main testId="main" id="main">
+										<AppFrame>
+											<Router
+												navigator={history}
+												navigationType={historyState.action}
+												location={historyState.location}
+											>
+												<Routes>
+													<Route path="/" element={<ProjectListHome />}></Route>
+													<Route
+														path="/startup"
+														element={<StartUpPage />}
+													></Route>
+
 													<Route
 														path="/resources"
-														element={<HomeSideBar rootPath="/" />}
+														element={<ResourcesPage />}
 													></Route>
 													<Route
-														path="/settings"
-														element={<HomeSideBar rootPath="/" />}
+														path="/skills"
+														element={<div>Skills</div>}
 													></Route>
-												</Route>
-												<Route
-													path="/:projectId/*"
-													element={<ProjectSideBar rootPath="/:projectId/" />}
-												></Route>
-											</Routes>
-										</Router>
-									</div>
-								</LeftSidebar>
-								<Main testId="main" id="main">
-									<AppFrame>
-										<Router
-											navigator={history}
-											navigationType={historyState.action}
-											location={historyState.location}
-										>
-											<Routes>
-												<Route path="/" element={<ProjectListHome />}></Route>
-												<Route
-													path="/startup"
-													element={<StartUpPage />}
-												></Route>
+													<Route path="/more" element={<MorePage />}></Route>
+													<Route path="/modals" element={<TestModal />}></Route>
 
-												<Route
-													path="/resources"
-													element={<ResourcesPage />}
-												></Route>
-												<Route
-													path="/settings"
-													element={<div>Settings</div>}
-												></Route>
-												<Route path="/modals" element={<TestModal />}></Route>
-
-												<Route path="/:projectId">
-													<Route path="" element={<SchedulePage />}></Route>
-													<Route
-														path="estimation"
-														element={<EstimationPage />}
-													></Route>
-													<Route
-														path="schedule"
-														element={<SchedulePage />}
-													></Route>
-													<Route
-														path="tasks"
-														element={<div>Tasks Page of</div>}
-													></Route>
-													<Route
-														path="reports"
-														element={<div>Reporsts Page</div>}
-													></Route>
-												</Route>
-											</Routes>
-											{threadStateValue.isModalOpen ? (
-												<LoadingModalWithThread state={threadState} />
-											) : (
-												""
-											)}
-										</Router>
-									</AppFrame>
-								</Main>
-							</Content>
-						) : (
-							<Spinner interactionName="load" />
-						)}
-					</PageLayout>
-				</ThreadLoadingContext.Provider>
+													<Route path="/:projectId">
+														<Route path="" element={<SchedulePage />}></Route>
+														<Route
+															path="estimation"
+															element={<EstimationPage />}
+														></Route>
+														<Route
+															path="schedule"
+															element={<SchedulePage />}
+														></Route>
+														<Route
+															path="tasks"
+															element={<div>Tasks Page of</div>}
+														></Route>
+														<Route
+															path="reports"
+															element={<div>Reporsts Page</div>}
+														></Route>
+													</Route>
+												</Routes>
+												{threadStateValue.isModalOpen ? (
+													<LoadingModalWithThread state={threadState} />
+												) : (
+													""
+												)}
+											</Router>
+										</AppFrame>
+									</Main>
+								</Content>
+							) : (
+								<Spinner interactionName="load" />
+							)}
+						</PageLayout>
+					</ThreadLoadingContext.Provider>
+				</AppContext.Provider>
 			) : (
 				<>
 					<StartUpPage />
