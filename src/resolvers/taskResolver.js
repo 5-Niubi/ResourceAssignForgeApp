@@ -43,6 +43,18 @@ function taskResolver(resolver) {
 			return response;
 		} catch (error) {
 			console.log("Error in saveTasks: ", error);
+			Promise.reject(error);
+			return error;
+		}
+	});
+
+	resolver.define("updateTask", async function (req) {
+		try {
+			let response = await taskService.updateTask(req.payload.task);
+			console.log(response);
+			return response;
+		} catch (error) {
+			console.log("Error in updateTask: ", error);
 			return Promise.reject(error);
 		}
 	});

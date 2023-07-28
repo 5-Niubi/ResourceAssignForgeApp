@@ -26,6 +26,39 @@ function scheduleResolver(resolver) {
 			return Promise.reject(error);
 		}
 	});
+
+	resolver.define("saveSolution", async function (req) {
+		try {
+			let response = await scheduleService.saveSolution(req.payload.solutionReq);
+			console.log(response);
+			return response;
+		} catch (error) {
+			console.log("Error in saveSolution: ", error);
+			return Promise.reject(error);
+		}
+	});
+
+	resolver.define("getSolutionsByProject", async function (req) {
+		try {
+			let response = await scheduleService.getSolutionsByProject(req.payload.projectId, req.payload.page);
+			console.log(response);
+			return response;
+		} catch (error) {
+			console.log("Error in getSolutionsByProject: ", error);
+			return Promise.reject(error);
+		}
+	});
+
+	resolver.define("getSchedule", async function (req) {
+		try {
+			let response = await scheduleService.getSchedule(req.payload.scheduleId);
+			console.log(response);
+			return response;
+		} catch (error) {
+			console.log("Error in getSchedule: ", error);
+			return Promise.reject(error);
+		}
+	});
 }
 
 export default scheduleResolver;

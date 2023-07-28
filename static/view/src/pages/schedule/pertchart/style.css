@@ -10,3 +10,11 @@
 	-ms-overflow-style: none;/* IE and Edge */
 	scrollbar-width: thin;/* Firefox */;
 }
+
+.red {
+	color: red;
+}
+
+.thick{
+	font-weight: 500;
+}

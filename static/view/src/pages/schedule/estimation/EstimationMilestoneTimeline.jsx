@@ -5,10 +5,17 @@ import {
 import FlagFilledIcon from "@atlaskit/icon/glyph/flag-filled";
 import PeopleGroupIcon from "@atlaskit/icon/glyph/people-group";
 import TrayIcon from "@atlaskit/icon/glyph/tray";
-import { colorsBank, findObj } from "../pertchart/VisualizeTasks";
+import { findObj, getCache, getColor } from "../../../common/utils";
 
-export default function MilestonesTimeline({ milestones, skills }) {
-	var estimation = JSON.parse(localStorage.getItem("estimation"));
+export default function MilestonesTimeline({ milestones, skills, handleChangeTab }) {
+	var estimation = getCache("estimation");
+	if (estimation){
+		estimation = JSON.parse(estimation);
+	} else {
+		handleChangeTab(0);
+		return "";
+	}
+
 	return (
 		<>
 			<VerticalTimeline lineColor="#172B4D">
@@ -20,24 +27,22 @@ export default function MilestonesTimeline({ milestones, skills }) {
 								<VerticalTimelineElement
 									className="vertical-timeline-element--work"
 									contentStyle={{
-										background:
-											colorsBank[milestone.id % 30],
-										color: "#fff",
+										background: getColor(milestone.id),
+										color: "#444",
 									}}
 									contentArrowStyle={{
 										borderRight:
 											"7px solid " +
-											colorsBank[milestone.id % 30],
+											getColor(milestone.id),
 									}}
 									iconStyle={{
-										background:
-											colorsBank[milestone.id % 30],
+										background: getColor(milestone.id),
 										color: "black",
 										paddingRight: "10",
 									}}
 								>
 									<h3 className="vertical-timeline-element-title">
-										#Milestone {index + 1}{" "}
+										#Group {index + 1}{" "}
 										<FlagFilledIcon size="medium"></FlagFilledIcon>
 									</h3>
 									<h4 className="vertical-timeline-element-subtitle">

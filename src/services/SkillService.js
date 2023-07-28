@@ -9,4 +9,13 @@ async function getAllSkill() {
 	}
 }
 
-export { getAllSkill };
+async function createSkill(skillReq) {
+	try {
+		let response = await APIServices.post("/api/Skills/CreateSkill", null, skillReq);
+		return response;
+	} catch (error) {
+		return Promise.reject(error);
+	}
+}
+
+export { getAllSkill, createSkill };

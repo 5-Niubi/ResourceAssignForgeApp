@@ -15,6 +15,7 @@ import DeleteProjectModal from "./modal/DeleteProjectModal";
 import Toastify from "../../common/Toastify";
 import EmptyState from "@atlaskit/empty-state";
 import Button from "@atlaskit/button";
+import { cache, getCache } from "../../common/utils";
 
 const width = MODAL_WIDTH.M;
 const modalInitState = { project: {}, isOpen: false };
@@ -38,7 +39,13 @@ function ProjectListHome() {
 		searchParams.get("q") ? searchParams.get("q") : ""
 	);
 
-	const [projects, setProjects] = useState([]);
+	var projectsCache = getCache("projects");
+	if (!projectsCache) {
+		projectsCache = [];
+	} else {
+		projectsCache = JSON.parse(projectsCache);
+	}
+	const [projects, setProjects] = useState(projectsCache);
 	const [projectsForDisplay, setProjectsForDisplay] = useState(projects);
 
 	const filterProjectName = useCallback(function (projects, query) {
@@ -54,28 +61,34 @@ function ProjectListHome() {
 		[projects]
 	);
 	useEffect(function () {
-		invoke("getProjectsList")
-			.then(function (res) {
-				setProjectTableLoadingState(false);
-				let projectsList = [];
-				for (let project of res) {
-					let itemProject = {};
-					itemProject = {
-						id: project.id,
-						imageAvatar: project.imageAvatar,
-						name: project.name,
-						startDate: project.startDate,
-						tasks: project.taskCount,
-					};
-					projectsList.push(itemProject);
-				}
-				setProjects(projectsList);
-				filterProjectName(projectsList, searchBoxValue);
-			})
-			.catch(function (error) {
-				setProjectTableLoadingState(false);
-				Toastify.error(error.toString());
-			});
+		var projectsCache = getCache("projects");
+		if (!projectsCache || !JSON.parse(projectsCache).length){
+			invoke("getProjectsList")
+				.then(function (res) {
+					setProjectTableLoadingState(false);
+					let projectsList = [];
+					for (let project of res) {
+						let itemProject = {};
+						itemProject = {
+							id: project.id,
+							imageAvatar: project.imageAvatar,
+							name: project.name,
+							startDate: project.startDate,
+							tasks: project.taskCount,
+						};
+						projectsList.push(itemProject);
+					}
+					setProjects(projectsList);
+					filterProjectName(projectsList, searchBoxValue);
+					cache("projects", JSON.stringify(projectsList));
+				})
+				.catch(function (error) {
+					setProjectTableLoadingState(false);
+					Toastify.error(error.toString());
+				});
+		} else {
+			setProjectTableLoadingState(false);
+		}
 	}, []);
 
 	function handleOnSearchBoxChange(e) {

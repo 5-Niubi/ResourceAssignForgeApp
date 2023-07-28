@@ -42,6 +42,7 @@
     "@atlaskit/tokens": "^1.5.2",
     "@forge/bridge": "^2.6.0",
     "@microsoft/signalr": "^7.0.9",
+    "@phosphor-icons/core": "^2.0.2",
     "buffer": "^6.0.3",
     "eslint-plugin-no-inline-styles": "^1.0.5",
     "gojs": "^2.3.8",

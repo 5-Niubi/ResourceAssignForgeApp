@@ -13,7 +13,7 @@ import React, { Fragment, useState, useCallback, useEffect } from "react";
 import TextField from "@atlaskit/textfield";
 import Form, { Field, FormSection } from "@atlaskit/form";
 import { invoke } from "@forge/bridge";
-import { findObj } from "../VisualizeTasks";
+import { cache, findObj } from "../../../../common/utils";
 import Toastify from "../../../../common/Toastify";
 
 function CreateTaskModal({
@@ -25,6 +25,8 @@ function CreateTaskModal({
 	skills,
 	updateTasks,
 	updateCurrentTaskId,
+	updateSkills,
+	updateMilestones
 }) {
 	const [taskName, setTaskName] = useState("");
 	const [duration, setDuration] = useState(0);
@@ -33,10 +35,11 @@ function CreateTaskModal({
 	const [precedences, setPrecedences] = useState([]);
 
 	const [ms, setMilestones] = useState(milestones);
+	const [skillsPage, setSkillsPage] = useState(skills);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	var milestoneOpts = [];
-	milestones?.forEach((milestone) => {
+	ms?.forEach((milestone) => {
 		milestoneOpts.push({
 			value: milestone.id,
 			label: milestone.name,
@@ -56,7 +59,7 @@ function CreateTaskModal({
 
 	var skillOpts = [];
 	var skillValues = [];
-	skills?.forEach((skill) => {
+	skillsPage?.forEach((skill) => {
 		for (let i = 1; i <= 5; i++) {
 			skillOpts.push({
 				value: skill.id + "-" + i,
@@ -65,7 +68,7 @@ function CreateTaskModal({
 		}
 	});
 	reqSkills?.forEach((s) => {
-		var skill = findObj(skills, s.skillId);
+		var skill = findObj(skillsPage, s.skillId);
 		if (skill) {
 			skillValues.push({
 				value: skill.id + "-" + s.level,
@@ -85,12 +88,16 @@ function CreateTaskModal({
 	}, []);
 
 	const updateMilestone = useCallback(function (objValue) {
-		var milestone = findObj(milestones, objValue.value);
-		if (milestone) {
-			setMilestone({
-				value: milestone.id,
-				label: milestone.name,
-			});
+		if (!objValue){
+			setMilestone(null);
+		} else {
+			var milestone = findObj(ms, objValue.value);
+			if (milestone) {
+				setMilestone({
+					value: milestone.id,
+					label: milestone.name,
+				});
+			}
 		}
 	}, []);
 
@@ -99,7 +106,18 @@ function CreateTaskModal({
 		values?.forEach((item) => {
 			var items = item.value.split("-");
 			if (items.length != 2) return;
-			skills.push({ skillId: items[0], level: items[1] });
+
+			//check duplicate skill; update leve if needed
+			let existed = false;
+			skills?.forEach((s) => {
+				if (s.skillId == items[0]){
+					s.level = items[1];
+					existed = true;
+				}
+			});
+			if (!existed){
+				skills.push({ skillId: items[0], level: items[1] });
+			}
 		});
 		setReqSkills(skills);
 	}, []);
@@ -110,40 +128,49 @@ function CreateTaskModal({
 		setPrecedences(pres);
 	}, []);
 
-	const createMilestone = (name) => {
-		let reqMilestone = {
-			Name: name,
-			ProjectId: projectId,
-		};
-		invoke("createMilestone", { reqMilestone })
-			.then(function (res) {
-				console.log(res);
-				if (res.id) {
-					return res;
-				}
-			})
-			.catch();
-		return null;
-	};
-
 	const handleCreateMilestone = (inputValue) => {
 		let reqMilestone = {
 			Name: inputValue,
 			ProjectId: projectId,
 		};
+		setIsSubmitting(true);
 		invoke("createMilestone", { milestoneObjRequest: reqMilestone })
 			.then(function (res) {
-				console.log(res);
+				setIsSubmitting(false);
 				if (res.id) {
 					setMilestones([...ms, res]);
 					setMilestone({
 						value: res.id,
 						label: res.name,
 					});
-					return res;
+					cache("milestones", JSON.stringify([...ms, res]));
 				}
 			})
 			.catch((error) => {
+				setIsSubmitting(false);
+				console.log(error);
+				Toastify.error(error.toString());
+			});
+	};
+
+	const handleCreateSkill = (inputValue) => {
+		setIsSubmitting(true);
+		invoke("createSkill", { skillReq: { name: inputValue } })
+			.then(function (res) {
+				setIsSubmitting(false);
+				if (res.id) {
+					setSkillsPage([...skillsPage, res]);
+					
+					setReqSkills([
+						...reqSkills,
+						{ skillId: res.id, level: 1 },
+					]);
+
+					cache("skills", JSON.stringify([...skillsPage, res]));
+				}
+			})
+			.catch((error) => {
+				setIsSubmitting(false);
 				console.log(error);
 				Toastify.error(error.toString());
 			});
@@ -172,16 +199,22 @@ function CreateTaskModal({
 		};
 		invoke("createNewTask", { taskObjRequest })
 			.then(function (res) {
-				// setProjectsDisplay((prevs) => [res, ...prevs]);
-				console.log(res);
+				setIsSubmitting(false);
 				if (res.id) {
 					tasks.push(res);
 					updateTasks(tasks);
 					updateCurrentTaskId(res.id);
+					updateSkills(skillsPage);
+					updateMilestones(ms);
+					Toastify.success("Created task successfully");
 				}
 				closeModal();
 			})
-			.catch();
+			.catch((error) => {
+				setIsSubmitting(false);
+				console.log(error);
+				Toastify.error(error.toString());
+			});
 	}
 
 	return (
@@ -226,11 +259,12 @@ function CreateTaskModal({
 													autoComplete="off"
 													value={duration}
 													onChange={updateDuration}
+													elemAfterInput={<span style={{paddingRight: "10px"}}>DAYS</span>}
 												/>
 											)}
 										</Field>
 										<Field
-											label="Milestone"
+											label="Group"
 											name="milestone"
 											defaultValue=""
 											isRequired
@@ -263,18 +297,21 @@ function CreateTaskModal({
 										>
 											{({ fieldProps }) => (
 												<Fragment>
-													<Select
+													<CreatableSelect
 														{...fieldProps}
-														inputId="multi-select-example"
-														className="multi-select"
-														classNamePrefix="react-select"
+														inputId="select-skills"
+														className="select-skills"
+														isClearable
 														options={skillOpts}
 														value={skillValues}
-														isMulti
-														isSearchable={true}
 														onChange={
 															updateReqSkills
 														}
+														onCreateOption={
+															handleCreateSkill
+														}
+														isMulti
+														isSearchable={true}
 														placeholder="Choose skills"
 													/>
 												</Fragment>

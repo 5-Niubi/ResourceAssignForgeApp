@@ -37,6 +37,8 @@ import Form, {
 } from "@atlaskit/form";
 import AddCircle from "@atlaskit/icon/glyph/add-circle";
 import { COLOR_SKILL_LEVEL } from "../../../common/contants";
+import { PiStarFill } from "react-icons/pi";
+import InfoMessageColor from "./ParameterInfoMessage";
 
 const options = [
 	{ name: "workingType", value: "0", label: "Fulltime" },
@@ -139,17 +141,17 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 			{
 				key: "no",
 				content: "No",
-				width: 10,
+				width: 8,
 			},
 			{
 				key: "name",
 				content: "Name",
-				width: 35,
+				width: 30,
 			},
 			{
 				key: "skills",
 				content: "Skills",
-				width: 55,
+				width: 62,
 			},
 		],
 	};
@@ -190,7 +192,7 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 									}}
                                     isBold
 								>
-									{skill.name}
+									{skill.name} - {skill.level}<PiStarFill/>
 								</Lozenge>
 							</span>
 						))}
@@ -250,13 +252,14 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 						width={"medium"}
 					>
 						<ModalHeader>
+                            <div 
+                                style={{ flexWrap: "wrap",}}
+                            >
 							<ModalTitle>Select Workforce</ModalTitle>
-						</ModalHeader>
-						<ModalBody>
-							<div
+                            <div
 								style={{
 									display: "flex",
-									marginBottom: "10px",
+									marginTop: "10px",
 								}}
 							>
 								<div
@@ -296,9 +299,13 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 												? "Deselect All"
 												: "Select All"}
 										</Button>
+                                        <InfoMessageColor/>
 									</ButtonGroup>
 								</div>
 							</div>
+                            </div>
+						</ModalHeader>
+						<ModalBody>
 							<DynamicTable
 								shouldScrollInViewport
 								head={head}
