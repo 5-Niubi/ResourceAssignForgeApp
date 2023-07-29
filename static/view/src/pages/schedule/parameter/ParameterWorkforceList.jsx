@@ -27,7 +27,7 @@ import TextField from "@atlaskit/textfield";
 import Rating from "react-rating";
 import CreatableAdvanced from "./creatable-selection";
 import { COLOR_SKILL_LEVEL } from "../../../common/contants";
-
+import { validateEmail, validateNumberOnly, validateWorkingEffort, validateName } from "../../../common/utils";
 function ParameterWorkforceList() {
 	let { projectId } = useParams();
 	const [workforces, setWorkforces] = useState([]);
@@ -75,6 +75,10 @@ function ParameterWorkforceList() {
 		invoke("getAllSkills", {})
 			.then(function (res) {
 				setSkillDB(res);
+                localStorage.setItem(
+					"all_skills_DB",
+					JSON.stringify(res)
+				);
 			})
 			.catch(function (error) {
 				console.log(error);
@@ -152,66 +156,6 @@ function ParameterWorkforceList() {
 				console.log(error);
 				Toastify.error(error.toString());
 			});
-	};
-
-	const validateEmail = (value) => {
-		//REQUIRES NOT NULL, AND CONTAINS @ SYMBOL
-		if (!value) {
-			return "NOT_VALID";
-		}
-		if (!value.includes("@")) {
-			return "NOT_VALID";
-		}
-		return undefined;
-	};
-
-	const validateNumberOnly = (value) => {
-		//REQUIRES NOT NULL, NUMBER ONLY
-		if (!value) {
-			return "NOT_VALID";
-		}
-
-		if (isNaN(parseFloat(value))) {
-			return "NOT_VALID";
-		}
-		const regex = /^\d*\.?\d*$/;
-		if (!regex.test(value)) {
-			return "NOT_VALID";
-		}
-		return undefined;
-	};
-
-	const validateWorkingEffort = (value) => {
-		//REQUIRES NOT NULL, NUMBER ONLY, FROM 0.0 TO 1.1
-		if (!value) {
-			return "NOT_VALID";
-		}
-
-		if (isNaN(parseFloat(value))) {
-			return "NOT_VALID";
-		}
-
-		if (value < 0.0 || value > 1.0) {
-			return "OUT_SCOPE";
-		}
-
-		const regex = /^\d*\.?\d*$/;
-		if (!regex.test(value)) {
-			return "NOT_VALID";
-		}
-		return undefined;
-	};
-
-	const validateName = (value) => {
-		//REQUIRES NOT NULL, LETTER ONLY, 6 CHARACTERS AT LEAST
-		if (!value) {
-			return "NOT_VALID";
-		}
-		const regex = /^[A-Za-z ]{6,}$/;
-		if (!regex.test(value)) {
-			return "NOT_VALID";
-		}
-		return undefined;
 	};
 
 	function updateWorkforce(workforce_request) {
@@ -324,7 +268,7 @@ function ParameterWorkforceList() {
 	return (
 		<div>
 			<div>
-				<PageHeader actions={buttonActions}>Workforces</PageHeader>
+				<PageHeader actions={buttonActions}>Employees</PageHeader>
 			</div>
 			{/* DISPLAY WORKFORCE PARMETER BUTTONS  */}
 			<div>
@@ -708,7 +652,7 @@ function ParameterWorkforceList() {
 																size="small"
 																content=""
 															></InfoIcon>
-															Working percentage
+															Working hours
 															per day
 														</HelperMessage>
 													)}
@@ -762,7 +706,7 @@ function ParameterWorkforceList() {
 																				from
 																				0.0
 																				to
-																				1.0
+																				8.0
 																			</ErrorMessage>
 																		)}
 																	</Fragment>
@@ -813,7 +757,7 @@ function ParameterWorkforceList() {
 																				from
 																				0.0
 																				to
-																				1.0
+																				8.0
 																			</ErrorMessage>
 																		)}
 																	</Fragment>
@@ -864,7 +808,7 @@ function ParameterWorkforceList() {
 																				from
 																				0.0
 																				to
-																				1.0
+																				8.0
 																			</ErrorMessage>
 																		)}
 																	</Fragment>
@@ -915,7 +859,7 @@ function ParameterWorkforceList() {
 																				from
 																				0.0
 																				to
-																				1.0
+																				8.0
 																			</ErrorMessage>
 																		)}
 																	</Fragment>
@@ -966,7 +910,7 @@ function ParameterWorkforceList() {
 																				from
 																				0.0
 																				to
-																				1.0
+																				8.0
 																			</ErrorMessage>
 																		)}
 																	</Fragment>
@@ -1017,7 +961,7 @@ function ParameterWorkforceList() {
 																				from
 																				0.0
 																				to
-																				1.0
+																				8.0
 																			</ErrorMessage>
 																		)}
 																	</Fragment>
@@ -1068,7 +1012,7 @@ function ParameterWorkforceList() {
 																				from
 																				0.0
 																				to
-																				1.0
+																				8.0
 																			</ErrorMessage>
 																		)}
 																	</Fragment>

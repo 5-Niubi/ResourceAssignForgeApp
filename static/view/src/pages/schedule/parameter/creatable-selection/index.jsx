@@ -6,6 +6,7 @@ const createOption = (label) => ({
     id: null,
 	label: formatText(label),
 	value: formatText(label),
+    level: 1
 });
 
 export function formatText(input) {

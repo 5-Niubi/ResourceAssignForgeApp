@@ -2,13 +2,9 @@ import { useCallback, useEffect, useState, Fragment } from "react";
 import { css, jsx } from "@emotion/react";
 import DynamicTable from "@atlaskit/dynamic-table";
 import Button, { ButtonGroup } from "@atlaskit/button";
-import AddCircleIcon from "@atlaskit/icon/glyph/add-circle";
-import StarFilledIcon from "@atlaskit/icon/glyph/star-filled";
-import TrashIcon from "@atlaskit/icon/glyph/trash";
-import EditIcon from "@atlaskit/icon/glyph/edit";
-import StarIcon from "@atlaskit/icon/glyph/star";
 import InfoIcon from "@atlaskit/icon/glyph/info";
 import { useParams } from "react-router";
+import { PiStarFill, PiStarBold } from "react-icons/pi";
 import Avatar from "@atlaskit/avatar";
 import Select from "@atlaskit/select";
 import Modal, {
@@ -37,12 +33,15 @@ import Form, {
 } from "@atlaskit/form";
 import AddCircle from "@atlaskit/icon/glyph/add-circle";
 import { COLOR_SKILL_LEVEL } from "../../../common/contants";
-import { PiStarFill } from "react-icons/pi";
 import InfoMessageColor from "../../../components/InfoMessageColor";
+import { Grid, GridColumn } from "@atlaskit/page";
+import CreatableAdvanced from "./creatable-selection";
+import Rating from "react-rating";
+import { validateEmail, validateNumberOnly, validateWorkingEffort, validateName } from "../../../common/utils";
 
 const options = [
-	{ name: "workingType", value: "0", label: "Fulltime" },
-	{ name: "workingType", value: "1", label: "Part-time" },
+	{ name: "workingType", value: 0, label: "Fulltime" },
+	{ name: "workingType", value: 1, label: "Part-time" },
 ];
 
 const boldStyles = css({
@@ -89,10 +88,10 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 				);
 				setSelectedWorkforces(localWorkforceIds);
 
-                //CHECK BUTTON SELECT ALL
-                if(workforces.length == localWorkforceIds.length){
-                    setSelectAll(true);
-                }
+				//CHECK BUTTON SELECT ALL
+				if (workforces.length == localWorkforceIds.length) {
+					setSelectAll(true);
+				}
 			})
 			.catch(function (error) {
 				console.log(error);
@@ -190,9 +189,10 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 												.color,
 										color: "white",
 									}}
-                                    isBold
+									isBold
 								>
-									{skill.name} - {skill.level}<PiStarFill/>
+									{skill.name} - {skill.level}
+									<PiStarFill />
 								</Lozenge>
 							</span>
 						))}
@@ -252,58 +252,56 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 						width={"medium"}
 					>
 						<ModalHeader>
-                            <div 
-                                style={{ flexWrap: "wrap",}}
-                            >
-							<ModalTitle>Select Workforce</ModalTitle>
-                            <div
-								style={{
-									display: "flex",
-									marginTop: "10px",
-								}}
-							>
+							<div style={{ flexWrap: "wrap" }}>
+								<ModalTitle>Select Employees</ModalTitle>
 								<div
 									style={{
-										flex: "0 0 320px",
-										marginRight: "10px",
+										display: "flex",
+										marginTop: "10px",
 									}}
 								>
-									<TextField
-										isCompact
-										placeholder="Search Workforce Name"
-										aria-label="Filter"
-										onChange={handleOnSearchBoxChange}
-										value={searchInput}
-									/>
-								</div>
-								<div
-									style={{
-										flex: "0 0 300px",
-									}}
-								>
-									<ButtonGroup>
-										<Button
-											appearance="primary"
-											onClick={() => {
-												closeSWModal();
-											}}
-										>
-											Create new
-										</Button>
-										{/* SELECT ALL BUTTON */}
-										<Button
-											appearance="primary"
-											onClick={handleSelectAll}
-										>
-											{selectAll
-												? "Deselect All"
-												: "Select All"}
-										</Button>
-                                        <InfoMessageColor/>
-									</ButtonGroup>
+									<div
+										style={{
+											flex: "0 0 320px",
+											marginRight: "10px",
+										}}
+									>
+										<TextField
+											isCompact
+											placeholder="Search Employee Name"
+											aria-label="Filter"
+											onChange={handleOnSearchBoxChange}
+											value={searchInput}
+										/>
+									</div>
+									<div
+										style={{
+											flex: "0 0 300px",
+										}}
+									>
+										<ButtonGroup>
+											<Button
+												appearance="primary"
+												onClick={() => {
+													closeSWModal();
+												}}
+											>
+												Create new
+											</Button>
+											{/* SELECT ALL BUTTON */}
+											<Button
+												appearance="primary"
+												onClick={handleSelectAll}
+											>
+												{selectAll
+													? "Deselect All"
+													: "Select All"}
+											</Button>
+											<InfoMessageColor />
+										</ButtonGroup>
+									</div>
 								</div>
 							</div>
-                            </div>
 						</ModalHeader>
 						<ModalBody>
 							<DynamicTable
@@ -343,6 +341,9 @@ export function ParameterCreareWorkforceModal() {
 	const openCWModal = useCallback(() => setIsCWOpen(true), []);
 	const closeCWModal = useCallback(() => setIsCWOpen(false), []);
 	const [isParttimeSelected, setIsParttimeSelected] = useState(false);
+	const [skillsTable, setSkillsTable] = useState([]);
+	const [loadingSubmit, setLoadingSubmit] = useState(false);
+	const [skillDB, setSkillDB] = useState([]);
 
 	const [workforcesJiraAccount, setWorkforcesJiraAccount] = useState([]);
 
@@ -365,87 +366,96 @@ export function ParameterCreareWorkforceModal() {
 				console.log(error);
 				Toastify.error(error.toString());
 			});
+
+		invoke("getAllSkills", {})
+			.then(function (res) {
+				setSkillDB(res);
+				localStorage.setItem("all_skills_DB", JSON.stringify(res));
+			})
+			.catch(function (error) {
+				console.log(error);
+				Toastify.error(error.toString());
+			});
 	}, []);
 
-	function handleOnSelected(e) {
-		if (e.currentTarget.value == "1") {
-			setIsParttimeSelected(true);
-		} else {
-			setIsParttimeSelected(false);
-		}
-	}
 
-	const buttonAddSkills = (
-		<>
-			<Button
-				iconBefore={<AddCircle label="" size="medium" />}
-				appearance="subtle"
-			></Button>
-		</>
-	);
+	const onSelectedValue = (childValue) => {
+		console.log("Received value from child:", childValue);
 
-	const head = {
+		setSkillsTable(childValue.selectedValue);
+		console.log("Received value display in table:", skillsTable);
+	};
+
+	const headSkillTable = {
 		cells: [
 			{
 				key: "skills",
 				content: "Skills",
-				width: 30,
+				width: 40,
 			},
 			{
-				key: "star",
-				content: "Star",
+				key: "level",
+				content: "Level",
 				width: 60,
-			},
-			{
-				key: "action",
-				content: "Actions",
-				width: 10,
 			},
 		],
 	};
 
-	const rows = [
-		{ name: "C#", level: "3" },
-		{ name: "Java", level: "5" },
-		{ name: "Unity", level: "2" },
-	].map((skill, index) => ({
-		key: skill.name?.toString(),
-		cells: [
-			{
+	const rowsSkillTable = skillsTable
+		? skillsTable?.map((skill, index) => ({
 				key: skill.name?.toString(),
-				content: skill.name?.toString(),
-			},
-			{
-				key: skill.level?.toString(),
-				content: (
-					<>
-						<StarFilledIcon></StarFilledIcon>
-						<StarFilledIcon></StarFilledIcon>
-						<StarFilledIcon></StarFilledIcon>
-						<StarFilledIcon></StarFilledIcon>
-						<StarIcon></StarIcon>
-					</>
-				),
-			},
-			{
-				key: "actions",
-				content: (
-					<>
-						<Button
-							iconBefore={<EditIcon label="" size="medium" />}
-							appearance="subtle"
-							// onClick={openModal}
-						></Button>
-						<Button
-							iconBefore={<TrashIcon label="" size="medium" />}
-							appearance="subtle"
-							// onClick={openModal}
-						></Button>
-					</>
-				),
-			},
-		],
-	}));
+				cells: [
+					{
+						key: skill.label?.toString(),
+						content: skill.label?.toString(),
+					},
+					{
+						key: skill.level?.toString(),
+						content: (
+							<>
+								<Rating
+									emptySymbol={<PiStarBold size={25} />}
+									fullSymbol={[
+										<PiStarFill
+											size={25}
+											fill={COLOR_SKILL_LEVEL[0].color}
+											border
+										/>,
+										<PiStarFill
+											size={25}
+											fill={COLOR_SKILL_LEVEL[1].color}
+											border
+										/>,
+										<PiStarFill
+											size={25}
+											fill={COLOR_SKILL_LEVEL[2].color}
+											border
+										/>,
+										<PiStarFill
+											size={25}
+											fill={COLOR_SKILL_LEVEL[3].color}
+											border
+										/>,
+										<PiStarFill
+											size={25}
+											fill={COLOR_SKILL_LEVEL[4].color}
+											border
+										/>,
+									]}
+									initialRating={
+										skill.level === null ? 1 : skill.level
+									}
+									onClick={(value) => {
+										skill.level =
+											value === null ? 1 : value;
+									}}
+								></Rating>
+							</>
+						),
+					},
+				],
+		  }))
+		: null;
 
 	function formatOptionLabel(user) {
 		return (
@@ -460,188 +470,92 @@ export function ParameterCreareWorkforceModal() {
 		<>
 			<Button onClick={openCWModal}>Create new</Button>
 			{/* CREATE WORKFORCE MODAL (CW) */}
-			<ModalTransition>
-				{isCWOpen && (
+			{isCWOpen && (
+				<ModalTransition>
 					<Modal
 						onClose={closeCWModal}
 						shouldScrollInViewport={true}
 						width={"large"}
 					>
 						<ModalHeader>
-							<ModalTitle>Add new workforce</ModalTitle>
+							<ModalTitle>Create new Employee</ModalTitle>
 						</ModalHeader>
-						<ModalBody>
-							<div>
-								<Form
-									onSubmit={(data) => {
-										console.log("form data", data);
-										return new Promise((resolve) =>
-											setTimeout(resolve, 2000)
-										).then(() =>
-											data.username === "error"
-												? { username: "IN_USE" }
-												: undefined
-										);
-									}}
-								>
-									{({ formProps, submitting }) => (
-										<form {...formProps}>
-											<Field
-												name="jiraAccount"
-												label="Jira Account"
-												isRequired
-												defaultValue=""
-											>
-												{({ fieldProps, error }) => (
-													<Fragment>
-														<Select
-															inputId="single-select-example"
-															className="single-select"
-															classNamePrefix="react-select"
-															options={[
-																workforcesJiraAccount.map(
-																	(user) => ({
-																		label: user.displayName,
-																		value: user.displayName,
-																		avatar: user.avatar,
-																	})
-																),
-															]}
-															formatOptionLabel={
-																formatOptionLabel
-															}
-															placeholder="Choose a Jira account"
-														/>
-														{!error && (
-															<HelperMessage></HelperMessage>
-														)}
-														{error && (
-															<ErrorMessage></ErrorMessage>
-														)}
-													</Fragment>
-												)}
-											</Field>
-											<Field
-												name="email"
-												label="Email"
-												isRequired
-												defaultValue=""
-											>
-												{({ fieldProps, error }) => (
-													<Fragment>
-														<TextField
-															autoComplete="off"
-															{...fieldProps}
-															placeholder="Email only."
-														/>
-														{!error && (
-															<HelperMessage></HelperMessage>
-														)}
-														{error && (
-															<ErrorMessage></ErrorMessage>
-														)}
-													</Fragment>
-												)}
-											</Field>
-											<Field
-												name="usernamejira"
-												label="Username Jira"
-												isRequired
-												defaultValue=""
-											>
-												{({ fieldProps, error }) => (
-													<Fragment>
-														<TextField
-															autoComplete="off"
-															{...fieldProps}
-															placeholder="You can use letters and numbers."
-														/>
-														{!error && (
-															<HelperMessage></HelperMessage>
-														)}
-														{error && (
-															<ErrorMessage>
-																This username is
-																already in use,
-																try another one.
-															</ErrorMessage>
-														)}
-													</Fragment>
-												)}
-											</Field>
-											<Field
-												name="name"
-												label="Name"
-												isRequired
-												defaultValue=""
-											>
-												{({ fieldProps, error }) => (
-													<Fragment>
-														<TextField
-															autoComplete="off"
-															{...fieldProps}
-															placeholder="You can use letters and numbers."
-														/>
-														{!error && (
-															<HelperMessage></HelperMessage>
-														)}
-														{error && (
-															<ErrorMessage>
-																This username is
-																already in use,
-																try another one.
-															</ErrorMessage>
-														)}
-													</Fragment>
-												)}
-											</Field>
-											<Field
-												name="salary"
-												label="Salary (Hour)"
-												isRequired
-												defaultValue=""
-											>
-												{({ fieldProps, error }) => (
-													<Fragment>
-														<TextField
-															autoComplete="off"
-															{...fieldProps}
-															placeholder="Number only"
-														/>
-														{!error && (
-															<HelperMessage></HelperMessage>
-														)}
-														{error && (
-															<ErrorMessage>
-																Wrong input.
-															</ErrorMessage>
-														)}
-													</Fragment>
-												)}
-											</Field>
-											<Field
-												label="Working Type"
-												name="workingType"
-												defaultValue=""
-												isRequired
-											>
-												{({ fieldProps }) => (
-													<RadioGroup
-														{...fieldProps}
-														options={options}
-														onChange={
-															handleOnSelected
-														}
-													/>
-												)}
-											</Field>
-											{/* WOKRING EFFORTS IN WEEEK */}
-											{isParttimeSelected && (
+						<Form
+							onSubmit={(data) => {
+								setLoadingSubmit(true);
+								// let workforce_request = {
+								// 	id: selectedWorkforce.id,
+								// 	accountId: selectedWorkforce.accountId,
+								// 	email: data.email,
+								// 	accountType: selectedWorkforce.accountType,
+								// 	name: data.name,
+								// 	avatar: selectedWorkforce.avatar,
+								// 	displayName: data.usernamejira,
+								// 	unitSalary: data.salary,
+								// 	workingType:
+								// 		isParttimeSelected === true ? 1 : 0,
+								// 	workingEfforts:
+								// 		isParttimeSelected === true
+								// 			? [
+								// 					data.mon,
+								// 					data.tues,
+								// 					data.wed,
+								// 					data.thurs,
+								// 					data.fri,
+								// 					data.sat,
+								// 					data.sun,
+								// 			  ].map((value) =>
+								// 					parseFloat(value)
+								// 			  )
+								// 			: null,
+								// 	Skills: skillsTable
+								// 		.filter((s) => s.id != null)
+								// 		.map((skill) => ({
+								// 			skillId: skill.id,
+								// 			level: parseInt(
+								// 				skill.level === null
+								// 					? 1
+								// 					: skill.level
+								// 			),
+								// 		})),
+								// 	newSkills: skillsTable
+								// 		.filter((s) => s.id == null)
+								// 		.map((skill) => ({
+								// 			name: skill.value,
+								// 			level: parseInt(
+								// 				skill.level === null
+								// 					? 1
+								// 					: skill.level
+								// 			),
+								// 		})),
+								// };
+
+								console.log("Form data", workforce_request);
+								updateWorkforce(workforce_request);
+								return new Promise((resolve) =>
+									setTimeout(resolve, 2000)
+								).then(() =>
+									data.username === "error"
+										? {
+												username: "IN_USE",
+										  }
+										: undefined
+								);
+							}}
+						>
+							{({ formProps, submitting }) => (
+								<form {...formProps}>
+									<ModalBody>
+										<Grid layout="fluid" spacing="compact">
+											{/* EMAIL TEXTFIELD */}
+											<GridColumn medium={12}>
 												<Field
-													name="workingEffort"
-													label="Working Effort"
+													name="email"
+													label="Email"
 													isRequired
-													defaultValue=""
+													validate={(v) =>
+														validateEmail(v)
+													}
 												>
 													{({
 														fieldProps,
@@ -650,216 +564,576 @@ export function ParameterCreareWorkforceModal() {
 														<Fragment>
 															<TextField
 																autoComplete="off"
-																defaultValue={
-																	0.99
-																}
-																label="Monday"
+																{...fieldProps}
+																placeholder="Email only."
+															/>
+															{error ===
+																"NOT_VALID" && (
+																<ErrorMessage>
+																	Invalid
+																	email, needs
+																	contains @
+																	symbol.
+																</ErrorMessage>
+															)}
+															{error ===
+																"IN_USE" && (
+																<ErrorMessage>
+																	Username
+																	already
+																	taken, try
+																	another one
+																</ErrorMessage>
+															)}
+														</Fragment>
+													)}
+												</Field>
+											</GridColumn>
+											{/* USERNAME JIRA TEXTFIELD */}
+											<GridColumn medium={6}>
+												<Field
+													name="usernamejira"
+													label="Username Jira"
+													isRequired
+												>
+													{({
+														fieldProps,
+														error,
+													}) => (
+														<Fragment>
+															<TextField
+																autoComplete="off"
+																{...fieldProps}
+																placeholder="You can use letters and numbers."
+															/>
+															{!error && (
+																<HelperMessage></HelperMessage>
+															)}
+															{error && (
+																<ErrorMessage>
+																	This
+																	username is
+																	already in
+																	use, try
+																	another one.
+																</ErrorMessage>
+															)}
+														</Fragment>
+													)}
+												</Field>
+											</GridColumn>
+											{/* NAME TEXTFIELD */}
+											<GridColumn medium={6}>
+												<Field
+													name="name"
+													label="Name"
+													isRequired
+													validate={(v) =>
+														validateName(v)
+													}
+												>
+													{({
+														fieldProps,
+														error,
+													}) => (
+														<Fragment>
+															<TextField
+																autoComplete="off"
+																{...fieldProps}
+																placeholder="Example: John Smith"
+															/>
+															{error ===
+																"NOT_VALID" && (
+																<ErrorMessage>
+																	The name
+																	field should
+																	only contain
+																	letters and
+																	must have a
+																	minimum
+																	length of 6
+																	characters.
+																</ErrorMessage>
+															)}
+														</Fragment>
+													)}
+												</Field>
+											</GridColumn>
+											{/* SALARY TEXTFIELD */}
+											<GridColumn medium={12}>
+												<Field
+													name="salary"
+													label="Salary (Hour)"
+													isRequired
+													validate={(value) =>
+														validateNumberOnly(
+															value
+														)
+													}
+												>
+													{({
+														fieldProps,
+														error,
+													}) => (
+														<Fragment>
+															<TextField
+																autoComplete="off"
+																{...fieldProps}
+																placeholder="Number only"
 																elemBeforeInput={
 																	<p
 																		style={{
-																			fontWeight:
-																				"bold",
+																			marginLeft: 10,
 																		}}
 																	>
-																		Mon
+																		$
 																	</p>
 																}
-																width={90}
-																isCompact
 															/>
-															<TextField
-																style={{
-																	flex: 1,
+															{error ===
+																"NOT_VALID" && (
+																<ErrorMessage>
+																	Wrong input.
+																</ErrorMessage>
+															)}
+														</Fragment>
+													)}
+												</Field>
+											</GridColumn>
+											{/* WORKING TYPE SELECT  */}
+											<GridColumn medium={3}>
+												<Field
+													label="Working Type"
+													name="workingType"
+													isRequired
+												>
+													{({
+														fieldProps,
+														error,
+													}) => (
+														<Fragment>
+															<Select
+																{...fieldProps}
+																options={
+																	options
+																}
+																placeholder="Choose type..."
+																onChange={(
+																	newValue
+																) => {
+																	setIsParttimeSelected(
+																		newValue.value ===
+																			1
+																			? true
+																			: false
+																	);
 																}}
-																autoComplete="off"
-																elemBeforeInput={
-																	<p
-																		style={{
-																			fontWeight:
-																				"bold",
-																		}}
-																	>
-																		Tues
-																	</p>
-																}
-																width={90}
-																defaultValue={
-																	0.99
-																}
-																isCompact
-															/>
-															<TextField
-																autoComplete="off"
-																elemBeforeInput={
-																	<p
-																		style={{
-																			fontWeight:
-																				"bold",
-																		}}
-																	>
-																		Wed
-																	</p>
-																}
-																width={90}
-																isCompact
-																defaultValue={
-																	0.99
-																}
-															/>
-															<TextField
-																autoComplete="off"
-																elemBeforeInput={
-																	<p
-																		style={{
-																			fontWeight:
-																				"bold",
-																		}}
-																	>
-																		Thurs
-																	</p>
-																}
-																width={90}
-																isCompact
-																defaultValue={
-																	0.99
-																}
-															/>
-															<TextField
-																defaultValue={
-																	0.99
-																}
-																elemBeforeInput={
-																	<p
-																		style={{
-																			fontWeight:
-																				"bold",
-																		}}
-																	>
-																		Fri
-																	</p>
-																}
-																width={90}
-																isCompact
-																autoComplete="off"
-															/>{" "}
-															<TextField
-																autoComplete="off"
-																elemBeforeInput={
-																	<p
-																		style={{
-																			fontWeight:
-																				"bold",
-																		}}
-																	>
-																		Sat
-																	</p>
-																}
-																width={90}
-																isCompact
-																defaultValue={
-																	0.99
-																}
-															/>
-															<TextField
-																autoComplete="off"
-																elemBeforeInput={
-																	<p
-																		style={{
-																			fontWeight:
-																				"bold",
-																		}}
-																	>
-																		Sun
-																	</p>
-																}
-																width={90}
-																isCompact
-																defaultValue={
-																	0.99
-																}
+																value={options.find(
+																	(
+																		option
+																	) =>
+																		option.value ===
+																		(isParttimeSelected
+																			? 1
+																			: 0)
+																)}
 															/>
 														</Fragment>
 													)}
 												</Field>
-											)}
-											<Field
-												name="skills"
-												label="Skills"
-												isRequired
-												defaultValue=""
-											>
-												{({ fieldProps, error }) => (
-													<Fragment>
-														<TextField
-															autoComplete="off"
-															elemAfterInput={
-																buttonAddSkills
+												{isParttimeSelected && (
+													<HelperMessage>
+														<InfoIcon
+															size="small"
+															content=""
+														></InfoIcon>
+														Working hours per day
+													</HelperMessage>
+												)}
+											</GridColumn>
+											{/* WORKING EFFORT (PART-TIME) */}
+											<GridColumn medium={9}>
+												{isParttimeSelected && (
+													<>
+														{/* MONDAY*/}
+														<Field
+															name="mon"
+															label="Monday"
+															isRequired
+															validate={(value) =>
+																validateWorkingEffort(
+																	value
+																)
 															}
-															{...fieldProps}
-														/>
-
-														{!error && (
+														>
+															{({
+																fieldProps,
+																error,
+															}) => (
+																<Fragment>
+																	<TextField
+																		autoComplete="off"
+																		{...fieldProps}
+																		placeholder="Number only"
+																	/>
+																	{error ===
+																		"NOT_VALID" && (
+																		<ErrorMessage>
+																			Wrong
+																			input.
+																		</ErrorMessage>
+																	)}
+																	{error ===
+																		"OUT_SCOPE" && (
+																		<ErrorMessage>
+																			Value
+																			raging
+																			from
+																			0.0
+																			to
+																			8.0
+																		</ErrorMessage>
+																	)}
+																</Fragment>
+															)}
+														</Field>
+														{/* TUESDAY */}
+														<Field
+															name="tues"
+															label="Tuesday"
+															isRequired
+															validate={(value) =>
+																validateWorkingEffort(
+																	value
+																)
+															}
+														>
+															{({
+																fieldProps,
+																error,
+															}) => (
+																<Fragment>
+																	<TextField
+																		autoComplete="off"
+																		{...fieldProps}
+																		placeholder="Number only"
+																	/>
+																	{error ===
+																		"NOT_VALID" && (
+																		<ErrorMessage>
+																			Wrong
+																			input.
+																		</ErrorMessage>
+																	)}
+																	{error ===
+																		"OUT_SCOPE" && (
+																		<ErrorMessage>
+																			Value
+																			raging
+																			from
+																			0.0
+																			to
+																			8.0
+																		</ErrorMessage>
+																	)}
+																</Fragment>
+															)}
+														</Field>
+														{/* WEDNESDAY */}
+														<Field
+															name="wed"
+															label="Wednesday"
+															isRequired
+															validate={(value) =>
+																validateWorkingEffort(
+																	value
+																)
+															}
+														>
+															{({
+																fieldProps,
+																error,
+															}) => (
+																<Fragment>
+																	<TextField
+																		autoComplete="off"
+																		{...fieldProps}
+																		placeholder="Number only"
+																	/>
+																	{error ===
+																		"NOT_VALID" && (
+																		<ErrorMessage>
+																			Wrong
+																			input.
+																		</ErrorMessage>
+																	)}
+																	{error ===
+																		"OUT_SCOPE" && (
+																		<ErrorMessage>
+																			Value
+																			raging
+																			from
+																			0.0
+																			to
+																			8.0
+																		</ErrorMessage>
+																	)}
+																</Fragment>
+															)}
+														</Field>
+														{/* THURSDAY */}
+														<Field
+															name="thurs"
+															label="Thursday"
+															isRequired
+															validate={(value) =>
+																validateWorkingEffort(
+																	value
+																)
+															}
+														>
+															{({
+																fieldProps,
+																error,
+															}) => (
+																<Fragment>
+																	<TextField
+																		autoComplete="off"
+																		{...fieldProps}
+																		placeholder="Number only"
+																	/>
+																	{error ===
+																		"NOT_VALID" && (
+																		<ErrorMessage>
+																			Wrong
+																			input.
+																		</ErrorMessage>
+																	)}
+																	{error ===
+																		"OUT_SCOPE" && (
+																		<ErrorMessage>
+																			Value
+																			raging
+																			from
+																			0.0
+																			to
+																			8.0
+																		</ErrorMessage>
+																	)}
+																</Fragment>
+															)}
+														</Field>
+														{/* FRIDAY */}
+														<Field
+															name="fri"
+															label="Friday"
+															isRequired
+															validate={(value) =>
+																validateWorkingEffort(
+																	value
+																)
+															}
+														>
+															{({
+																fieldProps,
+																error,
+															}) => (
+																<Fragment>
+																	<TextField
+																		autoComplete="off"
+																		{...fieldProps}
+																		placeholder="Number only"
+																	/>
+																	{error ===
+																		"NOT_VALID" && (
+																		<ErrorMessage>
+																			Wrong
+																			input.
+																		</ErrorMessage>
+																	)}
+																	{error ===
+																		"OUT_SCOPE" && (
+																		<ErrorMessage>
+																			Value
+																			raging
+																			from
+																			0.0
+																			to
+																			8.0
+																		</ErrorMessage>
+																	)}
+																</Fragment>
+															)}
+														</Field>
+														{/* SATURDAY */}
+														<Field
+															name="sat"
+															label="Saturday"
+															isRequired
+															validate={(value) =>
+																validateWorkingEffort(
+																	value
+																)
+															}
+														>
+															{({
+																fieldProps,
+																error,
+															}) => (
+																<Fragment>
+																	<TextField
+																		autoComplete="off"
+																		{...fieldProps}
+																		placeholder="Number only"
+																	/>
+																	{error ===
+																		"NOT_VALID" && (
+																		<ErrorMessage>
+																			Wrong
+																			input.
+																		</ErrorMessage>
+																	)}
+																	{error ===
+																		"OUT_SCOPE" && (
+																		<ErrorMessage>
+																			Value
+																			raging
+																			from
+																			0.0
+																			to
+																			8.0
+																		</ErrorMessage>
+																	)}
+																</Fragment>
+															)}
+														</Field>
+														{/* SUNDAY */}
+														<Field
+															name="sun"
+															label="Sunday"
+															isRequired
+															validate={(value) =>
+																validateWorkingEffort(
+																	value
+																)
+															}
+														>
+															{({
+																fieldProps,
+																error,
+															}) => (
+																<Fragment>
+																	<TextField
+																		autoComplete="off"
+																		{...fieldProps}
+																		placeholder="Number only"
+																	/>
+																	{error ===
+																		"NOT_VALID" && (
+																		<ErrorMessage>
+																			Wrong
+																			input.
+																		</ErrorMessage>
+																	)}
+																	{error ===
+																		"OUT_SCOPE" && (
+																		<ErrorMessage>
+																			Value
+																			raging
+																			from
+																			0.0
+																			to
+																			8.0
+																		</ErrorMessage>
+																	)}
+																</Fragment>
+															)}
+														</Field>
+													</>
+												)}
+											</GridColumn>
+											{/* SKILL CREATABLE MULTIPLE SELECT */}
+											<GridColumn medium={12}>
+												<Field
+													name="skills"
+													label="Skills"
+												>
+													{({
+														fieldProps,
+														error,
+													}) => (
+														<Fragment>
+															<CreatableAdvanced
+																isRequired
+																defaultOptions={skillDB?.map(
+																	(
+																		skill
+																	) => ({
+																		id: skill.id,
+																		value: skill.name,
+																		label: skill.name,
+																		level: skill.level,
+																	})
+																)}
+																onSelectedValue={
+																	onSelectedValue
+																}
+															></CreatableAdvanced>
 															<HelperMessage>
 																<InfoIcon
 																	size="small"
 																	content=""
 																></InfoIcon>
-																Click add circle
-																button in order
-																to add skills
-																into table
+																Change skill's
+																level in table,
+																can not store
+																non-word
+																characters
 															</HelperMessage>
-														)}
-														{error && (
-															<ErrorMessage>
-																Wrong input.
-															</ErrorMessage>
-														)}
-													</Fragment>
-												)}
-											</Field>
-											<DynamicTable
-												head={head}
-												rows={rows}
-											/>
-											<FormFooter>
-												<ButtonGroup>
-													<Button appearance="subtle">
-														Cancel
-													</Button>
-													<LoadingButton
-														type="submit"
-														appearance="primary"
-														isLoading={submitting}
-													>
-														Create
-													</LoadingButton>
-												</ButtonGroup>
-											</FormFooter>
-										</form>
-									)}
-								</Form>
-							</div>
-						</ModalBody>
-						<ModalFooter>
-							<Button
-								appearance="subtle"
-								onClick={closeCWModal}
-								autoFocus
-							>
-								Cancel
-							</Button>
-							<Button
-								appearance="primary"
-								onClick={closeCWModal}
-								autoFocus
-							>
-								Create
-							</Button>
-						</ModalFooter>
+														</Fragment>
+													)}
+												</Field>
+											</GridColumn>
+											{/* SKILL DISPLAYING WITH LEVEL TABLE */}
+											<GridColumn medium={12}>
+												<DynamicTable
+													head={headSkillTable}
+													rows={rowsSkillTable}
+												/>
+											</GridColumn>
+										</Grid>
+									</ModalBody>
+									<ModalFooter>
+										<Button
+											appearance="subtle"
+											onClick={closeCWModal}
+											autoFocus
+										>
+											Cancel
+										</Button>
+										{loadingSubmit ? (
+											<LoadingButton
+												appearance="primary"
+												isLoading
+											>
+												Saving...
+											</LoadingButton>
+										) : (
+											<LoadingButton
+												type="submit"
+												appearance="primary"
+												autoFocus
+											>
+												Save
+											</LoadingButton>
+										)}
+									</ModalFooter>
+								</form>
+							)}
+						</Form>
 					</Modal>
-				)}
-			</ModalTransition>
+				</ModalTransition>
+			)}
 		</>
 	);
 }
