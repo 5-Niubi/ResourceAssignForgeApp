@@ -69,7 +69,7 @@ const GanttChart = ({
 			return {
 				id: task.id + "-2",
 				start: new Date(task.endDate).getTime(),
-				end: new Date(task.endDate).getTime(),
+				end: new Date(task.endDate).getTime() + day*5,
 				y: i,
 				assignTo: task.workforce,
 				color: "transparent",
@@ -194,10 +194,13 @@ const GanttChart = ({
 				},
 				tooltip: {
 					formatter: function () {
-						return false;
+						return "<span>Assigned To: {point.assignTo.name}</span><br/><span>From: {point.start:%e. %b}</span><span> To: {point.end:%e. %b}</span>";
 					},
-					// 	pointFormat:
-					// 		"<span>Assigned To: {point.assignTo.name}</span><br/><span>From: {point.start:%e. %b}</span><span> To: {point.end:%e. %b}</span>",
+					shared: true,
+					// pointFormatter: function(point) {
+					// 	console.log(point);
+					// 	return `<span>Assigned To: {point.assignTo.name}</span><br/><span>From: {point.start:%e. %b}</span><span> To: {point.end:%e. %b}</span>`;
+					// },
 				},
 				scrollbar: {
 					enabled: true,

@@ -285,7 +285,7 @@ function CreateTaskModal({
 															handleCreateMilestone
 														}
 														isSearchable={true}
-														placeholder="Choose milestone"
+														placeholder="Choose group"
 													/>
 												</Fragment>
 											)}
