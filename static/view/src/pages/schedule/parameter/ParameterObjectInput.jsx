@@ -43,14 +43,14 @@ const objectiveItems = [
 	{ name: "time", value: "time", label: "Time" },
 	{ name: "cost", value: "cost", label: "Cost" },
 	{ name: "experience", value: "quality", label: "Experience" },
-	{ name: "none", value: "neutral", label: "Neutral" },
+	{ name: "none", value: "", label: "Neutral" },
 ];
 
 export default function ParameterObjectInput({ handleChangeTab }) {
 	let project_detail = JSON.parse(localStorage.getItem("project_detail"));
 	const { projectId } = useParams();
 	const [startDate, setStartDate] = useState(project_detail.startDate);
-	const [endDate, setEndDate] = useState(project_detail.DeadLine);
+	const [endDate, setEndDate] = useState(project_detail.deadline);
 	const [budget, setBudget] = useState(project_detail.budget);
 	const [budgetUnit, setBudgetUnit] = useState(project_detail.budgetUnit);
 	const [isLoading, setIsLoading] = useState(false);
@@ -125,7 +125,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 		Duration: 0,
 	};
 
-	function SaveParameters({ cost }) {
+	function SaveParameters({ cost, objectives }) {
 		setIsScheduling(true);
 		var parameterResourcesLocal = JSON.parse(
 			localStorage.getItem("selected_workforces")
@@ -141,6 +141,9 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 		var data = {
 			ProjectId: Number(projectId),
 			Duration: calculateDuration({ startDate, endDate }),
+            ObjectiveTime: (objectives === "time")?1:null,
+            ObjectiveCost: (objectives === "cost")?1:null,
+            ObjectiveQuality: (objectives === "quality")?1:null,
 			StartDate: startDate,
 			DeadLine: endDate,
 			Budget: Number(cost),
@@ -219,9 +222,9 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 		<div style={{ width: "100%" }}>
 			{isLoading ? <Spinner size={"large"} /> : null}
 			<Form
-				onSubmit={({ cost }) => {
-					console.log("Form Submitted: ", cost);
-					SaveParameters({ cost });
+				onSubmit={({ cost, objectives }) => {
+					console.log("Form Submitted: ", objectives);
+					SaveParameters({ cost, objectives });
 					return new Promise((resolve) =>
 						setTimeout(resolve, 2000)
 					).then(() =>
@@ -250,7 +253,6 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 											validateNumberOnly(value)
 										}
 										defaultValue={budget}
-										isDisabled
 									>
 										{({ fieldProps, error }) => (
 											<Fragment>
@@ -309,7 +311,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 										{() => (
 											<Fragment>
 												<DatePicker
-													minDate={startDate}
+                                                    minDate={startDate}
 													value={endDate}
 													onChange={handleSetEndDate}
 													dateFormat={DATE_FORMAT.DMY}
@@ -324,7 +326,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 									<Field
 										label="Objective Estimation"
 										name="objectives"
-										defaultValue="neutral"
+										defaultValue=""
 										isRequired
 									>
 										{({ fieldProps }) => (

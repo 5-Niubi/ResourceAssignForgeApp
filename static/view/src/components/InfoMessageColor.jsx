@@ -1,7 +1,7 @@
 import React from "react";
 import InlineMessage from "@atlaskit/inline-message";
 import Lozenge from "@atlaskit/lozenge";
-import { COLOR_SKILL_LEVEL } from "../../../common/contants";
+import { COLOR_SKILL_LEVEL } from "../common/contants";
 import { PiStarFill } from "react-icons/pi";
 
 const InfoMessageColor = () => {
