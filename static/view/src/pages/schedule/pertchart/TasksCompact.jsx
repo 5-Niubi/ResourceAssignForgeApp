@@ -8,12 +8,14 @@ import CreateTaskModal from "./modal/CreateTaskModal";
 import { useParams } from "react-router";
 import Tooltip from "@atlaskit/tooltip";
 import ErrorIcon from "@atlaskit/icon/glyph/error";
+import EmptyState from "@atlaskit/empty-state";
 
 /**
  * List of tasks with only name; use for select task to appeared in the pertchart
  */
 const TasksCompact = ({
 	tasks,
+	loadingTasks,
 	tasksError,
 	milestones,
 	skills,
@@ -128,7 +130,13 @@ const TasksCompact = ({
 	return (
 		<div id="tasks">
 			<PageHeader actions={actionsContent}>Tasks list:</PageHeader>
-			{(tasksError && tasksError.length > 0) ? <div className="red">There are some incomplete tasks need your attention!</div> : ""}
+			{tasksError && tasksError.length > 0 ? (
+				<div className="red">
+					There are some incomplete tasks need your attention!
+				</div>
+			) : (
+				""
+			)}
 			<div
 				class="inner"
 				style={{
@@ -142,7 +150,21 @@ const TasksCompact = ({
 					rows={rows}
 					loadingSpinnerSize="large"
 					isFixedSize
-					isLoading={tasks.length <= 0}
+					isLoading={loadingTasks}
+					emptyView={
+						<EmptyState
+							header="Empty"
+							description="Look like there is no task."
+							primaryAction={
+								<Button
+									appearance="primary"
+									onClick={() => setIsModalCreateOpen(true)}
+								>
+									Create new task
+								</Button>
+							}
+						/>
+					}
 				/>
 			</div>
 

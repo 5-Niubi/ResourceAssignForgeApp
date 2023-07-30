@@ -39,13 +39,7 @@ function ProjectListHome() {
 		searchParams.get("q") ? searchParams.get("q") : ""
 	);
 
-	var projectsCache = getCache("projects");
-	if (!projectsCache) {
-		projectsCache = [];
-	} else {
-		projectsCache = JSON.parse(projectsCache);
-	}
-	const [projects, setProjects] = useState(projectsCache);
+	const [projects, setProjects] = useState([]);
 	const [projectsForDisplay, setProjectsForDisplay] = useState(projects);
 
 	const filterProjectName = useCallback(function (projects, query) {
@@ -61,34 +55,29 @@ function ProjectListHome() {
 		[projects]
 	);
 	useEffect(function () {
-		var projectsCache = getCache("projects");
-		if (!projectsCache || !JSON.parse(projectsCache).length){
-			invoke("getProjectsList")
-				.then(function (res) {
-					setProjectTableLoadingState(false);
-					let projectsList = [];
-					for (let project of res) {
-						let itemProject = {};
-						itemProject = {
-							id: project.id,
-							imageAvatar: project.imageAvatar,
-							name: project.name,
-							startDate: project.startDate,
-							tasks: project.taskCount,
-						};
-						projectsList.push(itemProject);
-					}
-					setProjects(projectsList);
-					filterProjectName(projectsList, searchBoxValue);
-					cache("projects", JSON.stringify(projectsList));
-				})
-				.catch(function (error) {
-					setProjectTableLoadingState(false);
-					Toastify.error(error.toString());
-				});
-		} else {
-			setProjectTableLoadingState(false);
-		}
+		invoke("getProjectsList")
+			.then(function (res) {
+				setProjectTableLoadingState(false);
+				let projectsList = [];
+				for (let project of res) {
+					let itemProject = {};
+					itemProject = {
+						id: project.id,
+						imageAvatar: project.imageAvatar,
+						name: project.name,
+						startDate: project.startDate,
+						tasks: project.taskCount,
+					};
+					projectsList.push(itemProject);
+				}
+				setProjects(projectsList);
+				filterProjectName(projectsList, searchBoxValue);
+				cache("projects", JSON.stringify(projectsList));
+			})
+			.catch(function (error) {
+				setProjectTableLoadingState(false);
+				Toastify.error(error.toString());
+			});
 	}, []);
 
 	function handleOnSearchBoxChange(e) {

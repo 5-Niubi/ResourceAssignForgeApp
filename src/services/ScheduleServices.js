@@ -34,9 +34,9 @@ async function saveSolution(solutionReq) {
 	}
 }
 
-async function getSolutionsByProject(projectId, page) {
+async function getSolutionsByProject(projectId) {
 	try {
-		let response = await APIServices.get(`/api/Schedule/GetSchedulesByProject`, { projectId, page } );
+		let response = await APIServices.get(`/api/Schedule/GetSchedulesByProject`, { projectId } );
 		return response;
 	} catch (error) {
 		return Promise.reject(error);
