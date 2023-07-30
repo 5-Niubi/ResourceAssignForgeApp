@@ -342,14 +342,15 @@ const TaskDetail = ({
 																fieldProps.onChange(
 																	event
 																);
-																setIsInfoChanged(true);
+																setIsInfoChanged(
+																	true
+																);
 																currentTask.milestoneId =
 																	event?.value ||
 																	null;
 																updateTaskMilestoneChanged(
 																	currentTask.milestoneId
 																);
-																
 															}}
 															onCreateOption={
 																handleCreateMilestone
@@ -358,7 +359,8 @@ const TaskDetail = ({
 															isLoading={
 																milestoneCreating
 															}
-															placeholder="Choose milestone"
+															placeholder="Choose group"
+															menuPosition="fixed"
 														/>
 													</Fragment>
 												)}
@@ -393,6 +395,7 @@ const TaskDetail = ({
 																skillCreating
 															}
 															placeholder="Choose skills"
+															menuPosition="fixed"
 														/>
 													</Fragment>
 												)}
@@ -417,6 +420,7 @@ const TaskDetail = ({
 															isMulti
 															isSearchable={true}
 															placeholder="Choose precedence tasks"
+															menuPosition="fixed"
 														/>
 													</Fragment>
 												)}

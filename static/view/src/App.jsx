@@ -195,8 +195,8 @@ function App() {
 															element={<div>Tasks Page of</div>}
 														></Route>
 														<Route
-															path="reports"
-															element={<div>Reporsts Page</div>}
+															path="groups"
+															element={<div>Groups Page</div>}
 														></Route>
 													</Route>
 												</Routes>

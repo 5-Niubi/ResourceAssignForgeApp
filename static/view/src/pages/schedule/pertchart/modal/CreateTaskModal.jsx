@@ -247,8 +247,7 @@ function CreateTaskModal({
 												/>
 											)}
 										</Field>
-									</FormSection>
-									<FormSection>
+
 										<Field
 											name="duration"
 											label="Duration"
@@ -259,7 +258,16 @@ function CreateTaskModal({
 													autoComplete="off"
 													value={duration}
 													onChange={updateDuration}
-													elemAfterInput={<span style={{paddingRight: "10px"}}>DAYS</span>}
+													elemAfterInput={
+														<span
+															style={{
+																paddingRight:
+																	"10px",
+															}}
+														>
+															DAYS
+														</span>
+													}
 												/>
 											)}
 										</Field>
@@ -286,6 +294,7 @@ function CreateTaskModal({
 														}
 														isSearchable={true}
 														placeholder="Choose group"
+														menuPosition="fixed"
 													/>
 												</Fragment>
 											)}
@@ -313,6 +322,7 @@ function CreateTaskModal({
 														isMulti
 														isSearchable={true}
 														placeholder="Choose skills"
+														menuPosition="fixed"
 													/>
 												</Fragment>
 											)}
@@ -337,6 +347,7 @@ function CreateTaskModal({
 														isMulti
 														isSearchable={true}
 														placeholder="Choose precedence tasks"
+														menuPosition="fixed"
 													/>
 												</Fragment>
 											)}
