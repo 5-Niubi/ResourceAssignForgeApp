@@ -95,11 +95,17 @@ const GanttChart = ({
 							dragMinY: 0,
 							dragPrecisionX: day / 24, // Snap to eight hours
 						},
+						tooltip: {
+							pointFormat: `<span>{point.name}</span><br/><span>Assigned To: {point.assignTo.name}</span><br/><span>From: {point.start:%e. %b}</span><span> To: {point.end:%e. %b}</span>`,
+						},
 					},
 					{
 						name: "Resources",
 						data: data2,
 						linkedTo: ":previous",
+						tooltip: {
+							pointFormat: "{point.assignTo.name}",
+						},
 						dragDrop: {
 							draggableX: true,
 							draggableY: true,
@@ -181,10 +187,15 @@ const GanttChart = ({
 				plotOptions: {
 					series: {
 						connectors: {
-							lineWidth: 1,
+							lineWidth: 1.5,
 							radius: 5,
 							startMarker: {
+								enabled: false,
+							},
+							endMarker: {
 								enabled: true,
+								radius: 5,
+								height: 5
 							},
 						},
 					},
@@ -193,11 +204,7 @@ const GanttChart = ({
 					text: "",
 				},
 				tooltip: {
-					// formatter: function () {
-					// 	return "<span>Assigned To: {point.assignTo.name}</span><br/><span>From: {point.start:%e. %b}</span><span> To: {point.end:%e. %b}</span>";
-					// },
-					shared: true,
-					pointFormat: `<span>Assigned To: {point.assignTo.name}</span><br/><span>From: {point.start:%e. %b}</span><span> To: {point.end:%e. %b}</span>`
+					enabled: true,
 				},
 				scrollbar: {
 					enabled: true,
@@ -390,8 +397,14 @@ const GanttChart = ({
 									x: 0,
 								},
 								categories: data.map(function (s) {
-									var duration = s.duration < 10 ? "0" + s.duration : s.duration;
-									var unit = s.duration == 1 ? "&nbsp; day" : " days";
+									var duration =
+										s.duration < 10
+											? "0" + s.duration
+											: s.duration;
+									var unit =
+										s.duration == 1
+											? "&nbsp; day"
+											: " days";
 									return duration + unit;
 								}),
 								labels: {
@@ -447,7 +460,7 @@ const GanttChart = ({
 			},
 			function (chart) {
 				//40 is a pixel value for one cell
-				let chartHeight = 40 * chart.series[0].data.length + 280;
+				let chartHeight = 50 * chart.series[0].data.length + 280;
 				chart.update({
 					chart: {
 						height: chartHeight,

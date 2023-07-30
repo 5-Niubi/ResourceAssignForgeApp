@@ -245,7 +245,7 @@ function VisualizeTasksPage({ handleChangeTab }) {
 	);
 
 	return (
-		<div class="visualize-tasks" style={{ width: "100%", height: "90vh" }}>
+		<div class="visualize-tasks">
 			<PageLayout>
 				<Content>
 					<Main testId="main2" id="main2">
@@ -284,11 +284,9 @@ function VisualizeTasksPage({ handleChangeTab }) {
 					<div
 						className="right-sidebar tasks-compact"
 						style={{
-							backgroundColor: "#fafbfc",
 							boxSizing: "border-box",
 							borderLeft: "1px solid #e5e5e5",
 							marginLeft: "2rem",
-							marginRight: "-2rem",
 						}}
 					>
 						<RightSidebar

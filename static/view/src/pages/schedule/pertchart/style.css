@@ -19,6 +19,12 @@
 	font-weight: 500;
 }
 
+.visualize-tasks{
+	width: 100%;
+	height: calc(100vh - 80px);
+	overflow: hidden;
+}
+
 .tasks-compact {
 	position: relative;
 	width: 300px;
@@ -26,7 +32,7 @@
 }
 
 .tasks-compact.-collapsed {
-	width: 0px;
+	width: 12px;
 }
 
 .tasks-compact .collapse-button {
@@ -64,7 +70,7 @@
 }
 
 .pert-chart.-expanded{
-	height: 88%;
+	height: calc(100vh - 170px);
 }
 
 .pert-chart .expand-button {
