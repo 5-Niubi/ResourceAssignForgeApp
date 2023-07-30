@@ -47,6 +47,10 @@ function ProjectListDynamicTable({ isLoading, content }) {
 			},
 			{
 				key: data.id,
+				content: formatDateDMY(data.deadLine),
+			},
+			{
+				key: data.id,
 				content: data.tasks,
 			},
 			{
@@ -104,6 +108,13 @@ export const createHead = () => {
 				width: 15,
 			},
 			{
+				key: "endDate",
+				content: "End date",
+				shouldTruncate: true,
+				isSortable: true,
+				width: 15,
+			},
+			{
 				key: "tasks",
 				content: "Tasks",
 				isSortable: true,
@@ -112,6 +123,7 @@ export const createHead = () => {
 			},
 			{
 				key: "option",
+				content: "Option",
 				shouldTruncate: true,
 			},
 		],

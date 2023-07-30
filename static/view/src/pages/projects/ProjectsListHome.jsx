@@ -74,6 +74,7 @@ function ProjectListHome() {
 							imageAvatar: project.imageAvatar,
 							name: project.name,
 							startDate: project.startDate,
+							deadline: project.deadLine,
 							tasks: project.taskCount,
 						};
 						projectsList.push(itemProject);
