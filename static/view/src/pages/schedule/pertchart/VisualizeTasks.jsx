@@ -129,17 +129,20 @@ function VisualizeTasksPage({ handleChangeTab }) {
 	const [tasks, setTasks] = useState(tasksCache);
 	const [skills, setSkills] = useState(skillsCache);
 	const [milestones, setMilestones] = useState(milestonesCache);
+	const [loadingTasks, setLoadingTasks] = useState(tasks.length == 0);
 	useEffect(function () {
 		var tasksCache = getCache("tasks");
 		if (!tasksCache) {
 			invoke("getTasksList", { projectId })
 				.then(function (res) {
+					setLoadingTasks(false);
 					if (res) {
 						setTasks(res);
 						cache("tasks", JSON.stringify(res));
 					}
 				})
 				.catch(function (error) {
+					setLoadingTasks(false);
 					console.log(error);
 					Toastify.error(error.toString());
 				});
@@ -315,6 +318,7 @@ function VisualizeTasksPage({ handleChangeTab }) {
 							>
 								<TasksCompact
 									tasks={tasks}
+									loadingTasks={loadingTasks}
 									tasksError={tasksError}
 									milestones={milestones}
 									skills={skills}
