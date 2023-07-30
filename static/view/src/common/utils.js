@@ -94,3 +94,63 @@ export function findObj(arr, id){
 export function getColor(index, bank = colorsBank){
 	return bank[index % bank.length];
 }
+
+export const validateEmail = (value) => {
+    //REQUIRES NOT NULL, AND CONTAINS @ SYMBOL
+    if (!value) {
+        return "NOT_VALID";
+    }
+    if (!value.includes("@")) {
+        return "NOT_VALID";
+    }
+    return undefined;
+};
+
+export const validateNumberOnly = (value) => {
+    //REQUIRES NOT NULL, NUMBER ONLY
+    if (!value) {
+        return "NOT_VALID";
+    }
+
+    if (isNaN(parseFloat(value))) {
+        return "NOT_VALID";
+    }
+    const regex = /^\d*\.?\d*$/;
+    if (!regex.test(value)) {
+        return "NOT_VALID";
+    }
+    return undefined;
+};
+
+export const validateWorkingEffort = (value) => {
+    //REQUIRES NOT NULL, NUMBER ONLY, FROM 0.0 TO 24.0
+    if (!value) {
+        return "NOT_VALID";
+    }
+
+    if (isNaN(parseFloat(value))) {
+        return "NOT_VALID";
+    }
+
+    if (value < 0.0 || value > 8.0) {
+        return "OUT_SCOPE";
+    }
+
+    const regex = /^\d*\.?\d*$/;
+    if (!regex.test(value)) {
+        return "NOT_VALID";
+    }
+    return undefined;
+};
+
+export const validateName = (value) => {
+    //REQUIRES NOT NULL, LETTER ONLY, 6 CHARACTERS AT LEAST
+    if (!value) {
+        return "NOT_VALID";
+    }
+    const regex = /^[A-Za-z ]{6,}$/;
+    if (!regex.test(value)) {
+        return "NOT_VALID";
+    }
+    return undefined;
+};

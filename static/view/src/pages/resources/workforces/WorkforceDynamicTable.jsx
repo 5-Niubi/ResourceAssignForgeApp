@@ -116,26 +116,21 @@ function WorkforceDynamicTable() {
 		return {
 			cells: [
 				{
-					key: "no",
-					content: "No",
-					width: 2,
-				},
-				{
 					key: "id",
 					content: "ID",
-					width: withWidth ? 8 : undefined,
+					width: withWidth ? 5 : undefined,
 				},
 				{
 					key: "name",
                     content: "Name",
                     isSortable: true,
-                    width: withWidth ? 25 : undefined
+                    width: withWidth ? 15 : undefined
 				},
 				{
 					key: "skill",
 					content: "Skills",
 					shouldTruncate: false,
-					width: withWidth ? 25 : undefined,
+					width: withWidth ? 40 : undefined,
 				},
 				{
 					key: "salary",
@@ -147,11 +142,11 @@ function WorkforceDynamicTable() {
 					key: "type",
 					content: "Type",
 					shouldTruncate: false,
-					width: withWidth ? 5 : undefined,
+					width: withWidth ? 10 : undefined,
 				},
 				{
-					key: "action",
-					content: "Action",
+					key: "detail",
+					content: "Detail",
 					shouldTruncate: false,
 					width: withWidth ? 5 : undefined,
 				},
@@ -166,17 +161,8 @@ function WorkforceDynamicTable() {
 		isHighlighted: false,
 		cells: [
 			{
-				key: workforce.no,
-				content: index + 1,
-				width: 15,
-			},
-			{
 				key: workforce.id,
-				content: (
-					<NameWrapper>
-						<a href="">{workforce.id}</a>
-					</NameWrapper>
-				),
+				content: (<strong>#{workforce.id}</strong>),
 			},
 			{
 				key: createKey(workforce.name),
@@ -222,7 +208,7 @@ function WorkforceDynamicTable() {
 				content: workforce.workingType == 0 ? "Full-time" : "Part-time",
 			},
 			{
-				key: "action",
+				key: "detail",
 				content: (
 					<div>
 						<MoreIcon></MoreIcon>
@@ -233,21 +219,19 @@ function WorkforceDynamicTable() {
 	}));
 
 	return (
-		<div css={wrapperStyles}>
-			<InlineMessage appearance="info">
-				<p>
-					<strong>NUMBER RECORDS</strong>
-				</p>
-				<p>We have total number {workforces.length} members</p>
-			</InlineMessage>
-			<div css={overflow}>
-				<DynamicTable
-					head={head}
-					rows={rows}
-					isLoading={TableLoadingState}
-				/>
-			</div>
-		</div>
+        <>
+            <h5 style={{marginBottom: "3px"}}>We have total number: {workforces.length} members</h5>
+            <div css={wrapperStyles}>
+                <div css={overflow}>
+                    <DynamicTable
+                        head={head}
+                        rows={rows}
+                        isLoading={TableLoadingState}
+                    />
+                </div>
+            </div>
+        </>
+		
 	);
 }
 
