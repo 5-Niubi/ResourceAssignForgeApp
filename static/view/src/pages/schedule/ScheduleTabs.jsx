@@ -6,10 +6,11 @@ import EstimationPage from "./estimation";
 import { createContext, useCallback, useEffect, useState } from "react";
 import ResultPage from "./resultpage/ResultPage";
 import React from "react";
-import { invoke } from "@forge/bridge";
+import { invoke, router } from "@forge/bridge";
 import { useParams } from "react-router";
 import Toastify from "../../common/Toastify";
 import { cache, clearProjectBasedCache, getCache } from "../../common/utils";
+import Link from "../../components/common/Link";
 
 const projectInfoContextInit = {};
 export const ProjectInfoContext = createContext(projectInfoContextInit);
@@ -32,41 +33,26 @@ export default function ScheduleTabs() {
 	// const [project, setProject] = useState(projectCache);
 
 	const handleChangeTab = useCallback(
-		(index) => setSelected(index),
+		(index) => {
+			setSelected(index);
+		},
 		[setSelected]
 	);
-
-	// useEffect(() => {
-	// 	var projectCache = getCache("project");
-	// 	if (!projectCache) {
-	// 		invoke("getProjectDetail", { projectId })
-	// 			.then((res) => {
-	// 				if (res){
-	// 					setProject(res);
-	// 					cache("project", JSON.stringify(res));
-	// 				}
-	// 			})
-	// 			.catch((error) => {
-	// 				console.log(error);
-	// 				Toastify.error(error.message);
-	// 			});
-	// 	}
-	// }, []);
 
 	return (
 		<ProjectInfoContext.Provider value={project}>
 			<Tabs onChange={handleChangeTab} selected={selected} id="default">
 				<TabList>
-					<Tab>
+					<Tab id="tasks">
 						<Badge>{1}</Badge> Tasks dependencies
 					</Tab>
-					<Tab>
+					<Tab id="suggestion">
 						<Badge>{2}</Badge> Resource suggestion
 					</Tab>
-					<Tab>
+					<Tab id="parameters">
 						<Badge>{3}</Badge> Parameters
 					</Tab>
-					<Tab>
+					<Tab id="solutions">
 						<Badge>{4}</Badge> Schedule
 					</Tab>
 				</TabList>

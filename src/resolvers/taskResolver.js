@@ -21,7 +21,8 @@ function taskResolver(resolver) {
 			return response;
 		} catch (error) {
 			console.log("Error in createNewTask: ", error);
-			return Promise.reject(error);
+			throw new Error(error.messages || "Error in create new task");
+			// return Promise.reject(error);
 		}
 	});
 

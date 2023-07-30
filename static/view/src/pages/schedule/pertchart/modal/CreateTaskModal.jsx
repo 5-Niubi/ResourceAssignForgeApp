@@ -207,13 +207,19 @@ function CreateTaskModal({
 					updateSkills(skillsPage);
 					updateMilestones(ms);
 					Toastify.success("Created task successfully");
+					closeModal();
+				} else if (res.messages) {
+					Toastify.error(res.messages);
 				}
-				closeModal();
 			})
 			.catch((error) => {
 				setIsSubmitting(false);
-				console.log(error);
-				Toastify.error(error.toString());
+				console.log(error.message);
+				if (error.messages){
+					Toastify.error(res.messages);
+				} else {
+					Toastify.error(error.message);
+				}
 			});
 	}
 
@@ -303,6 +309,7 @@ function CreateTaskModal({
 											label="Required skills"
 											name="skills"
 											defaultValue=""
+											isRequired={true}
 										>
 											{({ fieldProps }) => (
 												<Fragment>

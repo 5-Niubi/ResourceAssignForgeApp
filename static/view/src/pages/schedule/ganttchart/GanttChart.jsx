@@ -193,14 +193,11 @@ const GanttChart = ({
 					text: "",
 				},
 				tooltip: {
-					formatter: function () {
-						return "<span>Assigned To: {point.assignTo.name}</span><br/><span>From: {point.start:%e. %b}</span><span> To: {point.end:%e. %b}</span>";
-					},
-					shared: true,
-					// pointFormatter: function(point) {
-					// 	console.log(point);
-					// 	return `<span>Assigned To: {point.assignTo.name}</span><br/><span>From: {point.start:%e. %b}</span><span> To: {point.end:%e. %b}</span>`;
+					// formatter: function () {
+					// 	return "<span>Assigned To: {point.assignTo.name}</span><br/><span>From: {point.start:%e. %b}</span><span> To: {point.end:%e. %b}</span>";
 					// },
+					shared: true,
+					pointFormat: `<span>Assigned To: {point.assignTo.name}</span><br/><span>From: {point.start:%e. %b}</span><span> To: {point.end:%e. %b}</span>`
 				},
 				scrollbar: {
 					enabled: true,

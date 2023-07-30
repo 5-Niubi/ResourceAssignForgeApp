@@ -1,10 +1,11 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as go from "gojs";
 import "gojs/extensions/DrawCommandHandler";
 import "gojs/extensions/Figures";
 import "gojs/extensions/GeometryReshapingTool";
 import { findObj, getColor } from "../../../common/utils";
-import { color } from "highcharts";
+import ChevronUpCircleIcon from "@atlaskit/icon/glyph/chevron-up-circle";
+import ChevronDownCircleIcon from "@atlaskit/icon/glyph/chevron-down-circle";
 
 const PertChart = ({
 	tasks,
@@ -455,12 +456,32 @@ const PertChart = ({
 		});
 	}
 
+	const [chartExpanded, setChartExpanded] = useState(false);
+	const handleExpandChart = () => {
+		document
+			.getElementsByClassName("pert-chart")[0]
+			.classList.toggle("-expanded");
+		setChartExpanded(
+			document
+				.getElementsByClassName("pert-chart")[0]
+				.classList.contains("-expanded")
+		);
+	};
+
 	return (
-		<div
-			ref={diagramRef}
-			className="diagram-component"
-			style={{ height: "40vh", width: "100%" }}
-		></div>
+		<div className="pert-chart">
+			<div ref={diagramRef} className="diagram-component"></div>
+			<div
+				className="expand-button"
+				onClick={handleExpandChart}
+			>
+				{chartExpanded ? (
+					<ChevronUpCircleIcon />
+				) : (
+					<ChevronDownCircleIcon />
+				)}
+			</div>
+		</div>
 	);
 };
 

@@ -1,20 +1,84 @@
 /* Hide scroll bar */
 .visualize-tasks #tasks .inner::-webkit-scrollbar,
-.visualize-tasks .task-details::-webkit-scrollbar{
+.visualize-tasks .task-details::-webkit-scrollbar {
 	display: none; /*Chrome*/
 }
 /* .visualize-tasks .diagram-component div:last-child::-webkit-scrollbar */
 
 .visualize-tasks #tasks .inner,
-.visualize-tasks .task-details{
-	-ms-overflow-style: none;/* IE and Edge */
-	scrollbar-width: thin;/* Firefox */;
+.visualize-tasks .task-details {
+	-ms-overflow-style: none; /* IE and Edge */
+	scrollbar-width: thin; /* Firefox */
 }
 
 .red {
 	color: red;
 }
 
-.thick{
+.thick {
 	font-weight: 500;
 }
+
+.tasks-compact {
+	position: relative;
+	width: 300px;
+	transition: all ease-in-out 0.3s;
+}
+
+.tasks-compact.-collapsed {
+	width: 0px;
+}
+
+.tasks-compact .collapse-button {
+	position: absolute;
+	left: -12px;
+	top: 20px;
+	cursor: pointer;
+	display: none;
+	width: 24px;
+	height: 24px;
+}
+
+.tasks-compact:hover .collapse-button {
+	display: block;
+}
+
+.task-details {
+	position: relative;
+	border-top: 1px solid #e5e5e5;
+	height: 40%;
+	/* overflow-y: auto; */
+	transition: all ease-in-out 0.3s;
+}
+
+.pert-chart {
+	position: relative;
+	height: 50%;
+	width: 100%;
+	transition: all ease-in-out 0.3s;
+}
+
+.pert-chart .diagram-component{
+	height: 100%;
+	width: 100%;
+}
+
+.pert-chart.-expanded{
+	height: 88%;
+}
+
+.pert-chart .expand-button {
+	position: absolute;
+	left: 50%;
+	bottom: -12px;
+	cursor: pointer;
+	display: none;
+	width: 24px;
+	height: 24px;
+	z-index: 111;
+}
+
+.pert-chart:hover .expand-button {
+	display: block;
+}
+

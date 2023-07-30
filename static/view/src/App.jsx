@@ -112,7 +112,9 @@ function App() {
 		<>
 			{isAuthenticated ? (
 				<AppContext.Provider value={appContextState}>
-					<ThreadLoadingContext.Provider value={{ state: threadState }}>
+					<ThreadLoadingContext.Provider
+						value={{ state: threadState }}
+					>
 						<PageLayout>
 							{history && historyState ? (
 								<Content>
@@ -120,36 +122,50 @@ function App() {
 										<div style={{ height: "100vh" }}>
 											<Router
 												navigator={history}
-												navigationType={historyState.action}
+												navigationType={
+													historyState.action
+												}
 												location={historyState.location}
 											>
 												<Routes>
 													{/* Path with * take effect in all route after current */}
 													<Route
 														path="/"
-														element={<HomeSideBar rootPath="/" />}
+														element={
+															<HomeSideBar rootPath="/" />
+														}
 													>
 														<Route></Route>
 														<Route
 															path="/projects"
-															element={<HomeSideBar rootPath="/" />}
+															element={
+																<HomeSideBar rootPath="/" />
+															}
 														></Route>
 														<Route
 															path="/resources"
-															element={<HomeSideBar rootPath="/" />}
+															element={
+																<HomeSideBar rootPath="/" />
+															}
 														></Route>
 														<Route
 															path="/skills"
-															element={<HomeSideBar rootPath="/" />}
+															element={
+																<HomeSideBar rootPath="/" />
+															}
 														></Route>
 														<Route
 															path="/more"
-															element={<HomeSideBar rootPath="/" />}
+															element={
+																<HomeSideBar rootPath="/" />
+															}
 														></Route>
 													</Route>
 													<Route
 														path="/:projectId/*"
-														element={<ProjectSideBar rootPath="/:projectId/" />}
+														element={
+															<ProjectSideBar rootPath="/:projectId/" />
+														}
 													></Route>
 												</Routes>
 											</Router>
@@ -159,49 +175,88 @@ function App() {
 										<AppFrame>
 											<Router
 												navigator={history}
-												navigationType={historyState.action}
+												navigationType={
+													historyState.action
+												}
 												location={historyState.location}
 											>
 												<Routes>
-													<Route path="/" element={<ProjectListHome />}></Route>
+													<Route
+														path="/"
+														element={
+															<ProjectListHome />
+														}
+													></Route>
 													<Route
 														path="/startup"
-														element={<StartUpPage />}
+														element={
+															<StartUpPage />
+														}
 													></Route>
 
 													<Route
 														path="/resources"
-														element={<ResourcesPage />}
+														element={
+															<ResourcesPage />
+														}
 													></Route>
 													<Route
 														path="/skills"
-														element={<div>Skills</div>}
+														element={
+															<div>Skills</div>
+														}
 													></Route>
-													<Route path="/more" element={<MorePage />}></Route>
-													<Route path="/modals" element={<TestModal />}></Route>
+													<Route
+														path="/more"
+														element={<MorePage />}
+													></Route>
+													<Route
+														path="/modals"
+														element={<TestModal />}
+													></Route>
 
 													<Route path="/:projectId">
-														<Route path="" element={<SchedulePage />}></Route>
+														<Route
+															path=""
+															element={
+																<SchedulePage />
+															}
+														></Route>
 														<Route
 															path="estimation"
-															element={<EstimationPage />}
+															element={
+																<EstimationPage />
+															}
 														></Route>
 														<Route
 															path="schedule"
-															element={<SchedulePage />}
+															element={
+																<SchedulePage />
+															}
 														></Route>
 														<Route
 															path="tasks"
-															element={<div>Tasks Page of</div>}
+															element={
+																<div>
+																	Tasks Page
+																	of
+																</div>
+															}
 														></Route>
 														<Route
 															path="groups"
-															element={<div>Groups Page</div>}
+															element={
+																<div>
+																	Groups Page
+																</div>
+															}
 														></Route>
 													</Route>
 												</Routes>
 												{threadStateValue.isModalOpen ? (
-													<LoadingModalWithThread state={threadState} />
+													<LoadingModalWithThread
+														state={threadState}
+													/>
 												) : (
 													""
 												)}

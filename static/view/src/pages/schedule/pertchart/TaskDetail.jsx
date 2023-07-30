@@ -228,25 +228,9 @@ const TaskDetail = ({
 	);
 
 	return (
-		<div
-			class="task-details"
-			style={{
-				borderTop: "1px solid #e5e5e5",
-				height: "40vh",
-				overflowY: "auto",
-			}}
-		>
-			<PageHeader actions={actionsContent}>
-				{currentTask
-					? `Task ${currentTask.id} details:`
-					: "Task details:"}
-			</PageHeader>
-			{/* <PageHeader>
-				{currentTask
-					? `Task ${currentTask.id} details:`
-					: "Task details:"}
-			</PageHeader> */}
-			<div style={{ width: "100%" }}>
+		<div class="task-details">
+			<PageHeader actions={actionsContent}>Task details:</PageHeader>
+			<div>
 				<pre>
 					{currentTask ? (
 						<Form

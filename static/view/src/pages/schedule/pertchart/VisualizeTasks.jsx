@@ -10,6 +10,8 @@ import PageHeader from "@atlaskit/page-header";
 import Button, { LoadingButton } from "@atlaskit/button";
 import "./style.css";
 import { cache, getCache } from "../../../common/utils";
+import ChevronRightCircleIcon from "@atlaskit/icon/glyph/chevron-right-circle";
+import ChevronLeftCircleIcon from "@atlaskit/icon/glyph/chevron-left-circle";
 
 /**
  * Using as Page to show pert chart and task dependences
@@ -26,6 +28,12 @@ function VisualizeTasksPage({ handleChangeTab }) {
 	const [isSaving, setIsSaving] = useState(false);
 	const [isEstimating, setIsEstimating] = useState(false);
 	const [tasksError, setTasksError] = useState([]);
+
+	const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false);
+	const handleCollapseRightPanel = () => {
+		document.getElementsByClassName("tasks-compact")[0].classList.toggle("-collapsed");
+		setRightPanelCollapsed(document.getElementsByClassName("tasks-compact")[0].classList.contains("-collapsed"));
+	};
 
 	function handleEstimate() {
 		setIsEstimating(true);
@@ -274,6 +282,7 @@ function VisualizeTasksPage({ handleChangeTab }) {
 						/>
 					</Main>
 					<div
+						className="right-sidebar tasks-compact"
 						style={{
 							backgroundColor: "#fafbfc",
 							boxSizing: "border-box",
@@ -289,6 +298,16 @@ function VisualizeTasksPage({ handleChangeTab }) {
 							isFixed={false}
 							width={300}
 						>
+							<div
+								className="collapse-button"
+								onClick={handleCollapseRightPanel}
+							>
+								{rightPanelCollapsed ? (
+									<ChevronLeftCircleIcon />
+								) : (
+									<ChevronRightCircleIcon />
+								)}
+							</div>
 							<div
 								style={{
 									minHeight: "95vh",
