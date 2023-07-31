@@ -62,7 +62,6 @@ function ProjectListHome() {
 	useEffect(function () {
 		invoke("getProjectsList")
 			.then(function (res) {
-				debugger;
 				setProjectTableLoadingState(false);
 				let projectsList = [];
 				for (let project of res) {
@@ -79,7 +78,7 @@ function ProjectListHome() {
 				}
 				setProjects(projectsList);
 				filterProjectName(projectsList, searchBoxValue);
-				// cache("projects", JSON.stringify(projectsList));
+				cache("projects", JSON.stringify(projectsList));
 			})
 			.catch(function (error) {
 				setProjectTableLoadingState(false);

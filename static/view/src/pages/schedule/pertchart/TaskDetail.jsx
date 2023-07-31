@@ -228,25 +228,9 @@ const TaskDetail = ({
 	);
 
 	return (
-		<div
-			class="task-details"
-			style={{
-				borderTop: "1px solid #e5e5e5",
-				height: "40vh",
-				overflowY: "auto",
-			}}
-		>
-			<PageHeader actions={actionsContent}>
-				{currentTask
-					? `Task ${currentTask.id} details:`
-					: "Task details:"}
-			</PageHeader>
-			{/* <PageHeader>
-				{currentTask
-					? `Task ${currentTask.id} details:`
-					: "Task details:"}
-			</PageHeader> */}
-			<div style={{ width: "100%" }}>
+		<div class="task-details">
+			<PageHeader actions={actionsContent}>Task details:</PageHeader>
+			<div>
 				<pre>
 					{currentTask ? (
 						<Form
@@ -342,14 +326,15 @@ const TaskDetail = ({
 																fieldProps.onChange(
 																	event
 																);
-																setIsInfoChanged(true);
+																setIsInfoChanged(
+																	true
+																);
 																currentTask.milestoneId =
 																	event?.value ||
 																	null;
 																updateTaskMilestoneChanged(
 																	currentTask.milestoneId
 																);
-																
 															}}
 															onCreateOption={
 																handleCreateMilestone
@@ -358,7 +343,8 @@ const TaskDetail = ({
 															isLoading={
 																milestoneCreating
 															}
-															placeholder="Choose milestone"
+															placeholder="Choose group"
+															menuPosition="fixed"
 														/>
 													</Fragment>
 												)}
@@ -393,6 +379,7 @@ const TaskDetail = ({
 																skillCreating
 															}
 															placeholder="Choose skills"
+															menuPosition="fixed"
 														/>
 													</Fragment>
 												)}
@@ -417,6 +404,7 @@ const TaskDetail = ({
 															isMulti
 															isSearchable={true}
 															placeholder="Choose precedence tasks"
+															menuPosition="fixed"
 														/>
 													</Fragment>
 												)}

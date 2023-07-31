@@ -97,7 +97,7 @@ function GanttChartPage({ setSelectedSolution, selectedSolution}) {
 						Export to MS Project
 					</Button>
 					<Button appearance="primary" onClick={openJiraExportModal}>
-						Sync to Jira
+						Export to Jira
 					</Button>
 				</>
 			)}

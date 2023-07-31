@@ -40,7 +40,7 @@ function scheduleResolver(resolver) {
 
 	resolver.define("getSolutionsByProject", async function (req) {
 		try {
-			let response = await scheduleService.getSolutionsByProject(req.payload.projectId, req.payload.page);
+			let response = await scheduleService.getSolutionsByProject(req.payload.projectId);
 			console.log(response);
 			return response;
 		} catch (error) {

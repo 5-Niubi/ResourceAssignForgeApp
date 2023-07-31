@@ -7,9 +7,6 @@ td {
 	border: 1px solid black;
 	padding: 8px;
 }
-th {
-	background-color: lightgray;
-}
 .task {
 	border: 1px solid black;
 	padding: 5px;
@@ -31,5 +28,9 @@ th {
     padding-bottom: 35px;
     padding-top: 50px;
     font-weight: 500;
+}
+
+.hidden {
+	display: none;
 }
 
