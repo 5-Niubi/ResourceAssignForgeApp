@@ -27,7 +27,7 @@ export const DATE_FORMAT = {
 	DMY: "DD/MM/YYYY",
 };
 
-export const ROW_PER_PAGE = 10;
+export const ROW_PER_PAGE = 15;
 export const ROW_PER_PAGE_MODAL_TABLE = 7;
 
 export const THREAD_STATUS = Object.freeze({
