@@ -76,7 +76,8 @@ function WorkforceDynamicTable() {
 						displayName: user.displayName,
 					}));
 
-				setWorkforces([...workforces, ...jiraUsers]);
+				// setWorkforces([...workforces, ...jiraUsers]);
+                setWorkforces(workforces);
 				setTableLoadingState(false);
 			})
 			.catch((error) => {
