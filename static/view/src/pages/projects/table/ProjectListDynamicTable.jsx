@@ -47,7 +47,7 @@ function ProjectListDynamicTable({ isLoading, content }) {
 			},
 			{
 				key: data.id,
-				content: formatDateDMY(data.deadLine),
+				content: formatDateDMY(data.deadline),
 			},
 			{
 				key: data.id,
