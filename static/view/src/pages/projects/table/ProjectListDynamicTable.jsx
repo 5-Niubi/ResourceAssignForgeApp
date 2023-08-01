@@ -1,19 +1,33 @@
 import DynamicTable from "@atlaskit/dynamic-table";
-import React, { createContext, useCallback, useState } from "react";
+import React, { useContext, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import Avatar from "@atlaskit/avatar";
+import EditIcon from "@atlaskit/icon/glyph/edit";
+import TrashIcon from "@atlaskit/icon/glyph/trash";
 
 import ProjectDropdownAction from "./dropdown-options/ProjectDropdownAction";
 import { formatDateDMY } from "../../../common/utils";
 import Link from "../../../components/common/Link";
 import { ROW_PER_PAGE } from "../../../common/contants";
+import Button from "@atlaskit/button";
+import { ModalStateContext } from "../ProjectsListHome";
 
 function ProjectListDynamicTable({ isLoading, content }) {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [page, setPage] = useState(
 		searchParams.get("page") ? Number(searchParams.get("page")) : 1
 	);
+
+	const { setModalEditState, setModalDeleteState } =
+		useContext(ModalStateContext);
+	function editOnClick(project) {
+		setModalEditState({ project, isOpen: true });
+	}
+
+	function deleteOnClick(project) {
+		setModalDeleteState({ project, isOpen: true });
+	}
 
 	const rows = content.map((data, index) => ({
 		key: `row-${index + 1}-${data.name}`,
@@ -24,7 +38,7 @@ function ProjectListDynamicTable({ isLoading, content }) {
 				content: index + 1,
 			},
 			{
-				key: data.id,
+				key: data.name,
 				content: (
 					<span>
 						<span style={{ verticalAlign: "middle", marginRight: "0.5rem" }}>
@@ -42,20 +56,40 @@ function ProjectListDynamicTable({ isLoading, content }) {
 				),
 			},
 			{
-				key: data.id,
+				key: data.startDate,
 				content: formatDateDMY(data.startDate),
 			},
 			{
-				key: data.id,
+				key: data.deadline,
 				content: formatDateDMY(data.deadline),
 			},
 			{
-				key: data.id,
+				key: data.tasks,
 				content: data.tasks,
 			},
 			{
-				key: "option",
-				content: <ProjectDropdownAction project={data} />,
+				key: "optionDelete",
+				content: (
+					<Button
+						onClick={() => {
+							deleteOnClick(data);
+						}}
+						appearance="subtle"
+						iconBefore={<TrashIcon label="delete" />}
+					></Button>
+				),
+			},
+			{
+				key: "optionEdit",
+				content: (
+					<Button
+						onClick={() => {
+							editOnClick(data);
+						}}
+						appearance="subtle"
+						iconBefore={<EditIcon label="edit" />}
+					></Button>
+				),
 			},
 		],
 	}));
@@ -122,9 +156,16 @@ export const createHead = () => {
 				width: 10,
 			},
 			{
-				key: "option",
-				content: "Option",
+				key: "optionDelete",
+				content: "",
 				shouldTruncate: true,
+				width: 5,
+			},
+			{
+				key: "optionEdit",
+				content: "",
+				shouldTruncate: true,
+				width: 5,
 			},
 		],
 	};
