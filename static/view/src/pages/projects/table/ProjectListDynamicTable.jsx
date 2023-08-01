@@ -68,6 +68,10 @@ function ProjectListDynamicTable({ isLoading, content }) {
 				content: data.tasks,
 			},
 			{
+				key: data.createDatetime,
+				content: formatDateDMY(data.createDatetime),
+			},
+			{
 				key: "optionDelete",
 				content: (
 					<Button
@@ -154,6 +158,13 @@ export const createHead = () => {
 				isSortable: true,
 				shouldTruncate: true,
 				width: 10,
+			},
+			{
+				key: "createDatetime",
+				content: "Create at",
+				isSortable: true,
+				shouldTruncate: true,
+				width: 15,
 			},
 			{
 				key: "optionDelete",

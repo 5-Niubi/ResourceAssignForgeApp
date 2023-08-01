@@ -73,6 +73,7 @@ function ProjectListHome() {
 						startDate: project.startDate,
 						deadline: project.deadline,
 						tasks: project.taskCount,
+						createDatetime: project.createDatetime,
 					};
 					projectsList.push(itemProject);
 				}
