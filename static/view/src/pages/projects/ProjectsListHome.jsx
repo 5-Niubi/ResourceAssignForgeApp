@@ -121,7 +121,7 @@ function ProjectListHome() {
 					</GridColumn>
 				) : (
 					<>
-						<GridColumn medium={isDesktopOrLaptop ? 7 : columns}>
+						<GridColumn medium={columns}>
 							<div style={{ marginBottom: "1rem" }}>
 								<ModalStateContext.Provider
 									value={{ setModalEditState, setModalDeleteState }}
@@ -133,9 +133,9 @@ function ProjectListHome() {
 								</ModalStateContext.Provider>
 							</div>
 						</GridColumn>
-						<Desktop>
-							<GridColumn medium={3}>{/* <div>Hover panel</div> */}</GridColumn>
-						</Desktop>
+						{/* <Desktop>
+							<GridColumn medium={0}><div>Hover panel</div></GridColumn>
+						</Desktop> */}
 					</>
 				)}
 			</Grid>
