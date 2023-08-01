@@ -17,7 +17,7 @@ export default function ParameterEstimateMessage() {
 	const [isEstimating, setIsEstimating] = useState(true);
 
 	useEffect(function () {
-		invoke("estimate", { projectId })
+		invoke("getEstimateOverallWorkforce", { projectId })
 			.then(function (res) {
 				setIsEstimating(false);
 				if (res.id || res.id === 0) {
@@ -46,8 +46,13 @@ export default function ParameterEstimateMessage() {
 					<ul>
 						{estimations.workforceWithMilestoneList?.map(
 							(workforceWithMilestone) =>
-								workforceWithMilestone?.workforceOutputList?.map(
-									(workers) => {
+								workforceWithMilestone?.workforceOutputList
+									?.filter(
+										(s) =>
+											s.skillOutputList != null &&
+											s.skillOutputList.length > 0
+									)
+									.map((workers) => {
 										let skills = [];
 										workers.skillOutputList?.forEach(
 											(skill) =>
@@ -100,8 +105,7 @@ export default function ParameterEstimateMessage() {
 												</li>
 											</>
 										);
-									}
-								)
+									})
 						)}
 					</ul>
 				</SectionMessage>
