@@ -198,7 +198,13 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 			.catch(function (error) {
 				// handleChangeTab(3);
 				setIsScheduling(false);
-				Toastify.error(error.toString());
+                //READ ERROR MESSAGE:
+                for (let taskMessage in error)[
+                    Toastify.info(taskMessage.taskId),
+                    Toastify.info(taskMessage.skillRequireds?.map((skill)=>{skill.skillId})),
+                    Toastify.info(taskMessage.messages)
+                ]
+				// Toastify.error(error.toString());
 				setIsScheduling(false);
 			});
 	}

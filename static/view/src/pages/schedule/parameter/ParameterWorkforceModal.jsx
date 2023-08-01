@@ -262,7 +262,9 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 					>
 						<ModalHeader>
 							<div style={{ flexWrap: "wrap" }}>
-								<ModalTitle>Select Employees <InfoMessageColor /></ModalTitle>
+								<ModalTitle>
+									Select Employees <InfoMessageColor />
+								</ModalTitle>
 								<div
 									style={{
 										display: "flex",
@@ -385,7 +387,7 @@ export function ParameterCreareWorkforceModal() {
 				Toastify.error(error.toString());
 			});
 
-            invoke("getAllUserJira")
+		invoke("getAllUserJira")
 			.then(function (jiraUsersResponse) {
 				const jiraUsers = jiraUsersResponse
 					.filter((user) => user.accountType === "atlassian")
@@ -516,7 +518,14 @@ export function ParameterCreareWorkforceModal() {
 
 	return (
 		<>
-			<Button onClick={openCWModal}>Create new</Button>
+			<Button
+				onClick={() => {
+					setSkillsTable([]);
+					setIsCWOpen(true);
+				}}
+			>
+				Create new
+			</Button>
 			{/* CREATE WORKFORCE MODAL (CW) */}
 			{isCWOpen && (
 				<ModalTransition>
@@ -526,7 +535,9 @@ export function ParameterCreareWorkforceModal() {
 						width={"large"}
 					>
 						<ModalHeader>
-							<ModalTitle>Create new Employee <InfoMessageColor/></ModalTitle>
+							<ModalTitle>
+								Create new Employee <InfoMessageColor />
+							</ModalTitle>
 						</ModalHeader>
 						<Form
 							onSubmit={(data) => {
@@ -577,7 +588,9 @@ export function ParameterCreareWorkforceModal() {
 											),
 										})),
 								};
-
+                                if(workforce_request.workingType == 0){
+                                    workforce_request.workingEfforts = [1,1,1,1,1,1,1]
+                                }
 								console.log("Form data", workforce_request);
 								createNewWorkforce(workforce_request);
 								return new Promise((resolve) =>
@@ -595,8 +608,8 @@ export function ParameterCreareWorkforceModal() {
 								<form {...formProps}>
 									<ModalBody>
 										<Grid layout="fluid" spacing="compact">
-                                            {/* USER ACCOUNT */}
-                                            <Field
+											{/* USER ACCOUNT */}
+											<Field
 												name="jiraAccount"
 												label="Jira Account (optional)"
 												defaultValue=""
@@ -1177,14 +1190,12 @@ export function ParameterCreareWorkforceModal() {
 											</GridColumn>
 											{/* SKILL DISPLAYING WITH LEVEL TABLE */}
 											<GridColumn medium={12}>
-                                                {
-                                                    skillsTable?.length > 0 &&(
-                                                        <DynamicTable
-													head={headSkillTable}
-													rows={rowsSkillTable}
-												/>
-                                                    )
-                                                }
+												{skillsTable?.length > 0 && (
+													<DynamicTable
+														head={headSkillTable}
+														rows={rowsSkillTable}
+													/>
+												)}
 											</GridColumn>
 										</Grid>
 									</ModalBody>

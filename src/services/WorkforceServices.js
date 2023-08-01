@@ -47,7 +47,7 @@ async function updateWorkforce(workforce_request) {
 
 async function createWorkforce(workforce_request) {
 	try {
-		let response = await APIServices.put(
+		let response = await APIServices.post(
 			`/api/Workforces/CreateWorkforce`,
 			null,
 			workforce_request
