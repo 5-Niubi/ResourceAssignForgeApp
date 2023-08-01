@@ -45,4 +45,17 @@ async function updateWorkforce(workforce_request) {
 	}
 }
 
-export {getAllWorkforces, getAllUsersJira, updateWorkforce, getWorkforceById};
+async function createWorkforce(workforce_request) {
+	try {
+		let response = await APIServices.put(
+			`/api/Workforces/CreateWorkforce`,
+			null,
+			workforce_request
+		);
+		return response;
+	} catch (error) {
+		return Promise.reject(error);
+	}
+}
+
+export {getAllWorkforces, getAllUsersJira, updateWorkforce, getWorkforceById, createWorkforce};

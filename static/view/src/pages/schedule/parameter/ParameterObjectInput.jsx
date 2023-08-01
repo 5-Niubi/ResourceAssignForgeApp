@@ -128,7 +128,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 	function SaveParameters({ cost, objectives }) {
 		setIsScheduling(true);
 		var parameterResourcesLocal = JSON.parse(
-			localStorage.getItem("selected_workforces")
+			localStorage.getItem("workforce_parameter")
 		);
 		let parameterResources = [];
 		for (let item of parameterResourcesLocal) {
