@@ -394,7 +394,9 @@ function ParameterWorkforceList() {
 												),
 											})),
 									};
-
+                                    if(workforce_request.workingType == 0){
+                                        workforce_request.workingEfforts = [8,8,8,8,8,8,8];
+                                    }
 									console.log("Form data", workforce_request);
 									updateWorkforce(workforce_request);
 									return new Promise((resolve) =>
