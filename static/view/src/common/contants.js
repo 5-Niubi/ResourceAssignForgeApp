@@ -55,23 +55,23 @@ export const INTERVAL_FETCH = 10000;
 export const COLOR_SKILL_LEVEL = [
     {
         level: 1,
-        color: "#7bd1e5",
+        color: "#CCE0FF",
     },
     {
         level: 2,
-        color: "#98FB98",
+        color: "#579DFF",
     },
     {
         level: 3,
-        color: "#FFC107",
+        color: "#1D7AFC",
     },
     {
         level: 4,
-        color: "#FF9F38",
+        color: "#0055CC",
     },
     {
         level: 5,
-        color: "#F14A5B",
+        color: "#092957",
     },
 ];
 
