@@ -28,11 +28,12 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 	const [endDate, setEndDate] = useState(project.deadline);
 	const [budget, setBudget] = useState(0);
 	const [unit, setUnit] = useState("");
-	// const [objTime, setObjTime] = useState(50);
-	// const [objCost, setObjCost] = useState(50);
-	// const [objQuality, setObjQuality] = useState(50);
-	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [baseWorkingHour, setBaseWorkingHour] = useState(
+		project.baseWorkingHour || 0
+	);
 
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [isLoaded, setIsLoaded] = useState(false);
 	const closeModal = function () {
 		setOpenState({ project: {}, isOpen: false });
 	};
@@ -40,30 +41,21 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 	useEffect(function () {
 		invoke("getProjectDetail", { projectId: project.id })
 			.then(function (res) {
-				let project = res;
-				project.isLoaded = true;
-				setProjectName(project.name);
-				setStartDate(project.startDate);
-				setEndDate(project.deadline);
-				setBudget(project.budget);
-				setUnit(project.budgetUnit);
-				setProject(project);
+				let projectRes = res;
+				setProjectName(projectRes.name);
+				setStartDate(projectRes.startDate);
+				setEndDate(projectRes.deadline);
+				setBudget(projectRes.budget);
+				setUnit(projectRes.budgetUnit);
+				setBaseWorkingHour(projectRes.baseWorkingHour);
+
+				setProject(projectRes);
+				setIsLoaded(true);
 			})
 			.catch(function (error) {
 				Toastify.error(error.toString());
 			});
 	}, []);
-
-	// useEffect(
-	// 	function () {
-	// 		setProjectName(project.name);
-	// 		setStartDate(project.startDate);
-	// 		setEndDate(project.deadline);
-	// 		setBudget(project.budget);
-	// 		setUnit(project.budgetUnit);
-	// 	},
-	// 	[project]
-	// );
 
 	const handleSetProjectName = function (e) {
 		setProjectName(e.target.value);
@@ -88,32 +80,14 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 		setUnit(e.target.value);
 	};
 
-	// const handleSetObjTime = useCallback(function (e) {
-	// 	setObjTime(e.target.value);
-	// }, []);
-
-	// const handleRangeSetObjTime = useCallback(function (value) {
-	// 	setObjTime(value);
-	// }, []);
-
-	// const handleSetObjCost = useCallback(function (e) {
-	// 	setObjCost(e.target.value);
-	// }, []);
-
-	// const handleRangeSetObjCost = useCallback(function (value) {
-	// 	setObjCost(value);
-	// }, []);
-
-	// const handleSetObjQuality = useCallback(function (e) {
-	// 	setObjQuality(e.target.value);
-	// }, []);
-
-	// const handleRangeSetObjQuality = useCallback(function (value) {
-	// 	setObjQuality(value);
-	// }, []);
+	const handleSetBaseWorkHour = function (e) {
+		let workHour = Number(e.target.value);
+		if (0 <= workHour && workHour <= 24) setBaseWorkingHour(workHour);
+	};
 
 	function handleSubmitCreate() {
 		setIsSubmitting(true);
+		debugger;
 		let projectObjRequest = {
 			id: project.id,
 			name: projectName,
@@ -121,9 +95,7 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 			deadline: endDate,
 			budget,
 			budgetUnit: unit,
-			// objectiveTime: objTime,
-			// objectiveCost: objCost,
-			// objectiveQuality: objQuality,
+			baseWorkingHour,
 		};
 
 		invoke("editProject", { projectObjRequest })
@@ -159,7 +131,7 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 										{project.name}
 									</div>
 								</ModalTitle>
-								{project.isLoaded ? "" : <Spinner size={"medium"}></Spinner>}
+								{!isLoaded && <Spinner size={"medium"}></Spinner>}
 							</ModalHeader>
 							<ModalBody>
 								<Grid layout="fluid" spacing="compact" columns={columns}>
@@ -177,11 +149,34 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 															autoComplete="off"
 															value={projectName}
 															onChange={handleSetProjectName}
-															isDisabled={!project.isLoaded}
+															isDisabled={!isLoaded}
 															isRequired
 														/>
 														<HelperMessage>
 															Project name must start with uppercase letter.
+														</HelperMessage>
+													</Fragment>
+												)}
+											</Field>
+											<Field
+												aria-required={true}
+												name="projectBaseWorkHour"
+												label="Working Hours/Day"
+												isRequired
+											>
+												{(fieldProps) => (
+													<Fragment>
+														<TextField
+															autoComplete="off"
+															value={baseWorkingHour}
+															onChange={handleSetBaseWorkHour}
+															type="number"
+															isDisabled={!isLoaded}
+															{...fieldProps}
+														/>
+														<HelperMessage>
+															Working hour must greater than 0 and smaller than
+															24.
 														</HelperMessage>
 													</Fragment>
 												)}
@@ -195,7 +190,7 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 															value={startDate}
 															onChange={handleSetStartDate}
 															dateFormat={DATE_FORMAT.DMY}
-															isDisabled={!project.isLoaded}
+															isDisabled={!isLoaded}
 														/>
 													</Fragment>
 												)}
@@ -208,7 +203,7 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 															value={endDate}
 															onChange={handleSetEndDate}
 															dateFormat={DATE_FORMAT.DMY}
-															isDisabled={!project.isLoaded}
+															isDisabled={!isLoaded}
 														/>
 													</Fragment>
 												)}
@@ -228,7 +223,7 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 																value={budget}
 																onChange={handleSetBudget}
 																type="number"
-																isDisabled={!project.isLoaded}
+																isDisabled={!isLoaded}
 																{...fieldProps}
 															/>
 														)}
@@ -245,7 +240,7 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 																autoComplete="off"
 																value={unit}
 																onChange={handleSetUnit}
-																isDisabled={!project.isLoaded}
+																isDisabled={!isLoaded}
 																{...fieldProps}
 															/>
 														)}
@@ -253,29 +248,6 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 												</GridColumn>
 											</Grid>
 										</FormSection>
-										{/* <FormSection>
-												<ObjectiveRange
-													label="Objective Time"
-													name="ObjectiveTime"
-													value={objTime}
-													onChange={handleSetObjTime}
-													rangeOnChange={handleRangeSetObjTime}
-												/>
-												<ObjectiveRange
-													name="ObjectiveCost"
-													label="Objective Cost"
-													value={objCost}
-													onChange={handleSetObjCost}
-													rangeOnChange={handleRangeSetObjCost}
-												/>
-												<ObjectiveRange
-													name="ObjectiveQuality"
-													label="Objective Quality"
-													value={objQuality}
-													onChange={handleSetObjQuality}
-													rangeOnChange={handleRangeSetObjQuality}
-												/>
-											</FormSection> */}
 									</GridColumn>
 								</Grid>
 							</ModalBody>
@@ -285,20 +257,15 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 									<Button appearance="default" onClick={closeModal}>
 										Cancel
 									</Button>
-									{isSubmitting ? (
-										<LoadingButton appearance="primary" isLoading>
-											Create
-										</LoadingButton>
-									) : (
-										<Button
-											type="submit"
-											appearance="primary"
-											onClick={handleSubmitCreate}
-											isDisabled={!project.isLoaded}
-										>
-											Save
-										</Button>
-									)}
+									<LoadingButton
+										type="submit"
+										appearance="primary"
+										onClick={handleSubmitCreate}
+										isDisabled={!isLoaded}
+										isLoading={isSubmitting}
+									>
+										Save
+									</LoadingButton>
 								</ButtonGroup>
 							</ModalFooter>
 						</form>

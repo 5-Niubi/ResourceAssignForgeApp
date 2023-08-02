@@ -3,7 +3,6 @@ import Modal, {
 	ModalBody,
 	ModalFooter,
 	ModalHeader,
-	ModalTitle,
 	ModalTransition,
 } from "@atlaskit/modal-dialog";
 import { Grid, GridColumn } from "@atlaskit/page";
@@ -11,7 +10,6 @@ import React, { Fragment, useState, useCallback, useEffect } from "react";
 import TextField from "@atlaskit/textfield";
 import Form, { Field, FormSection, HelperMessage } from "@atlaskit/form";
 import { DatePicker } from "@atlaskit/datetime-picker";
-import ObjectiveRange from "../form/ObjectiveRange";
 import { getCurrentTime } from "../../../common/utils";
 import { invoke } from "@forge/bridge";
 import { DATE_FORMAT, MODAL_WIDTH } from "../../../common/contants";
@@ -28,11 +26,8 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 	const [startDate, setStartDate] = useState(getCurrentTime());
 	const [endDate, setEndDate] = useState(startDate);
 	const [budget, setBudget] = useState(0);
-	const [unit, setUnit] = useState("");
-	const [objTime, setObjTime] = useState(50);
-	const [objCost, setObjCost] = useState(50);
-	const [objQuality, setObjQuality] = useState(50);
-
+	const [unit, setUnit] = useState("$");
+	const [baseWorkingHour, setBaseWorkingHour] = useState(8);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const handleSetProjectName = function (e) {
@@ -58,28 +53,9 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 		setUnit(e.target.value);
 	};
 
-	const handleSetObjTime = function (e) {
-		setObjTime(e.target.value);
-	};
-
-	const handleRangeSetObjTime = function (value) {
-		setObjTime(value);
-	};
-
-	const handleSetObjCost = function (e) {
-		setObjCost(e.target.value);
-	};
-
-	const handleRangeSetObjCost = function (value) {
-		setObjCost(value);
-	};
-
-	const handleSetObjQuality = function (e) {
-		setObjQuality(e.target.value);
-	};
-
-	const handleRangeSetObjQuality = function (value) {
-		setObjQuality(value);
+	const handleSetBaseWorkHour = function (e) {
+		let workHour = Number(e.target.value);
+		if (0 <= workHour && workHour <= 24) setBaseWorkingHour(workHour);
 	};
 
 	const closeModal = function () {
@@ -94,9 +70,7 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 			deadline: endDate,
 			budget,
 			budgetUnit: unit,
-			objectiveTime: objTime,
-			objectiveCost: objCost,
-			objectiveQuality: objQuality,
+			baseWorkingHour,
 		};
 		invoke("createNewProjectProjectLists", { projectObjRequest })
 			.then(function (res) {
@@ -121,7 +95,9 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 						<form id="form-with-id" {...formProps}>
 							<ModalHeader>
 								<div>
-									<h2 style={{display: "inline"}}>Create new Software Project</h2>
+									<h2 style={{ display: "inline" }}>
+										Create new Software Project
+									</h2>
 									<InlineMessageGuideProjectField />
 								</div>
 							</ModalHeader>
@@ -145,6 +121,27 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 														/>
 														<HelperMessage>
 															Project name must start with uppercase letter.
+														</HelperMessage>
+													</Fragment>
+												)}
+											</Field>
+											<Field
+												aria-required={true}
+												name="projectBaseWorkHour"
+												label="Working Hours/Day"
+												isRequired
+											>
+												{(fieldProps) => (
+													<Fragment>
+														<TextField
+															autoComplete="off"
+															value={baseWorkingHour}
+															onChange={handleSetBaseWorkHour}
+															type="number"
+															{...fieldProps}
+														/>
+														<HelperMessage>
+															Working hour must greater than 0 and smaller than 24.
 														</HelperMessage>
 													</Fragment>
 												)}
@@ -190,10 +187,7 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 													</Field>
 												</GridColumn>
 												<GridColumn medium={2}>
-													<Field
-														name="budgetUnit"
-														label="Unit"
-													>
+													<Field name="budgetUnit" label="Unit">
 														{(fieldProps) => (
 															<TextField
 																autoComplete="off"
@@ -206,37 +200,6 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 												</GridColumn>
 											</Grid>
 										</FormSection>
-										{/* <FormSection>
-												<ObjectiveRange
-													label="Objective Time"
-													name="ObjectiveTime"
-													value={objTime}
-													onChange={handleSetObjTime}
-													rangeOnChange={
-														handleRangeSetObjTime
-													}
-												/>
-												<ObjectiveRange
-													name="ObjectiveCost"
-													label="Objective Cost"
-													value={objCost}
-													onChange={handleSetObjCost}
-													rangeOnChange={
-														handleRangeSetObjCost
-													}
-												/>
-												<ObjectiveRange
-													name="ObjectiveQuality"
-													label="Objective Quality"
-													value={objQuality}
-													onChange={
-														handleSetObjQuality
-													}
-													rangeOnChange={
-														handleRangeSetObjQuality
-													}
-												/>
-											</FormSection> */}
 									</GridColumn>
 								</Grid>
 							</ModalBody>
