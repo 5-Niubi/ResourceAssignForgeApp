@@ -27,6 +27,19 @@ function parameterResolver(resolver) {
 			return Promise.reject(error);
 		}
 	});
+
+    resolver.define("getEstimateOverallWorkforce", async function (req) {
+		try {
+			let response = await parameterService.GetEstimateOverallWorkforce(req.payload.projectId);
+			console.log("GetEstimateOverallWorkforce: ", response);
+			return response;
+		} catch (error) {
+			console.log("Error in GetEstimateOverallWorkforce: ", error);
+			return Promise.reject(error);
+		}
+	});
+
+    
 }
 
 export default parameterResolver;

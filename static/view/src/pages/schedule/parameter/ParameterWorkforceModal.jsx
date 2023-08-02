@@ -37,7 +37,12 @@ import InfoMessageColor from "../../../components/InfoMessageColor";
 import { Grid, GridColumn } from "@atlaskit/page";
 import CreatableAdvanced from "./creatable-selection";
 import Rating from "react-rating";
-import { validateEmail, validateNumberOnly, validateWorkingEffort, validateName } from "../../../common/utils";
+import {
+	validateEmail,
+	validateNumberOnly,
+	validateWorkingEffort,
+	validateName,
+} from "../../../common/utils";
 
 const options = [
 	{ name: "workingType", value: 0, label: "Fulltime" },
@@ -102,11 +107,15 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 	//FILTER WORKFORCE SELECT TABLE
 	const [workforcesFilter, setWorkforcesFilter] = useState(workforces);
 	const filterWorkforceName = useCallback(function (workforces, query) {
-		setWorkforcesFilter(
-			workforces.filter((e) =>
-				e.name.toLowerCase().includes(query.toLowerCase())
-			)
-		);
+		if (query === null || query.trim() === "") {
+			setWorkforcesFilter(workforces);
+		} else {
+			setWorkforcesFilter(
+				workforces.filter((e) =>
+					e.name.toLowerCase().includes(query.toLowerCase())
+				)
+			);
+		}
 	}, []);
 
 	useEffect(
@@ -187,7 +196,10 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 										backgroundColor:
 											COLOR_SKILL_LEVEL[skill.level - 1]
 												.color,
-										color: "white",
+										color:
+									(skill.level === 1)
+										? "#091e42"
+										: "white",
 									}}
 									isBold
 								>
@@ -253,7 +265,9 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 					>
 						<ModalHeader>
 							<div style={{ flexWrap: "wrap" }}>
-								<ModalTitle>Select Employees</ModalTitle>
+								<ModalTitle>
+									Select Employees <InfoMessageColor />
+								</ModalTitle>
 								<div
 									style={{
 										display: "flex",
@@ -297,7 +311,6 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 													? "Deselect All"
 													: "Select All"}
 											</Button>
-											<InfoMessageColor />
 										</ButtonGroup>
 									</div>
 								</div>
@@ -376,8 +389,26 @@ export function ParameterCreareWorkforceModal() {
 				console.log(error);
 				Toastify.error(error.toString());
 			});
-	}, []);
 
+		invoke("getAllUserJira")
+			.then(function (jiraUsersResponse) {
+				const jiraUsers = jiraUsersResponse
+					.filter((user) => user.accountType === "atlassian")
+					.map((user) => ({
+						accountId: user.accountId,
+						email: user.emailAddress,
+						accountType: user.accountType,
+						name: user.displayName,
+						avatar: user.avatarUrls["48x48"],
+						displayName: user.displayName,
+					}));
+				setWorkforcesJiraAccount(jiraUsers);
+			})
+			.catch(function (error) {
+				console.log(error);
+				Toastify.error(error.toString());
+			});
+	}, []);
 
 	const onSelectedValue = (childValue) => {
 		console.log("Received value from child:", childValue);
@@ -457,6 +488,28 @@ export function ParameterCreareWorkforceModal() {
 		  }))
 		: null;
 
+	function createNewWorkforce(workforce_request) {
+		setLoadingSubmit(true);
+		invoke("createWorkforce", { workforce_request })
+			.then(function (res) {
+				if (res != null) {
+					console.log("create new workforce", res);
+					let workforce_name_display = res.name;
+					Toastify.success(
+						"Workforce '" + workforce_name_display + "' is created."
+					);
+					setSkillsTable([]);
+					setLoadingSubmit(false);
+					setIsCWOpen(false);
+				}
+			})
+			.catch(function (error) {
+				console.log(error);
+				Toastify.error(error.toString());
+				setLoadingSubmit(false);
+			});
+	}
+
 	function formatOptionLabel(user) {
 		return (
 			<div style={{ display: "flex", alignItems: "center" }}>
@@ -468,7 +521,14 @@ export function ParameterCreareWorkforceModal() {
 
 	return (
 		<>
-			<Button onClick={openCWModal}>Create new</Button>
+			<Button
+				onClick={() => {
+					setSkillsTable([]);
+					setIsCWOpen(true);
+				}}
+			>
+				Create new
+			</Button>
 			{/* CREATE WORKFORCE MODAL (CW) */}
 			{isCWOpen && (
 				<ModalTransition>
@@ -478,60 +538,64 @@ export function ParameterCreareWorkforceModal() {
 						width={"large"}
 					>
 						<ModalHeader>
-							<ModalTitle>Create new Employee</ModalTitle>
+							<ModalTitle>
+								Create new Employee <InfoMessageColor />
+							</ModalTitle>
 						</ModalHeader>
 						<Form
 							onSubmit={(data) => {
 								setLoadingSubmit(true);
-								// let workforce_request = {
-								// 	id: selectedWorkforce.id,
-								// 	accountId: selectedWorkforce.accountId,
-								// 	email: data.email,
-								// 	accountType: selectedWorkforce.accountType,
-								// 	name: data.name,
-								// 	avatar: selectedWorkforce.avatar,
-								// 	displayName: data.usernamejira,
-								// 	unitSalary: data.salary,
-								// 	workingType:
-								// 		isParttimeSelected === true ? 1 : 0,
-								// 	workingEfforts:
-								// 		isParttimeSelected === true
-								// 			? [
-								// 					data.mon,
-								// 					data.tues,
-								// 					data.wed,
-								// 					data.thurs,
-								// 					data.fri,
-								// 					data.sat,
-								// 					data.sun,
-								// 			  ].map((value) =>
-								// 					parseFloat(value)
-								// 			  )
-								// 			: null,
-								// 	Skills: skillsTable
-								// 		.filter((s) => s.id != null)
-								// 		.map((skill) => ({
-								// 			skillId: skill.id,
-								// 			level: parseInt(
-								// 				skill.level === null
-								// 					? 1
-								// 					: skill.level
-								// 			),
-								// 		})),
-								// 	newSkills: skillsTable
-								// 		.filter((s) => s.id == null)
-								// 		.map((skill) => ({
-								// 			name: skill.value,
-								// 			level: parseInt(
-								// 				skill.level === null
-								// 					? 1
-								// 					: skill.level
-								// 			),
-								// 		})),
-								// };
-
+								let workforce_request = {
+									id: 0, //DEFAULT
+									accountId: null, //DEFAULT
+									email: data.email,
+									accountType: "atlassian", //DEFAULT
+									name: data.name,
+									avatar: null, //DEFAULT
+									displayName: data.usernamejira,
+									unitSalary: data.salary,
+									workingType:
+										isParttimeSelected === true ? 1 : 0,
+									workingEfforts:
+										isParttimeSelected === true
+											? [
+													data.mon,
+													data.tues,
+													data.wed,
+													data.thurs,
+													data.fri,
+													data.sat,
+													data.sun,
+											  ].map((value) =>
+													parseFloat(value)
+											  )
+											: null,
+									Skills: skillsTable
+										.filter((s) => s.id != null)
+										.map((skill) => ({
+											skillId: skill.id,
+											level: parseInt(
+												skill.level === null
+													? 1
+													: skill.level
+											),
+										})),
+									newSkills: skillsTable
+										.filter((s) => s.id == null)
+										.map((skill) => ({
+											name: skill.value,
+											level: parseInt(
+												skill.level === null
+													? 1
+													: skill.level
+											),
+										})),
+								};
+                                if(workforce_request.workingType == 0){
+                                    workforce_request.workingEfforts = [1,1,1,1,1,1,1]
+                                }
 								console.log("Form data", workforce_request);
-								updateWorkforce(workforce_request);
+								createNewWorkforce(workforce_request);
 								return new Promise((resolve) =>
 									setTimeout(resolve, 2000)
 								).then(() =>
@@ -547,6 +611,41 @@ export function ParameterCreareWorkforceModal() {
 								<form {...formProps}>
 									<ModalBody>
 										<Grid layout="fluid" spacing="compact">
+											{/* USER ACCOUNT */}
+											<Field
+												name="jiraAccount"
+												label="Jira Account (optional)"
+												defaultValue=""
+											>
+												{({ fieldProps, error }) => (
+													<Fragment>
+														<Select
+															inputId="single-select-example"
+															className="single-select"
+															classNamePrefix="react-select"
+															options={[
+																workforcesJiraAccount.map(
+																	(user) => ({
+																		label: user.displayName,
+																		value: user.displayName,
+																		avatar: user.avatar,
+																	})
+																),
+															]}
+															formatOptionLabel={
+																formatOptionLabel
+															}
+															placeholder="Choose a Jira account"
+														/>
+														{!error && (
+															<HelperMessage></HelperMessage>
+														)}
+														{error && (
+															<ErrorMessage></ErrorMessage>
+														)}
+													</Fragment>
+												)}
+											</Field>
 											{/* EMAIL TEXTFIELD */}
 											<GridColumn medium={12}>
 												<Field
@@ -593,7 +692,7 @@ export function ParameterCreareWorkforceModal() {
 											<GridColumn medium={6}>
 												<Field
 													name="usernamejira"
-													label="Username Jira"
+													label="Jira Username"
 													isRequired
 												>
 													{({
@@ -729,9 +828,7 @@ export function ParameterCreareWorkforceModal() {
 																	);
 																}}
 																value={options.find(
-																	(
-																		option
-																	) =>
+																	(option) =>
 																		option.value ===
 																		(isParttimeSelected
 																			? 1
@@ -1096,10 +1193,12 @@ export function ParameterCreareWorkforceModal() {
 											</GridColumn>
 											{/* SKILL DISPLAYING WITH LEVEL TABLE */}
 											<GridColumn medium={12}>
-												<DynamicTable
-													head={headSkillTable}
-													rows={rowsSkillTable}
-												/>
+												{skillsTable?.length > 0 && (
+													<DynamicTable
+														head={headSkillTable}
+														rows={rowsSkillTable}
+													/>
+												)}
 											</GridColumn>
 										</Grid>
 									</ModalBody>
@@ -1116,7 +1215,7 @@ export function ParameterCreareWorkforceModal() {
 												appearance="primary"
 												isLoading
 											>
-												Saving...
+												Creating...
 											</LoadingButton>
 										) : (
 											<LoadingButton
@@ -1124,7 +1223,7 @@ export function ParameterCreareWorkforceModal() {
 												appearance="primary"
 												autoFocus
 											>
-												Save
+												Create
 											</LoadingButton>
 										)}
 									</ModalFooter>

@@ -41,6 +41,15 @@ function workforceResolver(resolver){
 		}
 	});
 
+    resolver.define("createWorkforce", async function (req) {
+		try {
+			return await workforceService.createWorkforce(req.payload.workforce_request);
+		} catch (error) {
+			console.log("Error in Create Workforce: ", error);
+			return Promise.reject(error);
+		}
+	});
+
 }
 
 export default workforceResolver;

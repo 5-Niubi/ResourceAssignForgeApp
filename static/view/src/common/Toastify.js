@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 class Toastify {
 	info(content) {
 		toast.info(content, {
-			position: "top-right",
+			position: "bottom-right",
 			autoClose: 5000,
 			hideProgressBar: false,
 			closeOnClick: true,
@@ -16,7 +16,7 @@ class Toastify {
 
     error(content) {
 		toast.error(content, {
-			position: "top-right",
+			position: "bottom-right",
 			autoClose: 5000,
 			hideProgressBar: false,
 			closeOnClick: true,
@@ -29,8 +29,8 @@ class Toastify {
 
 	success(content) {
 		toast.success(content, {
-			position: "top-right",
-			autoClose: 30000,
+			position: "bottom-right",
+			autoClose: 5000,
 			hideProgressBar: false,
 			closeOnClick: true,
 			pauseOnHover: true,

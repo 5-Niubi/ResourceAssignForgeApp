@@ -3,21 +3,19 @@ import Modal, {
 	ModalBody,
 	ModalFooter,
 	ModalHeader,
-	ModalTitle,
 	ModalTransition,
-	useModal,
 } from "@atlaskit/modal-dialog";
 import { Grid, GridColumn } from "@atlaskit/page";
 import React, { Fragment, useState, useCallback, useEffect } from "react";
 import TextField from "@atlaskit/textfield";
-import Form, { Field, FormSection } from "@atlaskit/form";
+import Form, { Field, FormSection, HelperMessage } from "@atlaskit/form";
 import { DatePicker } from "@atlaskit/datetime-picker";
-import ObjectiveRange from "../form/ObjectiveRange";
 import { getCurrentTime } from "../../../common/utils";
 import { invoke } from "@forge/bridge";
 import { DATE_FORMAT, MODAL_WIDTH } from "../../../common/contants";
 import Toastify from "../../../common/Toastify";
 import { useNavigate } from "react-router";
+import InlineMessageGuideProjectField from "../message/InlineMessageGuideProjectField";
 
 const width = MODAL_WIDTH.M;
 function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
@@ -28,11 +26,8 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 	const [startDate, setStartDate] = useState(getCurrentTime());
 	const [endDate, setEndDate] = useState(startDate);
 	const [budget, setBudget] = useState(0);
-	const [unit, setUnit] = useState("");
-	const [objTime, setObjTime] = useState(50);
-	const [objCost, setObjCost] = useState(50);
-	const [objQuality, setObjQuality] = useState(50);
-
+	const [unit, setUnit] = useState("$");
+	const [baseWorkingHour, setBaseWorkingHour] = useState(8);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const handleSetProjectName = function (e) {
@@ -58,28 +53,9 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 		setUnit(e.target.value);
 	};
 
-	const handleSetObjTime = function (e) {
-		setObjTime(e.target.value);
-	};
-
-	const handleRangeSetObjTime = function (value) {
-		setObjTime(value);
-	};
-
-	const handleSetObjCost = function (e) {
-		setObjCost(e.target.value);
-	};
-
-	const handleRangeSetObjCost = function (value) {
-		setObjCost(value);
-	};
-
-	const handleSetObjQuality = function (e) {
-		setObjQuality(e.target.value);
-	};
-
-	const handleRangeSetObjQuality = function (value) {
-		setObjQuality(value);
+	const handleSetBaseWorkHour = function (e) {
+		let workHour = Number(e.target.value);
+		if (0 <= workHour && workHour <= 24) setBaseWorkingHour(workHour);
 	};
 
 	const closeModal = function () {
@@ -94,9 +70,7 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 			deadline: endDate,
 			budget,
 			budgetUnit: unit,
-			objectiveTime: objTime,
-			objectiveCost: objCost,
-			objectiveQuality: objQuality,
+			baseWorkingHour,
 		};
 		invoke("createNewProjectProjectLists", { projectObjRequest })
 			.then(function (res) {
@@ -120,7 +94,12 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 					{({ formProps }) => (
 						<form id="form-with-id" {...formProps}>
 							<ModalHeader>
-								<ModalTitle>Create new Software Project</ModalTitle>
+								<div>
+									<h2 style={{ display: "inline" }}>
+										Create new Software Project
+									</h2>
+									<InlineMessageGuideProjectField />
+								</div>
 							</ModalHeader>
 							<ModalBody>
 								<Grid layout="fluid" spacing="compact" columns={columns}>
@@ -130,18 +109,46 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 												aria-required={true}
 												name="projectName"
 												label="Project Name"
+												isRequired
 											>
-												{() => (
-													<TextField
-														autoComplete="off"
-														value={projectName}
-														onChange={handleSetProjectName}
-													/>
+												{(fieldProps) => (
+													<Fragment>
+														<TextField
+															autoComplete="off"
+															value={projectName}
+															onChange={handleSetProjectName}
+															{...fieldProps}
+														/>
+														<HelperMessage>
+															Project name must start with uppercase letter.
+														</HelperMessage>
+													</Fragment>
+												)}
+											</Field>
+											<Field
+												aria-required={true}
+												name="projectBaseWorkHour"
+												label="Working Hours/Day"
+												isRequired
+											>
+												{(fieldProps) => (
+													<Fragment>
+														<TextField
+															autoComplete="off"
+															value={baseWorkingHour}
+															onChange={handleSetBaseWorkHour}
+															type="number"
+															{...fieldProps}
+														/>
+														<HelperMessage>
+															Working hour must greater than 0 and smaller than 24.
+														</HelperMessage>
+													</Fragment>
 												)}
 											</Field>
 										</FormSection>
 										<FormSection>
-											<Field name="startDate" label="Start Date" isRequired>
+											<Field name="startDate" label="Start Date">
 												{() => (
 													<Fragment>
 														<DatePicker
@@ -152,7 +159,7 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 													</Fragment>
 												)}
 											</Field>
-											<Field name="endDate" label="End Date" isRequired>
+											<Field name="endDate" label="End Date">
 												{() => (
 													<Fragment>
 														<DatePicker
@@ -165,14 +172,10 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 												)}
 											</Field>
 										</FormSection>
-										{/* <FormSection>
+										<FormSection>
 											<Grid spacing="compact" columns={columns}>
 												<GridColumn medium={8}>
-													<Field
-														aria-required={true}
-														name="budget"
-														label="Budget"
-													>
+													<Field name="budget" label="Budget">
 														{() => (
 															<TextField
 																autoComplete="off"
@@ -184,53 +187,19 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 													</Field>
 												</GridColumn>
 												<GridColumn medium={2}>
-													<Field
-														aria-required={true}
-														name="budgetUnit"
-														label="Unit"
-													>
-														{() => (
+													<Field name="budgetUnit" label="Unit">
+														{(fieldProps) => (
 															<TextField
 																autoComplete="off"
 																value={unit}
 																onChange={handleSetUnit}
+																{...fieldProps}
 															/>
 														)}
 													</Field>
 												</GridColumn>
 											</Grid>
-										</FormSection> */}
-										{/* <FormSection>
-												<ObjectiveRange
-													label="Objective Time"
-													name="ObjectiveTime"
-													value={objTime}
-													onChange={handleSetObjTime}
-													rangeOnChange={
-														handleRangeSetObjTime
-													}
-												/>
-												<ObjectiveRange
-													name="ObjectiveCost"
-													label="Objective Cost"
-													value={objCost}
-													onChange={handleSetObjCost}
-													rangeOnChange={
-														handleRangeSetObjCost
-													}
-												/>
-												<ObjectiveRange
-													name="ObjectiveQuality"
-													label="Objective Quality"
-													value={objQuality}
-													onChange={
-														handleSetObjQuality
-													}
-													rangeOnChange={
-														handleRangeSetObjQuality
-													}
-												/>
-											</FormSection> */}
+										</FormSection>
 									</GridColumn>
 								</Grid>
 							</ModalBody>
@@ -240,19 +209,15 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 									<Button appearance="default" onClick={closeModal}>
 										Cancel
 									</Button>
-									{isSubmitting ? (
-										<LoadingButton appearance="primary" isLoading>
-											Create
-										</LoadingButton>
-									) : (
-										<Button
-											type="submit"
-											appearance="primary"
-											onClick={handleSubmitCreate}
-										>
-											Create
-										</Button>
-									)}
+
+									<LoadingButton
+										type="submit"
+										appearance="primary"
+										onClick={handleSubmitCreate}
+										isLoading={isSubmitting}
+									>
+										Create
+									</LoadingButton>
 								</ButtonGroup>
 							</ModalFooter>
 						</form>

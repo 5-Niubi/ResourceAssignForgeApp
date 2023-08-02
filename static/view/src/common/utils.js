@@ -69,6 +69,16 @@ export function clearProjectBasedCache(){
 	return;
 }
 
+export function getCacheObject(key, initValue){
+    let cache =  getCache(key);
+	if (!cache) {
+		cache = initValue;
+	} else {
+		cache = JSON.parse(cache);
+	}
+    return cache
+}
+
 /**
  * @desc Get a specific object in the array by its id
  * @param {Array} arr 

@@ -125,7 +125,7 @@ function GanttChartPage({ setSelectedSolution, selectedSolution}) {
 				updateTasksChanged={updateTasksChanged}
 			/>
 
-			<ScheduleExportContext.Provider value={{ id: selectedSolution }}>
+			<ScheduleExportContext.Provider value={{ id: selectedSolution.id }}>
 				{jiraExportState.isModalOpen && (
 					<JiraExport state={jiraExportModalState} />
 				)}

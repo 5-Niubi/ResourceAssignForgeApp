@@ -27,7 +27,12 @@ import TextField from "@atlaskit/textfield";
 import Rating from "react-rating";
 import CreatableAdvanced from "./creatable-selection";
 import { COLOR_SKILL_LEVEL } from "../../../common/contants";
-import { validateEmail, validateNumberOnly, validateWorkingEffort, validateName } from "../../../common/utils";
+import {
+	validateEmail,
+	validateNumberOnly,
+	validateWorkingEffort,
+	validateName,
+} from "../../../common/utils";
 function ParameterWorkforceList() {
 	let { projectId } = useParams();
 	const [workforces, setWorkforces] = useState([]);
@@ -75,10 +80,7 @@ function ParameterWorkforceList() {
 		invoke("getAllSkills", {})
 			.then(function (res) {
 				setSkillDB(res);
-                localStorage.setItem(
-					"all_skills_DB",
-					JSON.stringify(res)
-				);
+				localStorage.setItem("all_skills_DB", JSON.stringify(res));
 			})
 			.catch(function (error) {
 				console.log(error);
@@ -392,7 +394,9 @@ function ParameterWorkforceList() {
 												),
 											})),
 									};
-
+                                    if(workforce_request.workingType == 0){
+                                        workforce_request.workingEfforts = [8,8,8,8,8,8,8];
+                                    }
 									console.log("Form data", workforce_request);
 									updateWorkforce(workforce_request);
 									return new Promise((resolve) =>
@@ -469,7 +473,7 @@ function ParameterWorkforceList() {
 												<GridColumn medium={6}>
 													<Field
 														name="usernamejira"
-														label="Username Jira"
+														label="Jira Username"
 														isRequired
 														defaultValue={
 															selectedWorkforce.displayName
@@ -652,8 +656,8 @@ function ParameterWorkforceList() {
 																size="small"
 																content=""
 															></InfoIcon>
-															Working hours
-															per day
+															Working hours per
+															day
 														</HelperMessage>
 													)}
 												</GridColumn>
@@ -1082,14 +1086,17 @@ function ParameterWorkforceList() {
 														</GridColumn>
 														{/* SKILL DISPLAYING WITH LEVEL TABLE */}
 														<GridColumn medium={12}>
-															<DynamicTable
-																head={
-																	headSkillTable
-																}
-																rows={
-																	rowsSkillTable
-																}
-															/>
+															{skillsTable?.length >
+																0 && (
+																<DynamicTable
+																	head={
+																		headSkillTable
+																	}
+																	rows={
+																		rowsSkillTable
+																	}
+																/>
+															)}
 														</GridColumn>
 													</>
 												)}

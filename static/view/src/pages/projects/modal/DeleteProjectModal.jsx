@@ -45,11 +45,11 @@ function DeleteProjectModal({ openState, setOpenState, setProjectsListState }) {
 				<Modal onClose={closeModal}>
 					<ModalHeader>
 						<ModalTitle appearance="warning">
-							Delete the {project.projectName} Project
+							Delete {project.name}
 						</ModalTitle>
 					</ModalHeader>
 					<ModalBody>
-						Project {project.projectId} will be delete permanly. This can not be
+						{project.name} will be delete permanly. This can not be
 						undone!!!
 					</ModalBody>
 					<ModalFooter>
