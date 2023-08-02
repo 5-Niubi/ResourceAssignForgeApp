@@ -28,6 +28,7 @@ function commonResolver(resolver) {
 	resolver.define("getIsAuthenticated", async function (req) {
 		try {
 			let isAuthenticated = await storage.get("isAuthenticated");
+			console.log(STORAGE.TOKEN, ": ", await storage.getSecret(STORAGE.TOKEN));
 			return Promise.resolve({
 				isAuthenticated,
 			});

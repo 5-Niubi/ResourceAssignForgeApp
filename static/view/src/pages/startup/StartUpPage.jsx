@@ -3,7 +3,6 @@ import EmptyState from "@atlaskit/empty-state";
 import { invoke, router } from "@forge/bridge";
 import React, { useState } from "react";
 import { useCallback } from "react";
-import { toast } from "react-toastify";
 import Toastify from "../../common/Toastify";
 
 function StartUpPage() {
@@ -21,15 +20,20 @@ function StartUpPage() {
 				setIsSubmited(false);
 				if (!res.isAuthenticated) {
 					handleAuthenOAuth(res.authenUrl);
+				} else {
+					Toastify.info("You already have permission.");
+					router.reload();
 				}
 			})
-			.catch(function (error) {});
+			.catch(function (error) {
+				Toastify.error(error.message);
+			});
 	}, []);
 
 	return (
 		<EmptyState
 			header="You don't have access to this application"
-			description="Make sure the issue exists in this project. If it does, ask a project admin for permission to see the project's issues."
+			description="Make sure you have right in this app. If it does, ask a project admin for permission to access."
 			primaryAction={
 				<Button
 					appearance="primary"

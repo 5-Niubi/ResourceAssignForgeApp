@@ -2,7 +2,6 @@ import Button from "@atlaskit/button/standard-button";
 import MoreIcon from "@atlaskit/icon/glyph/more";
 import EditIcon from "@atlaskit/icon/glyph/edit";
 import TrashIcon from "@atlaskit/icon/glyph/trash";
-import CopyIcon from "@atlaskit/icon/glyph/copy";
 
 import DropdownMenu from "@atlaskit/dropdown-menu";
 import React, { useContext } from "react";

@@ -29,7 +29,7 @@ class AuthenWithBE {
 		storage.delete(STORAGE.IS_AUTHENTICATED);
 		storage.deleteSecret(STORAGE.TOKEN);
 	}
-
+ 
 	/**
 	 * @param {Object} data
 	 */
