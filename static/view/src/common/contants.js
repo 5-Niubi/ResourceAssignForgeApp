@@ -1,5 +1,6 @@
-export const APP_NAME = "Resource Assign";
-export const APP_NAME_DESCRIPTOR = "Resource Assign Demo";
+export const APP_NAME = "WoTaas";
+export const APP_NAME_DESCRIPTOR = "Worker - Task Auto Assign";
+export const PROJECT_NAME_DESCRIPTOR = "Software Project";
 
 export const MEDIA_QUERY = {
 	DESKTOP_LAPTOP: {

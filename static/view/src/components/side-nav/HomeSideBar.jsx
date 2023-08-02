@@ -7,6 +7,7 @@ import PeopleGroupIcon from "@atlaskit/icon/glyph/people-group";
 import LightBulb from "@atlaskit/icon/glyph/lightbulb";
 import SignOutIcon from "@atlaskit/icon/glyph/sign-out";
 import { AtlassianIcon } from "@atlaskit/logo";
+import { ReactComponent as LogoSvg } from '../../resources/reshot-icon-planning-SJ7W8K623A.svg';
 
 import {
 	Header,
@@ -37,7 +38,8 @@ function HomeSideBar(rootPath) {
 		<SideNavigation label="project" testId="side-navigation">
 			<NavigationHeader>
 				<Header
-					iconBefore={<AtlassianIcon appearance="brand" />}
+					// iconBefore={<AtlassianIcon appearance="brand" />}
+					iconBefore={<LogoSvg></LogoSvg>}
 					description={APP_NAME_DESCRIPTOR}
 				>
 					{APP_NAME}
