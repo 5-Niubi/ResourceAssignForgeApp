@@ -39,9 +39,7 @@ export default function ParameterEstimateMessage() {
 			{isEstimating ? (
 				<Spinner size={"large"} />
 			) : (
-				<SectionMessage
-					title="We need these resources:"
-					appearance="warning"
+				<div
 				>
 					<ul>
 						{estimations.workforceWithMilestoneList?.map(
@@ -67,27 +65,26 @@ export default function ParameterEstimateMessage() {
 											<>
 												<li>
 													{workers.quantity} workers
-													with skills set (
+													with skills set  
 													{workers.skillOutputList?.map(
 														(skill, i) => (
 															<span
 																style={{
 																	marginRight:
 																		"2px",
+                                                                    marginLeft: "8px"
 																}}
 															>
 																<Lozenge
 																	key={i}
 																	style={{
-																		marginLeft:
-																			"8px",
 																		backgroundColor:
 																			COLOR_SKILL_LEVEL[
 																				skill.level -
 																					1
 																			]
 																				.color,
-																		color: "white",
+																		color: (skill.level===1)?"#091e42":"white",
 																	}}
 																	isBold
 																>
@@ -101,14 +98,13 @@ export default function ParameterEstimateMessage() {
 															</span>
 														)
 													)}
-													)
 												</li>
 											</>
 										);
 									})
 						)}
 					</ul>
-				</SectionMessage>
+				</div>
 			)}
 		</>
 	);
