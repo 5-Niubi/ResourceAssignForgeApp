@@ -55,8 +55,7 @@ export default function ResourceDeleteWorkforceModal({ openState, setOpenState }
 						</ModalTitle>
 					</ModalHeader>
 					<ModalBody>
-						{workforce.name} will be delete permanly. This can not be
-						undone!!!
+					    The workforce name '{workforce.name}' will be permanently removed?
 					</ModalBody>
 					<ModalFooter>
 						<Button
