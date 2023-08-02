@@ -191,7 +191,6 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 												</GridColumn>
 												<GridColumn medium={2}>
 													<Field
-														aria-required={true}
 														name="budgetUnit"
 														label="Unit"
 													>
