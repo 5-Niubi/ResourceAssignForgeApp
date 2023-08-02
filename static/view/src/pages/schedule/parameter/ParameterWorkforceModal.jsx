@@ -196,7 +196,10 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 										backgroundColor:
 											COLOR_SKILL_LEVEL[skill.level - 1]
 												.color,
-										color: "white",
+										color:
+									(skill.level === 1)
+										? "#091e42"
+										: "white",
 									}}
 									isBold
 								>
