@@ -55,7 +55,7 @@ export default function ResourceDeleteWorkforceModal({ openState, setOpenState }
 						</ModalTitle>
 					</ModalHeader>
 					<ModalBody>
-					    The workforce name '{workforce.name}' will be permanently removed?
+					    The employee name '{workforce.name}' will be permanently removed?
 					</ModalBody>
 					<ModalFooter>
 						<Button
