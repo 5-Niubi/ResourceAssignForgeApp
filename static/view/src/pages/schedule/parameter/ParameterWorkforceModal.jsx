@@ -122,7 +122,7 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 				workforces.filter((e) => {
                     const lowercaseQuery = query.toLowerCase().trim();
                     const nameMatch = e.name.toLowerCase().includes(lowercaseQuery);
-                    const skillMatch = e.skills?.some(skill => skill.name.replace("-","").toLowerCase().includes(lowercaseQuery));
+                    const skillMatch = e.skills?.some(skill => skill.name.replace("-"," ").toLowerCase().includes(lowercaseQuery));
                     return nameMatch || skillMatch;
                   })
 			);
