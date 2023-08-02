@@ -119,9 +119,12 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 			setWorkforcesFilter(workforces);
 		} else {
 			setWorkforcesFilter(
-				workforces.filter((e) =>
-					e.name.toLowerCase().includes(query.toLowerCase())
-				)
+				workforces.filter((e) => {
+                    const lowercaseQuery = query.toLowerCase().trim();
+                    const nameMatch = e.name.toLowerCase().includes(lowercaseQuery);
+                    const skillMatch = e.skills?.some(skill => skill.name.replace("-","").toLowerCase().includes(lowercaseQuery));
+                    return nameMatch || skillMatch;
+                  })
 			);
 		}
 	}, []);
@@ -156,7 +159,7 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 		cells: [
 			{
 				key: "no",
-				content: "No",
+				content: null,
 				width: 8,
 			},
 			{
@@ -290,7 +293,7 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 									>
 										<TextField
 											isCompact
-											placeholder="Search Employee Name"
+											placeholder="Search Employee/Skill"
 											aria-label="Filter"
 											onChange={handleOnSearchBoxChange}
 											value={searchInput}
