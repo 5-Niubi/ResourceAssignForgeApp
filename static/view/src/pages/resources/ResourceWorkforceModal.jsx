@@ -17,7 +17,7 @@ const boldStyles = css({
   fontWeight: "bold",
 });
 
-export default function WorkforceModal() {
+export default function ResourceWorkforceModal() {
   const [isOpen, setIsOpen] = useState(false);
   const openModal = useCallback(() => setIsOpen(true), []);
   const closeModal = useCallback(() => setIsOpen(false), []);

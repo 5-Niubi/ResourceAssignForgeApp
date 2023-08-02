@@ -3,21 +3,12 @@ import React, { useEffect, useState, useCallback, Fragment } from "react";
 import DynamicTable from "@atlaskit/dynamic-table";
 import { FC, ReactNode } from "react";
 import { invoke } from "@forge/bridge";
-import Toastify from "../../../common/Toastify";
+import Toastify from "../../common/Toastify";
 import Lozenge from "@atlaskit/lozenge";
-import { COLOR_SKILL_LEVEL } from "../../../common/contants";
-import InlineMessage from "@atlaskit/inline-message";
+import { COLOR_SKILL_LEVEL } from "../../common/contants";
 import { css, jsx } from "@emotion/react";
-import TrashIcon from "@atlaskit/icon/glyph/trash";
-import EditIcon from "@atlaskit/icon/glyph/edit";
 import Avatar from "@atlaskit/avatar";
-import DropdownMenu, {
-	DropdownItem,
-	DropdownItemGroup,
-} from "@atlaskit/dropdown-menu";
-import WorkforceLozenge from "./WorkforceLozenge";
-import Button from "@atlaskit/button";
-import WorkforceModal from "./WorkforceModal";
+import { PiStarFill } from "react-icons/pi";
 import MoreIcon from "@atlaskit/icon/glyph/more";
 
 const wrapperStyles = css({
@@ -44,7 +35,7 @@ const overflow = css({
 	},
 });
 
-function WorkforceDynamicTable() {
+function ResourceWorkforceTable() {
 	const [TableLoadingState, setTableLoadingState] = useState(true);
 	const [workforces, setWorkforces] = useState([]);
 	useEffect(() => {
@@ -77,7 +68,7 @@ function WorkforceDynamicTable() {
 					}));
 
 				// setWorkforces([...workforces, ...jiraUsers]);
-                setWorkforces(workforces);
+				setWorkforces(workforces);
 				setTableLoadingState(false);
 			})
 			.catch((error) => {
@@ -123,9 +114,9 @@ function WorkforceDynamicTable() {
 				},
 				{
 					key: "name",
-                    content: "Name",
-                    isSortable: true,
-                    width: withWidth ? 15 : undefined
+					content: "Name",
+					isSortable: true,
+					width: withWidth ? 15 : undefined,
 				},
 				{
 					key: "skill",
@@ -163,7 +154,7 @@ function WorkforceDynamicTable() {
 		cells: [
 			{
 				key: workforce.id,
-				content: (<strong>#{workforce.id}</strong>),
+				content: <strong>#{workforce.id}</strong>,
 			},
 			{
 				key: createKey(workforce.name),
@@ -183,21 +174,29 @@ function WorkforceDynamicTable() {
 			{
 				key: workforce.skills,
 				content: (
-					<>
+					<div>
 						{workforce.skills?.map((skill, i) => (
-							<Lozenge
-								key={i}
-								style={{
-									backgroundColor:
-										COLOR_SKILL_LEVEL[skill.level - 1]
-											.color,
-									color: "white",
-								}}
-							>
-								{skill.name}
-							</Lozenge>
+							<span style={{ marginRight: "2px" }}>
+								<Lozenge
+									key={i}
+									style={{
+										marginLeft: "8px",
+										backgroundColor:
+											COLOR_SKILL_LEVEL[skill.level - 1]
+												.color,
+										color:
+											skill.level === 1
+												? "#091e42"
+												: "white",
+									}}
+									isBold
+								>
+									{skill.name} - {skill.level}
+									<PiStarFill />
+								</Lozenge>
+							</span>
 						))}
-					</>
+					</div>
 				),
 			},
 			{
@@ -220,20 +219,24 @@ function WorkforceDynamicTable() {
 	}));
 
 	return (
-        <>
-            <h5 style={{marginBottom: "3px"}}>We have total number: {workforces.length} members</h5>
-            <div css={wrapperStyles}>
-                <div css={overflow}>
-                    <DynamicTable
-                        head={head}
-                        rows={rows}
-                        isLoading={TableLoadingState}
-                    />
-                </div>
-            </div>
-        </>
-		
+		<>
+			<h5 style={{ marginBottom: "3px" }}>
+				We have total number: {workforces.length} members
+			</h5>
+			<div css={wrapperStyles}>
+				<div css={overflow}>
+					<DynamicTable
+						head={head}
+						rows={rows}
+						rowsPerPage={10}
+						defaultPage={1}
+						isFixedSize
+						isLoading={TableLoadingState}
+					/>
+				</div>
+			</div>
+		</>
 	);
 }
 
-export default WorkforceDynamicTable;
+export default ResourceWorkforceTable;
