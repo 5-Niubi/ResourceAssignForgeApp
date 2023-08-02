@@ -53,6 +53,7 @@ const boldStyles = css({
 	fontWeight: "bold",
 });
 
+
 export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 	//SELECT WORKFORCE MODAL (SW)
 	let workforce_local = JSON.parse(
@@ -64,8 +65,14 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 	const [TableLoadingState, setTableLoadingState] = useState(true);
 	const [searchInput, setSearchInput] = useState("");
 	const [workforces, setWorkforces] = useState([]);
-
 	const [selectedWorkforces, setSelectedWorkforces] = useState([]);
+    const [createClicked, setCreateClicked] = useState(false);
+
+    const handleCreateClicked = () => {
+        setCreateClicked(true);
+        console.log("setCreateClicked", "Da click");
+    }
+
 	useEffect(function () {
 		invoke("getAllWorkforces")
 			.then(function (res) {
@@ -102,7 +109,8 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 				console.log(error);
 				Toastify.error(error.toString());
 			});
-	}, []);
+        setCreateClicked(false);
+	}, [createClicked]);
 
 	//FILTER WORKFORCE SELECT TABLE
 	const [workforcesFilter, setWorkforcesFilter] = useState(workforces);
@@ -294,14 +302,15 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 										}}
 									>
 										<ButtonGroup>
-											<Button
+											{/* <Button
 												appearance="primary"
 												onClick={() => {
 													closeSWModal();
 												}}
 											>
 												Create new
-											</Button>
+											</Button> */}
+                                            <ParameterCreareWorkforceModal onCreatedClick={handleCreateClicked}/>
 											{/* SELECT ALL BUTTON */}
 											<Button
 												appearance="primary"
@@ -348,7 +357,7 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 	);
 }
 
-export function ParameterCreareWorkforceModal() {
+export function ParameterCreareWorkforceModal({onCreatedClick}) {
 	//CREATE WORKFORCE MODAL (CW)
 	const [isCWOpen, setIsCWOpen] = useState(false);
 	const openCWModal = useCallback(() => setIsCWOpen(true), []);
@@ -410,6 +419,10 @@ export function ParameterCreareWorkforceModal() {
 			});
 	}, []);
 
+    const handleCreateClicked = () => {
+        onCreatedClick(); 
+    };
+    
 	const onSelectedValue = (childValue) => {
 		console.log("Received value from child:", childValue);
 
@@ -501,6 +514,7 @@ export function ParameterCreareWorkforceModal() {
 					setSkillsTable([]);
 					setLoadingSubmit(false);
 					setIsCWOpen(false);
+                    handleCreateClicked();
 				}
 			})
 			.catch(function (error) {
