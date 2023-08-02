@@ -58,4 +58,16 @@ async function createWorkforce(workforce_request) {
 	}
 }
 
-export {getAllWorkforces, getAllUsersJira, updateWorkforce, getWorkforceById, createWorkforce};
+async function deleteWorkforce(workforce_id) {
+	try {
+		let response = await APIServices.delete(
+			`/api/Workforces/DeleteWorkforce`,
+			workforce_id
+		);
+		return response;
+	} catch (error) {
+		return Promise.reject(error);
+	}
+}
+
+export {getAllWorkforces, getAllUsersJira, updateWorkforce, getWorkforceById, createWorkforce, deleteWorkforce};

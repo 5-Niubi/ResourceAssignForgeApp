@@ -16,9 +16,14 @@ import TextField from "@atlaskit/textfield";
 import PageHeader from "@atlaskit/page-header";
 import InfoMessageColor from "../../components/InfoMessageColor";
 import EditorSearchIcon from "@atlaskit/icon/glyph/editor/search";
+import ResourceDeleteWorkforceModal from "./ResourceWorkforceModal";
+
+const modalInitState = { workforce: {}, isOpen: false };
 
 function ResourceWorkforceTable() {
 	const [TableLoadingState, setTableLoadingState] = useState(true);
+    const [modalDeleteState, setModalDeleteState] = useState(modalInitState);
+	const [modalEditState, setModalEditState] = useState(modalInitState);
 	const [workforces, setWorkforces] = useState([]);
 	useEffect(() => {
 		Promise.all([invoke("getAllWorkforces"), invoke("getAllUserJira")])
@@ -65,10 +70,6 @@ function ResourceWorkforceTable() {
 			: input;
 	}
 
-	
-    
-
-    //FILTER WORKFORCE SELECT TABLE
 	const [searchInput, setSearchInput] = useState("");
 	const [workforcesFilter, setWorkforcesFilter] = useState(workforces);
 	const filterWorkforceName = useCallback(function (workforces, query) {
@@ -77,11 +78,18 @@ function ResourceWorkforceTable() {
 		} else {
 			setWorkforcesFilter(
 				workforces.filter((e) => {
-                    const lowercaseQuery = query.toLowerCase().trim();
-                    const nameMatch = e.name.toLowerCase().includes(lowercaseQuery);
-                    const skillMatch = e.skills?.some(skill => skill.name.replace("-"," ").toLowerCase().includes(lowercaseQuery));
-                    return nameMatch || skillMatch;
-                  })
+					const lowercaseQuery = query.toLowerCase().trim();
+					const nameMatch = e.name
+						.toLowerCase()
+						.includes(lowercaseQuery);
+					const skillMatch = e.skills?.some((skill) =>
+						skill.name
+							.replace("-", " ")
+							.toLowerCase()
+							.includes(lowercaseQuery)
+					);
+					return nameMatch || skillMatch;
+				})
 			);
 		}
 	}, []);
@@ -94,12 +102,17 @@ function ResourceWorkforceTable() {
 	);
 
 	function handleOnSearchBoxChange(e) {
-        const newSearchInput = e.target.value;
-        setSearchInput(newSearchInput);
-        filterWorkforceName(workforces, newSearchInput);
-    }
+		const newSearchInput = e.target.value;
+		setSearchInput(newSearchInput);
+		filterWorkforceName(workforces, newSearchInput);
+	}
 
-    const barContent = (
+    function deleteOnClick(workforce) {
+		setModalDeleteState({ workforce, isOpen: true });
+	}
+
+
+	const barContent = (
 		<div style={{ display: "flex" }}>
 			<div style={{ flex: "0 0 280px" }}>
 				<TextField
@@ -114,7 +127,7 @@ function ResourceWorkforceTable() {
 		</div>
 	);
 
-    const createHead = (withWidth) => {
+	const createHead = (withWidth) => {
 		return {
 			cells: [
 				{
@@ -212,14 +225,14 @@ function ResourceWorkforceTable() {
 					<ButtonGroup>
 						<Button
 							onClick={() => {
-								deleteOnClick(data);
+								deleteOnClick(workforce);
 							}}
 							appearance="subtle"
 							iconBefore={<TrashIcon label="delete" />}
 						></Button>
 						<Button
 							onClick={() => {
-								editOnClick(data);
+								editOnClick(workforce);
 							}}
 							appearance="subtle"
 							iconBefore={<EditIcon label="edit" />}
@@ -230,10 +243,11 @@ function ResourceWorkforceTable() {
 		],
 	}));
 
-
 	return (
 		<>
-			<PageHeader bottomBar={barContent}>Employee List <InfoMessageColor /></PageHeader>
+			<PageHeader bottomBar={barContent}>
+				Employee List <InfoMessageColor />
+			</PageHeader>
 
 			<InlineMessage
 				title={"We have total number: "}
@@ -248,6 +262,25 @@ function ResourceWorkforceTable() {
 				isLoading={TableLoadingState}
 				emptyView={<h2>Not found any employee</h2>}
 			/>
+
+			{modalDeleteState.isOpen ? (
+				<ResourceDeleteWorkforceModal
+					openState={modalDeleteState}
+					setOpenState={setModalDeleteState}
+				/>
+			) : (
+				""
+			)}
+
+			{/* {modalEditState.isOpen ? (
+				<EditProjectModal
+					openState={modalEditState}
+					setOpenState={setModalEditState}
+					setProjectsListState={setProjects}
+				/>
+			) : (
+				""
+			)} */}
 		</>
 	);
 }
