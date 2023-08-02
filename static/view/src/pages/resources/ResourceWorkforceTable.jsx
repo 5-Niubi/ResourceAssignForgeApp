@@ -116,7 +116,7 @@ function ResourceWorkforceTable() {
 					key: "name",
 					content: "Name",
 					isSortable: true,
-					width: withWidth ? 15 : undefined,
+					width: withWidth ? 10 : undefined,
 				},
 				{
 					key: "skill",
@@ -128,7 +128,7 @@ function ResourceWorkforceTable() {
 					key: "salary",
 					content: "Salary (Hour)",
 					shouldTruncate: false,
-					width: withWidth ? 5 : undefined,
+					width: withWidth ? 10 : undefined,
 				},
 				{
 					key: "type",
@@ -230,7 +230,6 @@ function ResourceWorkforceTable() {
 						rows={rows}
 						rowsPerPage={10}
 						defaultPage={1}
-						isFixedSize
 						isLoading={TableLoadingState}
 					/>
 				</div>
