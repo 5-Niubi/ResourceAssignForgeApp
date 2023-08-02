@@ -1,39 +1,21 @@
 import { token } from "@atlaskit/tokens";
 import React, { useEffect, useState, useCallback, Fragment } from "react";
 import DynamicTable from "@atlaskit/dynamic-table";
-import { FC, ReactNode } from "react";
 import { invoke } from "@forge/bridge";
 import Toastify from "../../common/Toastify";
 import Lozenge from "@atlaskit/lozenge";
-import { COLOR_SKILL_LEVEL } from "../../common/contants";
+import { COLOR_SKILL_LEVEL, ROW_PER_PAGE } from "../../common/contants";
 import { css, jsx } from "@emotion/react";
-import Avatar from "@atlaskit/avatar";
 import { PiStarFill } from "react-icons/pi";
-import MoreIcon from "@atlaskit/icon/glyph/more";
-
-const wrapperStyles = css({
-	position: "relative",
-	table: {
-		width: "100%",
-	},
-});
-
-const overflow = css({
-	overflowX: "auto",
-	"::after": {
-		width: 20,
-		height: "100%",
-		position: "absolute",
-		top: token("space.0", "0px"),
-		// // eslint-disable-next-line @atlaskit/design-system/ensure-design-token-usage-spacing
-		left: "calc(100% - 8px)",
-		background: `linear-gradient(to right, ${token(
-			"color.blanket",
-			"rgba(99, 114, 130, 0)"
-		)} 0px, ${token("color.blanket", "rgba(9, 30, 66, 0.13)")} 100%)`,
-		content: "''",
-	},
-});
+import EditIcon from "@atlaskit/icon/glyph/edit";
+import TrashIcon from "@atlaskit/icon/glyph/trash";
+import Button, { ButtonGroup } from "@atlaskit/button";
+import InlineMessage from "@atlaskit/inline-message";
+import __noop from "@atlaskit/ds-lib/noop";
+import TextField from "@atlaskit/textfield";
+import PageHeader from "@atlaskit/page-header";
+import InfoMessageColor from "../../components/InfoMessageColor";
+import EditorSearchIcon from "@atlaskit/icon/glyph/editor/search";
 
 function ResourceWorkforceTable() {
 	const [TableLoadingState, setTableLoadingState] = useState(true);
@@ -83,28 +65,56 @@ function ResourceWorkforceTable() {
 			: input;
 	}
 
-	function iterateThroughLorem(index) {
-		return index > lorem.length ? index - lorem.length : index;
-	}
+	
+    
 
-	const nameWrapperStyles = css({
-		display: "flex",
-		alignItems: "center",
-	});
+    //FILTER WORKFORCE SELECT TABLE
+	const [searchInput, setSearchInput] = useState("");
+	const [workforcesFilter, setWorkforcesFilter] = useState(workforces);
+	const filterWorkforceName = useCallback(function (workforces, query) {
+		if (query === null || query.trim() === "") {
+			setWorkforcesFilter(workforces);
+		} else {
+			setWorkforcesFilter(
+				workforces.filter((e) => {
+                    const lowercaseQuery = query.toLowerCase().trim();
+                    const nameMatch = e.name.toLowerCase().includes(lowercaseQuery);
+                    const skillMatch = e.skills?.some(skill => skill.name.replace("-"," ").toLowerCase().includes(lowercaseQuery));
+                    return nameMatch || skillMatch;
+                  })
+			);
+		}
+	}, []);
 
-	const NameWrapper = ({ children }) => (
-		<span css={nameWrapperStyles}>{children}</span>
+	useEffect(
+		function () {
+			filterWorkforceName(workforces, searchInput);
+		},
+		[workforces]
 	);
 
-	const avatarWrapperStyles = css({
-		marginRight: token("space.100", "8px"),
-	});
+	function handleOnSearchBoxChange(e) {
+        const newSearchInput = e.target.value;
+        setSearchInput(newSearchInput);
+        filterWorkforceName(workforces, newSearchInput);
+    }
 
-	const AvatarWrapper = ({ children }) => (
-		<div css={avatarWrapperStyles}>{children}</div>
+    const barContent = (
+		<div style={{ display: "flex" }}>
+			<div style={{ flex: "0 0 280px" }}>
+				<TextField
+					isCompact
+					placeholder="Filter by Employee's Name or Skill"
+					aria-label="Filter"
+					elemAfterInput={<EditorSearchIcon label="Search" />}
+					onChange={handleOnSearchBoxChange}
+					value={searchInput}
+				/>
+			</div>
+		</div>
 	);
 
-	const createHead = (withWidth) => {
+    const createHead = (withWidth) => {
 		return {
 			cells: [
 				{
@@ -116,31 +126,31 @@ function ResourceWorkforceTable() {
 					key: "name",
 					content: "Name",
 					isSortable: true,
-					width: withWidth ? 10 : undefined,
+					width: withWidth ? 12 : undefined,
 				},
 				{
 					key: "skill",
 					content: "Skills",
 					shouldTruncate: false,
-					width: withWidth ? 40 : undefined,
+					width: withWidth ? 50 : undefined,
 				},
 				{
 					key: "salary",
 					content: "Salary (Hour)",
 					shouldTruncate: false,
-					width: withWidth ? 10 : undefined,
+					width: withWidth ? 7 : undefined,
 				},
 				{
 					key: "type",
 					content: "Type",
 					shouldTruncate: false,
-					width: withWidth ? 10 : undefined,
+					width: withWidth ? 7 : undefined,
 				},
 				{
-					key: "detail",
-					content: "Detail",
-					shouldTruncate: false,
-					width: withWidth ? 5 : undefined,
+					key: "actions",
+					content: "Actions",
+					shouldTruncate: true,
+					width: 6,
 				},
 			],
 		};
@@ -148,7 +158,7 @@ function ResourceWorkforceTable() {
 
 	const head = createHead(true);
 
-	const rows = workforces.map((workforce, index) => ({
+	const rows = workforcesFilter?.map((workforce, index) => ({
 		key: `row-${index}-${workforce.name}`,
 		isHighlighted: false,
 		cells: [
@@ -158,18 +168,7 @@ function ResourceWorkforceTable() {
 			},
 			{
 				key: createKey(workforce.name),
-				content: (
-					<NameWrapper>
-						<AvatarWrapper>
-							<Avatar
-								src={workforce.avatar}
-								name={workforce.displayName}
-								size="medium"
-							/>
-						</AvatarWrapper>
-						<a href="">{workforce.name}</a>
-					</NameWrapper>
-				),
+				content: workforce.name,
 			},
 			{
 				key: workforce.skills,
@@ -201,39 +200,54 @@ function ResourceWorkforceTable() {
 			},
 			{
 				key: workforce.salary,
-				content: workforce.unitSalary,
+				content: "$ " + workforce.unitSalary,
 			},
 			{
 				key: "type",
 				content: workforce.workingType == 0 ? "Full-time" : "Part-time",
 			},
 			{
-				key: "detail",
+				key: "actions",
 				content: (
-					<div>
-						<MoreIcon></MoreIcon>
-					</div>
+					<ButtonGroup>
+						<Button
+							onClick={() => {
+								deleteOnClick(data);
+							}}
+							appearance="subtle"
+							iconBefore={<TrashIcon label="delete" />}
+						></Button>
+						<Button
+							onClick={() => {
+								editOnClick(data);
+							}}
+							appearance="subtle"
+							iconBefore={<EditIcon label="edit" />}
+						></Button>
+					</ButtonGroup>
 				),
 			},
 		],
 	}));
 
+
 	return (
 		<>
-			<h5 style={{ marginBottom: "3px" }}>
-				We have total number: {workforces.length} members
-			</h5>
-			<div css={wrapperStyles}>
-				<div css={overflow}>
-					<DynamicTable
-						head={head}
-						rows={rows}
-						rowsPerPage={10}
-						defaultPage={1}
-						isLoading={TableLoadingState}
-					/>
-				</div>
-			</div>
+			<PageHeader bottomBar={barContent}>Employee List <InfoMessageColor /></PageHeader>
+
+			<InlineMessage
+				title={"We have total number: "}
+				secondaryText={workforcesFilter.length + " members"}
+			/>
+
+			<DynamicTable
+				head={head}
+				rows={rows}
+				rowsPerPage={ROW_PER_PAGE}
+				defaultPage={1}
+				isLoading={TableLoadingState}
+				emptyView={<h2>Not found any employee</h2>}
+			/>
 		</>
 	);
 }

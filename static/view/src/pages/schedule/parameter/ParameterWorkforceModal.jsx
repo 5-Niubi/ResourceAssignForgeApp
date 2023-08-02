@@ -53,7 +53,6 @@ const boldStyles = css({
 	fontWeight: "bold",
 });
 
-
 export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 	//SELECT WORKFORCE MODAL (SW)
 	let workforce_local = JSON.parse(
@@ -66,51 +65,54 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 	const [searchInput, setSearchInput] = useState("");
 	const [workforces, setWorkforces] = useState([]);
 	const [selectedWorkforces, setSelectedWorkforces] = useState([]);
-    const [createClicked, setCreateClicked] = useState(false);
+	const [createClicked, setCreateClicked] = useState(false);
 
-    const handleCreateClicked = () => {
-        setCreateClicked(true);
-        console.log("setCreateClicked", "Da click");
-    }
+	const handleCreateClicked = () => {
+		setCreateClicked(true);
+		console.log("setCreateClicked", "Da click");
+	};
 
-	useEffect(function () {
-		invoke("getAllWorkforces")
-			.then(function (res) {
-				let workforces = [];
-				for (let workforce of res) {
-					let itemWorkforce = {
-						id: workforce.id,
-						accountId: workforce.accountId,
-						email: workforce.email,
-						accountType: workforce.accountType,
-						name: workforce.name,
-						avatar: workforce.avatar,
-						displayName: workforce.displayName,
-						unitSalary: workforce.unitSalary,
-						workingType: workforce.workingType,
-						workingEfforts: workforce.workingEfforts,
-						skills: workforce.skills,
-					};
-					workforces.push(itemWorkforce);
-				}
-				setTableLoadingState(false);
-				setWorkforces(workforces);
-				const localWorkforceIds = workforce_local.map((workforce) =>
-					workforce.id.toString()
-				);
-				setSelectedWorkforces(localWorkforceIds);
+	useEffect(
+		function () {
+			invoke("getAllWorkforces")
+				.then(function (res) {
+					let workforces = [];
+					for (let workforce of res) {
+						let itemWorkforce = {
+							id: workforce.id,
+							accountId: workforce.accountId,
+							email: workforce.email,
+							accountType: workforce.accountType,
+							name: workforce.name,
+							avatar: workforce.avatar,
+							displayName: workforce.displayName,
+							unitSalary: workforce.unitSalary,
+							workingType: workforce.workingType,
+							workingEfforts: workforce.workingEfforts,
+							skills: workforce.skills,
+						};
+						workforces.push(itemWorkforce);
+					}
+					setTableLoadingState(false);
+					setWorkforces(workforces);
+					const localWorkforceIds = workforce_local.map((workforce) =>
+						workforce.id.toString()
+					);
+					setSelectedWorkforces(localWorkforceIds);
 
-				//CHECK BUTTON SELECT ALL
-				if (workforces.length == localWorkforceIds.length) {
-					setSelectAll(true);
-				}
-			})
-			.catch(function (error) {
-				console.log(error);
-				Toastify.error(error.toString());
-			});
-        setCreateClicked(false);
-	}, [createClicked]);
+					//CHECK BUTTON SELECT ALL
+					if (workforces.length == localWorkforceIds.length) {
+						setSelectAll(true);
+					}
+				})
+				.catch(function (error) {
+					console.log(error);
+					Toastify.error(error.toString());
+				});
+			setCreateClicked(false);
+		},
+		[createClicked]
+	);
 
 	//FILTER WORKFORCE SELECT TABLE
 	const [workforcesFilter, setWorkforcesFilter] = useState(workforces);
@@ -120,11 +122,18 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 		} else {
 			setWorkforcesFilter(
 				workforces.filter((e) => {
-                    const lowercaseQuery = query.toLowerCase().trim();
-                    const nameMatch = e.name.toLowerCase().includes(lowercaseQuery);
-                    const skillMatch = e.skills?.some(skill => skill.name.replace("-"," ").toLowerCase().includes(lowercaseQuery));
-                    return nameMatch || skillMatch;
-                  })
+					const lowercaseQuery = query.toLowerCase().trim();
+					const nameMatch = e.name
+						.toLowerCase()
+						.includes(lowercaseQuery);
+					const skillMatch = e.skills?.some((skill) =>
+						skill.name
+							.replace("-", " ")
+							.toLowerCase()
+							.includes(lowercaseQuery)
+					);
+					return nameMatch || skillMatch;
+				})
 			);
 		}
 	}, []);
@@ -137,10 +146,9 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 	);
 
 	function handleOnSearchBoxChange(e) {
-		setSearchInput(e.target.value);
-		if (e.target.value != null) {
-			filterWorkforceName(workforces, searchInput);
-		}
+		const newSearchInput = e.target.value;
+		setSearchInput(newSearchInput);
+		filterWorkforceName(workforces, newSearchInput);
 	}
 
 	function handleCheckboxChange(workforceId) {
@@ -208,9 +216,9 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 											COLOR_SKILL_LEVEL[skill.level - 1]
 												.color,
 										color:
-									(skill.level === 1)
-										? "#091e42"
-										: "white",
+											skill.level === 1
+												? "#091e42"
+												: "white",
 									}}
 									isBold
 								>
@@ -313,7 +321,11 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 											>
 												Create new
 											</Button> */}
-                                            <ParameterCreareWorkforceModal onCreatedClick={handleCreateClicked}/>
+											<ParameterCreareWorkforceModal
+												onCreatedClick={
+													handleCreateClicked
+												}
+											/>
 											{/* SELECT ALL BUTTON */}
 											<Button
 												appearance="primary"
@@ -335,6 +347,7 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 								rows={rows}
 								isFixedSize
 								isLoading={TableLoadingState}
+								emptyView={<h2>Not found any employee</h2>}
 							/>
 						</ModalBody>
 						<ModalFooter>
@@ -360,7 +373,7 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 	);
 }
 
-export function ParameterCreareWorkforceModal({onCreatedClick}) {
+export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 	//CREATE WORKFORCE MODAL (CW)
 	const [isCWOpen, setIsCWOpen] = useState(false);
 	const openCWModal = useCallback(() => setIsCWOpen(true), []);
@@ -422,10 +435,10 @@ export function ParameterCreareWorkforceModal({onCreatedClick}) {
 			});
 	}, []);
 
-    const handleCreateClicked = () => {
-        onCreatedClick(); 
-    };
-    
+	const handleCreateClicked = () => {
+		onCreatedClick();
+	};
+
 	const onSelectedValue = (childValue) => {
 		console.log("Received value from child:", childValue);
 
@@ -517,7 +530,7 @@ export function ParameterCreareWorkforceModal({onCreatedClick}) {
 					setSkillsTable([]);
 					setLoadingSubmit(false);
 					setIsCWOpen(false);
-                    handleCreateClicked();
+					handleCreateClicked();
 				}
 			})
 			.catch(function (error) {
@@ -608,9 +621,11 @@ export function ParameterCreareWorkforceModal({onCreatedClick}) {
 											),
 										})),
 								};
-                                if(workforce_request.workingType == 0){
-                                    workforce_request.workingEfforts = [1,1,1,1,1,1,1]
-                                }
+								if (workforce_request.workingType == 0) {
+									workforce_request.workingEfforts = [
+										1, 1, 1, 1, 1, 1, 1,
+									];
+								}
 								console.log("Form data", workforce_request);
 								createNewWorkforce(workforce_request);
 								return new Promise((resolve) =>
