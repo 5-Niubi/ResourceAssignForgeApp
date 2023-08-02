@@ -80,13 +80,6 @@ function ProjectSideBar(rootPath = "") {
 						pathTo={"tasks"}
 						iconBefore={<IssuesIcon label="" />}
 					/>
-					<ButtonItemSideBar
-						key="task-group"
-						rootPath={rootPath}
-						text={"Task Groups"}
-						pathTo={"groups"}
-						iconBefore={<FolderIcon label="" />}
-					/>
 				</Section>
 			</NestableNavigationContent>
 

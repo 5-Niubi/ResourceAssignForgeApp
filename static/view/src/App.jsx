@@ -19,6 +19,7 @@ import { STORAGE, THREAD_STATE_DEFAULT } from "./common/contants";
 import Toastify from "./common/Toastify";
 import MorePage from "./pages/more";
 import { useEffectOnlyOnUpdate } from "./common/effects";
+import TasksPage from "./pages/tasks/TasksPage";
 
 export const ThreadLoadingContext = createContext({ state: [] });
 export const AppContext = createContext({
@@ -237,18 +238,7 @@ function App() {
 														<Route
 															path="tasks"
 															element={
-																<div>
-																	Tasks Page
-																	of
-																</div>
-															}
-														></Route>
-														<Route
-															path="groups"
-															element={
-																<div>
-																	Groups Page
-																</div>
+																<TasksPage/>
 															}
 														></Route>
 													</Route>

@@ -154,6 +154,7 @@ function VisualizeTasksPage({ handleChangeTab }) {
 				.then(function (res) {
 					if (Object.keys(res).length !== 0) {
 						setSkills(res);
+						cache("skills", JSON.stringify(res));
 					}
 				})
 				.catch(function (error) {
@@ -168,6 +169,7 @@ function VisualizeTasksPage({ handleChangeTab }) {
 				.then(function (res) {
 					if (Object.keys(res).length !== 0) {
 						setMilestones(res);
+						cache("milestones", JSON.stringify(res));
 					}
 				})
 				.catch(function (error) {
