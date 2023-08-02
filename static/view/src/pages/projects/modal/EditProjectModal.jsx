@@ -10,7 +10,7 @@ import Modal, {
 import { Grid, GridColumn } from "@atlaskit/page";
 import React, { Fragment, useState, useCallback, useEffect } from "react";
 import TextField from "@atlaskit/textfield";
-import Form, { Field, FormSection } from "@atlaskit/form";
+import Form, { Field, FormSection, HelperMessage } from "@atlaskit/form";
 import { DatePicker } from "@atlaskit/datetime-picker";
 import ObjectiveRange from "../form/ObjectiveRange";
 import { getCurrentTime } from "../../../common/utils";
@@ -25,7 +25,7 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 	const [project, setProject] = useState(openState.project);
 	const [projectName, setProjectName] = useState(project.name);
 	const [startDate, setStartDate] = useState(project.startDate);
-	const [endDate, setEndDate] = useState(startDate);
+	const [endDate, setEndDate] = useState(project.deadline);
 	const [budget, setBudget] = useState(0);
 	const [unit, setUnit] = useState("");
 	// const [objTime, setObjTime] = useState(50);
@@ -111,7 +111,7 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 	// const handleRangeSetObjQuality = useCallback(function (value) {
 	// 	setObjQuality(value);
 	// }, []);
-	
+
 	function handleSubmitCreate() {
 		setIsSubmitting(true);
 		let projectObjRequest = {
@@ -148,7 +148,17 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 					{({ formProps }) => (
 						<form id="form-with-id" {...formProps}>
 							<ModalHeader>
-								<ModalTitle>{project.name}</ModalTitle>
+								<ModalTitle>
+									<div
+										style={{
+											whiteSpace: "nowrap",
+											overflow: "hidden",
+											textOverflow: "ellipsis",
+										}}
+									>
+										{project.name}
+									</div>
+								</ModalTitle>
 								{project.isLoaded ? "" : <Spinner size={"medium"}></Spinner>}
 							</ModalHeader>
 							<ModalBody>
@@ -162,13 +172,18 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 												isRequired
 											>
 												{() => (
-													<TextField
-														autoComplete="off"
-														value={projectName}
-														onChange={handleSetProjectName}
-														isDisabled={!project.isLoaded}
-														isRequired
-													/>
+													<Fragment>
+														<TextField
+															autoComplete="off"
+															value={projectName}
+															onChange={handleSetProjectName}
+															isDisabled={!project.isLoaded}
+															isRequired
+														/>
+														<HelperMessage>
+															Project name must start with uppercase letter.
+														</HelperMessage>
+													</Fragment>
 												)}
 											</Field>
 										</FormSection>
@@ -199,23 +214,22 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 												)}
 											</Field>
 										</FormSection>
-										{/* <FormSection>
+										<FormSection>
 											<Grid spacing="compact" columns={columns}>
 												<GridColumn medium={8}>
 													<Field
 														aria-required={true}
 														name="budget"
 														label="Budget"
-														isRequired
 													>
-														{() => (
+														{(fieldProps) => (
 															<TextField
 																autoComplete="off"
 																value={budget}
 																onChange={handleSetBudget}
 																type="number"
 																isDisabled={!project.isLoaded}
-																isRequired
+																{...fieldProps}
 															/>
 														)}
 													</Field>
@@ -225,21 +239,20 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 														aria-required={true}
 														name="budgetUnit"
 														label="Unit"
-														isRequired={true}
 													>
-														{() => (
+														{(fieldProps) => (
 															<TextField
 																autoComplete="off"
 																value={unit}
 																onChange={handleSetUnit}
 																isDisabled={!project.isLoaded}
-																isRequired={true}
+																{...fieldProps}
 															/>
 														)}
 													</Field>
 												</GridColumn>
 											</Grid>
-										</FormSection> */}
+										</FormSection>
 										{/* <FormSection>
 												<ObjectiveRange
 													label="Objective Time"

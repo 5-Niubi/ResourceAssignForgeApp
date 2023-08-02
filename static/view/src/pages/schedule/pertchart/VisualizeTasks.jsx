@@ -10,6 +10,8 @@ import PageHeader from "@atlaskit/page-header";
 import Button, { LoadingButton } from "@atlaskit/button";
 import "./style.css";
 import { cache, getCache } from "../../../common/utils";
+import ChevronRightCircleIcon from "@atlaskit/icon/glyph/chevron-right-circle";
+import ChevronLeftCircleIcon from "@atlaskit/icon/glyph/chevron-left-circle";
 
 /**
  * Using as Page to show pert chart and task dependences
@@ -26,6 +28,12 @@ function VisualizeTasksPage({ handleChangeTab }) {
 	const [isSaving, setIsSaving] = useState(false);
 	const [isEstimating, setIsEstimating] = useState(false);
 	const [tasksError, setTasksError] = useState([]);
+
+	const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false);
+	const handleCollapseRightPanel = () => {
+		document.getElementsByClassName("tasks-compact")[0].classList.toggle("-collapsed");
+		setRightPanelCollapsed(document.getElementsByClassName("tasks-compact")[0].classList.contains("-collapsed"));
+	};
 
 	function handleEstimate() {
 		setIsEstimating(true);
@@ -121,17 +129,20 @@ function VisualizeTasksPage({ handleChangeTab }) {
 	const [tasks, setTasks] = useState(tasksCache);
 	const [skills, setSkills] = useState(skillsCache);
 	const [milestones, setMilestones] = useState(milestonesCache);
+	const [loadingTasks, setLoadingTasks] = useState(tasks.length == 0);
 	useEffect(function () {
 		var tasksCache = getCache("tasks");
 		if (!tasksCache) {
 			invoke("getTasksList", { projectId })
 				.then(function (res) {
+					setLoadingTasks(false);
 					if (res) {
 						setTasks(res);
 						cache("tasks", JSON.stringify(res));
 					}
 				})
 				.catch(function (error) {
+					setLoadingTasks(false);
 					console.log(error);
 					Toastify.error(error.toString());
 				});
@@ -237,7 +248,7 @@ function VisualizeTasksPage({ handleChangeTab }) {
 	);
 
 	return (
-		<div class="visualize-tasks" style={{ width: "100%", height: "90vh" }}>
+		<div class="visualize-tasks">
 			<PageLayout>
 				<Content>
 					<Main testId="main2" id="main2">
@@ -274,12 +285,11 @@ function VisualizeTasksPage({ handleChangeTab }) {
 						/>
 					</Main>
 					<div
+						className="right-sidebar tasks-compact"
 						style={{
-							backgroundColor: "#fafbfc",
 							boxSizing: "border-box",
 							borderLeft: "1px solid #e5e5e5",
 							marginLeft: "2rem",
-							marginRight: "-2rem",
 						}}
 					>
 						<RightSidebar
@@ -290,6 +300,16 @@ function VisualizeTasksPage({ handleChangeTab }) {
 							width={300}
 						>
 							<div
+								className="collapse-button"
+								onClick={handleCollapseRightPanel}
+							>
+								{rightPanelCollapsed ? (
+									<ChevronLeftCircleIcon />
+								) : (
+									<ChevronRightCircleIcon />
+								)}
+							</div>
+							<div
 								style={{
 									minHeight: "95vh",
 									padding: "10px",
@@ -298,6 +318,7 @@ function VisualizeTasksPage({ handleChangeTab }) {
 							>
 								<TasksCompact
 									tasks={tasks}
+									loadingTasks={loadingTasks}
 									tasksError={tasksError}
 									milestones={milestones}
 									skills={skills}

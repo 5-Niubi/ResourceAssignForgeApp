@@ -207,13 +207,19 @@ function CreateTaskModal({
 					updateSkills(skillsPage);
 					updateMilestones(ms);
 					Toastify.success("Created task successfully");
+					closeModal();
+				} else if (res.messages) {
+					Toastify.error(res.messages);
 				}
-				closeModal();
 			})
 			.catch((error) => {
 				setIsSubmitting(false);
-				console.log(error);
-				Toastify.error(error.toString());
+				console.log(error.message);
+				if (error.messages){
+					Toastify.error(res.messages);
+				} else {
+					Toastify.error(error.message);
+				}
 			});
 	}
 
@@ -247,8 +253,7 @@ function CreateTaskModal({
 												/>
 											)}
 										</Field>
-									</FormSection>
-									<FormSection>
+
 										<Field
 											name="duration"
 											label="Duration"
@@ -259,7 +264,16 @@ function CreateTaskModal({
 													autoComplete="off"
 													value={duration}
 													onChange={updateDuration}
-													elemAfterInput={<span style={{paddingRight: "10px"}}>DAYS</span>}
+													elemAfterInput={
+														<span
+															style={{
+																paddingRight:
+																	"10px",
+															}}
+														>
+															DAYS
+														</span>
+													}
 												/>
 											)}
 										</Field>
@@ -285,7 +299,8 @@ function CreateTaskModal({
 															handleCreateMilestone
 														}
 														isSearchable={true}
-														placeholder="Choose milestone"
+														placeholder="Choose group"
+														menuPosition="fixed"
 													/>
 												</Fragment>
 											)}
@@ -294,6 +309,7 @@ function CreateTaskModal({
 											label="Required skills"
 											name="skills"
 											defaultValue=""
+											isRequired={true}
 										>
 											{({ fieldProps }) => (
 												<Fragment>
@@ -313,6 +329,7 @@ function CreateTaskModal({
 														isMulti
 														isSearchable={true}
 														placeholder="Choose skills"
+														menuPosition="fixed"
 													/>
 												</Fragment>
 											)}
@@ -337,6 +354,7 @@ function CreateTaskModal({
 														isMulti
 														isSearchable={true}
 														placeholder="Choose precedence tasks"
+														menuPosition="fixed"
 													/>
 												</Fragment>
 											)}

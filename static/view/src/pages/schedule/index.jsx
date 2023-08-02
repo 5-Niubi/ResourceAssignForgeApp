@@ -27,40 +27,10 @@ function SchedulePage() {
 				setIsLoading(false);
 				console.log(error);
 				Toastify.error(error.toString());
-			});
-		// invoke("getTasksList", { projectId })
-		// 	.then(function (res) {
-		// 		if(res && res.length){
-		// 			cache("tasks", JSON.stringify(res));
-		// 		}
-		// 	})
-		// 	.catch(function (error) {
-		// 		console.log(error);
-		// 		Toastify.error(error.toString());
-		// 	});
-
-		// invoke("getAllSkills", {})
-		// 	.then(function (res) {
-		// 		cache("skills", JSON.stringify(res));
-		// 	})
-		// 	.catch(function (error) {
-		// 		console.log(error);
-		// 		Toastify.error(error.toString());
-		// 	});
-
-		// invoke("getAllMilestones", { projectId })
-		// 	.then(function (res) {
-		// 		cache("milestones", JSON.stringify(res));
-		// 	})
-		// 	.catch(function (error) {
-		// 		console.log(error);
-		// 		Toastify.error(error.toString());
-		// 	});
-
-		
+			});		
 	}, []);
 
-	return <>{isLoading ? <Spinner size="xlarge" /> : <ScheduleTabs />}</>;
+	return <>{isLoading ? <Spinner size="large" /> : <ScheduleTabs />}</>;
 }
 
 export default SchedulePage;

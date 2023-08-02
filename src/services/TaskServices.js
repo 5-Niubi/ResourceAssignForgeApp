@@ -18,6 +18,7 @@ async function createTask(taskRequest) {
 		);
 		return response;
 	} catch (error) {
+		// throw new Error(error.messages || "Error in create new task");
 		return Promise.reject(error);
 	}
 }
