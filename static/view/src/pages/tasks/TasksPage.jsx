@@ -9,16 +9,19 @@ import {
 	findObj,
 	getCache,
 } from "../../common/utils";
-import Toastify from "../../common/Toastify";
 import Button, { ButtonGroup } from "@atlaskit/button";
 import PageHeader from "@atlaskit/page-header";
 import DynamicTable from "@atlaskit/dynamic-table";
 import EmptyState from "@atlaskit/empty-state";
-import { ROW_PER_PAGE } from "../../common/contants";
+import { COLOR_SKILL_LEVEL, ROW_PER_PAGE } from "../../common/contants";
 import "./style.css";
 import EditIcon from "@atlaskit/icon/glyph/edit";
 import TrashIcon from "@atlaskit/icon/glyph/trash";
 import { Grid, GridColumn } from "@atlaskit/page";
+import CreateTaskModal from "../schedule/pertchart/modal/CreateTaskModal";
+import Lozenge from "@atlaskit/lozenge";
+import DeleteTaskModal from "../schedule/pertchart/modal/DeleteTaskModal";
+import Toastify from "../../common/Toastify";
 
 /**
  * Using as Demo Homepage
@@ -32,33 +35,48 @@ function TasksPage() {
 	const [loadingTasks, setLoadingTasks] = useState(true);
 	const [tasks, setTasks] = useState([]);
 	const [milestones, setMilestones] = useState([]);
+	const [skills, setSkills] = useState([]);
 	const [selectedMilestone, setSelectedMilestone] = useState(null);
 	const [selectedMilestoneIndex, setSelectedMilestoneIndex] = useState(0);
 	const [displayTasks, setDisplayTasks] = useState(tasks);
+	const [isModalCreateTaskOpen, setIsModalCreateTaskOpen] = useState(false);
+	const [isModalDeleteTaskOpen, setIsModalDeleteTaskOpen] = useState(false);
+	const [taskEdit, setTaskEdit] = useState(null);
+	const [taskEdited, setTaskEdited] = useState(false);
 
-	var projectCache = getCache("projectCache");
-	if (!projectCache) {
-		clearProjectBasedCache();
-		projectCache = {};
-	} else {
-		projectCache = JSON.parse(projectCache);
-		if (!projectCache || projectCache.id != projectCacheId) {
-			clearProjectBasedCache();
-			projectCache = {};
-		}
-	}
-
-	var tasksCache = getCache("tasks");
-	if (tasksCache) {
-		setTasks(JSON.parse(tasksCache));
-	}
-
-	var milestonesCache = getCache("milestones");
-	if (milestonesCache) {
-		setMilestones(JSON.parse(milestonesCache));
-	}
+	const updateTasks = (tasks) => {
+		cache("tasks", JSON.stringify(tasks));
+		setTasks(tasks);
+	};
+	const updateSkills = (skills) => {
+		cache("skills", JSON.stringify(skills));
+		setSkills(skills);
+	};
+	const updateMilestones = (milestones) => {
+		cache("milestones", JSON.stringify(milestones));
+		setMilestones(milestones);
+	};
+	const updateTaskEdited = (flag) => {
+		setTaskEdited(flag);
+	};
 
 	useEffect(function () {
+		setLoadingTasks(false);
+		var projectCache = getCache("projectCache");
+		if (!projectCache) {
+			clearProjectBasedCache();
+			projectCache = {};
+		} else {
+			projectCache = JSON.parse(projectCache);
+			if (!projectCache || projectCache.id != projectCacheId) {
+				clearProjectBasedCache();
+				projectCache = {};
+			}
+		}
+		var tasksCache = getCache("tasks");
+		var milestonesCache = getCache("milestones");
+		var skillsCache = getCache("skills");
+
 		if (Object.keys(projectCache).length == 0) {
 			setIsLoading(true);
 			invoke("getProjectDetail", { projectId })
@@ -91,6 +109,8 @@ function TasksPage() {
 					console.log(error);
 					Toastify.error(error.toString());
 				});
+		} else {
+			setTasks(JSON.parse(tasksCache));
 		}
 
 		if (!milestonesCache) {
@@ -104,23 +124,45 @@ function TasksPage() {
 					}
 				})
 				.catch(function (error) {
+					setLoadingTasks(false);
 					console.log(error);
 					Toastify.error(error.toString());
 				});
+		} else {
+			setMilestones(JSON.parse(milestonesCache));
+		}
+
+		if (!skillsCache) {
+			setLoadingTasks(true);
+			invoke("getAllSkills", {})
+				.then(function (res) {
+					setLoadingTasks(false);
+					if (Object.keys(res).length !== 0) {
+						setSkills(res);
+						cache("skills", JSON.stringify(res));
+					}
+				})
+				.catch(function (error) {
+					setLoadingTasks(false);
+					console.log(error);
+					Toastify.error(error.toString());
+				});
+		} else {
+			setSkills(JSON.parse(skillsCache));
 		}
 	}, []);
 
 	const handleChangeMilestone = (id, index = 0) => {
 		setSelectedMilestone(id);
 		setSelectedMilestoneIndex(index);
-		
+
 		var milestoneTasks = [];
-		if (id === null){
+		if (id === null) {
 			milestoneTasks = tasks;
 		}
-		if (id === 0){
+		if (id === 0) {
 			for (let j = 0; j < tasks.length; j++) {
-				if (!tasks[j].milestoneId){
+				if (!tasks[j].milestoneId) {
 					milestoneTasks.push(tasks[j]);
 				}
 			}
@@ -131,14 +173,22 @@ function TasksPage() {
 				}
 			}
 		}
-		
+
 		setDisplayTasks(milestoneTasks);
-	}
+	};
 
 	const actionsContent = (
 		<ButtonGroup>
 			<Button>Create new group</Button>
-			<Button appearance="primary">Create new task</Button>
+			<Button
+				appearance="primary"
+				onClick={() => {
+					setTaskEdit(null);
+					setIsModalCreateTaskOpen(true);
+				}}
+			>
+				Create new task
+			</Button>
 		</ButtonGroup>
 	);
 
@@ -167,14 +217,14 @@ function TasksPage() {
 			{
 				key: "skills",
 				content: "Required skills",
-				shouldTruncate: true,
+				shouldTruncate: false,
 				isSortable: false,
 				width: 20,
 			},
 			{
 				key: "precedences",
 				content: "Tasks precedences",
-				shouldTruncate: true,
+				shouldTruncate: false,
 				isSortable: false,
 				width: 20,
 			},
@@ -221,7 +271,7 @@ function TasksPage() {
 				},
 			],
 			onClick: (e) => {
-				handleChangeMilestone(m.id, index+2);
+				handleChangeMilestone(m.id, index + 2);
 			},
 		};
 	});
@@ -259,7 +309,7 @@ function TasksPage() {
 			cells: [
 				{
 					key: "no",
-					content: <div class="text-center">{index+1}</div>,
+					content: <div className="text-center">{index + 1}</div>,
 				},
 				{
 					key: "name",
@@ -271,28 +321,84 @@ function TasksPage() {
 				},
 				{
 					key: "skill",
-					content: "",
+					content: (
+						<>
+							{task.skillRequireds?.map((obj, i) => {
+								let skill = findObj(skills, obj.skillId);
+								return (
+									<span style={{ marginRight: "5px" }}>
+										<Lozenge
+											key={i}
+											style={{
+												backgroundColor:
+													COLOR_SKILL_LEVEL[
+														obj.level - 1
+													].color,
+												color: "white",
+											}}
+										>
+											{skill.name}
+										</Lozenge>
+									</span>
+								);
+							})}
+						</>
+					),
 				},
 				{
 					key: "precedences",
-					content: "",
+					content: (
+						<>
+							{task.precedences?.map((obj, i) => {
+								let preTask = findObj(tasks, obj.precedenceId);
+								if (preTask) {
+									return (
+										<span style={{ marginRight: "5px" }}>
+											<Lozenge
+												key={i}
+												style={{
+													marginRight: "5px",
+													maxWidth: "20px",
+												}}
+											>
+												{preTask.name}
+											</Lozenge>
+										</span>
+									);
+								}
+							})}
+						</>
+					),
 				},
 				{
 					key: "option",
 					content: (
 						<div className="actions">
 							<ButtonGroup>
-								<Button appearance="subtle">
+								<Button
+									appearance="subtle"
+									onClick={() => {
+										setTaskEdit(task);
+										setTaskEdited(false);
+										setIsModalCreateTaskOpen(true);
+									}}
+								>
 									<EditIcon />
 								</Button>
-								<Button appearance="subtle">
+								<Button
+									appearance="subtle"
+									onClick={() => {
+										setTaskEdit(task);
+										setIsModalDeleteTaskOpen(true);
+									}}
+								>
 									<TrashIcon />
 								</Button>
 							</ButtonGroup>
 						</div>
 					),
 				},
-			]
+			],
 		};
 	});
 
@@ -301,15 +407,17 @@ function TasksPage() {
 			{isLoading ? (
 				<Spinner size="large" />
 			) : (
-				<div class="tasks-page">
+				<div className="tasks-page">
 					<PageHeader actions={actionsContent}>Tasks List</PageHeader>
 					<Grid layout="fluid" spacing="compact" columns={10}>
 						<GridColumn medium={3}>
-							<div class="task-groups">
+							<div className="task-groups">
 								<DynamicTable
 									head={groupHead}
 									rows={groupRows}
-									highlightedRowIndex={[selectedMilestoneIndex]}
+									highlightedRowIndex={[
+										selectedMilestoneIndex,
+									]}
 									isFixedSize
 									isLoading={loadingTasks}
 								/>
@@ -334,9 +442,12 @@ function TasksPage() {
 											primaryAction={
 												<Button
 													appearance="primary"
-													onClick={() =>
-														console.log("onClick")
-													}
+													onClick={() => {
+														setTaskEdit(null);
+														setIsModalCreateTaskOpen(
+															true
+														);
+													}}
 												>
 													Create new task
 												</Button>
@@ -347,6 +458,37 @@ function TasksPage() {
 							</div>
 						</GridColumn>
 					</Grid>
+
+					{isModalCreateTaskOpen ? (
+						<CreateTaskModal
+							isOpen={isModalCreateTaskOpen}
+							setIsOpen={setIsModalCreateTaskOpen}
+							projectId={projectId}
+							milestones={milestones}
+							tasks={tasks}
+							skills={skills}
+							updateTasks={updateTasks}
+							updateCurrentTaskId={null}
+							updateSkills={updateSkills}
+							updateMilestones={updateMilestones}
+							taskEdit={taskEdit}
+							updateTaskEdited={updateTaskEdited}
+						/>
+					) : (
+						""
+					)}
+
+					{isModalDeleteTaskOpen ? (
+						<DeleteTaskModal
+							isOpen={isModalDeleteTaskOpen}
+							setIsOpen={setIsModalDeleteTaskOpen}
+							task={taskEdit}
+							tasks={tasks}
+							updateTasks={updateTasks}
+						/>
+					) : (
+						""
+					)}
 				</div>
 			)}
 		</>

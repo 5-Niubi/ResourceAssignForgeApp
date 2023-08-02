@@ -59,6 +59,17 @@ function taskResolver(resolver) {
 			return Promise.reject(error);
 		}
 	});
+
+	resolver.define("deleteTask", async function (req) {
+		try {
+			let response = await taskService.deleteTask(req.payload.taskId);
+			console.log(response);
+			return response;
+		} catch (error) {
+			console.log("Error in deleteTask: ", error);
+			return Promise.reject(error);
+		}
+	});
 }
 
 export default taskResolver;
