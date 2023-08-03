@@ -12,6 +12,7 @@ import Spinner from "@atlaskit/spinner";
 import { getCache } from "../../../common/utils";
 import EmptyState from "@atlaskit/empty-state";
 import { ROW_PER_PAGE } from "../../../common/contants";
+import "./style.css";
 
 /**
  * Using as Page to show pert chart and task dependences
@@ -22,7 +23,6 @@ function ResultPage({ handleChangeTab }) {
 
 	var project = getCache("project");
 	if (!project) {
-		
 	} else {
 		project = JSON.parse(project);
 	}
@@ -35,24 +35,21 @@ function ResultPage({ handleChangeTab }) {
 
 	const [solutions, setSolutions] = useState([]);
 	const [pageLoading, setPageLoading] = useState(true);
-	
-	useEffect(
-		function () {
-			invoke("getSolutionsByProject", { projectId })
-				.then(function (res) {
-					setPageLoading(false);
-					if (res) {
-						setSolutions(res.values);
-					}
-				})
-				.catch((error) => {
-					setPageLoading(false);
-					console.log(error);
-					Toastify.error(error.toString());
-				});
-		},
-		[]
-	);
+
+	useEffect(function () {
+		invoke("getSolutionsByProject", { projectId })
+			.then(function (res) {
+				setPageLoading(false);
+				if (res) {
+					setSolutions(res.values);
+				}
+			})
+			.catch((error) => {
+				setPageLoading(false);
+				console.log(error);
+				Toastify.error(error.toString());
+			});
+	}, []);
 
 	const [selectedSolution, setSelectedSolution] = useState(null);
 
@@ -65,25 +62,32 @@ function ResultPage({ handleChangeTab }) {
 				width: 15,
 			},
 			{
+				key: "since",
+				content: "Generated at",
+				shouldTruncate: true,
+				isSortable: true,
+				width: 20,
+			},
+			{
 				key: "duration",
 				content: "Duration",
 				shouldTruncate: true,
 				isSortable: true,
-				width: 25,
+				width: 15,
 			},
 			{
 				key: "cost",
 				content: "Cost",
 				shouldTruncate: true,
 				isSortable: true,
-				width: 25,
+				width: 15,
 			},
 			{
 				key: "quality",
 				content: "Quality",
 				shouldTruncate: true,
 				isSortable: true,
-				width: 25,
+				width: 15,
 			},
 			{
 				key: "action",
@@ -92,44 +96,62 @@ function ResultPage({ handleChangeTab }) {
 		],
 	};
 
-	const rows = solutions.map((s, index) => ({
-		key: `row-${s.id}`,
-		isHighlighted: false,
-		cells: [
-			{
-				key: index,
-				content: (
-					<Button
-						appearance="subtle-link"
-						onClick={() => setSelectedSolution(s)}
-					>
-						{"Solution #" + s.id}
-					</Button>
-				),
-			},
-			{
-				key: index,
-				content: s.duration + " days",
-			},
-			{
-				key: index,
-				content: "$" + s.cost,
-			},
-			{
-				key: index,
-				content: s.quality + "%",
-			},
-			{
-				key: "option",
-				content: (
-					<Button onClick={() => setSelectedSolution(s)}>View</Button>
-				),
-			},
-		],
-	}));
+	const rows = solutions.map((s, index) => {
+		let since = "N/A";
+		if (s.since) {
+			let datetime = new Date(s.since);
+			since = datetime.toLocaleDateString() + " " + datetime.toLocaleTimeString();
+		}
+		return ({
+			key: `row-${s.id}`,
+			isHighlighted: false,
+			cells: [
+				{
+					key: index,
+					content: (
+						<Button
+							appearance="subtle-link"
+							onClick={() => setSelectedSolution(s)}
+						>
+							{"Solution #" + s.id}
+						</Button>
+					),
+				},
+				{
+					key: index,
+					content: since,
+				},
+				{
+					key: index,
+					content: s.duration + " days",
+				},
+				{
+					key: index,
+					content: "$" + s.cost,
+				},
+				{
+					key: index,
+					content: s.quality + "%",
+				},
+				{
+					key: "option",
+					content: (
+						<div className="actions">
+						<Button onClick={() => setSelectedSolution(s)}>
+							View
+						</Button>
+						</div>
+					),
+				},
+			],
+		});
+	});
 
 	return (
-		<div style={{ width: "100%", height: "90vh" }}>
+		<div
+			className="solutions-list"
+			style={{ width: "100%", height: "90vh" }}
+		>
 			{selectedSolution !== null ? (
 				<GanttChartPage
 					setSelectedSolution={setSelectedSolution}
@@ -140,9 +162,9 @@ function ResultPage({ handleChangeTab }) {
 					<PageHeader actions={actionsContent}>
 						Solution optimizations
 					</PageHeader>
-					<h3 style={{ marginBottom: "15px" }}>
+					<h4 style={{ marginBottom: "10px" }}>
 						Total number of solutions: {solutions.length}
-					</h3>
+					</h4>
 					<DynamicTable
 						head={head}
 						rows={rows}

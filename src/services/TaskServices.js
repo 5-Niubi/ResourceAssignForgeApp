@@ -60,4 +60,16 @@ async function updateTask(task) {
 	}
 }
 
-export { getTasks, createTask, getTask, saveTasks, updateTask };
+async function deleteTask(id) {
+	try {
+		let response = await APIServices.delete(
+			`/api/Tasks/DeleteTask`,
+			{Id: id}
+		);
+		return response;
+	} catch (error) {
+		return Promise.reject(error);
+	}
+}
+
+export { getTasks, createTask, getTask, saveTasks, updateTask, deleteTask };

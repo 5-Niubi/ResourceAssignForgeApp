@@ -26,13 +26,30 @@ function CreateTaskModal({
 	updateTasks,
 	updateCurrentTaskId,
 	updateSkills,
-	updateMilestones
+	updateMilestones,
+	taskEdit,
+	updateTaskEdited,
 }) {
-	const [taskName, setTaskName] = useState("");
-	const [duration, setDuration] = useState(0);
-	const [milestone, setMilestone] = useState(null);
-	const [reqSkills, setReqSkills] = useState([]);
-	const [precedences, setPrecedences] = useState([]);
+	const [taskName, setTaskName] = useState(taskEdit ? taskEdit.name : "");
+	const [duration, setDuration] = useState(taskEdit ? taskEdit.duration : 0);
+
+	var initMilestone = null;
+	if (taskEdit) {
+		initMilestone = findObj(milestones, taskEdit.milestoneId);
+		if (initMilestone) {
+			initMilestone = {
+				value: initMilestone.id,
+				label: initMilestone.name,
+			};
+		}
+	}
+	const [milestone, setMilestone] = useState(initMilestone);
+	const [reqSkills, setReqSkills] = useState(
+		taskEdit ? taskEdit.skillRequireds : []
+	);
+	const [precedences, setPrecedences] = useState(
+		taskEdit ? taskEdit.precedences : []
+	);
 
 	const [ms, setMilestones] = useState(milestones);
 	const [skillsPage, setSkillsPage] = useState(skills);
@@ -88,7 +105,7 @@ function CreateTaskModal({
 	}, []);
 
 	const updateMilestone = useCallback(function (objValue) {
-		if (!objValue){
+		if (!objValue) {
 			setMilestone(null);
 		} else {
 			var milestone = findObj(ms, objValue.value);
@@ -110,12 +127,12 @@ function CreateTaskModal({
 			//check duplicate skill; update leve if needed
 			let existed = false;
 			skills?.forEach((s) => {
-				if (s.skillId == items[0]){
+				if (s.skillId == items[0]) {
 					s.level = items[1];
 					existed = true;
 				}
 			});
-			if (!existed){
+			if (!existed) {
 				skills.push({ skillId: items[0], level: items[1] });
 			}
 		});
@@ -160,11 +177,8 @@ function CreateTaskModal({
 				setIsSubmitting(false);
 				if (res.id) {
 					setSkillsPage([...skillsPage, res]);
-					
-					setReqSkills([
-						...reqSkills,
-						{ skillId: res.id, level: 1 },
-					]);
+
+					setReqSkills([...reqSkills, { skillId: res.id, level: 1 }]);
 
 					cache("skills", JSON.stringify([...skillsPage, res]));
 				}
@@ -197,30 +211,66 @@ function CreateTaskModal({
 			skillRequireds: reqSkills,
 			precedences,
 		};
-		invoke("createNewTask", { taskObjRequest })
-			.then(function (res) {
-				setIsSubmitting(false);
-				if (res.id) {
-					tasks.push(res);
-					updateTasks(tasks);
-					updateCurrentTaskId(res.id);
-					updateSkills(skillsPage);
-					updateMilestones(ms);
-					Toastify.success("Created task successfully");
-					closeModal();
-				} else if (res.messages) {
-					Toastify.error(res.messages);
-				}
-			})
-			.catch((error) => {
-				setIsSubmitting(false);
-				console.log(error.message);
-				if (error.messages){
-					Toastify.error(res.messages);
-				} else {
-					Toastify.error(error.message);
-				}
-			});
+		if (taskEdit) {
+			taskObjRequest.id = taskEdit.id;
+			//update current task
+			invoke("updateTask", { task: taskObjRequest })
+				.then(function (res) {
+					setIsSubmitting(false);
+					if (res.id) {
+						for(let i=0; i<tasks.length; i++) {
+							if (tasks[i].id == res.id) tasks[i] = res;
+						};
+						updateTasks(tasks);
+						if (updateTaskEdited){
+							updateTaskEdited(true);
+						}
+						updateSkills(skillsPage);
+						updateMilestones(ms);
+						Toastify.success("Updated task successfully");
+						closeModal();
+					} else if (res.messages) {
+						Toastify.error(res.messages);
+					}
+				})
+				.catch((error) => {
+					setIsSubmitting(false);
+					console.log(error.message);
+					if (error.messages) {
+						Toastify.error(res.messages);
+					} else {
+						Toastify.error(error.message);
+					}
+				});
+		} else {
+			//create new
+			invoke("createNewTask", { taskObjRequest })
+				.then(function (res) {
+					setIsSubmitting(false);
+					if (res.id) {
+						tasks.push(res);
+						updateTasks(tasks);
+						if (updateCurrentTaskId) {
+							updateCurrentTaskId(res.id);
+						}
+						updateSkills(skillsPage);
+						updateMilestones(ms);
+						Toastify.success("Created task successfully");
+						closeModal();
+					} else if (res.messages) {
+						Toastify.error(res.messages);
+					}
+				})
+				.catch((error) => {
+					setIsSubmitting(false);
+					console.log(error.message);
+					if (error.messages) {
+						Toastify.error(res.messages);
+					} else {
+						Toastify.error(error.message);
+					}
+				});
+		}
 	}
 
 	return (
@@ -383,7 +433,7 @@ function CreateTaskModal({
 												appearance="primary"
 												onClick={handleSubmitCreate}
 											>
-												Create
+												{taskEdit ? "Save" : "Create"}
 											</Button>
 										)}
 									</ButtonGroup>
