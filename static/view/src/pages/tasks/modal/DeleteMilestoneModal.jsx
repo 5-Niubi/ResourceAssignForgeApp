@@ -11,36 +11,40 @@ import Modal, {
 	ModalTitle,
 	ModalTransition,
 } from "@atlaskit/modal-dialog";
-import Toastify from "../../../../common/Toastify";
+import Toastify from "../../../common/Toastify";
 
-function DeleteTaskModal({
-	isOpen,
+function DeleteMilestoneModal({
 	setIsOpen,
-	task,
-	tasks,
-	updateTasks,
+	milestone,
+	milestones,
+	updateMilestones,
+	updateSelectedMilestoneIndex,
 }) {
 	const [isDeleting, setIsDeleting] = useState(false);
 	const closeModal = useCallback(function () {
 		setIsOpen(false);
 	});
-
 	const handleDelete = useCallback(() => {
 		setIsDeleting(true);
-		invoke("deleteTask", { taskId: task.id })
+		invoke("deleteMilestone", { milestoneId: milestone.id })
 			.then(function (res) {
-				for (let i = 0; i < tasks.length; i++) {
-					if (tasks[i].id == task.id) {
-						tasks.splice(i, 1);
+				for (let i = 0; i < milestones.length; i++) {
+					if (milestones[i].id == milestone.id) {
+						milestones.splice(i, 1);
 					}
 				}
-				updateTasks(tasks);
-				Toastify.success(`Delete task successfully`);
+				updateMilestones(milestones);
+				if (updateSelectedMilestoneIndex) {
+					updateSelectedMilestoneIndex(0);
+				}
+				Toastify.success(`Delete ${milestone.name} successfully`);
 				closeModal();
 			})
 			.catch(function (error) {
 				closeModal();
-				Toastify.error(error.toString());
+				if (error.message) {
+					Toastify.error(error.message);
+				} else Toastify.error(error.toString());
 			});
 	}, []);
 
@@ -50,12 +54,12 @@ function DeleteTaskModal({
 				<Modal onClose={closeModal}>
 					<ModalHeader>
 						<ModalTitle appearance="warning">
-							Delete {task.name}
+							Delete {milestone.name}
 						</ModalTitle>
 					</ModalHeader>
 					<ModalBody>
-						{task.name} will be delete permanly. This can not be
-						undone!!!
+						{milestone.name} will be delete permanly. This can not
+						be undone!!!
 					</ModalBody>
 					<ModalFooter>
 						<Button
@@ -66,15 +70,13 @@ function DeleteTaskModal({
 						>
 							Cancel
 						</Button>
-						{isDeleting ? (
-							<LoadingButton appearance="warning" isLoading>
-								Create
-							</LoadingButton>
-						) : (
-							<Button appearance="warning" onClick={handleDelete}>
-								Delete
-							</Button>
-						)}
+						<LoadingButton
+							appearance="warning"
+							isLoading={isDeleting}
+							onClick={handleDelete}
+						>
+							Delete
+						</LoadingButton>
 					</ModalFooter>
 				</Modal>
 			</ModalTransition>
@@ -82,4 +84,4 @@ function DeleteTaskModal({
 	);
 }
 
-export default DeleteTaskModal;
+export default DeleteMilestoneModal;

@@ -18,4 +18,29 @@ async function createSkill(skillReq) {
 	}
 }
 
-export { getAllSkill, createSkill };
+async function updateSkill(skillRequest) {
+	try {
+		let response = await APIServices.put(
+			`/api/Skills/UpdateNameSkill`,
+			null,
+			skillRequest
+		);
+		return response;
+	} catch (error) {
+		return Promise.reject(error);
+	}
+}
+
+async function deleteSkill(skillId) {
+	try {
+		let response = await APIServices.delete(
+			`/api/Skills/DeleteSkill`, 
+			{id: skillId}
+		);
+		return response;
+	} catch (error) {
+		return Promise.reject(error);
+	}
+}
+
+export { getAllSkill, createSkill, updateSkill, deleteSkill };

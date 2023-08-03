@@ -11,36 +11,36 @@ import Modal, {
 	ModalTitle,
 	ModalTransition,
 } from "@atlaskit/modal-dialog";
-import Toastify from "../../../../common/Toastify";
+import Toastify from "../../../common/Toastify";
 
-function DeleteTaskModal({
-	isOpen,
+function DeleteSkillModal({
 	setIsOpen,
-	task,
-	tasks,
-	updateTasks,
+	skill,
+	skills,
+	updateSkills
 }) {
 	const [isDeleting, setIsDeleting] = useState(false);
 	const closeModal = useCallback(function () {
 		setIsOpen(false);
 	});
-
 	const handleDelete = useCallback(() => {
 		setIsDeleting(true);
-		invoke("deleteTask", { taskId: task.id })
+		invoke("deleteSkill", { skillId: skill.id })
 			.then(function (res) {
-				for (let i = 0; i < tasks.length; i++) {
-					if (tasks[i].id == task.id) {
-						tasks.splice(i, 1);
+				for (let i = 0; i < skills.length; i++) {
+					if (skills[i].id == skill.id) {
+						skills.splice(i, 1);
 					}
 				}
-				updateTasks(tasks);
-				Toastify.success(`Delete task successfully`);
+				updateSkills(skills);
+				Toastify.success(`Delete ${skill.name} successfully`);
 				closeModal();
 			})
 			.catch(function (error) {
 				closeModal();
-				Toastify.error(error.toString());
+				if (error.message) {
+					Toastify.error(error.message);
+				} else Toastify.error(error.toString());
 			});
 	}, []);
 
@@ -50,12 +50,12 @@ function DeleteTaskModal({
 				<Modal onClose={closeModal}>
 					<ModalHeader>
 						<ModalTitle appearance="warning">
-							Delete {task.name}
+							Delete {skill.name}
 						</ModalTitle>
 					</ModalHeader>
 					<ModalBody>
-						{task.name} will be delete permanly. This can not be
-						undone!!!
+						{skill.name} will be delete permanly. This can not
+						be undone!!!
 					</ModalBody>
 					<ModalFooter>
 						<Button
@@ -66,15 +66,13 @@ function DeleteTaskModal({
 						>
 							Cancel
 						</Button>
-						{isDeleting ? (
-							<LoadingButton appearance="warning" isLoading>
-								Create
-							</LoadingButton>
-						) : (
-							<Button appearance="warning" onClick={handleDelete}>
-								Delete
-							</Button>
-						)}
+						<LoadingButton
+							appearance="warning"
+							isLoading={isDeleting}
+							onClick={handleDelete}
+						>
+							Delete
+						</LoadingButton>
 					</ModalFooter>
 				</Modal>
 			</ModalTransition>
@@ -82,4 +80,4 @@ function DeleteTaskModal({
 	);
 }
 
-export default DeleteTaskModal;
+export default DeleteSkillModal;

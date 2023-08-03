@@ -14,6 +14,11 @@
     box-sizing: border-box;
 }
 
+.tasks-container table th span{
+    margin-top: 7px;
+    display: block;
+}
+
 .tasks-container table tr{
     height: 40px;
     box-sizing: border-box;
@@ -44,6 +49,16 @@
 }
 
 .tasks-container table tr:hover .actions{
+    display: block;
+}
+
+.task-groups table th{
+    font-size: 14px;
+    height: 30px;
+    box-sizing: border-box;
+}
+.task-groups table th span{
+    margin-top: 7px;
     display: block;
 }
 
