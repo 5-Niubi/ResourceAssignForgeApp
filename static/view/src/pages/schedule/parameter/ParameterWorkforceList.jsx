@@ -54,28 +54,35 @@ function ParameterWorkforceList() {
 	};
 
 	useEffect(function () {
-		invoke("getWorkforceParameter", { projectId })
-			.then(function (res) {
-				let workforces = [];
-				for (let workforce of res) {
-					let itemWorkforce = {
-						id: workforce.id,
-						name: workforce.name,
-					};
-					workforces.push(itemWorkforce);
-				}
-				setIsLoading(false);
-				localStorage.setItem(
-					"workforce_parameter",
-					JSON.stringify(workforces)
-				);
-				setWorkforces(workforces);
-				console.log("Cac workforce", workforces);
-			})
-			.catch(function (error) {
-				console.log(error);
-				Toastify.error(error.toString());
-			});
+
+        let workforce_local = JSON.parse(
+            localStorage.getItem("workforce_parameter")
+        );
+        setWorkforces(workforce_local);
+		setIsLoading(false);
+
+		// invoke("getWorkforceParameter", { projectId })
+		// 	.then(function (res) {
+		// 		let workforces = [];
+		// 		for (let workforce of res) {
+		// 			let itemWorkforce = {
+		// 				id: workforce.id,
+		// 				name: workforce.name,
+		// 			};
+		// 			workforces.push(itemWorkforce);
+		// 		}
+		// 		setIsLoading(false);
+		// 		localStorage.setItem(
+		// 			"workforce_parameter",
+		// 			JSON.stringify(workforces)
+		// 		);
+		// 		setWorkforces(workforces);
+		// 		console.log("Cac workforce", workforces);
+		// 	})
+		// 	.catch(function (error) {
+		// 		console.log(error);
+		// 		Toastify.error(error.toString());
+		// 	});
 
 		invoke("getAllSkills", {})
 			.then(function (res) {
@@ -279,39 +286,40 @@ function ParameterWorkforceList() {
 				) : (
 					<>
 						<h5>Total number: {workforces.length}</h5>
-						{workforces
-							.slice(0, displayedWorkforces)
-							.map((workforce, index) =>
-								// BUTTON CLICK TO OPEN WORKFORCE INFORMATION DETAIL
-								loadingDetail &&
-								loadingDetailId === workforce.id ? (
-									<LoadingButton
-										style={{
-											marginTop: "5px",
-											marginRight: "8px",
-										}}
-										appearance="primary"
-										isLoading
-									>
-										Loading...
-									</LoadingButton>
-								) : (
-									<LoadingButton
-										style={{
-											marginTop: "5px",
-											marginRight: "8px",
-										}}
-										value={workforce.id}
-										onClick={() =>
-											handleOpenWorkforceModal(
-												workforce.id
-											)
-										}
-									>
-										{workforce.name}
-									</LoadingButton>
-								)
-							)}
+						{workforces.length > 0 &&
+							workforces
+								.slice(0, displayedWorkforces)
+								.map((workforce, index) =>
+									// BUTTON CLICK TO OPEN WORKFORCE INFORMATION DETAIL
+									loadingDetail &&
+									loadingDetailId === workforce.id ? (
+										<LoadingButton
+											style={{
+												marginTop: "5px",
+												marginRight: "8px",
+											}}
+											appearance="primary"
+											isLoading
+										>
+											Loading...
+										</LoadingButton>
+									) : (
+										<LoadingButton
+											style={{
+												marginTop: "5px",
+												marginRight: "8px",
+											}}
+											value={workforce.id}
+											onClick={() =>
+												handleOpenWorkforceModal(
+													workforce.id
+												)
+											}
+										>
+											{workforce.name}
+										</LoadingButton>
+									)
+								)}
 						{/* BUTTON CLICK TO SHOW ALL/SHOW LESS WORKFORCE */}
 						{workforces.length > 10 && (
 							<Button
@@ -394,9 +402,11 @@ function ParameterWorkforceList() {
 												),
 											})),
 									};
-                                    if(workforce_request.workingType == 0){
-                                        workforce_request.workingEfforts = [8,8,8,8,8,8,8];
-                                    }
+									if (workforce_request.workingType == 0) {
+										workforce_request.workingEfforts = [
+											8, 8, 8, 8, 8, 8, 8,
+										];
+									}
 									console.log("Form data", workforce_request);
 									updateWorkforce(workforce_request);
 									return new Promise((resolve) =>
@@ -1040,7 +1050,7 @@ function ParameterWorkforceList() {
 																	<Fragment>
 																		<CreatableAdvanced
 																			isRequired
-																			defaultOptions={skillDB.map(
+																			defaultOptions={skillDB?.map(
 																				(
 																					skill
 																				) => ({

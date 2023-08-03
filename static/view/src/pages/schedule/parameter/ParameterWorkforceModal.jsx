@@ -386,7 +386,8 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 	const [workforcesJiraAccount, setWorkforcesJiraAccount] = useState([]);
 
 	useEffect(function () {
-		invoke("getAllUserJira")
+        if(workforcesJiraAccount.length <1){
+            invoke("getAllUserJira")
 			.then(function (jiraUsersResponse) {
 				const jiraUsers = jiraUsersResponse
 					.filter((user) => user.accountType === "atlassian")
@@ -404,30 +405,12 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 				console.log(error);
 				Toastify.error(error.toString());
 			});
+        }
 
 		invoke("getAllSkills", {})
 			.then(function (res) {
 				setSkillDB(res);
 				localStorage.setItem("all_skills_DB", JSON.stringify(res));
-			})
-			.catch(function (error) {
-				console.log(error);
-				Toastify.error(error.toString());
-			});
-
-		invoke("getAllUserJira")
-			.then(function (jiraUsersResponse) {
-				const jiraUsers = jiraUsersResponse
-					.filter((user) => user.accountType === "atlassian")
-					.map((user) => ({
-						accountId: user.accountId,
-						email: user.emailAddress,
-						accountType: user.accountType,
-						name: user.displayName,
-						avatar: user.avatarUrls["48x48"],
-						displayName: user.displayName,
-					}));
-				setWorkforcesJiraAccount(jiraUsers);
 			})
 			.catch(function (error) {
 				console.log(error);

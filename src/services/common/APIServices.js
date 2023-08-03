@@ -68,6 +68,8 @@ class APIServices {
 					break;
 				case HttpStatus.BAD_REQUEST.code:
 					return Promise.reject(await response.json());
+                case HttpStatus.PRECONDITION_FAILED.code:
+                    return await response.json();
 			}
 			return Promise.reject(response);
 		} catch (err) {
