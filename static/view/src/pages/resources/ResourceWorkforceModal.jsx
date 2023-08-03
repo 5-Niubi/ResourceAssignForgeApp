@@ -1,8 +1,12 @@
-import React, { useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 
-import Button from "@atlaskit/button/standard-button";
-import { LoadingButton } from "@atlaskit/button";
+import { css, jsx } from "@emotion/react";
+import TrashIcon from "@atlaskit/icon/glyph/trash";
+import EditIcon from "@atlaskit/icon/glyph/edit";
+import Button from "@atlaskit/button";
 import { invoke } from "@forge/bridge";
+import LoadingButton from "@atlaskit/button";
+import Toastify from "../../common/Toastify";
 
 import Modal, {
 	ModalBody,
@@ -11,32 +15,37 @@ import Modal, {
 	ModalTitle,
 	ModalTransition,
 } from "@atlaskit/modal-dialog";
-import Toastify from "../../../../common/Toastify";
 
-function DeleteTaskModal({
-	isOpen,
-	setIsOpen,
-	task,
-	tasks,
-	updateTasks,
+const boldStyles = css({
+	fontWeight: "bold",
+});
+
+export default function ResourceDeleteWorkforceModal({
+	openState,
+	setOpenState,
+	setWorkforcesListState,
 }) {
+	const workforce = openState.workforce;
+
 	const [isDeleting, setIsDeleting] = useState(false);
-	const closeModal = useCallback(function () {
-		setIsOpen(false);
-	});
+	const closeModal = useCallback(
+		function () {
+			setOpenState({ workforce: workforce, isOpen: false });
+		},
+		[setOpenState]
+	);
 
 	const handleDelete = useCallback(() => {
 		setIsDeleting(true);
-		invoke("deleteTask", { taskId: task.id })
+		let workforce_id = workforce.id;
+		invoke("deleteWorkforce", { id: workforce_id })
 			.then(function (res) {
-				for (let i = 0; i < tasks.length; i++) {
-					if (tasks[i].id == task.id) {
-						tasks.splice(i, 1);
-					}
-				}
-				updateTasks(tasks);
-				Toastify.success(`Delete task successfully`);
+				Toastify.success(`Delete ${workforce.name} successfully`);
+				console.log(res);
 				closeModal();
+				setWorkforcesListState((prev) =>
+					prev.filter((item) => item.id !== workforce_id)
+				);
 			})
 			.catch(function (error) {
 				closeModal();
@@ -50,12 +59,12 @@ function DeleteTaskModal({
 				<Modal onClose={closeModal}>
 					<ModalHeader>
 						<ModalTitle appearance="warning">
-							Delete {task.name}
+							Delete {workforce.name}
 						</ModalTitle>
 					</ModalHeader>
 					<ModalBody>
-						{task.name} will be delete permanly. This can not be
-						undone!!!
+						The employee name '{workforce.name}' will be permanently
+						removed?
 					</ModalBody>
 					<ModalFooter>
 						<Button
@@ -68,7 +77,7 @@ function DeleteTaskModal({
 						</Button>
 						{isDeleting ? (
 							<LoadingButton appearance="warning" isLoading>
-								Create
+								Deleting...
 							</LoadingButton>
 						) : (
 							<Button appearance="warning" onClick={handleDelete}>
@@ -81,5 +90,3 @@ function DeleteTaskModal({
 		</>
 	);
 }
-
-export default DeleteTaskModal;

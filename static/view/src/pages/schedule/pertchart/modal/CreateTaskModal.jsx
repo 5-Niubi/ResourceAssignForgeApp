@@ -5,10 +5,8 @@ import Modal, {
 	ModalHeader,
 	ModalTitle,
 	ModalTransition,
-	useModal,
 } from "@atlaskit/modal-dialog";
 import Select, { CreatableSelect } from "@atlaskit/select";
-import { Grid, GridColumn } from "@atlaskit/page";
 import React, { Fragment, useState, useCallback, useEffect } from "react";
 import TextField from "@atlaskit/textfield";
 import Form, { Field, FormSection } from "@atlaskit/form";
@@ -28,7 +26,7 @@ function CreateTaskModal({
 	updateSkills,
 	updateMilestones,
 	taskEdit,
-	updateTaskEdited,
+	updateTaskEdit,
 }) {
 	const [taskName, setTaskName] = useState(taskEdit ? taskEdit.name : "");
 	const [duration, setDuration] = useState(taskEdit ? taskEdit.duration : 0);
@@ -222,8 +220,8 @@ function CreateTaskModal({
 							if (tasks[i].id == res.id) tasks[i] = res;
 						};
 						updateTasks(tasks);
-						if (updateTaskEdited){
-							updateTaskEdited(true);
+						if (updateTaskEdit){
+							updateTaskEdit({...taskEdit});
 						}
 						updateSkills(skillsPage);
 						updateMilestones(ms);
@@ -285,7 +283,9 @@ function CreateTaskModal({
 						{({ formProps }) => (
 							<form id="form-with-id" {...formProps}>
 								<ModalHeader>
-									<ModalTitle>Create new Task</ModalTitle>
+									<ModalTitle>
+										{taskEdit ? "Edit task" : "Create new task"}
+									</ModalTitle>
 								</ModalHeader>
 								<ModalBody>
 									<FormSection>

@@ -24,6 +24,22 @@ function skillResolver(resolver) {
 
 		}
 	});
+
+	resolver.define("updateSkill", async function (req) {
+		try {               
+			return await skillService.updateSkill(req.payload.skillRequest);
+		} catch (error) {
+			console.log("Error in updateSkill: ", error);
+		}
+	});
+
+	resolver.define("deleteSkill", async function (req) {
+		try {               
+			return await skillService.deleteSkill(req.payload.skillId);
+		} catch (error) {
+			console.log("Error in deleteSkill: ", error);
+		}
+	});
 }
 
 export default skillResolver;

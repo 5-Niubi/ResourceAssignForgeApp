@@ -24,7 +24,7 @@ const barContent = (
       />
     </div>
     <div style={{ flex: '0 0 200px', paddingTop: "5px", paddingLeft:"5px" }}>
-    <InfoMessageColor/>
+    
     </div>
 
   </div>
@@ -32,11 +32,9 @@ const barContent = (
 
 const WorkforcePageHeader = () => {
   return (
-    <PageHeader
-      bottomBar={barContent}
-    >
-      Employee List
-    </PageHeader>
+		<PageHeader bottomBar={barContent}>
+			Employee List <InfoMessageColor />
+		</PageHeader>
   );
 };
 

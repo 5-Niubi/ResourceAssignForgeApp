@@ -22,6 +22,8 @@ import CreateTaskModal from "../schedule/pertchart/modal/CreateTaskModal";
 import Lozenge from "@atlaskit/lozenge";
 import DeleteTaskModal from "../schedule/pertchart/modal/DeleteTaskModal";
 import Toastify from "../../common/Toastify";
+import CreateMilestoneModal from "./modal/CreateMilestoneModal";
+import DeleteMilestoneModal from "./modal/DeleteMilestoneModal";
 
 /**
  * Using as Demo Homepage
@@ -39,14 +41,28 @@ function TasksPage() {
 	const [selectedMilestone, setSelectedMilestone] = useState(null);
 	const [selectedMilestoneIndex, setSelectedMilestoneIndex] = useState(0);
 	const [displayTasks, setDisplayTasks] = useState(tasks);
+
 	const [isModalCreateTaskOpen, setIsModalCreateTaskOpen] = useState(false);
 	const [isModalDeleteTaskOpen, setIsModalDeleteTaskOpen] = useState(false);
 	const [taskEdit, setTaskEdit] = useState(null);
-	const [taskEdited, setTaskEdited] = useState(false);
+
+	const [isModalCreateMilestoneOpen, setIsModalCreateMilestoneOpen] =
+		useState(false);
+	const [isModalDeleteMilestoneOpen, setIsModalDeleteMilestoneOpen] =
+		useState(false);
+	const [milestoneEdit, setMilestoneEdit] = useState(null);
 
 	const updateTasks = (tasks) => {
 		cache("tasks", JSON.stringify(tasks));
 		setTasks(tasks);
+
+		var milestoneTasks = [];
+		for (let j = 0; j < tasks.length; j++) {
+			if (tasks[j].milestoneId == selectedMilestone) {
+				milestoneTasks.push(tasks[j]);
+			}
+		}
+		setDisplayTasks(milestoneTasks);
 	};
 	const updateSkills = (skills) => {
 		cache("skills", JSON.stringify(skills));
@@ -55,9 +71,6 @@ function TasksPage() {
 	const updateMilestones = (milestones) => {
 		cache("milestones", JSON.stringify(milestones));
 		setMilestones(milestones);
-	};
-	const updateTaskEdited = (flag) => {
-		setTaskEdited(flag);
 	};
 
 	useEffect(function () {
@@ -179,7 +192,14 @@ function TasksPage() {
 
 	const actionsContent = (
 		<ButtonGroup>
-			<Button>Create new group</Button>
+			<Button
+				onClick={() => {
+					setMilestoneEdit(null);
+					setIsModalCreateMilestoneOpen(true);
+				}}
+			>
+				Create new group
+			</Button>
 			<Button
 				appearance="primary"
 				onClick={() => {
@@ -258,10 +278,22 @@ function TasksPage() {
 							{m.name}
 							<div className="actions">
 								<ButtonGroup>
-									<Button appearance="subtle">
+									<Button
+										appearance="subtle"
+										onClick={() => {
+											setMilestoneEdit(m);
+											setIsModalCreateMilestoneOpen(true);
+										}}
+									>
 										<EditIcon />
 									</Button>
-									<Button appearance="subtle">
+									<Button
+										appearance="subtle"
+										onClick={() => {
+											setMilestoneEdit(m);
+											setIsModalDeleteMilestoneOpen(true);
+										}}
+									>
 										<TrashIcon />
 									</Button>
 								</ButtonGroup>
@@ -313,7 +345,16 @@ function TasksPage() {
 				},
 				{
 					key: "name",
-					content: task.name,
+					content: (
+						<div
+							onClick={() => {
+								setTaskEdit(task);
+								setIsModalCreateTaskOpen(true);
+							}}
+						>
+							{task.name}
+						</div>
+					),
 				},
 				{
 					key: "duration",
@@ -379,7 +420,6 @@ function TasksPage() {
 									appearance="subtle"
 									onClick={() => {
 										setTaskEdit(task);
-										setTaskEdited(false);
 										setIsModalCreateTaskOpen(true);
 									}}
 								>
@@ -472,7 +512,7 @@ function TasksPage() {
 							updateSkills={updateSkills}
 							updateMilestones={updateMilestones}
 							taskEdit={taskEdit}
-							updateTaskEdited={updateTaskEdited}
+							updateTaskEdit={(task) => setTaskEdit(task)}
 						/>
 					) : (
 						""
@@ -485,6 +525,35 @@ function TasksPage() {
 							task={taskEdit}
 							tasks={tasks}
 							updateTasks={updateTasks}
+							updateTaskEdit={(task) => setTaskEdit(task)}
+						/>
+					) : (
+						""
+					)}
+
+					{isModalCreateMilestoneOpen ? (
+						<CreateMilestoneModal
+							isOpen={isModalCreateMilestoneOpen}
+							setIsOpen={setIsModalCreateMilestoneOpen}
+							projectId={projectId}
+							milestones={milestones}
+							updateMilestones={updateMilestones}
+							milestoneEdit={milestoneEdit}
+							updateMilestoneEdit={(m) => updateMilestoneEdit(m)}
+						/>
+					) : (
+						""
+					)}
+
+					{isModalDeleteMilestoneOpen ? (
+						<DeleteMilestoneModal
+							setIsOpen={setIsModalDeleteMilestoneOpen}
+							milestone={milestoneEdit}
+							milestones={milestones}
+							updateMilestones={updateMilestones}
+							updateSelectedMilestoneIndex={(i) =>
+								setSelectedMilestoneIndex(i)
+							}
 						/>
 					) : (
 						""

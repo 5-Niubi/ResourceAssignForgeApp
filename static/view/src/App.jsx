@@ -7,7 +7,6 @@ import HomeSideBar from "./components/side-nav/HomeSideBar";
 import ProjectListHome from "./pages/projects/ProjectsListHome";
 import AppFrame from "./components/common/AppFrame";
 import SchedulePage from "./pages/schedule";
-import ResourcesPage from "./pages/resources";
 import ProjectSideBar from "./components/side-nav/ProjectSideBar";
 import Spinner from "@atlaskit/spinner";
 import StartUpPage from "./pages/startup/StartUpPage";
@@ -19,8 +18,11 @@ import { STORAGE, THREAD_STATE_DEFAULT } from "./common/contants";
 import Toastify from "./common/Toastify";
 import MorePage from "./pages/more";
 import { useEffectOnlyOnUpdate } from "./common/effects";
+import ResourcesPage from "./pages/resources/ResourcePage";
 import TasksPage from "./pages/tasks/TasksPage";
 import ErrorModal from "./components/ErrorModal";
+import SkillsPage from "./pages/skills/SkillsPage";
+import "./pages/style.css";
 
 export const ThreadLoadingContext = createContext({ state: [] });
 export const AppContext = createContext();
@@ -203,7 +205,7 @@ function App() {
 													<Route
 														path="/skills"
 														element={
-															<div>Skills</div>
+															<SkillsPage/>
 														}
 													></Route>
 													<Route

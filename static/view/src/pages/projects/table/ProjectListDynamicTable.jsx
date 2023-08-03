@@ -35,7 +35,7 @@ function ProjectListDynamicTable({ isLoading, content }) {
 		cells: [
 			{
 				key: data.id,
-				content: index + 1,
+				content: <div className="text-center">{index + 1}</div>,
 			},
 			{
 				key: data.name,

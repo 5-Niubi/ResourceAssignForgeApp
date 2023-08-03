@@ -64,45 +64,55 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 	const [TableLoadingState, setTableLoadingState] = useState(true);
 	const [searchInput, setSearchInput] = useState("");
 	const [workforces, setWorkforces] = useState([]);
-
 	const [selectedWorkforces, setSelectedWorkforces] = useState([]);
-	useEffect(function () {
-		invoke("getAllWorkforces")
-			.then(function (res) {
-				let workforces = [];
-				for (let workforce of res) {
-					let itemWorkforce = {
-						id: workforce.id,
-						accountId: workforce.accountId,
-						email: workforce.email,
-						accountType: workforce.accountType,
-						name: workforce.name,
-						avatar: workforce.avatar,
-						displayName: workforce.displayName,
-						unitSalary: workforce.unitSalary,
-						workingType: workforce.workingType,
-						workingEfforts: workforce.workingEfforts,
-						skills: workforce.skills,
-					};
-					workforces.push(itemWorkforce);
-				}
-				setTableLoadingState(false);
-				setWorkforces(workforces);
-				const localWorkforceIds = workforce_local.map((workforce) =>
-					workforce.id.toString()
-				);
-				setSelectedWorkforces(localWorkforceIds);
+	const [createClicked, setCreateClicked] = useState(false);
 
-				//CHECK BUTTON SELECT ALL
-				if (workforces.length == localWorkforceIds.length) {
-					setSelectAll(true);
-				}
-			})
-			.catch(function (error) {
-				console.log(error);
-				Toastify.error(error.toString());
-			});
-	}, []);
+	const handleCreateClicked = () => {
+		setCreateClicked(true);
+		console.log("setCreateClicked", "Da click");
+	};
+
+	useEffect(
+		function () {
+			invoke("getAllWorkforces")
+				.then(function (res) {
+					let workforces = [];
+					for (let workforce of res) {
+						let itemWorkforce = {
+							id: workforce.id,
+							accountId: workforce.accountId,
+							email: workforce.email,
+							accountType: workforce.accountType,
+							name: workforce.name,
+							avatar: workforce.avatar,
+							displayName: workforce.displayName,
+							unitSalary: workforce.unitSalary,
+							workingType: workforce.workingType,
+							workingEfforts: workforce.workingEfforts,
+							skills: workforce.skills,
+						};
+						workforces.push(itemWorkforce);
+					}
+					setTableLoadingState(false);
+					setWorkforces(workforces);
+					const localWorkforceIds = workforce_local.map((workforce) =>
+						workforce.id.toString()
+					);
+					setSelectedWorkforces(localWorkforceIds);
+
+					//CHECK BUTTON SELECT ALL
+					if (workforces.length == localWorkforceIds.length) {
+						setSelectAll(true);
+					}
+				})
+				.catch(function (error) {
+					console.log(error);
+					Toastify.error(error.toString());
+				});
+			setCreateClicked(false);
+		},
+		[createClicked]
+	);
 
 	//FILTER WORKFORCE SELECT TABLE
 	const [workforcesFilter, setWorkforcesFilter] = useState(workforces);
@@ -111,9 +121,19 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 			setWorkforcesFilter(workforces);
 		} else {
 			setWorkforcesFilter(
-				workforces.filter((e) =>
-					e.name.toLowerCase().includes(query.toLowerCase())
-				)
+				workforces.filter((e) => {
+					const lowercaseQuery = query.toLowerCase().trim();
+					const nameMatch = e.name
+						.toLowerCase()
+						.includes(lowercaseQuery);
+					const skillMatch = e.skills?.some((skill) =>
+						skill.name
+							.replace("-", " ")
+							.toLowerCase()
+							.includes(lowercaseQuery)
+					);
+					return nameMatch || skillMatch;
+				})
 			);
 		}
 	}, []);
@@ -126,10 +146,9 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 	);
 
 	function handleOnSearchBoxChange(e) {
-		setSearchInput(e.target.value);
-		if (e.target.value != null) {
-			filterWorkforceName(workforces, searchInput);
-		}
+		const newSearchInput = e.target.value;
+		setSearchInput(newSearchInput);
+		filterWorkforceName(workforces, newSearchInput);
 	}
 
 	function handleCheckboxChange(workforceId) {
@@ -148,7 +167,7 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 		cells: [
 			{
 				key: "no",
-				content: "No",
+				content: null,
 				width: 8,
 			},
 			{
@@ -197,9 +216,9 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 											COLOR_SKILL_LEVEL[skill.level - 1]
 												.color,
 										color:
-									(skill.level === 1)
-										? "#091e42"
-										: "white",
+											skill.level === 1
+												? "#091e42"
+												: "white",
 									}}
 									isBold
 								>
@@ -282,7 +301,7 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 									>
 										<TextField
 											isCompact
-											placeholder="Search Employee Name"
+											placeholder="Search Employee/Skill"
 											aria-label="Filter"
 											onChange={handleOnSearchBoxChange}
 											value={searchInput}
@@ -294,14 +313,19 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 										}}
 									>
 										<ButtonGroup>
-											<Button
+											{/* <Button
 												appearance="primary"
 												onClick={() => {
 													closeSWModal();
 												}}
 											>
 												Create new
-											</Button>
+											</Button> */}
+											<ParameterCreareWorkforceModal
+												onCreatedClick={
+													handleCreateClicked
+												}
+											/>
 											{/* SELECT ALL BUTTON */}
 											<Button
 												appearance="primary"
@@ -323,6 +347,7 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 								rows={rows}
 								isFixedSize
 								isLoading={TableLoadingState}
+								emptyView={<h2>Not found any employee</h2>}
 							/>
 						</ModalBody>
 						<ModalFooter>
@@ -348,7 +373,7 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 	);
 }
 
-export function ParameterCreareWorkforceModal() {
+export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 	//CREATE WORKFORCE MODAL (CW)
 	const [isCWOpen, setIsCWOpen] = useState(false);
 	const openCWModal = useCallback(() => setIsCWOpen(true), []);
@@ -361,7 +386,8 @@ export function ParameterCreareWorkforceModal() {
 	const [workforcesJiraAccount, setWorkforcesJiraAccount] = useState([]);
 
 	useEffect(function () {
-		invoke("getAllUserJira")
+        if(workforcesJiraAccount.length <1){
+            invoke("getAllUserJira")
 			.then(function (jiraUsersResponse) {
 				const jiraUsers = jiraUsersResponse
 					.filter((user) => user.accountType === "atlassian")
@@ -379,6 +405,7 @@ export function ParameterCreareWorkforceModal() {
 				console.log(error);
 				Toastify.error(error.toString());
 			});
+        }
 
 		invoke("getAllSkills", {})
 			.then(function (res) {
@@ -389,26 +416,11 @@ export function ParameterCreareWorkforceModal() {
 				console.log(error);
 				Toastify.error(error.toString());
 			});
-
-		invoke("getAllUserJira")
-			.then(function (jiraUsersResponse) {
-				const jiraUsers = jiraUsersResponse
-					.filter((user) => user.accountType === "atlassian")
-					.map((user) => ({
-						accountId: user.accountId,
-						email: user.emailAddress,
-						accountType: user.accountType,
-						name: user.displayName,
-						avatar: user.avatarUrls["48x48"],
-						displayName: user.displayName,
-					}));
-				setWorkforcesJiraAccount(jiraUsers);
-			})
-			.catch(function (error) {
-				console.log(error);
-				Toastify.error(error.toString());
-			});
 	}, []);
+
+	const handleCreateClicked = () => {
+		onCreatedClick();
+	};
 
 	const onSelectedValue = (childValue) => {
 		console.log("Received value from child:", childValue);
@@ -501,6 +513,7 @@ export function ParameterCreareWorkforceModal() {
 					setSkillsTable([]);
 					setLoadingSubmit(false);
 					setIsCWOpen(false);
+					handleCreateClicked();
 				}
 			})
 			.catch(function (error) {
@@ -591,9 +604,11 @@ export function ParameterCreareWorkforceModal() {
 											),
 										})),
 								};
-                                if(workforce_request.workingType == 0){
-                                    workforce_request.workingEfforts = [1,1,1,1,1,1,1]
-                                }
+								if (workforce_request.workingType == 0) {
+									workforce_request.workingEfforts = [
+										1, 1, 1, 1, 1, 1, 1,
+									];
+								}
 								console.log("Form data", workforce_request);
 								createNewWorkforce(workforce_request);
 								return new Promise((resolve) =>

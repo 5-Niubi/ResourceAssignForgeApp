@@ -36,9 +36,6 @@ import { RadioGroup } from "@atlaskit/radio";
 import Page from "@atlaskit/page";
 import PageHeader from "@atlaskit/page-header";
 
-const boldStyles = css({
-	fontWeight: "bold",
-});
 const objectiveItems = [
 	{ name: "time", value: "time", label: "Time" },
 	{ name: "cost", value: "cost", label: "Cost" },
@@ -56,37 +53,6 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 	const [isLoading, setIsLoading] = useState(false);
 	const [isScheduling, setIsScheduling] = useState(false);
 
-	// useEffect(function () {
-	// 	invoke("getProjectDetail", { projectId })
-	// 		.then(function (res) {
-	// 			let project = {
-	// 				startDate: res.startDate,
-	// 				endDate: res.deadline,
-	// 				budgetUnit: res.budgetUnit,
-	// 				budget: res.budget,
-	// 			};
-	// 			setStartDate(project.startDate);
-	// 			setEndDate(project.endDate);
-	// 			setBudget(project.budget);
-	// 			setBudgetUnit(project.budgetUnit);
-	// 			console.log(
-	// 				"PROJECT DATE: ",
-	// 				project.startDate +
-	// 					", " +
-	// 					project.endDate +
-	// 					", " +
-	// 					project.budget +
-	// 					", " +
-	// 					project.budgetUnit
-	// 			);
-
-	// 			setIsLoading(false);
-	// 		})
-	// 		.catch(function (error) {
-	// 			console.log("PROJECT DATE: ", error);
-	// 		});
-	// }, []);
-
 	const handleSetStartDate = useCallback(function (value) {
 		setStartDate(value);
 	}, []);
@@ -94,10 +60,6 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 	const handleSetEndDate = useCallback(function (value) {
 		setEndDate(value);
 	}, []);
-
-	const [isOpen, setIsOpen] = useState(false);
-	const openModal = useCallback(() => setIsOpen(true), []);
-	const closeModal = useCallback(() => setIsOpen(false), []);
 
 	const validateNumberOnly = (value) => {
 		//REQUIRES NOT NULL, NUMBER ONLY
@@ -113,16 +75,6 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 			return "NOT_VALID";
 		}
 		return undefined;
-	};
-
-	const ParameterResourcesRequest = {
-		ResourceId: 0,
-		Type: "",
-	};
-
-	const params = {
-		Budget: 0,
-		Duration: 0,
 	};
 
 	function SaveParameters({ cost, objectives }) {
@@ -141,9 +93,9 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 		var data = {
 			ProjectId: Number(projectId),
 			Duration: calculateDuration({ startDate, endDate }),
-            ObjectiveTime: (objectives === "time")?1:null,
-            ObjectiveCost: (objectives === "cost")?1:null,
-            ObjectiveQuality: (objectives === "quality")?1:null,
+			ObjectiveTime: objectives === "time" ? 1 : null,
+			ObjectiveCost: objectives === "cost" ? 1 : null,
+			ObjectiveQuality: objectives === "quality" ? 1 : null,
 			StartDate: startDate,
 			DeadLine: endDate,
 			Budget: Number(cost),
@@ -170,10 +122,15 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 									})
 										.then(function (res) {
 											setIsScheduling(false);
-											if (res && res.status == "success") {
+											if (
+												res &&
+												res.status == "success"
+											) {
 												clearInterval(scheduleInterval);
 
-												Toastify.success("Schedule successfully.");
+												Toastify.success(
+													"Schedule successfully."
+												);
 
 												handleChangeTab(3);
 											}
@@ -190,21 +147,15 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 							Toastify.error(error.toString());
 						});
 				}
-				// DISPLAY SUCCESSFUL MESSAGE OR NEED MORE SKILL REQUIRED MESSAGE (NOT DONE)
-				Toastify.info(res);
+				// DISPLAY SUCCESSFUL MESSAGE OR NEED MORE SKILL REQUIRED MESSAGE
 				console.log("message required skills in task", res);
+				Toastify.info("These task id are missing skill: " + res.taskSkillRequiredError?.map((task)=> (task.taskId)));
 				setIsScheduling(false);
 			})
 			.catch(function (error) {
 				// handleChangeTab(3);
 				setIsScheduling(false);
-                //READ ERROR MESSAGE:
-                for (let taskMessage in error)[
-                    Toastify.info(taskMessage.taskId),
-                    Toastify.info(taskMessage.skillRequireds?.map((skill)=>{skill.skillId})),
-                    Toastify.info(taskMessage.messages)
-                ]
-				// Toastify.error(error.toString());
+				Toastify.error(error.toString());
 				setIsScheduling(false);
 			});
 	}
@@ -317,7 +268,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 										{() => (
 											<Fragment>
 												<DatePicker
-                                                    minDate={startDate}
+													minDate={startDate}
 													value={endDate}
 													onChange={handleSetEndDate}
 													dateFormat={DATE_FORMAT.DMY}

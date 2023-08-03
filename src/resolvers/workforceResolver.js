@@ -61,6 +61,15 @@ function workforceResolver(resolver){
 		}
 	});
 
+    resolver.define("deleteWorkforce", async function (req) {
+		try {
+			return await workforceService.deleteWorkforce(req.payload.id);
+		} catch (error) {
+			console.log("Error in deleteWorkforce: ", error);
+			return Promise.reject(error);
+		}
+	});
+
 }
 
 export default workforceResolver;
