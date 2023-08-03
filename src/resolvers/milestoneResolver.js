@@ -10,6 +10,8 @@ function milestoneResolver(resolver) {
 			return await milestoneService.getAllMilestones(req.payload.projectId);
 		} catch (error) {
 			console.log("Error in getAllMilestones: ", error);
+			throw new Error(error);
+
 		}
 	});
 
@@ -19,6 +21,30 @@ function milestoneResolver(resolver) {
 			return response;
 		} catch (error) {
 			console.log("Error in createMilestone: ", error);
+			throw new Error(error);
+
+			return Promise.reject(error);
+		}
+	});
+
+	resolver.define("updateMilestone", async function (req) {
+		try {
+			let response = await milestoneService.updateMilestone(req.payload.milestoneObjRequest);
+			return response;
+		} catch (error) {
+			console.log("Error in updateMilestone: ", error);
+			return Promise.reject(error);
+		}
+	});
+
+	resolver.define("deleteMilestone", async function (req) {
+		try {
+			let response = await milestoneService.deleteMilestone(req.payload.milestoneId);
+			console.log(response);
+			return response;
+		} catch (error) {
+			console.log("Error in deleteMilestone: ", error);
+			// throw new Error(error.message || "Error in Deleting milestone");
 			return Promise.reject(error);
 		}
 	});

@@ -10,6 +10,8 @@ function taskResolver(resolver) {
 			return await taskService.getTasks(req.payload.projectId);
 		} catch (error) {
 			console.log("Error in getTasksList: ", error);
+			throw new Error(error);
+
 			return Promise.reject(error);
 		}
 	});
@@ -33,6 +35,8 @@ function taskResolver(resolver) {
 			return response;
 		} catch (error) {
 			console.log("Error in getTaskDetail: ", error);
+			throw new Error(error);
+
 			return Promise.reject(error);
 		}
 	});
@@ -44,6 +48,8 @@ function taskResolver(resolver) {
 			return response;
 		} catch (error) {
 			console.log("Error in saveTasks: ", error);
+			throw new Error(error);
+
 			Promise.reject(error);
 			return error;
 		}
@@ -56,6 +62,18 @@ function taskResolver(resolver) {
 			return response;
 		} catch (error) {
 			console.log("Error in updateTask: ", error);
+			throw new Error(error);
+			return Promise.reject(error);
+		}
+	});
+
+	resolver.define("deleteTask", async function (req) {
+		try {
+			let response = await taskService.deleteTask(req.payload.taskId);
+			console.log(response);
+			return response;
+		} catch (error) {
+			console.log("Error in deleteTask: ", error);
 			return Promise.reject(error);
 		}
 	});

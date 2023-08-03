@@ -121,7 +121,7 @@ class APIServices {
 					fetchUrl.searchParams.append(key, params[key])
 				);
 			}
-			console.log("TOKEN: ", await storage.getSecret(STORAGE.TOKEN));
+			// console.log("TOKEN: ", await storage.getSecret(STORAGE.TOKEN));
 			let response = await API.fetch(fetchUrl.toString(), {
 				method: "DELETE",
 				headers: {

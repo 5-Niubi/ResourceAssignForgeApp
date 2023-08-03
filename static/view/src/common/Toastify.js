@@ -15,6 +15,7 @@ class Toastify {
 	}
 
     error(content) {
+		console.log(content);
 		toast.error(content, {
 			position: "bottom-right",
 			autoClose: 5000,

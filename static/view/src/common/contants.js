@@ -1,5 +1,6 @@
-export const APP_NAME = "Resource Assign";
-export const APP_NAME_DESCRIPTOR = "Resource Assign Demo";
+export const APP_NAME = "WoTaas";
+export const APP_NAME_DESCRIPTOR = "Worker - Task Auto Assign";
+export const PROJECT_NAME_DESCRIPTOR = "Software Project";
 
 export const MEDIA_QUERY = {
 	DESKTOP_LAPTOP: {
@@ -27,7 +28,7 @@ export const DATE_FORMAT = {
 	DMY: "DD/MM/YYYY",
 };
 
-export const ROW_PER_PAGE = 10;
+export const ROW_PER_PAGE = 15;
 export const ROW_PER_PAGE_MODAL_TABLE = 7;
 
 export const THREAD_STATUS = Object.freeze({

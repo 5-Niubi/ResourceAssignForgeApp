@@ -19,6 +19,9 @@ import Toastify from "./common/Toastify";
 import MorePage from "./pages/more";
 import { useEffectOnlyOnUpdate } from "./common/effects";
 import ResourcesPage from "./pages/resources/ResourcePage";
+import TasksPage from "./pages/tasks/TasksPage";
+import SkillsPage from "./pages/skills/SkillsPage";
+import "./pages/style.css";
 
 export const ThreadLoadingContext = createContext({ state: [] });
 export const AppContext = createContext({
@@ -203,7 +206,7 @@ function App() {
 													<Route
 														path="/skills"
 														element={
-															<div>Skills</div>
+															<SkillsPage/>
 														}
 													></Route>
 													<Route
@@ -237,18 +240,7 @@ function App() {
 														<Route
 															path="tasks"
 															element={
-																<div>
-																	Tasks Page
-																	of
-																</div>
-															}
-														></Route>
-														<Route
-															path="groups"
-															element={
-																<div>
-																	Groups Page
-																</div>
+																<TasksPage/>
 															}
 														></Route>
 													</Route>

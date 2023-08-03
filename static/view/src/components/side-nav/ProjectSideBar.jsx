@@ -19,6 +19,8 @@ import React, { useEffect, useState } from "react";
 import ButtonItemSideBar from "./ButtonItemSideBar";
 import { useNavigate, useParams } from "react-router";
 import { AtlassianIcon } from "@atlaskit/logo";
+import Avatar from "@atlaskit/avatar";
+import { PROJECT_NAME_DESCRIPTOR } from "../../common/contants";
 
 function ProjectSideBar(rootPath = "") {
 	const navigate = useNavigate();
@@ -29,11 +31,7 @@ function ProjectSideBar(rootPath = "") {
 		invoke("getProjectDetail", { projectId })
 			.then(function (res) {
 				setProjectSidebar(res);
-                localStorage.setItem(
-                    "project_detail",
-                    JSON.stringify(res)
-                );
-
+				localStorage.setItem("project_detail", JSON.stringify(res));
 			})
 			.catch(function (error) {});
 	}, []);
@@ -42,8 +40,15 @@ function ProjectSideBar(rootPath = "") {
 		<SideNavigation label="project" testId="side-navigation">
 			<NavigationHeader>
 				<Header
-					description="Sidebar header description"
-					iconBefore={<AtlassianIcon appearance="neutral" />}
+					description={PROJECT_NAME_DESCRIPTOR}
+					iconBefore={
+						<Avatar
+							size="small"
+							appearance="square"
+							src={""}
+							name="Project Avatar"
+						/>
+					}
 				>
 					{projectSidebar.name ? (
 						projectSidebar.name
@@ -79,13 +84,6 @@ function ProjectSideBar(rootPath = "") {
 						text={"Task Lists"}
 						pathTo={"tasks"}
 						iconBefore={<IssuesIcon label="" />}
-					/>
-					<ButtonItemSideBar
-						key="task-group"
-						rootPath={rootPath}
-						text={"Task Groups"}
-						pathTo={"groups"}
-						iconBefore={<FolderIcon label="" />}
 					/>
 				</Section>
 			</NestableNavigationContent>
