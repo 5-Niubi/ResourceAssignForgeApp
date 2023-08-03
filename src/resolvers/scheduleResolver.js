@@ -12,6 +12,8 @@ function scheduleResolver(resolver) {
 			return response;
 		} catch (error) {
 			console.log("Error in schedule: ", error);
+			throw new Error(error);
+
 			return Promise.reject(error);
 		}
 	});
@@ -23,6 +25,8 @@ function scheduleResolver(resolver) {
 			return response;
 		} catch (error) {
 			console.log("Error in schedule: ", error);
+			throw new Error(error);
+
 			return Promise.reject(error);
 		}
 	});
@@ -34,6 +38,8 @@ function scheduleResolver(resolver) {
 			return response;
 		} catch (error) {
 			console.log("Error in saveSolution: ", error);
+			throw new Error(error);
+
 			return Promise.reject(error);
 		}
 	});
@@ -45,6 +51,8 @@ function scheduleResolver(resolver) {
 			return response;
 		} catch (error) {
 			console.log("Error in getSolutionsByProject: ", error);
+			throw new Error(error);
+
 			return Promise.reject(error);
 		}
 	});
@@ -56,6 +64,8 @@ function scheduleResolver(resolver) {
 			return response;
 		} catch (error) {
 			console.log("Error in getSchedule: ", error);
+			throw new Error(error);
+
 			return Promise.reject(error);
 		}
 	});
