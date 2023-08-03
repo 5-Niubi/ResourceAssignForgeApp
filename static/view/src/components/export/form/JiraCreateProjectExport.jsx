@@ -1,6 +1,6 @@
 import { LoadingButton } from "@atlaskit/button";
 import Button from "@atlaskit/button";
-import { Field } from "@atlaskit/form";
+import { Field, HelperMessage } from "@atlaskit/form";
 import Modal, {
 	ModalBody,
 	ModalFooter,
@@ -9,7 +9,7 @@ import Modal, {
 	ModalTransition,
 } from "@atlaskit/modal-dialog";
 import TextField from "@atlaskit/textfield";
-import React, { useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { extractProjectKey } from "../../../common/utils";
 
 function JiraCreateProjectExport({ state, onCreateClick, isLoading }) {
@@ -28,7 +28,10 @@ function JiraCreateProjectExport({ state, onCreateClick, isLoading }) {
 		setProjectKey(extractProjectKey(e.target.value));
 	}
 	function handleProjectKeyInput(e) {
-		setProjectKey(e.target.value);
+		let input = e.target.value;
+		if (input.length <= 10) {
+			setProjectKey(extractProjectKey(input));
+		}
 	}
 
 	useEffect(() => {
@@ -53,14 +56,25 @@ function JiraCreateProjectExport({ state, onCreateClick, isLoading }) {
 							/>
 						)}
 					</Field>
-					<Field name="projectKey" label="Project Key">
+					<Field name="projectKey" label="Project Key" isRequired>
 						{(fieldProps) => (
-							<TextField
-								name="projectKey"
-								{...fieldProps}
-								value={projectKey}
-								onChange={handleProjectKeyInput}
-							/>
+							<Fragment>
+								<TextField
+									name="projectKey"
+									{...fieldProps}
+									value={projectKey}
+									onChange={handleProjectKeyInput}
+								/>
+								<HelperMessage>
+									<ul>
+										<li>
+											Project keys must start with an uppercase letter, followed
+											by one or more uppercase alphanumeric characters.
+										</li>
+										<li>Project key is bellow 10 characters.</li>
+									</ul>
+								</HelperMessage>
+							</Fragment>
 						)}
 					</Field>
 				</ModalBody>

@@ -20,11 +20,10 @@ import Toastify from "./common/Toastify";
 import MorePage from "./pages/more";
 import { useEffectOnlyOnUpdate } from "./common/effects";
 import TasksPage from "./pages/tasks/TasksPage";
+import ErrorModal from "./components/ErrorModal";
 
 export const ThreadLoadingContext = createContext({ state: [] });
-export const AppContext = createContext({
-	subscription: {},
-});
+export const AppContext = createContext();
 
 function App() {
 	// Enable auto change theme Dark/light mode within Jira
@@ -112,7 +111,7 @@ function App() {
 	return (
 		<>
 			{isAuthenticated ? (
-				<AppContext.Provider value={appContextState}>
+				<AppContext.Provider value={{appContextState, setAppContextState}}>
 					<ThreadLoadingContext.Provider
 						value={{ state: threadState }}
 					>
@@ -265,6 +264,7 @@ function App() {
 					<StartUpPage />
 				</>
 			)}
+			{appContextState.error && <ErrorModal setState={setAppContextState}>{appContextState.error}</ErrorModal>} 
 			<ToastContainer />
 		</>
 	);
