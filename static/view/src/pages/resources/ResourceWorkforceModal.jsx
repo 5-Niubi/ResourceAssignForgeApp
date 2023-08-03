@@ -20,7 +20,11 @@ const boldStyles = css({
 	fontWeight: "bold",
 });
 
-export default function ResourceDeleteWorkforceModal({ openState, setOpenState }) {
+export default function ResourceDeleteWorkforceModal({
+	openState,
+	setOpenState,
+	setWorkforcesListState,
+}) {
 	const workforce = openState.workforce;
 
 	const [isDeleting, setIsDeleting] = useState(false);
@@ -33,11 +37,15 @@ export default function ResourceDeleteWorkforceModal({ openState, setOpenState }
 
 	const handleDelete = useCallback(() => {
 		setIsDeleting(true);
-		invoke("deleteWorkforce", { workforce_id: workforce.id })
+		let workforce_id = workforce.id;
+		invoke("deleteWorkforce", { id: workforce_id })
 			.then(function (res) {
 				Toastify.success(`Delete ${workforce.name} successfully`);
 				console.log(res);
 				closeModal();
+				setWorkforcesListState((prev) =>
+					prev.filter((item) => item.id !== workforce_id)
+				);
 			})
 			.catch(function (error) {
 				closeModal();
@@ -55,7 +63,8 @@ export default function ResourceDeleteWorkforceModal({ openState, setOpenState }
 						</ModalTitle>
 					</ModalHeader>
 					<ModalBody>
-					    The employee name '{workforce.name}' will be permanently removed?
+						The employee name '{workforce.name}' will be permanently
+						removed?
 					</ModalBody>
 					<ModalFooter>
 						<Button
@@ -81,4 +90,3 @@ export default function ResourceDeleteWorkforceModal({ openState, setOpenState }
 		</>
 	);
 }
-

@@ -61,6 +61,7 @@ function ResourceWorkforceTable() {
 			.catch((error) => {
 				console.log(error);
 				Toastify.error(error.toString());
+				setTableLoadingState(false);
 			});
 	}, []);
 
@@ -267,6 +268,7 @@ function ResourceWorkforceTable() {
 				<ResourceDeleteWorkforceModal
 					openState={modalDeleteState}
 					setOpenState={setModalDeleteState}
+                    setWorkforcesListState={setWorkforces}
 				/>
 			) : (
 				""
