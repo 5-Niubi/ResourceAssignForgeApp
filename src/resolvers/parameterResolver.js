@@ -13,6 +13,8 @@ function parameterResolver(resolver) {
 			return response;
 		} catch (error) {
 			console.log("Error in save parameters: ", error);
+			throw new Error(error);
+
 			return Promise.reject(error);
 		}
 	});
@@ -24,6 +26,8 @@ function parameterResolver(resolver) {
 			return response;
 		} catch (error) {
 			console.log("Error in workforce parameters: ", error);
+			throw new Error(error);
+
 			return Promise.reject(error);
 		}
 	});
@@ -35,6 +39,8 @@ function parameterResolver(resolver) {
 			return response;
 		} catch (error) {
 			console.log("Error in GetEstimateOverallWorkforce: ", error);
+			throw new Error(error);
+
 			return Promise.reject(error);
 		}
 	});

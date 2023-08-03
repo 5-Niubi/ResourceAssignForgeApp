@@ -9,6 +9,8 @@ function skillResolver(resolver) {
 		try {               
 			return await skillService.getAllSkill();
 		} catch (error) {
+			throw new Error(error);
+
 			console.log("Error in getAllSkills: ", error);
 		}
 	});
@@ -18,6 +20,8 @@ function skillResolver(resolver) {
 			return await skillService.createSkill(req.payload.skillReq);
 		} catch (error) {
 			console.log("Error in createSkill: ", error);
+			throw new Error(error);
+
 		}
 	});
 }

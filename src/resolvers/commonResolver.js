@@ -21,7 +21,8 @@ function commonResolver(resolver) {
 				authenUrl,
 			});
 		} catch (error) {
-			return Promise.reject(error);
+			throw new Error(error);
+			// return Promise.reject(error);
 		}
 	});
 
@@ -33,7 +34,8 @@ function commonResolver(resolver) {
 				isAuthenticated,
 			});
 		} catch (error) {
-			return Promise.reject(error);
+			throw new Error(error);
+			// return Promise.reject(error);
 		}
 	});
 
@@ -42,7 +44,8 @@ function commonResolver(resolver) {
 			await AuthenWithBE.handleUnauthorizedStatus();
 			return Promise.resolve();
 		} catch (error) {
-			return Promise.reject(error);
+			throw new Error(error);
+			// return Promise.reject(error);
 		}
 	});
 

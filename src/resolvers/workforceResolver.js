@@ -5,11 +5,14 @@ import { workforceService } from "../services";
  * @param {Resolver} resolver
  */
 function workforceResolver(resolver){
-    resolver.define("getAllWorkforces", async function (request){
+
+    resolver.define("getAllWorkforces", async function (req){
         try {
-            return await workforceService.getAllWorkforces(request.payload.page);
+            return await workforceService.getAllWorkforces();
         } catch (error){
             console.log("Workforce Error: ", error);
+			throw new Error(error);
+
             return Promise.reject(error);
         }
     });
@@ -19,6 +22,8 @@ function workforceResolver(resolver){
 			return await workforceService.getAllUsersJira({});
 		} catch (error) {
 			console.log("Error in getAllUserJira: ", error);
+			throw new Error(error);
+
 			return Promise.reject(error);
 		}
 	});
@@ -28,6 +33,8 @@ function workforceResolver(resolver){
 			return await workforceService.updateWorkforce(req.payload.workforce_request);
 		} catch (error) {
 			console.log("Error in UpdateWorkforce: ", error);
+			throw new Error(error);
+
 			return Promise.reject(error);
 		}
 	});
@@ -37,6 +44,8 @@ function workforceResolver(resolver){
 			return await workforceService.getWorkforceById(req.payload.id);
 		} catch (error) {
 			console.log("Error in Get Workforce ID: ", error);
+			throw new Error(error);
+
 			return Promise.reject(error);
 		}
 	});
@@ -46,6 +55,8 @@ function workforceResolver(resolver){
 			return await workforceService.createWorkforce(req.payload.workforce_request);
 		} catch (error) {
 			console.log("Error in Create Workforce: ", error);
+			throw new Error(error);
+
 			return Promise.reject(error);
 		}
 	});
