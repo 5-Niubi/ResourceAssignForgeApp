@@ -58,11 +58,11 @@ async function createWorkforce(workforce_request) {
 	}
 }
 
-async function deleteWorkforce(workforce_id) {
+async function deleteWorkforce(id) {
 	try {
 		let response = await APIServices.delete(
 			`/api/Workforces/DeleteWorkforce`,
-			workforce_id
+			{id,}
 		);
 		return response;
 	} catch (error) {
