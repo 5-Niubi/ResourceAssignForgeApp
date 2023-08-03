@@ -30,6 +30,21 @@ function exportResolver(resolver) {
 			);
 		} catch (error) {
 			console.log("getDownloadMSXMLUrl Error: ", error);
+			throw new Error(error);
+
+			return Promise.reject(error);
+		}
+	});
+
+	resolver.define("checkAdministratorprivileges", async function (request) {
+		try {
+			return await exportService.checkPrivileges(
+				request.context
+			);
+		} catch (error) {
+			console.log("checkAdministratorprivileges Error: ", error);
+			throw new Error(error);
+
 			return Promise.reject(error);
 		}
 	});
