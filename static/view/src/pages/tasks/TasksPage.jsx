@@ -41,13 +41,15 @@ function TasksPage() {
 	const [selectedMilestone, setSelectedMilestone] = useState(null);
 	const [selectedMilestoneIndex, setSelectedMilestoneIndex] = useState(0);
 	const [displayTasks, setDisplayTasks] = useState(tasks);
-	
+
 	const [isModalCreateTaskOpen, setIsModalCreateTaskOpen] = useState(false);
 	const [isModalDeleteTaskOpen, setIsModalDeleteTaskOpen] = useState(false);
 	const [taskEdit, setTaskEdit] = useState(null);
-	
-	const [isModalCreateMilestoneOpen, setIsModalCreateMilestoneOpen] = useState(false);
-	const [isModalDeleteMilestoneOpen, setIsModalDeleteMilestoneOpen] = useState(false);
+
+	const [isModalCreateMilestoneOpen, setIsModalCreateMilestoneOpen] =
+		useState(false);
+	const [isModalDeleteMilestoneOpen, setIsModalDeleteMilestoneOpen] =
+		useState(false);
 	const [milestoneEdit, setMilestoneEdit] = useState(null);
 
 	const updateTasks = (tasks) => {
@@ -343,7 +345,16 @@ function TasksPage() {
 				},
 				{
 					key: "name",
-					content: task.name,
+					content: (
+						<div
+							onClick={() => {
+								setTaskEdit(task);
+								setIsModalCreateTaskOpen(true);
+							}}
+						>
+							{task.name}
+						</div>
+					),
 				},
 				{
 					key: "duration",
