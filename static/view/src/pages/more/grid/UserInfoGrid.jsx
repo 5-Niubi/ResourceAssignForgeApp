@@ -11,8 +11,8 @@ import { SUBSCRIPTION } from "../../../common/contants";
 
 const columns = 12;
 function UserInfoGrid() {
-	const appContext = useContext(AppContext);
-	let subscription = appContext.subscription;
+	const {appContextState} = useContext(AppContext);
+	let subscription = appContextState.subscription;
 
 	function handleChangePlanClick() {
 		router.open(`https://localhost:5242/Upgrade?token=${subscription.token}`);

@@ -29,7 +29,7 @@ function threadResolver(resolver) {
 
 	resolver.define("removeThreadInfo", async function (req) {
 		try {
-			await threadService.removeThreadState(req.payload.threadId);
+			await threadService.removeThreadState();
 			return Promise.resolve();
 		} catch (error) {
 			console.log("removeThreadInfo");

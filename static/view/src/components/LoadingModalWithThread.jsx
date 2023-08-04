@@ -8,7 +8,7 @@ import Modal, {
 } from "@atlaskit/modal-dialog";
 import ProgressBar from "@atlaskit/progress-bar";
 import { invoke } from "@forge/bridge";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import Toastify from "../common/Toastify";
 import {
 	INTERVAL_FETCH,
@@ -17,29 +17,32 @@ import {
 	THREAD_ACTION,
 	THREAD_STATUS,
 } from "../common/contants";
-import { removeThreadInfo } from "../common/utils";
+import { isArrayEmpty, isObjectEmpty, removeThreadInfo } from "../common/utils";
 import signal, { HubConnectionBuilder } from "@microsoft/signalr";
+import { AppContext } from "../App";
 
 function LoadingModalWithThread({ state }) {
 	const [modalState, setModalState] = state;
+	const { setAppContextState } = useContext(AppContext);
 	const closeModal = useCallback(
 		() => setModalState((prev) => ({ ...prev, isModalOpen: false })),
 		[]
 	);
 	const [progress, setProgress] = useState("...");
+	const [errorMsg, setErrorMsg] = useState("");
 
 	// --- Handle Loading
 	let retryNumber = RETRY_TIMES;
-	function checkingThread(intervalId) {	
+	function checkingThread(intervalId) {
 		invoke("getThreadResult", { threadId: modalState.threadId })
 			.then((res) => {
 				retryNumber = RETRY_TIMES;
-				handleThreadSuccess(res);
+				handleThreadSuccess(res, intervalId);
 			})
 			.catch((error) => {
 				Toastify.error(error.toString());
 				if (!--retryNumber) {
-					removeThreadInfo(modalState.threadId);
+					removeThreadInfo();
 					localStorage.removeItem(STORAGE.THREAD_INFO);
 					closeModal();
 					if (intervalId) {
@@ -57,7 +60,7 @@ function LoadingModalWithThread({ state }) {
 
 		return () => clearInterval(intervalId); //This is important
 	}, []);
-	const handleThreadSuccess = useCallback((res) => {
+	const handleThreadSuccess = useCallback((res, intervalId) => {
 		console.log(res);
 
 		// Export thread success
@@ -72,16 +75,52 @@ function LoadingModalWithThread({ state }) {
 						`Export successfully: ${res.result.projectName} was created`
 					);
 				}
-                
-				removeThreadInfo(res.threadId);
+
+				removeThreadInfo();
 				closeModal();
 				break;
 			case THREAD_STATUS.ERROR:
-				Toastify.error(
-					`${res.result.message} - ${JSON.parse(res.result.response).error}`
-				);
+				let message, response, errorMessages, errors;
+				message = res.result.message;
+				
+				if (res.result.response) {
+					response = JSON.parse(res.result.response);
+					errorMessages = response.errorMessages;
+					errors = response.errors;
+				}
+				// setErrorMsg(JSON.stringify(JSON.parse(res.result.response).errors));
 
-				removeThreadInfo(res.threadId);
+				const errorBody = (
+					<div>
+						{message && (
+							<div>
+								<h4>{message}</h4>
+							</div>
+						)}
+
+						{!isArrayEmpty(errorMessages) && (
+							<div>
+								Messages Error:
+								<ul>
+									{errorMessages.map((e, index) => (
+										<li key={index}>{e}</li>
+									))}
+								</ul>
+							</div>
+						)}
+						{!isObjectEmpty(errors) && (
+							<div>
+								Errors:
+								{JSON.stringify(errors)};
+							</div>
+						)}
+					</div>
+				);
+				setAppContextState((prev) => ({ ...prev, error: errorBody }));
+				if (intervalId) {
+					clearInterval(intervalId);
+				}
+				removeThreadInfo();
 				closeModal();
 				break;
 		}
@@ -119,6 +158,14 @@ function LoadingModalWithThread({ state }) {
 				</ModalBody>
 				<ModalFooter></ModalFooter>
 			</Modal>
+			{errorMsg.length > 0 && (
+				<>
+					<Modal onClose={closeModal}>
+						<ModalBody>{errorMsg}</ModalBody>
+						<ModalFooter></ModalFooter>
+					</Modal>
+				</>
+			)}
 		</ModalTransition>
 	);
 }
