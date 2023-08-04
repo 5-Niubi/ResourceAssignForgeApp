@@ -560,7 +560,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 								setLoadingSubmit(true);
 								let workforce_request = {
 									id: 0, //DEFAULT
-									accountId: null, //DEFAULT
+									accountId: (data.jiraAccount !== null)? data.jiraAccount?.value:null, //DEFAULT
 									email: data.email,
 									accountType: "atlassian", //DEFAULT
 									name: data.name,
@@ -638,15 +638,12 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															inputId="single-select-example"
 															className="single-select"
 															classNamePrefix="react-select"
-															options={[
-																workforcesJiraAccount.map(
-																	(user) => ({
-																		label: user.displayName,
-																		value: user.displayName,
-																		avatar: user.avatar,
-																	})
-																),
-															]}
+                                                            {...fieldProps}
+															options={workforcesJiraAccount?.map(user => ({
+                                                                label: user.displayName,
+                                                                value: user.accountId,
+                                                                avatar: user.avatar,
+                                                              }))}
 															formatOptionLabel={
 																formatOptionLabel
 															}
