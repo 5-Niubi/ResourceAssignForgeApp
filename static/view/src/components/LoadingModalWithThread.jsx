@@ -17,7 +17,7 @@ import {
 	THREAD_ACTION,
 	THREAD_STATUS,
 } from "../common/contants";
-import { removeThreadInfo } from "../common/utils";
+import { isArrayEmpty, isObjectEmpty, removeThreadInfo } from "../common/utils";
 import signal, { HubConnectionBuilder } from "@microsoft/signalr";
 import { AppContext } from "../App";
 
@@ -42,7 +42,7 @@ function LoadingModalWithThread({ state }) {
 			.catch((error) => {
 				Toastify.error(error.toString());
 				if (!--retryNumber) {
-					removeThreadInfo(modalState.threadId);
+					removeThreadInfo();
 					localStorage.removeItem(STORAGE.THREAD_INFO);
 					closeModal();
 					if (intervalId) {
@@ -76,34 +76,51 @@ function LoadingModalWithThread({ state }) {
 					);
 				}
 
-				removeThreadInfo(res.threadId);
+				removeThreadInfo();
 				closeModal();
 				break;
 			case THREAD_STATUS.ERROR:
-				let response = JSON.parse(res.result.response);
-				let errorMessages = response.errorMessages;
-				let errors = response.errors;
-
+				let message, response, errorMessages, errors;
+				message = res.result.message;
+				
+				if (res.result.response) {
+					response = JSON.parse(res.result.response);
+					errorMessages = response.errorMessages;
+					errors = response.errors;
+				}
 				// setErrorMsg(JSON.stringify(JSON.parse(res.result.response).errors));
 
 				const errorBody = (
 					<div>
-						<div>
-							Messages:
-							<ul>
-								{errorMessages.map((e, index) => (
-									<li key={index}>e</li>
-								))}
-							</ul>
-						</div>
-						<div>
-							Errors:
-							{JSON.stringify(errors)};
-						</div>
+						{message && (
+							<div>
+								<h4>{message}</h4>
+							</div>
+						)}
+
+						{!isArrayEmpty(errorMessages) && (
+							<div>
+								Messages Error:
+								<ul>
+									{errorMessages.map((e, index) => (
+										<li key={index}>{e}</li>
+									))}
+								</ul>
+							</div>
+						)}
+						{!isObjectEmpty(errors) && (
+							<div>
+								Errors:
+								{JSON.stringify(errors)};
+							</div>
+						)}
 					</div>
 				);
 				setAppContextState((prev) => ({ ...prev, error: errorBody }));
-				removeThreadInfo(res.threadId);
+				if (intervalId) {
+					clearInterval(intervalId);
+				}
+				removeThreadInfo();
 				closeModal();
 				break;
 		}

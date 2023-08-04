@@ -17,7 +17,7 @@ function ErrorModal({ children, setState }) {
 		<ModalTransition>
 			<Modal onClose={handleOnClose}>
 				<ModalHeader>
-					<ModalTitle>
+					<ModalTitle appearance="danger">
 						Error
 					</ModalTitle>
 				</ModalHeader>
