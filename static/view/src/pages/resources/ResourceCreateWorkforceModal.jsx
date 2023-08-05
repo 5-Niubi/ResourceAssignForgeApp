@@ -1,9 +1,7 @@
 import { useCallback, useEffect, useState, Fragment } from "react";
-import { css, jsx } from "@emotion/react";
 import DynamicTable from "@atlaskit/dynamic-table";
-import Button, { ButtonGroup } from "@atlaskit/button";
+import Button from "@atlaskit/button";
 import InfoIcon from "@atlaskit/icon/glyph/info";
-import { useParams } from "react-router";
 import { PiStarFill, PiStarBold } from "react-icons/pi";
 import Avatar from "@atlaskit/avatar";
 import Select from "@atlaskit/select";
@@ -15,27 +13,14 @@ import Modal, {
 	ModalTransition,
 } from "@atlaskit/modal-dialog";
 import { invoke } from "@forge/bridge";
-import Toastify from "../../../common/Toastify";
-import { RadioGroup } from "@atlaskit/radio";
+import Toastify from "../../common/Toastify";
 import LoadingButton from "@atlaskit/button";
-import { Checkbox } from "@atlaskit/checkbox";
-import Lozenge from "@atlaskit/lozenge";
 import TextField from "@atlaskit/textfield";
-import Form, {
-	CheckboxField,
-	ErrorMessage,
-	Field,
-	FormFooter,
-	FormHeader,
-	HelperMessage,
-	RequiredAsterisk,
-	ValidMessage,
-} from "@atlaskit/form";
-import AddCircle from "@atlaskit/icon/glyph/add-circle";
-import { COLOR_SKILL_LEVEL } from "../../../common/contants";
-import InfoMessageColor from "../../../components/InfoMessageColor";
+import Form, { ErrorMessage, Field, HelperMessage } from "@atlaskit/form";
+import { COLOR_SKILL_LEVEL } from "../../common/contants";
+import InfoMessageColor from "../../components/InfoMessageColor";
 import { Grid, GridColumn } from "@atlaskit/page";
-import CreatableAdvanced from "../../../components/creatable-selection";
+import CreatableAdvanced from "../../components/creatable-selection";
 import Rating from "react-rating";
 import {
 	validateEmail,
@@ -43,341 +28,16 @@ import {
 	validateWorkingEffort,
 	validateName,
 	getCacheObject,
-	cache,
-} from "../../../common/utils";
+} from "../../common/utils";
 
 const options = [
 	{ name: "workingType", value: 0, label: "Fulltime" },
 	{ name: "workingType", value: 1, label: "Part-time" },
 ];
 
-export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
-	//SELECT WORKFORCE MODAL (SW)
-
-	let workforce_local = getCacheObject("workforce_parameter", []);
-	const [isSWOpen, setIsSWOpen] = useState(false);
-	const openSWModal = useCallback(() => setIsSWOpen(true), []);
-	const closeSWModal = useCallback(() => setIsSWOpen(false), []);
-	const [TableLoadingState, setTableLoadingState] = useState(true);
-	const [searchInput, setSearchInput] = useState("");
-	const [workforces, setWorkforces] = useState([]);
-	const [selectedWorkforces, setSelectedWorkforces] = useState([]);
-	const [createClicked, setCreateClicked] = useState(false);
-
-	const handleCreateClicked = () => {
-		setCreateClicked(true);
-		console.log("setCreateClicked", "Da click");
-	};
-
-	useEffect(
-		function () {
-			invoke("getAllWorkforces")
-				.then(function (res) {
-					let workforces = [];
-					for (let workforce of res) {
-						let itemWorkforce = {
-							id: workforce.id,
-							accountId: workforce.accountId,
-							email: workforce.email,
-							accountType: workforce.accountType,
-							name: workforce.name,
-							avatar: workforce.avatar,
-							displayName: workforce.displayName,
-							unitSalary: workforce.unitSalary,
-							workingType: workforce.workingType,
-							workingEfforts: workforce.workingEfforts,
-							skills: workforce.skills,
-						};
-						workforces.push(itemWorkforce);
-					}
-					setTableLoadingState(false);
-					setWorkforces(workforces);
-
-					let localWorkforceIds = [];
-                    if(workforce_local?.length>0){
-                        localWorkforceIds = workforce_local?.map(
-                            (workforce) => workforce?.id?.toString()
-                        );
-                    }
-					setSelectedWorkforces(localWorkforceIds);
-
-					//CHECK BUTTON SELECT ALL
-					if (workforces?.length == localWorkforceIds?.length) {
-						setSelectAll(true);
-					}
-				})
-				.catch(function (error) {
-					console.log(error);
-					Toastify.error(error.toString());
-				});
-			setCreateClicked(false);
-		},
-		[createClicked]
-	);
-
-	//FILTER WORKFORCE SELECT TABLE
-	const [workforcesFilter, setWorkforcesFilter] = useState(workforces);
-	const filterWorkforceName = useCallback(function (workforces, query) {
-		if (query === null || query.trim() === "") {
-			setWorkforcesFilter(workforces);
-		} else {
-			setWorkforcesFilter(
-				workforces.filter((e) => {
-					const lowercaseQuery = query.toLowerCase().trim();
-					const nameMatch = e.name
-						.toLowerCase()
-						?.includes(lowercaseQuery);
-					const skillMatch = e.skills?.some((skill) =>
-						skill.name
-							.replace("-", " ")
-							.toLowerCase()
-							?.includes(lowercaseQuery)
-					);
-					return nameMatch || skillMatch;
-				})
-			);
-		}
-	}, []);
-
-	useEffect(
-		function () {
-			filterWorkforceName(workforces, searchInput);
-		},
-		[workforces]
-	);
-
-	function handleOnSearchBoxChange(e) {
-		const newSearchInput = e.target.value;
-		setSearchInput(newSearchInput);
-		filterWorkforceName(workforces, newSearchInput);
-	}
-
-	function handleCheckboxChange(workforceId) {
-		setSelectedWorkforces((prevSelectedWorkforces) => {
-			console.log("prevSelectedWorkforces:", prevSelectedWorkforces);
-
-			if (prevSelectedWorkforces?.includes(workforceId.toString())) {
-				return prevSelectedWorkforces.filter(
-					(id) => id !== workforceId.toString()
-				);
-			} else {
-				return [...prevSelectedWorkforces, workforceId.toString()];
-			}
-		});
-	}
-
-	const head = {
-		cells: [
-			{
-				key: "no",
-				content: null,
-				width: 8,
-			},
-			{
-				key: "name",
-				content: "Name",
-				width: 30,
-			},
-			{
-				key: "skills",
-				content: "Skills",
-				width: 62,
-			},
-		],
-	};
-
-	const rows = workforcesFilter?.map((workforce, index) => ({
-		key: workforce.id,
-		cells: [
-			{
-				key: "no",
-				content: (
-					<Checkbox
-						size="xlarge"
-						isChecked={selectedWorkforces?.includes(
-							workforce.id.toString()
-						)}
-						onChange={() => handleCheckboxChange(workforce.id)}
-					/>
-				),
-			},
-			{
-				key: "name",
-				content: workforce.name,
-			},
-			{
-				key: "skills",
-				content: (
-					<div>
-						{workforce.skills?.map((skill, i) => (
-							<span style={{ marginRight: "2px" }}>
-								<Lozenge
-									key={i}
-									style={{
-										marginLeft: "8px",
-										backgroundColor:
-											COLOR_SKILL_LEVEL[skill.level - 1]
-												.color,
-										color:
-											skill.level === 1
-												? "#091e42"
-												: "white",
-									}}
-									isBold
-								>
-									{skill.name} - {skill.level}
-									<PiStarFill />
-								</Lozenge>
-							</span>
-						))}
-					</div>
-				),
-			},
-		],
-	}));
-
-	function saveSelectedWorkforces() {
-		const selectedWorkforcesArray = selectedWorkforces?.map(
-			(workforceId) => {
-				return workforces.find(
-					(workforce) => workforce.id.toString() === workforceId
-				);
-			}
-		);
-		cache("workforce_parameter", JSON.stringify(selectedWorkforcesArray));
-
-		onSelectedWorkforces(selectedWorkforcesArray);
-	}
-
-	function handleConfirm() {
-		saveSelectedWorkforces();
-		closeSWModal();
-	}
-
-	//SELECT ALL BUTTON
-	const [selectAll, setSelectAll] = useState(false);
-	function handleSelectAll() {
-		if (selectAll) {
-			setSelectedWorkforces([]);
-		} else {
-			const allWorkforceIds = workforces.map((workforce) =>
-				workforce.id.toString()
-			);
-			setSelectedWorkforces(allWorkforceIds);
-		}
-		setSelectAll(!selectAll);
-	}
-
-	return (
-		<div>
-			<Button appearance="primary" onClick={openSWModal}>
-				Select
-			</Button>
-			{/* SELECT WORKFORCE MODAL (SW) */}
-			<ModalTransition>
-				{isSWOpen && (
-					<Modal
-						onClose={closeSWModal}
-						shouldScrollInViewport={false}
-						width={"medium"}
-					>
-						<ModalHeader>
-							<div style={{ flexWrap: "wrap" }}>
-								<ModalTitle>
-									Select Employees <InfoMessageColor />
-								</ModalTitle>
-								<div
-									style={{
-										display: "flex",
-										marginTop: "10px",
-									}}
-								>
-									<div
-										style={{
-											flex: "0 0 320px",
-											marginRight: "10px",
-										}}
-									>
-										<TextField
-											isCompact
-											placeholder="Search Employee/Skill"
-											aria-label="Filter"
-											onChange={handleOnSearchBoxChange}
-											value={searchInput}
-										/>
-									</div>
-									<div
-										style={{
-											flex: "0 0 300px",
-										}}
-									>
-										<ButtonGroup>
-											{/* <Button
-												appearance="primary"
-												onClick={() => {
-													closeSWModal();
-												}}
-											>
-												Create new
-											</Button> */}
-											<ParameterCreareWorkforceModal
-												onCreatedClick={
-													handleCreateClicked
-												}
-											/>
-											{/* SELECT ALL BUTTON */}
-											<Button
-												appearance="primary"
-												onClick={handleSelectAll}
-											>
-												{selectAll
-													? "Deselect All"
-													: "Select All"}
-											</Button>
-										</ButtonGroup>
-									</div>
-								</div>
-							</div>
-						</ModalHeader>
-						<ModalBody>
-							<DynamicTable
-								shouldScrollInViewport
-								head={head}
-								rows={rows}
-								isFixedSize
-								isLoading={TableLoadingState}
-								emptyView={<h2>Not found any employee</h2>}
-							/>
-						</ModalBody>
-						<ModalFooter>
-							<Button
-								appearance="subtle"
-								onClick={closeSWModal}
-								autoFocus
-							>
-								Cancel
-							</Button>
-							<Button
-								appearance="primary"
-								onClick={handleConfirm}
-								autoFocus
-							>
-								Confirm
-							</Button>
-						</ModalFooter>
-					</Modal>
-				)}
-			</ModalTransition>
-		</div>
-	);
-}
-
-export function ParameterCreareWorkforceModal({ onCreatedClick }) {
-	//CREATE WORKFORCE MODAL (CW)
-    let project = getCacheObject("project", null);
-    const baseWH = (project.baseWorkingHour===0 ||project.baseWorkingHour === null) ? 24: project.baseWorkingHour;
+export function ResourceCreateWorkforceModal({ onCreatedClick }) {
+	const baseWH = 8; //Default out-side project
 	const [isCWOpen, setIsCWOpen] = useState(false);
-	const openCWModal = useCallback(() => setIsCWOpen(true), []);
 	const closeCWModal = useCallback(() => setIsCWOpen(false), []);
 	const [isParttimeSelected, setIsParttimeSelected] = useState(false);
 	const [skillsTable, setSkillsTable] = useState([]);
@@ -386,48 +46,48 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 
 	const [workforcesJiraAccount, setWorkforcesJiraAccount] = useState([]);
 
-	useEffect(function () {
-		if (workforcesJiraAccount.length < 1) {
-			invoke("getAllUserJira")
-				.then(function (jiraUsersResponse) {
-					const jiraUsers = jiraUsersResponse
-						.filter((user) => user.accountType === "atlassian")
-						.map((user) => ({
-							accountId: user.accountId,
-							email: user.emailAddress,
-							accountType: user.accountType,
-							name: user.displayName,
-							avatar: user.avatarUrls["48x48"],
-							displayName: user.displayName,
-						}));
-					setWorkforcesJiraAccount(jiraUsers);
+	useEffect(
+		function () {
+			if (workforcesJiraAccount.length < 1) {
+				invoke("getAllUserJira")
+					.then(function (jiraUsersResponse) {
+						const jiraUsers = jiraUsersResponse
+							.filter((user) => user.accountType === "atlassian")
+							.map((user) => ({
+								accountId: user.accountId,
+								email: user.emailAddress,
+								accountType: user.accountType,
+								name: user.displayName,
+								avatar: user.avatarUrls["48x48"],
+								displayName: user.displayName,
+							}));
+						setWorkforcesJiraAccount(jiraUsers);
+					})
+					.catch(function (error) {
+						console.log(error);
+						Toastify.error(error.toString());
+					});
+			}
+
+			invoke("getAllSkills", {})
+				.then(function (res) {
+					setSkillDB(res);
+					localStorage.setItem("all_skills_DB", JSON.stringify(res));
 				})
 				.catch(function (error) {
 					console.log(error);
 					Toastify.error(error.toString());
 				});
-		}
-
-		invoke("getAllSkills", {})
-			.then(function (res) {
-				setSkillDB(res);
-				localStorage.setItem("all_skills_DB", JSON.stringify(res));
-			})
-			.catch(function (error) {
-				console.log(error);
-				Toastify.error(error.toString());
-			});
-	}, [loadingSubmit]);
+		},
+		[loadingSubmit]
+	);
 
 	const handleCreateClicked = () => {
 		onCreatedClick();
 	};
 
 	const onSelectedValue = (childValue) => {
-		console.log("Received value from child:", childValue);
-
 		setSkillsTable(childValue.selectedValue);
-		console.log("Received value display in table:", skillsTable);
 	};
 
 	const headSkillTable = {
@@ -533,7 +193,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 		);
 	}
 
-    const OutScopeMessage = () => (
+	const OutScopeMessage = () => (
 		<ErrorMessage>Value raging from 0 to {baseWH}</ErrorMessage>
 	);
 
@@ -544,6 +204,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 					setSkillsTable([]);
 					setIsCWOpen(true);
 				}}
+				appearance="primary"
 			>
 				Create new
 			</Button>
@@ -881,7 +542,8 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															isRequired
 															validate={(value) =>
 																validateWorkingEffort(
-																	value, baseWH
+																	value,
+																	baseWH
 																)
 															}
 														>
@@ -916,7 +578,8 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															isRequired
 															validate={(value) =>
 																validateWorkingEffort(
-																	value, baseWH
+																	value,
+																	baseWH
 																)
 															}
 														>
@@ -951,7 +614,8 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															isRequired
 															validate={(value) =>
 																validateWorkingEffort(
-																	value, baseWH
+																	value,
+																	baseWH
 																)
 															}
 														>
@@ -986,7 +650,8 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															isRequired
 															validate={(value) =>
 																validateWorkingEffort(
-																	value, baseWH
+																	value,
+																	baseWH
 																)
 															}
 														>
@@ -1009,7 +674,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																	)}
 																	{error ===
 																		"OUT_SCOPE" && (
-																		<OutScopeMessage/>
+                                                                        <OutScopeMessage/>
 																	)}
 																</Fragment>
 															)}
@@ -1021,7 +686,8 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															isRequired
 															validate={(value) =>
 																validateWorkingEffort(
-																	value, baseWH
+																	value,
+																	baseWH
 																)
 															}
 														>
@@ -1056,7 +722,8 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															isRequired
 															validate={(value) =>
 																validateWorkingEffort(
-																	value, baseWH
+																	value,
+																	baseWH
 																)
 															}
 														>
@@ -1091,7 +758,8 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															isRequired
 															validate={(value) =>
 																validateWorkingEffort(
-																	value, baseWH
+																	value,
+																	baseWH
 																)
 															}
 														>

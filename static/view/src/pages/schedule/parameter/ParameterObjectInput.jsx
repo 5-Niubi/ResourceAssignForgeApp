@@ -30,7 +30,7 @@ import Toastify from "../../../common/Toastify";
 import { ButtonGroup, LoadingButton } from "@atlaskit/button";
 import { DATE_FORMAT, MODAL_WIDTH } from "../../../common/contants";
 import { DatePicker } from "@atlaskit/datetime-picker";
-import { getCurrentTime, calculateDuration } from "../../../common/utils";
+import { getCurrentTime, calculateDuration, getCacheObject } from "../../../common/utils";
 import Spinner from "@atlaskit/spinner";
 import { RadioGroup } from "@atlaskit/radio";
 import Page from "@atlaskit/page";
@@ -44,7 +44,7 @@ const objectiveItems = [
 ];
 
 export default function ParameterObjectInput({ handleChangeTab }) {
-	let project_detail = JSON.parse(localStorage.getItem("project_detail"));
+	let project_detail = getCacheObject("project",[]);
 	const { projectId } = useParams();
 	const [startDate, setStartDate] = useState(project_detail.startDate);
 	const [endDate, setEndDate] = useState(project_detail.deadline);
@@ -79,9 +79,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 
 	function SaveParameters({ cost, objectives }) {
 		setIsScheduling(true);
-		var parameterResourcesLocal = JSON.parse(
-			localStorage.getItem("workforce_parameter")
-		);
+        var parameterResourcesLocal = getCacheObject("workforce_parameter",[]);
 		let parameterResources = [];
 		for (let item of parameterResourcesLocal) {
 			let itemParameterResource = {
