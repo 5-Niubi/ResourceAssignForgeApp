@@ -1,13 +1,9 @@
-import React, { useCallback } from "react";
-import { useNavigate } from "react-router";
+import React, { useCallback, useState } from "react";
 
-import SettingsIcon from "@atlaskit/icon/glyph/settings";
 import ActivityIcon from "@atlaskit/icon/glyph/activity";
 import PeopleGroupIcon from "@atlaskit/icon/glyph/people-group";
 import LightBulb from "@atlaskit/icon/glyph/lightbulb";
-import SignOutIcon from "@atlaskit/icon/glyph/sign-out";
-import { AtlassianIcon } from "@atlaskit/logo";
-import { ReactComponent as LogoSvg } from '../../resources/reshot-icon-planning-SJ7W8K623A.svg';
+import { ReactComponent as LogoSvg } from "../../resources/reshot-icon-planning-SJ7W8K623A.svg";
 
 import {
 	Header,
@@ -16,24 +12,14 @@ import {
 	NestableNavigationContent,
 	Section,
 	SideNavigation,
-	ButtonItem,
 } from "@atlaskit/side-navigation";
-import { invoke, router } from "@forge/bridge";
 
 import ButtonItemSideBar from "./ButtonItemSideBar";
 import { APP_NAME, APP_NAME_DESCRIPTOR } from "../../common/contants";
+import { HelperMessage } from "@atlaskit/form";
+import MoreSection from "./MoreSection";
 
 function HomeSideBar(rootPath) {
-	const handleSignout = useCallback(function () {
-		invoke("signout")
-			.then(function (res) {
-				router.reload();
-			})
-			.catch(function (error) {
-				console.log(error);
-			});
-	}, []);
-
 	return (
 		<SideNavigation label="project" testId="side-navigation">
 			<NavigationHeader>
@@ -69,24 +55,16 @@ function HomeSideBar(rootPath) {
 						pathTo={"skills"}
 						iconBefore={<LightBulb label="" />}
 					/>
-					<ButtonItemSideBar
-						rootPath={rootPath}
-						text={"More"}
-						pathTo={"more"}
-						iconBefore={<SettingsIcon label="" />}
-					/>
+					<Section hasSeparator>
+						<MoreSection rootPath={rootPath} />
+					</Section>
 				</Section>
 			</NestableNavigationContent>
 
 			<NavigationFooter>
-				<Section hasSeparator>
-					<ButtonItem
-						iconBefore={<SignOutIcon label="signout" />}
-						onClick={handleSignout}
-					>
-						Sign out
-					</ButtonItem>
-				</Section>
+				<p style={{ textAlign: "center", fontSize: "12px" }}>
+					You are in {APP_NAME}
+				</p>
 			</NavigationFooter>
 		</SideNavigation>
 	);
