@@ -12,7 +12,7 @@ function subscriptionResolver(resolver) {
 			return res
 		} catch (error) {
 			console.log("getCurrentSubscriptionPlan Error: ", error);
-			throw new Error(error);
+			throw new Error(JSON.stringify(error));
 
 			return Promise.reject(error);
 		}

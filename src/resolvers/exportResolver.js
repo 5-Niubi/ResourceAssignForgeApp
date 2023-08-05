@@ -30,7 +30,7 @@ function exportResolver(resolver) {
 			);
 		} catch (error) {
 			console.log("getDownloadMSXMLUrl Error: ", error);
-			throw new Error(error);
+			throw new Error(JSON.stringify(error));
 
 			return Promise.reject(error);
 		}
@@ -43,7 +43,7 @@ function exportResolver(resolver) {
 			);
 		} catch (error) {
 			console.log("checkAdministratorprivileges Error: ", error);
-			throw new Error(error);
+			throw new Error(JSON.stringify(error));
 
 			return Promise.reject(error);
 		}

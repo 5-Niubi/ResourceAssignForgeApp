@@ -10,7 +10,7 @@ function milestoneResolver(resolver) {
 			return await milestoneService.getAllMilestones(req.payload.projectId);
 		} catch (error) {
 			console.log("Error in getAllMilestones: ", error);
-			throw new Error(error);
+			throw new Error(JSON.stringify(error));
 
 		}
 	});
@@ -21,7 +21,7 @@ function milestoneResolver(resolver) {
 			return response;
 		} catch (error) {
 			console.log("Error in createMilestone: ", error);
-			throw new Error(error);
+			throw new Error(JSON.stringify(error));
 
 			return Promise.reject(error);
 		}

@@ -42,7 +42,6 @@ export const THREAD_ACTION = Object.freeze({
 });
 
 export const THREAD_STATE_DEFAULT = Object.freeze({
-	isModalOpen: false,
 	threadAction: "",
 	threadId: "",
 });
