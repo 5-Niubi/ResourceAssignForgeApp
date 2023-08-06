@@ -61,11 +61,19 @@
     margin-top: 7px;
     display: block;
 }
-
-.task-groups tr {
+.task-groups tbody tr {
     position: relative;
     height: 40px;
     cursor: pointer;
+    background-color: #fff;
+}
+
+.task-groups thead tr, .task-groups tr:nth-child(even) {
+    background-color: #fff;
+}
+
+.task-groups tr[data-ts--dynamic-table--table-row--highlighted="true"] {
+    background-color: var(--ds-background-selected, var(--local-dynamic-table-highlighted-bg));
 }
 
 .task-groups tr td {
@@ -73,7 +81,7 @@
     border-radius: 8px;
 }
 
-.task-groups tr:hover{
+.task-groups tbody tr:hover{
     background-color: #eee;
 }
 

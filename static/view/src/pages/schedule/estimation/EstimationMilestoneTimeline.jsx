@@ -6,10 +6,17 @@ import FlagFilledIcon from "@atlaskit/icon/glyph/flag-filled";
 import PeopleGroupIcon from "@atlaskit/icon/glyph/people-group";
 import TrayIcon from "@atlaskit/icon/glyph/tray";
 import { findObj, getCache, getColor } from "../../../common/utils";
+import Lozenge from "@atlaskit/lozenge";
+import { COLOR_SKILL_LEVEL } from "../../../common/contants";
+import { PiStarFill } from "react-icons/pi";
 
-export default function MilestonesTimeline({ milestones, skills, handleChangeTab }) {
+export default function MilestonesTimeline({
+	milestones,
+	skills,
+	handleChangeTab,
+}) {
 	var estimation = getCache("estimation");
-	if (estimation){
+	if (estimation) {
 		estimation = JSON.parse(estimation);
 	} else {
 		handleChangeTab(0);
@@ -63,8 +70,33 @@ export default function MilestonesTimeline({ milestones, skills, handleChangeTab
 												<p>
 													<PeopleGroupIcon></PeopleGroupIcon>{" "}
 													{workers.quantity} workers
-													with skills set (
-													{skills.join("; ")})
+													with skills set:{" "}
+													{workers.skillOutputList?.map(
+														(skill, index) => (
+															<Lozenge
+																key={index}
+																style={{
+																	marginLeft:
+																		"8px",
+																	backgroundColor:
+																		COLOR_SKILL_LEVEL[
+																			skill.level -
+																				1
+																		].color,
+																	color:
+																		skill.level ===
+																		1
+																			? "#091e42"
+																			: "white",
+																}}
+																isBold
+															>
+																{skill.name} -{" "}
+																{skill.level}
+																<PiStarFill />
+															</Lozenge>
+														)
+													)}
 												</p>
 											);
 										}
