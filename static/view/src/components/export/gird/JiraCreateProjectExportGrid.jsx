@@ -1,10 +1,11 @@
-import Button, { LoadingButton } from "@atlaskit/button";
+import { LoadingButton } from "@atlaskit/button";
 import Heading from "@atlaskit/heading";
-import { Grid, GridColumn } from "@atlaskit/page";
-import { xcss, Box, Flex } from "@atlaskit/primitives";
-import React, { useCallback, useContext, useState } from "react";
-import { MODAL_WIDTH, THREAD_ACTION } from "../../../common/contants";
 import Image from "@atlaskit/image";
+import { Grid, GridColumn } from "@atlaskit/page";
+import { Box, xcss } from "@atlaskit/primitives";
+import React from "react";
+import jiraSoftwarelogo from "../../../assets/images/Jira-Emblem.png";
+import { MODAL_WIDTH } from "../../../common/contants";
 
 const width = MODAL_WIDTH.M;
 const columns = 10;
@@ -19,13 +20,15 @@ const buttonContainerStyles = xcss({
 	display: "flex",
 	justifyContent: "right",
 	alignItems: "center",
-	height: "3rem"
+	height: "3rem",
 });
 
 const descriptionContainerStyles = xcss({
-	display: "flex", alignItems: "center", justifyContent: "center", height: "3rem"
+	display: "flex",
+	alignItems: "center",
+	justifyContent: "center",
+	height: "3rem",
 });
-const jiraSoftwarelogo = "https://i.ibb.co/wR3CZ6v/Jira-Emblem.png"
 function JiraCreateProjectExportGrid({
 	isButtonExportLoading,
 	onButtonExportClick,
@@ -34,12 +37,7 @@ function JiraCreateProjectExportGrid({
 		<Grid layout="fluid" spacing="compact" columns={columns}>
 			<GridColumn medium={2}>
 				<Box xcss={containerStyles}>
-					<Image
-						src={
-							jiraSoftwarelogo
-						}
-						alt="JiraSoftware Logo"
-					/>
+					<Image src={jiraSoftwarelogo} alt="JiraSoftware Logo" />
 				</Box>
 			</GridColumn>
 			<GridColumn medium={6}>

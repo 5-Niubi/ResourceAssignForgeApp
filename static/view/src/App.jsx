@@ -1,13 +1,12 @@
 // @ts-nocheck
-import React, { createContext, useEffect, useState } from "react";
-import { invoke, view } from "@forge/bridge";
 import Spinner from "@atlaskit/spinner";
-import StartUpPage from "./pages/startup/StartUpPage";
-import { ToastContainer, toast } from "react-toastify";
+import { invoke, view } from "@forge/bridge";
+import React, { createContext, useEffect, useState } from "react";
+import { ToastContainer } from "react-toastify";
 import ErrorModal from "./components/ErrorModal";
-import "./pages/style.css";
 import MainPage from "./components/main/MainPage";
-import { clearAllCache } from "./common/utils";
+import StartUpPage from "./pages/startup/StartUpPage";
+import "./pages/style.css";
 
 export const AppContext = createContext();
 
@@ -90,7 +89,7 @@ function App() {
 					)}
 				</>
 			) : (
-				<Spinner interactionName="load" />
+				<Spinner interactionName="load" size={"large"} />
 			)}
 			<ToastContainer />
 		</>

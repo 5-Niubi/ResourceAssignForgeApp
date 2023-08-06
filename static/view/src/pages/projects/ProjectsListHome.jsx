@@ -58,7 +58,7 @@ function ProjectListHome() {
 		function () {
 			filterProjectName(projects, searchBoxValue);
 		},
-		[projects]
+		[projects, searchBoxValue]
 	);
 	useEffect(function () {
 		invoke("getProjectsList")
@@ -91,7 +91,6 @@ function ProjectListHome() {
 	function handleOnSearchBoxChange(e) {
 		setSearchBoxValue(e.target.value);
 		setSearchParams({ q: e.target.value });
-		handleOnSearch();
 	}
 
 	function handleOnSearch() {

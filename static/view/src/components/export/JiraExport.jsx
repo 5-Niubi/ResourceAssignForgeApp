@@ -1,24 +1,22 @@
 import Button from "@atlaskit/button";
+import Heading from "@atlaskit/heading";
 import Modal, {
-	ModalHeader,
-	ModalTitle,
 	ModalBody,
 	ModalFooter,
+	ModalHeader,
+	ModalTitle,
 	ModalTransition,
 } from "@atlaskit/modal-dialog";
-import React, { useCallback, useEffect, useState } from "react";
-import { MODAL_WIDTH, THREAD_ACTION } from "../../common/contants";
-import { invoke, requestJira } from "@forge/bridge";
+import { invoke } from "@forge/bridge";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import Toastify from "../../common/Toastify";
-import JiraAutoCreateProjectExport from "./gird/JiraCreateProjectExportGrid";
-import Heading from "@atlaskit/heading";
-import { ScheduleExportContext } from "../../pages/schedule/ganttchart/GanttChartPage";
-import { useContext } from "react";
+import { MODAL_WIDTH, THREAD_ACTION } from "../../common/contants";
 import { saveThreadInfo } from "../../common/utils";
-import JiraCreateProjectExport from "./form/JiraCreateProjectExport";
-import { useParams } from "react-router";
 import { ProjectInfoContext } from "../../pages/schedule/ScheduleTabs";
+import { ScheduleExportContext } from "../../pages/schedule/ganttchart/GanttChartPage";
 import { ThreadLoadingContext } from "../main/MainPage";
+import JiraCreateProjectExport from "./form/JiraCreateProjectExport";
+import JiraAutoCreateProjectExport from "./gird/JiraCreateProjectExportGrid";
 const width = MODAL_WIDTH.M;
 
 const initProjectListState = {
@@ -41,7 +39,7 @@ function JiraExport({ state }) {
 	);
 
 	// Modal Create Project State
-	const [createProjectMdalState, setCreateProjectModalState] =
+	const [createProjectModalState, setCreateProjectModalState] =
 		useState(MODAL_STATE_DEFAULT);
 	const [isModalProjectStateLoading, setIsModalProjectStateLoading] =
 		useState(false);
@@ -79,8 +77,6 @@ function JiraExport({ state }) {
 	const [threadStateValue, setThreadStateValue] = threadLoadingContext.state;
 	// --------
 
-	// --- Create Project for export
-	const exportCreateProjectState = useState();
 
 	const schedule = useContext(ScheduleExportContext);
 	const [isLoading, setIsLoading] = useState(false);
@@ -90,7 +86,6 @@ function JiraExport({ state }) {
 		setThreadStateValue({
 			threadId,
 			threadAction,
-			isModalOpen: true,
 		});
 		let threadInfo = {
 			threadId,
@@ -108,7 +103,7 @@ function JiraExport({ state }) {
 		setIsModalProjectStateLoading(true);
 		invoke("exportToJira", {
 			scheduleId: schedule.id,
-			projectCreateInfo: createProjectMdalState.data,
+			projectCreateInfo: createProjectModalState.data,
 		})
 			.then((res) => {
 				closeModalCreateProject();
@@ -146,14 +141,12 @@ function JiraExport({ state }) {
 						exportButtonClick={handleExportClick}
 					/> */}
 
-					{createProjectMdalState.isModalOpen ? (
+					{createProjectModalState.isModalOpen && (
 						<JiraCreateProjectExport
-							state={[createProjectMdalState, setCreateProjectModalState]}
+							state={[createProjectModalState, setCreateProjectModalState]}
 							onCreateClick={handleCreateProjectClick}
 							isLoading={isModalProjectStateLoading}
 						/>
-					) : (
-						""
 					)}
 				</ModalBody>
 				<ModalFooter>
