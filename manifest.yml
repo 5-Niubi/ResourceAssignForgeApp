@@ -4,7 +4,7 @@ modules:
       resource: main
       resolver:
         function: resolver
-      title: WoTaas
+      title: WoTaas-Huy
       layout: blank
   # Khai báo webtrigger cho server callback lúc grant quyền
   webtrigger:
@@ -27,7 +27,7 @@ resources:
       port: 3000
 app:
   # Replace app id here
-  id: ari:cloud:ecosystem::app/cd7a95c9-5661-4973-b002-bdf61e1603f6
+  id: ari:cloud:ecosystem::app/87284dfd-9947-4a51-a7bb-20a3c938db04
   #----#
   licensing:
     enabled: true
@@ -38,9 +38,7 @@ permissions:
       backend:
         - "*.ngrok-free.app"
         - "https://be.ai4cert.com"
-    images:
-      - https://i.ibb.co/znTzdzQ/2346px-Microsoft-Project-2019-present-svg.png
-      - https://i.ibb.co/wR3CZ6v/Jira-Emblem.png
+        - "*.loca.lt"
   content:
     styles:
       - unsafe-inline
