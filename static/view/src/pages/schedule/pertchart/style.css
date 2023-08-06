@@ -73,6 +73,10 @@
 	width: 100%;
 }
 
+.pert-chart .diagram-component canvas{
+	z-index: 0;
+}
+
 .pert-chart.-expanded{
 	height: calc(100vh - 170px);
 }
