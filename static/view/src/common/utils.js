@@ -134,7 +134,7 @@ export const validateNumberOnly = (value) => {
 	return undefined;
 };
 
-export const validateWorkingEffort = (value) => {
+export const validateWorkingEffort = (value,maxValue) => {
 	//REQUIRES NOT NULL, NUMBER ONLY, FROM 0.0 TO 24.0
 	if (!value) {
 		return "NOT_VALID";
@@ -144,7 +144,7 @@ export const validateWorkingEffort = (value) => {
 		return "NOT_VALID";
 	}
 
-	if (value < 0.0 || value > 8.0) {
+	if (value < 0.0 || value > maxValue) {
 		return "OUT_SCOPE";
 	}
 
@@ -201,3 +201,12 @@ export function extractErrorMessage(error) {
 	}
 	return JSON.parse(stringErr);
 }
+
+export function formatText(input) {
+    //UPPERCASE AND REMOVE ANY NON-WORD CHARACTER
+    const formattedText = input.toUpperCase().replace(/\W+/g, ' ');
+  
+    //REPLACE SPACES WITH "-"
+    const result = formattedText.replace(/\s+/g, '-').trim();
+    return result;
+  }

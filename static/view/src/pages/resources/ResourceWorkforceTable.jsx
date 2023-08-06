@@ -16,15 +16,19 @@ import TextField from "@atlaskit/textfield";
 import PageHeader from "@atlaskit/page-header";
 import InfoMessageColor from "../../components/InfoMessageColor";
 import EditorSearchIcon from "@atlaskit/icon/glyph/editor/search";
-import ResourceDeleteWorkforceModal from "./ResourceWorkforceModal";
+import ResourceDeleteWorkforceModal from "./ResourceDeleteWorkforceModal";
+import { ResourceCreateWorkforceModal } from "./ResourceCreateWorkforceModal";
+import ResourceEditWorkforceModal from "./ResourceEditWorkforceModal";
 
 const modalInitState = { workforce: {}, isOpen: false };
 
 function ResourceWorkforceTable() {
 	const [TableLoadingState, setTableLoadingState] = useState(true);
-    const [modalDeleteState, setModalDeleteState] = useState(modalInitState);
+	const [modalDeleteState, setModalDeleteState] = useState(modalInitState);
 	const [modalEditState, setModalEditState] = useState(modalInitState);
 	const [workforces, setWorkforces] = useState([]);
+	const [createClicked, setCreateClicked] = useState(false);
+
 	useEffect(() => {
 		Promise.all([invoke("getAllWorkforces"), invoke("getAllUserJira")])
 			.then(([workforcesResponse, jiraUsersResponse]) => {
@@ -63,7 +67,8 @@ function ResourceWorkforceTable() {
 				Toastify.error(error.toString());
 				setTableLoadingState(false);
 			});
-	}, []);
+		setCreateClicked(false);
+	}, [createClicked]);
 
 	function createKey(input) {
 		return input
@@ -108,10 +113,25 @@ function ResourceWorkforceTable() {
 		filterWorkforceName(workforces, newSearchInput);
 	}
 
-    function deleteOnClick(workforce) {
+	function deleteOnClick(workforce) {
 		setModalDeleteState({ workforce, isOpen: true });
 	}
 
+    function editOnClick(workforce) {
+		setModalEditState({ workforce, isOpen: true });
+	}
+
+	const handleCreateClicked = () => {
+		setCreateClicked(true);
+	};
+
+	const actionsContent = (
+		<ButtonGroup>
+			<ResourceCreateWorkforceModal
+				onCreatedClick={handleCreateClicked}
+			/>
+		</ButtonGroup>
+	);
 
 	const barContent = (
 		<div style={{ display: "flex" }}>
@@ -246,13 +266,13 @@ function ResourceWorkforceTable() {
 
 	return (
 		<>
-			<PageHeader bottomBar={barContent}>
+			<PageHeader actions={actionsContent} bottomBar={barContent}>
 				Employee List <InfoMessageColor />
 			</PageHeader>
 
 			<InlineMessage
-				title={"We have total number: "}
-				secondaryText={workforcesFilter.length + " members"}
+				title={"Total employee: "}
+				secondaryText={workforcesFilter.length}
 			/>
 
 			<DynamicTable
@@ -268,21 +288,21 @@ function ResourceWorkforceTable() {
 				<ResourceDeleteWorkforceModal
 					openState={modalDeleteState}
 					setOpenState={setModalDeleteState}
-                    setWorkforcesListState={setWorkforces}
+					setWorkforcesListState={setWorkforces}
 				/>
 			) : (
 				""
 			)}
 
-			{/* {modalEditState.isOpen ? (
-				<EditProjectModal
+			{modalEditState.isOpen ? (
+				<ResourceEditWorkforceModal
 					openState={modalEditState}
 					setOpenState={setModalEditState}
-					setProjectsListState={setProjects}
+					setWorkforcesListState={setWorkforces}
 				/>
 			) : (
 				""
-			)} */}
+			)}
 		</>
 	);
 }
