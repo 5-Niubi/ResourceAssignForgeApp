@@ -72,31 +72,23 @@ function JiraExport({ state }) {
 	}, []);
 	// --------
 
+	const schedule = useContext(ScheduleExportContext);
+	const [isLoading, setIsLoading] = useState(false);
+
 	// State of Loading Thread Modal
 	const threadLoadingContext = useContext(ThreadLoadingContext);
 	const [threadStateValue, setThreadStateValue] = threadLoadingContext.state;
 	// --------
 
-
-	const schedule = useContext(ScheduleExportContext);
-	const [isLoading, setIsLoading] = useState(false);
-
 	const handleCreateThreadSuccess = useCallback((threadId) => {
 		let threadAction = THREAD_ACTION.JIRA_EXPORT;
-		setThreadStateValue({
-			threadId,
-			threadAction,
-		});
 		let threadInfo = {
 			threadId,
-			threadAction,
+			threadAction
 		};
+		setThreadStateValue(threadInfo);
 		saveThreadInfo(threadInfo);
 		closeJiraExportModal();
-	}, []);
-
-	const handleOpenCreateClick = useCallback(() => {
-		openModalCreateProject();
 	}, []);
 
 	const handleCreateProjectClick = function () {
@@ -115,6 +107,10 @@ function JiraExport({ state }) {
 				console.log(error);
 			});
 	};
+
+	const handleOpenCreateClick = useCallback(() => {
+		openModalCreateProject();
+	}, []);
 
 	return (
 		<ModalTransition>
