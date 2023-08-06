@@ -201,3 +201,12 @@ export function extractErrorMessage(error) {
 	}
 	return JSON.parse(stringErr);
 }
+
+export function formatText(input) {
+    //UPPERCASE AND REMOVE ANY NON-WORD CHARACTER
+    const formattedText = input.toUpperCase().replace(/\W+/g, ' ');
+  
+    //REPLACE SPACES WITH "-"
+    const result = formattedText.replace(/\s+/g, '-').trim();
+    return result;
+  }
