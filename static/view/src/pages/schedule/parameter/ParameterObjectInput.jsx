@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useCallback, useEffect } from "react";
+import React, { Fragment, useState, useCallback, useEffect , useContext} from "react";
 import Button from "@atlaskit/button/standard-button";
 import Form, {
 	Field,
@@ -28,13 +28,19 @@ import { invoke } from "@forge/bridge";
 import __noop from "@atlaskit/ds-lib/noop";
 import Toastify from "../../../common/Toastify";
 import { ButtonGroup, LoadingButton } from "@atlaskit/button";
-import { DATE_FORMAT, MODAL_WIDTH } from "../../../common/contants";
+import { DATE_FORMAT, MODAL_WIDTH, THREAD_ACTION } from "../../../common/contants";
 import { DatePicker } from "@atlaskit/datetime-picker";
-import { getCurrentTime, calculateDuration, getCacheObject } from "../../../common/utils";
+import {
+	getCurrentTime,
+	calculateDuration,
+	getCacheObject,
+    saveThreadInfo,
+} from "../../../common/utils";
 import Spinner from "@atlaskit/spinner";
 import { RadioGroup } from "@atlaskit/radio";
 import Page from "@atlaskit/page";
 import PageHeader from "@atlaskit/page-header";
+import { ThreadLoadingContext } from "../../../components/main/MainPage";
 
 const objectiveItems = [
 	{ name: "time", value: "time", label: "Time" },
@@ -44,7 +50,7 @@ const objectiveItems = [
 ];
 
 export default function ParameterObjectInput({ handleChangeTab }) {
-	let project_detail = getCacheObject("project",[]);
+	let project_detail = getCacheObject("project", []);
 	const { projectId } = useParams();
 	const [startDate, setStartDate] = useState(project_detail.startDate);
 	const [endDate, setEndDate] = useState(project_detail.deadline);
@@ -77,9 +83,26 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 		return undefined;
 	};
 
+	// State of Loading Thread Modal
+
+	const threadLoadingContext = useContext(ThreadLoadingContext);
+	const [threadStateValue, setThreadStateValue] = threadLoadingContext.state;
+	// --------
+
+	const handleCreateThreadSuccess = useCallback((threadId) => {
+		let threadAction = THREAD_ACTION.RUNNING_SCHEDULE;
+		let threadInfo = {
+			threadId,
+			threadAction,
+		};
+		setThreadStateValue(threadInfo);
+		saveThreadInfo(threadInfo);
+	}, []);
+
+
 	function SaveParameters({ cost, objectives }) {
 		setIsScheduling(true);
-        var parameterResourcesLocal = getCacheObject("workforce_parameter",[]);
+		var parameterResourcesLocal = getCacheObject("workforce_parameter", []);
 		let parameterResources = [];
 		for (let item of parameterResourcesLocal) {
 			let itemParameterResource = {
@@ -113,6 +136,9 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 					invoke("getThreadSchedule", { parameterId: res.id })
 						.then(function (res) {
 							if (res) {
+                                //handle open loading modal with thread
+                                handleCreateThreadSuccess(res.threadId);
+
 								//Getting result
 								var scheduleInterval = setInterval(function () {
 									invoke("schedule", {
@@ -145,13 +171,14 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 							Toastify.error(error.toString());
 						});
 				}
-				// DISPLAY SUCCESSFUL MESSAGE OR NEED MORE SKILL REQUIRED MESSAGE
-				console.log("message required skills in task", res);
-				Toastify.info("These task id are missing skill: " + res.taskSkillRequiredError?.map((task)=> (task.taskId)));
-				setIsScheduling(false);
 			})
 			.catch(function (error) {
-				// handleChangeTab(3);
+				// DISPLAY SUCCESSFUL MESSAGE OR NEED MORE SKILL REQUIRED MESSAGE
+				console.log("message required skills in task", res);
+				Toastify.info(
+					"These task id are missing skill: " +
+						res.taskSkillRequiredError?.map((task) => task.taskId)
+				);
 				setIsScheduling(false);
 				Toastify.error(error.toString());
 				setIsScheduling(false);
@@ -267,7 +294,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 											<Fragment>
 												<DatePicker
 													minDate={startDate}
-													value={endDate}
+													value={endDate ?? startDate}
 													onChange={handleSetEndDate}
 													dateFormat={DATE_FORMAT.DMY}
 													isRequired

@@ -39,6 +39,7 @@ export const THREAD_STATUS = Object.freeze({
 
 export const THREAD_ACTION = Object.freeze({
 	JIRA_EXPORT: "jiraExport",
+    RUNNING_SCHEDULE: "runningSchedule"
 });
 
 export const THREAD_STATE_DEFAULT = Object.freeze({
