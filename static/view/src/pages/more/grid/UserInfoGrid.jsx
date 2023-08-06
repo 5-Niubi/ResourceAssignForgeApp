@@ -1,18 +1,33 @@
 import Button from "@atlaskit/button";
 import { Grid, GridColumn } from "@atlaskit/page";
 import { Box } from "@atlaskit/primitives";
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../../App";
 import "../styles.css";
-import { formatDateDMY } from "../../../common/utils";
+import { extractErrorMessage, formatDateDMY } from "../../../common/utils";
 import Spinner from "@atlaskit/spinner";
-import { router } from "@forge/bridge";
+import { router, view } from "@forge/bridge";
 import { SUBSCRIPTION } from "../../../common/contants";
+import Toastify from "../../../common/Toastify";
 
 const columns = 12;
 function UserInfoGrid() {
 	const {appContextState} = useContext(AppContext);
 	let subscription = appContextState.subscription;
+
+	const [context, setContext] = useState({});
+
+	useEffect(() => {
+		view
+			.getContext()
+			.then((res) => {
+				setContext(res);
+			})
+			.catch((err) => {
+				let errString = extractErrorMessage(err);
+				Toastify.error(errString);
+			});
+	}, []);
 
 	function handleChangePlanClick() {
 		router.open(`https://localhost:5242/Upgrade?token=${subscription.token}`);
@@ -35,7 +50,7 @@ function UserInfoGrid() {
 							<h3 className="user-info-title">Your site</h3>
 						</GridColumn>
 						<GridColumn medium={7}>
-							<p className="user-info-detail">User site</p>
+							<p className="user-info-detail">{context.siteUrl}</p>
 						</GridColumn>
 
 						<GridColumn medium={5}>

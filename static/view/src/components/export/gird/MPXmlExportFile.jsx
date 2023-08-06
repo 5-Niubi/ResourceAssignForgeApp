@@ -1,11 +1,10 @@
 import { LoadingButton } from "@atlaskit/button";
 import Heading from "@atlaskit/heading";
+import Image from "@atlaskit/image";
 import { Grid, GridColumn } from "@atlaskit/page";
 import { Box, xcss } from "@atlaskit/primitives";
 import React from "react";
-import { MODAL_WIDTH } from "../../../common/contants";
-import Image from "@atlaskit/image";
-
+import MSPLogo from "../../../assets/images/Microsoft-Project-2019.png";
 const columns = 10;
 
 const containerStyles = xcss({
@@ -28,20 +27,12 @@ const descriptionContainerStyles = xcss({
 	height: "3rem",
 });
 
-const MSPLogo = "https://i.ibb.co/znTzdzQ/2346px-Microsoft-Project-2019-present-svg.png";
-
 function MPXmlExportFile({ isButtonExportLoading, onButtonExportClick }) {
 	return (
 		<Grid layout="fluid" spacing="compact" columns={columns}>
 			<GridColumn medium={2}>
 				<Box xcss={containerStyles}>
-					<Image
-						src={
-							MSPLogo
-						}
-						alt="Project logo"
-						testId="image"
-					/>
+					<Image src={MSPLogo} alt="Project logo" testId="image" />
 				</Box>
 			</GridColumn>
 			<GridColumn medium={6}>
