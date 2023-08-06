@@ -20,9 +20,11 @@ import ButtonItemSideBar from "./ButtonItemSideBar";
 import { useNavigate, useParams } from "react-router";
 import { AtlassianIcon } from "@atlaskit/logo";
 import Avatar from "@atlaskit/avatar";
-import { PROJECT_NAME_DESCRIPTOR } from "../../common/contants";
+import { APP_NAME, PROJECT_NAME_DESCRIPTOR } from "../../common/contants";
+import { HelperMessage } from "@atlaskit/form";
+import MoreSection from "./MoreSection";
 
-function ProjectSideBar(rootPath = "") {
+function ProjectSideBar({ rootPath = "" }) {
 	const navigate = useNavigate();
 	const [projectSidebar, setProjectSidebar] = useState(Object);
 	const { projectId } = useParams();
@@ -89,7 +91,9 @@ function ProjectSideBar(rootPath = "") {
 			</NestableNavigationContent>
 
 			<NavigationFooter>
-				<div></div>
+				<p style={{ textAlign: "center", fontSize: "12px" }}>
+					You are in {APP_NAME}
+				</p>
 			</NavigationFooter>
 		</SideNavigation>
 	);

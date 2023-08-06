@@ -81,7 +81,7 @@ function MainPage({ history, historyState }) {
 											element={<HomeSideBar rootPath="/" />}
 										></Route>
 										<Route
-											path="/more"
+											path="/subscription"
 											element={<HomeSideBar rootPath="/" />}
 										></Route>
 									</Route>
@@ -106,7 +106,7 @@ function MainPage({ history, historyState }) {
 
 									<Route path="/resources" element={<ResourcesPage />}></Route>
 									<Route path="/skills" element={<SkillsPage />}></Route>
-									<Route path="/more" element={<MorePage />}></Route>
+									<Route path="/subscription" element={<MorePage />}></Route>
 									<Route path="/modals" element={<TestModal />}></Route>
 
 									<Route path="/:projectId">
