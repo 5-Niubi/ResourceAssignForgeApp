@@ -1,7 +1,7 @@
 import Modal, {
 	ModalBody,
 	ModalFooter,
-	ModalTransition
+	ModalTransition,
 } from "@atlaskit/modal-dialog";
 import ProgressBar from "@atlaskit/progress-bar";
 import { invoke } from "@forge/bridge";
@@ -21,7 +21,7 @@ function LoadingModalWithThread({ state }) {
 	const [modalState, setModalState] = state;
 	const { setAppContextState } = useContext(AppContext);
 	const closeModal = useCallback(
-		() => setModalState((prev) => ({ ...prev, isModalOpen: false })),
+		() => setModalState((prev) => ({ ...prev, threadId: null })),
 		[]
 	);
 	const [progress, setProgress] = useState("...");
