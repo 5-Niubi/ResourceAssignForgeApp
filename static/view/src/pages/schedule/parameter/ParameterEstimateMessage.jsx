@@ -20,11 +20,7 @@ export default function ParameterEstimateMessage() {
 		invoke("getEstimateOverallWorkforce", { projectId })
 			.then(function (res) {
 				setIsEstimating(false);
-				if (res.id || res.id === 0) {
 					setEstimations(res);
-				} else {
-					Toastify.error("Error in estimate");
-				}
 				console.log("Get All Estimation", estimations);
 			})
 			.catch(function (error) {
@@ -42,7 +38,7 @@ export default function ParameterEstimateMessage() {
 				<div
 				>
 					<ul>
-						{estimations.workforceWithMilestoneList?.map(
+						{estimations?.workforceWithMilestoneList?.map(
 							(workforceWithMilestone) =>
 								workforceWithMilestone?.workforceOutputList
 									?.filter(
@@ -50,7 +46,7 @@ export default function ParameterEstimateMessage() {
 											s.skillOutputList != null &&
 											s.skillOutputList.length > 0
 									)
-									.map((workers) => {
+									?.map((workers) => {
 										let skills = [];
 										workers.skillOutputList?.forEach(
 											(skill) =>

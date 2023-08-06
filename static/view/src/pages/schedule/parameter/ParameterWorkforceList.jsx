@@ -25,16 +25,21 @@ import Modal, {
 import LoadingButton from "@atlaskit/button";
 import TextField from "@atlaskit/textfield";
 import Rating from "react-rating";
-import CreatableAdvanced from "./creatable-selection";
+import CreatableAdvanced from "../../../components/creatable-selection";
 import { COLOR_SKILL_LEVEL } from "../../../common/contants";
 import {
 	validateEmail,
 	validateNumberOnly,
 	validateWorkingEffort,
 	validateName,
+	cache,
+	getCacheObject,
+    findObj,
 } from "../../../common/utils";
 function ParameterWorkforceList() {
 	let { projectId } = useParams();
+	let project = getCacheObject("project", null);
+    const baseWH = (project.baseWorkingHour===0 ||project.baseWorkingHour === null) ? 24: project.baseWorkingHour;
 	const [workforces, setWorkforces] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [skillDB, setSkillDB] = useState([]);
@@ -54,11 +59,11 @@ function ParameterWorkforceList() {
 	};
 
 	useEffect(function () {
+		let workforce_local = getCacheObject("workforce_parameter", []);
+		if (workforce_local?.length > 0) {
+			setWorkforces(workforce_local);
+		}
 
-        let workforce_local = JSON.parse(
-            localStorage.getItem("workforce_parameter")
-        );
-        setWorkforces(workforce_local);
 		setIsLoading(false);
 
 		// invoke("getWorkforceParameter", { projectId })
@@ -72,7 +77,7 @@ function ParameterWorkforceList() {
 		// 			workforces.push(itemWorkforce);
 		// 		}
 		// 		setIsLoading(false);
-		// 		localStorage.setItem(
+		// 		cache(
 		// 			"workforce_parameter",
 		// 			JSON.stringify(workforces)
 		// 		);
@@ -93,7 +98,7 @@ function ParameterWorkforceList() {
 				console.log(error);
 				Toastify.error(error.toString());
 			});
-	}, []);
+	}, [loadingSubmit]);
 
 	const options = [
 		{ label: "Fulltime", value: 0 },
@@ -110,7 +115,6 @@ function ParameterWorkforceList() {
 	const buttonActions = (
 		<>
 			<ButtonGroup>
-				<ParameterCreareWorkforceModal></ParameterCreareWorkforceModal>
 				<ParameterSelectWorkforceModal
 					onSelectedWorkforces={handleSelectedWorkforces}
 				></ParameterSelectWorkforceModal>
@@ -177,6 +181,14 @@ function ParameterWorkforceList() {
 					Toastify.success(
 						"Workforce '" + workforce_name_display + "' is saved"
 					);
+                    //UPDATE LOCAL STOREAGE
+                    let workforce_local = getCacheObject("workforce_parameter",[]);
+                    for (let index = 0; index < workforce_local?.length; index++) {
+                        if(workforce_local[index].id === res.id){
+                            workforce_local[index].name = res.name;///CHANGE NEW NAME
+                        }
+                    }
+                    cache("workforce_parameter", JSON.stringify(workforce_local));
 					setLoadingSubmit(false);
 					setIsWorkforceOpen(false);
 				}
@@ -269,10 +281,14 @@ function ParameterWorkforceList() {
 			setShowAllWorkforces(false);
 		} else {
 			// DISPLAY ALL WORKFORCE WHEN CLICK ON "SHOW ALL" BUTTON
-			setDisplayedWorkforces(workforces.length);
+			setDisplayedWorkforces(workforces?.length);
 			setShowAllWorkforces(true);
 		}
 	};
+
+    const OutScopeMessage = () => (
+		<ErrorMessage>Value raging from 0 to {baseWH}</ErrorMessage>
+	);
 
 	return (
 		<div>
@@ -285,11 +301,11 @@ function ParameterWorkforceList() {
 					<Spinner size={"large"} />
 				) : (
 					<>
-						<h5>Total number: {workforces.length}</h5>
-						{workforces.length > 0 &&
+						<h5>Total employees: {workforces?.length}</h5>
+						{workforces?.length > 0 &&
 							workforces
-								.slice(0, displayedWorkforces)
-								.map((workforce, index) =>
+								?.slice(0, displayedWorkforces)
+								?.map((workforce, index) =>
 									// BUTTON CLICK TO OPEN WORKFORCE INFORMATION DETAIL
 									loadingDetail &&
 									loadingDetailId === workforce.id ? (
@@ -321,7 +337,7 @@ function ParameterWorkforceList() {
 									)
 								)}
 						{/* BUTTON CLICK TO SHOW ALL/SHOW LESS WORKFORCE */}
-						{workforces.length > 10 && (
+						{workforces?.length > 10 && (
 							<Button
 								appearance="primary"
 								onClick={handleShowMore}
@@ -377,13 +393,13 @@ function ParameterWorkforceList() {
 														data.fri,
 														data.sat,
 														data.sun,
-												  ].map((value) =>
+												  ]?.map((value) =>
 														parseFloat(value)
 												  )
 												: null,
 										Skills: skillsTable
 											.filter((s) => s.id != null)
-											.map((skill) => ({
+											?.map((skill) => ({
 												skillId: skill.id,
 												level: parseInt(
 													skill.level === null
@@ -393,7 +409,7 @@ function ParameterWorkforceList() {
 											})),
 										newSkills: skillsTable
 											.filter((s) => s.id == null)
-											.map((skill) => ({
+											?.map((skill) => ({
 												name: skill.value,
 												level: parseInt(
 													skill.level === null
@@ -688,7 +704,7 @@ function ParameterWorkforceList() {
 																	value
 																) =>
 																	validateWorkingEffort(
-																		value
+																		value, baseWH
 																	)
 																}
 																isDisabled={
@@ -714,14 +730,7 @@ function ParameterWorkforceList() {
 																		)}
 																		{error ===
 																			"OUT_SCOPE" && (
-																			<ErrorMessage>
-																				Value
-																				raging
-																				from
-																				0.0
-																				to
-																				8.0
-																			</ErrorMessage>
+																			<OutScopeMessage/>
 																		)}
 																	</Fragment>
 																)}
@@ -739,7 +748,7 @@ function ParameterWorkforceList() {
 																	value
 																) =>
 																	validateWorkingEffort(
-																		value
+																		value, baseWH
 																	)
 																}
 																isDisabled={
@@ -765,14 +774,7 @@ function ParameterWorkforceList() {
 																		)}
 																		{error ===
 																			"OUT_SCOPE" && (
-																			<ErrorMessage>
-																				Value
-																				raging
-																				from
-																				0.0
-																				to
-																				8.0
-																			</ErrorMessage>
+																			<OutScopeMessage/>
 																		)}
 																	</Fragment>
 																)}
@@ -790,7 +792,7 @@ function ParameterWorkforceList() {
 																	value
 																) =>
 																	validateWorkingEffort(
-																		value
+																		value, baseWH
 																	)
 																}
 																isDisabled={
@@ -816,14 +818,7 @@ function ParameterWorkforceList() {
 																		)}
 																		{error ===
 																			"OUT_SCOPE" && (
-																			<ErrorMessage>
-																				Value
-																				raging
-																				from
-																				0.0
-																				to
-																				8.0
-																			</ErrorMessage>
+																			<OutScopeMessage/>
 																		)}
 																	</Fragment>
 																)}
@@ -841,7 +836,7 @@ function ParameterWorkforceList() {
 																	value
 																) =>
 																	validateWorkingEffort(
-																		value
+																		value, baseWH
 																	)
 																}
 																isDisabled={
@@ -867,14 +862,7 @@ function ParameterWorkforceList() {
 																		)}
 																		{error ===
 																			"OUT_SCOPE" && (
-																			<ErrorMessage>
-																				Value
-																				raging
-																				from
-																				0.0
-																				to
-																				8.0
-																			</ErrorMessage>
+																			<OutScopeMessage/>
 																		)}
 																	</Fragment>
 																)}
@@ -892,7 +880,7 @@ function ParameterWorkforceList() {
 																	value
 																) =>
 																	validateWorkingEffort(
-																		value
+																		value, baseWH
 																	)
 																}
 																isDisabled={
@@ -918,14 +906,14 @@ function ParameterWorkforceList() {
 																		)}
 																		{error ===
 																			"OUT_SCOPE" && (
-																			<ErrorMessage>
-																				Value
-																				raging
-																				from
-																				0.0
-																				to
-																				8.0
-																			</ErrorMessage>
+                                                                                <ErrorMessage>
+                                                                                Value
+                                                                                raging
+                                                                                from
+                                                                                0.0
+                                                                                to
+                                                                                8.0
+                                                                            </ErrorMessage>
 																		)}
 																	</Fragment>
 																)}
@@ -943,7 +931,7 @@ function ParameterWorkforceList() {
 																	value
 																) =>
 																	validateWorkingEffort(
-																		value
+																		value, baseWH
 																	)
 																}
 																isDisabled={
@@ -969,14 +957,7 @@ function ParameterWorkforceList() {
 																		)}
 																		{error ===
 																			"OUT_SCOPE" && (
-																			<ErrorMessage>
-																				Value
-																				raging
-																				from
-																				0.0
-																				to
-																				8.0
-																			</ErrorMessage>
+																			<OutScopeMessage/>
 																		)}
 																	</Fragment>
 																)}
@@ -994,7 +975,7 @@ function ParameterWorkforceList() {
 																	value
 																) =>
 																	validateWorkingEffort(
-																		value
+																		value, baseWH
 																	)
 																}
 																isDisabled={
@@ -1020,14 +1001,7 @@ function ParameterWorkforceList() {
 																		)}
 																		{error ===
 																			"OUT_SCOPE" && (
-																			<ErrorMessage>
-																				Value
-																				raging
-																				from
-																				0.0
-																				to
-																				8.0
-																			</ErrorMessage>
+																			<OutScopeMessage/>
 																		)}
 																	</Fragment>
 																)}

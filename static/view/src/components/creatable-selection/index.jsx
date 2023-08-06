@@ -25,7 +25,7 @@ export default function CreatableAdvanced({
 }) {
 	const [isLoading, setIsLoading] = useState(false);
 	const [options, setOptions] = useState(defaultOptions);
-	const [value, setValue] = useState(selectedValue);
+	const [value, setValue] = useState(selectedValue??[]);
 
 	const handleChange = (newValue, actionMeta) => {
 		console.group("Value Changed");
