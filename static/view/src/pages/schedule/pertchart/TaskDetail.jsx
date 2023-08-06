@@ -145,6 +145,7 @@ const TaskDetail = ({
 		currentTask.skillRequireds = skills;
 		updateTaskSkillsChanged(skills);
 		updateCanEstimate(false);
+		setIsInfoChanged(true);
 	};
 
 	const handleUpdateTask = () => {
@@ -156,6 +157,13 @@ const TaskDetail = ({
 				setIsInfoChanged(false);
 				if (res.id) {
 					updateCurrentTaskChanged(currentTask);
+					for (let i = 0; i < tasks.length; i++) {
+						if (tasks[i].id == currentTask.id){
+							tasks[i] = currentTask;
+							break;
+						}
+					}
+					updateTasks(tasks);
 					Toastify.success("Task updated successfully");
 				}
 			})
@@ -296,6 +304,16 @@ const TaskDetail = ({
 																currentTask.duration =
 																	event.currentTarget.value;
 															}}
+															elemAfterInput={
+																<span
+																	style={{
+																		paddingRight:
+																			"10px",
+																	}}
+																>
+																	DAYS
+																</span>
+															}
 														/>
 													</Fragment>
 												)}

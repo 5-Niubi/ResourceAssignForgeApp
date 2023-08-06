@@ -9,7 +9,7 @@ function threadResolver(resolver) {
 		try {
 			return await threadService.getThreadState();
 		} catch (error) {
-			throw new Error(error);
+			throw new Error(JSON.stringify(error));
 
 			return Promise.reject(error);
 		}
@@ -21,7 +21,7 @@ function threadResolver(resolver) {
 			return Promise.resolve();
 		} catch (error) {
 			console.log("setThreadInfo");
-			throw new Error(error);
+			throw new Error(JSON.stringify(error));
 
 			return Promise.reject(error);
 		}
@@ -33,7 +33,7 @@ function threadResolver(resolver) {
 			return Promise.resolve();
 		} catch (error) {
 			console.log("removeThreadInfo");
-			throw new Error(error);
+			throw new Error(JSON.stringify(error));
 
 			return Promise.reject(error);
 		}
@@ -43,7 +43,7 @@ function threadResolver(resolver) {
 		try {
 			return await threadService.getThreadResult(req.payload.threadId);
 		} catch (error) {
-			throw new Error(error);
+			throw new Error(JSON.stringify(error));
 
 			return Promise.reject(error);
 		}

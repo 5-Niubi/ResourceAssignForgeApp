@@ -49,17 +49,21 @@
 	display: block;
 }
 
+.tasks-compact tbody tr{
+	background-color: #fff;
+}
+
 .task-details {
 	position: relative;
 	border-top: 1px solid #e5e5e5;
-	height: 40%;
+	height: 35%;
 	overflow-y: auto;
 	transition: all ease-in-out 0.3s;
 }
 
 .pert-chart {
 	position: relative;
-	height: 50%;
+	height: calc(60% - 100px);
 	width: 100%;
 	transition: all ease-in-out 0.3s;
 }

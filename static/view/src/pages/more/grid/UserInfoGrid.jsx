@@ -25,7 +25,7 @@ function UserInfoGrid() {
 					<Grid spacing="comfortable" columns={columns}>
 						<GridColumn medium={columns}>
 							<h1 className="" style={{ marginBottom: "1em" }}>
-								User Information
+								Subscription Information
 							</h1>
 						</GridColumn>
 					</Grid>

@@ -10,7 +10,7 @@ import React, { Fragment, useState, useCallback, useEffect } from "react";
 import TextField from "@atlaskit/textfield";
 import Form, { Field, FormSection, HelperMessage } from "@atlaskit/form";
 import { DatePicker } from "@atlaskit/datetime-picker";
-import { getCurrentTime } from "../../../common/utils";
+import { extractErrorMessage, getCurrentTime } from "../../../common/utils";
 import { invoke } from "@forge/bridge";
 import { DATE_FORMAT, MODAL_WIDTH } from "../../../common/contants";
 import Toastify from "../../../common/Toastify";
@@ -81,7 +81,9 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 			})
 			.catch((error) => {
 				setIsSubmitting(false);
-				Toastify.error(error.toString());
+
+				let errorMsg = extractErrorMessage(error);
+				Toastify.error(errorMsg.message);
 			});
 	}
 

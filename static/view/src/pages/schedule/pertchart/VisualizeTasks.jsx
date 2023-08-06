@@ -9,7 +9,7 @@ import Toastify from "../../../common/Toastify";
 import PageHeader from "@atlaskit/page-header";
 import Button, { LoadingButton } from "@atlaskit/button";
 import "./style.css";
-import { cache, getCache } from "../../../common/utils";
+import { cache, extractErrorMessage, findObj, getCache } from "../../../common/utils";
 import ChevronRightCircleIcon from "@atlaskit/icon/glyph/chevron-right-circle";
 import ChevronLeftCircleIcon from "@atlaskit/icon/glyph/chevron-left-circle";
 
@@ -85,22 +85,27 @@ function VisualizeTasksPage({ handleChangeTab }) {
 					setCanEstimate(true);
 					setTasksError([]);
 					Toastify.success("Saved successfully");
-				} else {
-					// console.log(res);\
-					setTasksError(res);
-					setCanEstimate(false);
-					res.forEach((taskErr) =>
-						Toastify.error(
-							"Task " + taskErr.taskId + ": " + taskErr.messages
-						)
-					);
 				}
 			})
 			.catch(function (error) {
 				setCanEstimate(false);
 				setIsSaving(false);
 				console.log(error);
-				Toastify.error(error.toString());
+				let errorMsg = extractErrorMessage(error);
+				if (errorMsg.message){
+					console.log(errorMsg.message);
+					Toastify.error(errorMsg.message);
+				} else {
+					var tasksError = [];
+					errorMsg.forEach((e) =>{
+						let task = findObj(tasks, e.taskId);
+						if (task){
+							tasksError.push(e);
+							Toastify.error(`${task.name}: ${e.messages}`);
+						}
+					});
+					setTasksError(tasksError);
+				}
 			});
 	}
 
@@ -131,8 +136,10 @@ function VisualizeTasksPage({ handleChangeTab }) {
 	const [milestones, setMilestones] = useState(milestonesCache);
 	const [loadingTasks, setLoadingTasks] = useState(tasks.length == 0);
 	useEffect(function () {
+		setLoadingTasks(false);
 		var tasksCache = getCache("tasks");
 		if (!tasksCache) {
+			setLoadingTasks(true);
 			invoke("getTasksList", { projectId })
 				.then(function (res) {
 					setLoadingTasks(false);
@@ -214,12 +221,15 @@ function VisualizeTasksPage({ handleChangeTab }) {
 	};
 
 	const updateTasks = (tasks) => {
+		cache("tasks", JSON.stringify(tasks));
 		setTasks(tasks);
 	};
 	const updateSkills = (skills) => {
+		cache("skills", JSON.stringify(skills));
 		setSkills(skills);
 	};
 	const updateMilestones = (milestones) => {
+		cache("milestones", JSON.stringify(milestones));
 		setMilestones(milestones);
 	};
 

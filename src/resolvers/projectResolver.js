@@ -10,7 +10,7 @@ function projectResolver(resolver) {
 			return await projectService.getProjects(req.payload.page);
 		} catch (error) {
 			console.log("Error in getProjectsList: ", error);
-			throw new Error(error);
+			throw new Error(JSON.stringify(error));
 
 			return Promise.reject(error);
 		}
@@ -18,11 +18,13 @@ function projectResolver(resolver) {
 
 	resolver.define("createNewProjectProjectLists", async function (req) {
 		try {
-			let response = await projectService.createProject(req.payload.projectObjRequest);
+			let response = await projectService.createProject(
+				req.payload.projectObjRequest
+			);
 			return response;
 		} catch (error) {
 			console.log("Error in createNewProjectProjectLists: ", error);
-			throw new Error(error);
+			throw new Error(JSON.stringify(error));
 
 			return Promise.reject(error);
 		}
@@ -30,23 +32,24 @@ function projectResolver(resolver) {
 
 	resolver.define("getProjectDetail", async function (req) {
 		try {
-			let response = await projectService.getProjectDetail(req.payload.projectId);
+			let response = await projectService.getProjectDetail(
+				req.payload.projectId
+			);
 			return response;
 		} catch (error) {
 			console.log("Error in getProjectDetail: ", error);
-			throw new Error(error);
+			throw new Error(JSON.stringify(error));
 
 			return Promise.reject(error);
 		}
 	});
-
 
 	resolver.define("getJiraProjectsList", async function (req) {
 		try {
 			return await projectService.getJiraSoftwareProjects({});
 		} catch (error) {
 			console.log("Error in getJiraProjectsList: ", error);
-			throw new Error(error);
+			throw new Error(JSON.stringify(error));
 
 			return Promise.reject(error);
 		}
@@ -59,7 +62,7 @@ function projectResolver(resolver) {
 			return response;
 		} catch (error) {
 			console.log("Error in estimate: ", error);
-			throw new Error(error);
+			throw new Error(JSON.stringify(error));
 
 			return Promise.reject(error);
 		}
@@ -70,23 +73,22 @@ function projectResolver(resolver) {
 			return await projectService.editProject(req.payload.projectObjRequest);
 		} catch (error) {
 			console.log("Error in editProject: ", error);
-			throw new Error(error);
+			throw new Error(JSON.stringify(error));
 
 			return Promise.reject(error);
 		}
 	});
-	
+
 	resolver.define("deleteProject", async function (req) {
 		try {
 			return await projectService.deleteProject(req.payload.projectId);
 		} catch (error) {
 			console.log("Error in editProject: ", error);
-			throw new Error(error);
+			throw new Error(JSON.stringify(error));
 
 			return Promise.reject(error);
 		}
 	});
-	
 }
 
 export default projectResolver;

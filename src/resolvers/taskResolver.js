@@ -10,7 +10,7 @@ function taskResolver(resolver) {
 			return await taskService.getTasks(req.payload.projectId);
 		} catch (error) {
 			console.log("Error in getTasksList: ", error);
-			throw new Error(error);
+			throw new Error(JSON.stringify(error));
 
 			return Promise.reject(error);
 		}
@@ -23,8 +23,9 @@ function taskResolver(resolver) {
 			return response;
 		} catch (error) {
 			console.log("Error in createNewTask: ", error);
-			throw new Error(error.messages || "Error in create new task");
-			// return Promise.reject(error);
+			// throw new Error(error.messages || "Error in create new task");
+			throw new Error(JSON.stringify(error));
+			return Promise.reject(error);
 		}
 	});
 
@@ -35,7 +36,7 @@ function taskResolver(resolver) {
 			return response;
 		} catch (error) {
 			console.log("Error in getTaskDetail: ", error);
-			throw new Error(error);
+			throw new Error(JSON.stringify(error));
 
 			return Promise.reject(error);
 		}
@@ -48,7 +49,7 @@ function taskResolver(resolver) {
 			return response;
 		} catch (error) {
 			console.log("Error in saveTasks: ", error);
-			throw new Error(error);
+			throw new Error(JSON.stringify(error));
 
 			Promise.reject(error);
 			return error;
@@ -62,7 +63,7 @@ function taskResolver(resolver) {
 			return response;
 		} catch (error) {
 			console.log("Error in updateTask: ", error);
-			throw new Error(error);
+			throw new Error(JSON.stringify(error));
 			return Promise.reject(error);
 		}
 	});
@@ -74,6 +75,7 @@ function taskResolver(resolver) {
 			return response;
 		} catch (error) {
 			console.log("Error in deleteTask: ", error);
+			throw new Error(JSON.stringify(error));
 			return Promise.reject(error);
 		}
 	});

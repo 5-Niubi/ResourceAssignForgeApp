@@ -13,12 +13,12 @@ import Toastify from "../../common/Toastify";
 import JiraAutoCreateProjectExport from "./gird/JiraCreateProjectExportGrid";
 import Heading from "@atlaskit/heading";
 import { ScheduleExportContext } from "../../pages/schedule/ganttchart/GanttChartPage";
-import { ThreadLoadingContext } from "../../App";
 import { useContext } from "react";
 import { saveThreadInfo } from "../../common/utils";
 import JiraCreateProjectExport from "./form/JiraCreateProjectExport";
 import { useParams } from "react-router";
 import { ProjectInfoContext } from "../../pages/schedule/ScheduleTabs";
+import { ThreadLoadingContext } from "../main/MainPage";
 const width = MODAL_WIDTH.M;
 
 const initProjectListState = {
