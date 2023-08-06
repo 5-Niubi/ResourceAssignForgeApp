@@ -15,32 +15,44 @@ import {
 	THREAD_ACTION,
 	THREAD_STATUS,
 } from "../common/contants";
-import { isArrayEmpty, isObjectEmpty, removeThreadInfo } from "../common/utils";
+import {
+	extractErrorMessage,
+	isArrayEmpty,
+	isObjectEmpty,
+	removeThreadInfo,
+} from "../common/utils";
+import { HttpStatus } from "../common/httpStatus";
 
+let retryNumber = RETRY_TIMES;
 function LoadingModalWithThread({ state }) {
 	const [modalState, setModalState] = state;
 	const { setAppContextState } = useContext(AppContext);
-	const closeModal = function (intervalId) {
-		if (intervalId) {
-			clearInterval(intervalId);
-		}
+	const closeModal = function () {
 		setModalState((prev) => ({ ...prev, threadId: null }));
 		removeThreadInfo();
 	};
 	const [progress, setProgress] = useState("...");
 
 	// --- Handle Loading
-	let retryNumber = RETRY_TIMES;
-	function checkingThread(intervalId) {
+
+	function checkingThread() {
 		invoke("getThreadResult", { threadId: modalState.threadId })
 			.then((res) => {
 				retryNumber = RETRY_TIMES;
-				handleThreadSuccess(res, intervalId);
+				handleThreadSuccess(res);
 			})
 			.catch((error) => {
-				Toastify.error(error.toString());
-				if (!--retryNumber) {
-					closeModal(intervalId);
+				let errorMsg = extractErrorMessage(error);
+				if (errorMsg.status === HttpStatus.NOT_FOUND.code) {
+					Toastify.error(errorMsg.statusText);
+					closeModal();
+				} else {
+					Toastify.error(errorMsg.message);
+				}
+
+				debugger;
+				if (--retryNumber === 0) {
+					closeModal();
 				}
 			});
 	}
@@ -48,12 +60,13 @@ function LoadingModalWithThread({ state }) {
 		checkingThread();
 		//assign interval to a variable to clear it.
 		const intervalId = setInterval(() => {
-			checkingThread(intervalId);
+			checkingThread();
 		}, INTERVAL_FETCH);
 
 		return () => clearInterval(intervalId); //This is important
 	}, []);
-	const handleThreadSuccess = useCallback((res, intervalId) => {
+
+	const handleThreadSuccess = useCallback((res) => {
 		console.log(res);
 
 		// Export thread success
@@ -72,10 +85,9 @@ function LoadingModalWithThread({ state }) {
 				if (modalState.threadAction === THREAD_ACTION.RUNNING_SCHEDULE) {
 					Toastify.success("Schedule of threads is done.");
 				}
-
 				// Handle finish thread
 
-				closeModal(intervalId);
+				closeModal();
 				break;
 			case THREAD_STATUS.ERROR:
 				if (modalState.threadAction === THREAD_ACTION.JIRA_EXPORT) {
@@ -119,7 +131,7 @@ function LoadingModalWithThread({ state }) {
 				}
 
 				// Handle finish thread
-				closeModal(intervalId);
+				closeModal();
 				break;
 		}
 	}, []);
