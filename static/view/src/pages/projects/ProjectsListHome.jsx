@@ -15,7 +15,7 @@ import DeleteProjectModal from "./modal/DeleteProjectModal";
 import Toastify from "../../common/Toastify";
 import EmptyState from "@atlaskit/empty-state";
 import Button from "@atlaskit/button";
-import { cache, getCache, getCacheObject } from "../../common/utils";
+import { cache, clearAllCache, getCache, getCacheObject } from "../../common/utils";
 
 const width = MODAL_WIDTH.M;
 const modalInitState = { project: {}, isOpen: false };
@@ -23,6 +23,7 @@ export const ModalStateContext = createContext();
 const columns = 10;
 
 function ProjectListHome() {
+	clearAllCache();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const isDesktopOrLaptop = useMediaQuery({
 		query: `(min-width: ${MEDIA_QUERY.DESKTOP_LAPTOP.MIN}px)`,

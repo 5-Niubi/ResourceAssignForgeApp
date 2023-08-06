@@ -24,6 +24,7 @@ import DeleteTaskModal from "../schedule/pertchart/modal/DeleteTaskModal";
 import Toastify from "../../common/Toastify";
 import CreateMilestoneModal from "./modal/CreateMilestoneModal";
 import DeleteMilestoneModal from "./modal/DeleteMilestoneModal";
+import { PiStarFill } from "react-icons/pi";
 
 /**
  * Using as Demo Homepage
@@ -334,7 +335,7 @@ function TasksPage() {
 		}
 	);
 
-	var rows = displayTasks.map((task, index) => {
+	var rows = displayTasks?.map((task, index) => {
 		return {
 			key: `milestone-${selectedMilestone || "s"}-${index}`,
 			isHighlighted: false,
@@ -371,14 +372,20 @@ function TasksPage() {
 										<Lozenge
 											key={i}
 											style={{
+												marginLeft: "8px",
 												backgroundColor:
 													COLOR_SKILL_LEVEL[
 														obj.level - 1
 													].color,
-												color: "white",
+												color:
+													obj.level === 1
+														? "#091e42"
+														: "white",
 											}}
+											isBold
 										>
-											{skill.name}
+											{skill.name} - {obj.level}
+											<PiStarFill />
 										</Lozenge>
 									</span>
 								);

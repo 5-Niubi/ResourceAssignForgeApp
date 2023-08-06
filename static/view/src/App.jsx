@@ -7,6 +7,7 @@ import { ToastContainer, toast } from "react-toastify";
 import ErrorModal from "./components/ErrorModal";
 import "./pages/style.css";
 import MainPage from "./components/main/MainPage";
+import { clearAllCache } from "./common/utils";
 
 export const AppContext = createContext();
 

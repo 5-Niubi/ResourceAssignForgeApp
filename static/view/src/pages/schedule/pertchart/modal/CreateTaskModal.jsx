@@ -11,7 +11,7 @@ import React, { Fragment, useState, useCallback, useEffect } from "react";
 import TextField from "@atlaskit/textfield";
 import Form, { Field, FormSection } from "@atlaskit/form";
 import { invoke } from "@forge/bridge";
-import { cache, findObj } from "../../../../common/utils";
+import { cache, extractErrorMessage, findObj } from "../../../../common/utils";
 import Toastify from "../../../../common/Toastify";
 
 function CreateTaskModal({
@@ -233,12 +233,9 @@ function CreateTaskModal({
 				})
 				.catch((error) => {
 					setIsSubmitting(false);
-					console.log(error.message);
-					if (error.messages) {
-						Toastify.error(res.messages);
-					} else {
-						Toastify.error(error.message);
-					}
+					let errorMsg = extractErrorMessage(error);
+					console.log(errorMsg.message);
+					Toastify.error(errorMsg.message);
 				});
 		} else {
 			//create new
@@ -261,12 +258,9 @@ function CreateTaskModal({
 				})
 				.catch((error) => {
 					setIsSubmitting(false);
-					console.log(error.message);
-					if (error.messages) {
-						Toastify.error(res.messages);
-					} else {
-						Toastify.error(error.message);
-					}
+					let errorMsg = extractErrorMessage(error);
+					console.log(errorMsg.message);
+					Toastify.error(errorMsg.message);
 				});
 		}
 	}
