@@ -25,7 +25,6 @@ function LoadingModalWithThread({ state }) {
 		[]
 	);
 	const [progress, setProgress] = useState("...");
-	const [errorMsg, setErrorMsg] = useState("");
 
 	// --- Handle Loading
 	let retryNumber = RETRY_TIMES;
@@ -154,14 +153,6 @@ function LoadingModalWithThread({ state }) {
 				</ModalBody>
 				<ModalFooter></ModalFooter>
 			</Modal>
-			{errorMsg.length > 0 && (
-				<>
-					<Modal onClose={closeModal}>
-						<ModalBody>{errorMsg}</ModalBody>
-						<ModalFooter></ModalFooter>
-					</Modal>
-				</>
-			)}
 		</ModalTransition>
 	);
 }
