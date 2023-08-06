@@ -70,6 +70,12 @@ function LoadingModalWithThread({ state }) {
 						`Export successfully: ${res.result.projectName} was created`
 					);
 				}
+                //define action running scheduling success
+                if(modalState.threadAction === THREAD_ACTION.RUNNING_SCHEDULE){
+                    Toastify.success(
+                        "Schedule of threads is done."
+                    );
+                }
 
 				removeThreadInfo();
 				closeModal();

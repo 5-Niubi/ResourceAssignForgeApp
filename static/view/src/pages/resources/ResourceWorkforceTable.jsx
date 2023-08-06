@@ -198,7 +198,7 @@ function ResourceWorkforceTable() {
 		cells: [
 			{
 				key: workforce.id,
-				content: <strong>#{workforce.id}</strong>,
+				content: "#"+workforce.id,
 			},
 			{
 				key: createKey(workforce.name),
@@ -270,10 +270,7 @@ function ResourceWorkforceTable() {
 				Employee List <InfoMessageColor />
 			</PageHeader>
 
-			<InlineMessage
-				title={"Total employee: "}
-				secondaryText={workforcesFilter.length}
-			/>
+            <h5>Total employees: {workforcesFilter?.length}</h5>
 
 			<DynamicTable
 				head={head}
