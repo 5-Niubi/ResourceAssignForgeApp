@@ -1,14 +1,12 @@
-import Button from "@atlaskit/button";
 import Modal, {
 	ModalBody,
 	ModalFooter,
-	ModalHeader,
-	ModalTitle,
-	ModalTransition,
+	ModalTransition
 } from "@atlaskit/modal-dialog";
 import ProgressBar from "@atlaskit/progress-bar";
 import { invoke } from "@forge/bridge";
 import React, { useCallback, useContext, useEffect, useState } from "react";
+import { AppContext } from "../App";
 import Toastify from "../common/Toastify";
 import {
 	INTERVAL_FETCH,
@@ -18,8 +16,6 @@ import {
 	THREAD_STATUS,
 } from "../common/contants";
 import { isArrayEmpty, isObjectEmpty, removeThreadInfo } from "../common/utils";
-import signal, { HubConnectionBuilder } from "@microsoft/signalr";
-import { AppContext } from "../App";
 
 function LoadingModalWithThread({ state }) {
 	const [modalState, setModalState] = state;
@@ -82,7 +78,7 @@ function LoadingModalWithThread({ state }) {
 			case THREAD_STATUS.ERROR:
 				let message, response, errorMessages, errors;
 				message = res.result.message;
-				
+
 				if (res.result.response) {
 					response = JSON.parse(res.result.response);
 					errorMessages = response.errorMessages;
