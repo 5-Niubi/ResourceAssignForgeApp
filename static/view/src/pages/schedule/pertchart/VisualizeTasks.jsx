@@ -102,6 +102,8 @@ function VisualizeTasksPage({ handleChangeTab }) {
 						if (task){
 							tasksError.push(e);
 							Toastify.error(`${task.name}: ${e.messages}`);
+						} else {
+							Toastify.error(e.messages);
 						}
 					});
 					setTasksError(tasksError);
