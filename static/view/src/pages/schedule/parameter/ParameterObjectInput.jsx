@@ -20,6 +20,7 @@ import Range from "@atlaskit/range";
 import { Grid, GridColumn } from "@atlaskit/page";
 import { useParams } from "react-router";
 import Textfield from "@atlaskit/textfield";
+import Lozenge from "@atlaskit/lozenge";
 import { css, jsx } from "@emotion/react";
 import RecentIcon from "@atlaskit/icon/glyph/recent";
 import Modal, {
@@ -35,6 +36,7 @@ import __noop from "@atlaskit/ds-lib/noop";
 import Toastify from "../../../common/Toastify";
 import { ButtonGroup, LoadingButton } from "@atlaskit/button";
 import {
+    COLOR_SKILL_LEVEL,
 	DATE_FORMAT,
 	MODAL_WIDTH,
 	THREAD_ACTION,
@@ -46,6 +48,7 @@ import {
 	getCacheObject,
 	saveThreadInfo,
 	validateEnddate,
+	extractErrorMessage,
 } from "../../../common/utils";
 import Spinner from "@atlaskit/spinner";
 import { RadioGroup } from "@atlaskit/radio";
@@ -53,6 +56,7 @@ import Page from "@atlaskit/page";
 import PageHeader from "@atlaskit/page-header";
 import { ThreadLoadingContext } from "../../../components/main/MainPage";
 import { AppContext } from "../../../App";
+import { PiStarFill } from "react-icons/pi";
 
 const objectiveItems = [
 	{ name: "time", value: "time", label: "Time" },
@@ -155,7 +159,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 					// handle open loading modal with thread
 					handleCreateThreadSuccess(res.threadId);
 					handleChangeTab(3);
-                    setIsScheduling(false);
+					setIsScheduling(false);
 
 					return invoke("schedule", {
 						threadId: res.threadId,
@@ -170,11 +174,44 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 			})
 			.catch(function (error) {
 				setIsScheduling(false);
-				if (error.response) {
-					handleCreateThreadFail(<p>{error.response}</p>);
-				} else {
-					handleCreateThreadFail(<p>{error.toString()}</p>);
-				}
+				let messageError = extractErrorMessage(error);
+				let messageDisplay = (
+					<ul>
+						{messageError.map((skillSet) => (
+							<li>
+								Task ID {skillSet.taskId} need workers with
+								skill sets{" "}
+								{skillSet.skillRequireds?.map((skill, i) => (
+									<span
+										style={{
+											marginRight: "2px",
+											marginLeft: "8px",
+										}}
+									>
+										<Lozenge
+											key={i}
+											style={{
+												backgroundColor:
+													COLOR_SKILL_LEVEL[
+														skill.level - 1
+													].color,
+												color:
+													skill.level === 1
+														? "#091e42"
+														: "white",
+											}}
+											isBold
+										>
+											{skill.name} - {skill.level}
+											<PiStarFill />
+										</Lozenge>
+									</span>
+								))}
+							</li>
+						))}
+					</ul>
+				);
+				handleCreateThreadFail(messageDisplay);
 			});
 	}
 
