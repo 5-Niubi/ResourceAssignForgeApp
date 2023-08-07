@@ -81,3 +81,5 @@ export const SUBSCRIPTION = Object.freeze({
 	FREE_ID : 1,
 	PLUS_ID : 2
 });
+
+export const DOMAIN_SUBSCRIPTION_SERVER = "https://admin.ai4cert.com"

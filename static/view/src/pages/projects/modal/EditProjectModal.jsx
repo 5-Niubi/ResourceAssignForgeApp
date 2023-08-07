@@ -87,7 +87,6 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 
 	function handleSubmitCreate() {
 		setIsSubmitting(true);
-		debugger;
 		let projectObjRequest = {
 			id: project.id,
 			name: projectName,

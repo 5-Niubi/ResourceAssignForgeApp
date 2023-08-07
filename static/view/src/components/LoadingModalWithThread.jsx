@@ -49,8 +49,6 @@ function LoadingModalWithThread({ state }) {
 				} else {
 					Toastify.error(errorMsg.message);
 				}
-
-				debugger;
 				if (--retryNumber === 0) {
 					closeModal();
 				}
