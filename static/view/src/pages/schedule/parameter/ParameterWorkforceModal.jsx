@@ -14,6 +14,7 @@ import Modal, {
 	ModalTitle,
 	ModalTransition,
 } from "@atlaskit/modal-dialog";
+import Spinner from "@atlaskit/spinner";
 import { invoke } from "@forge/bridge";
 import Toastify from "../../../common/Toastify";
 import { RadioGroup } from "@atlaskit/radio";
@@ -94,11 +95,11 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 					setWorkforces(workforces);
 
 					let localWorkforceIds = [];
-                    if(workforce_local?.length>0){
-                        localWorkforceIds = workforce_local?.map(
-                            (workforce) => workforce?.id?.toString()
-                        );
-                    }
+					if (workforce_local?.length > 0) {
+						localWorkforceIds = workforce_local?.map((workforce) =>
+							workforce?.id?.toString()
+						);
+					}
 					setSelectedWorkforces(localWorkforceIds);
 
 					//CHECK BUTTON SELECT ALL
@@ -374,49 +375,46 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 
 export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 	//CREATE WORKFORCE MODAL (CW)
-    let project = getCacheObject("project", null);
-    const baseWH = (project.baseWorkingHour===0 ||project.baseWorkingHour === null) ? 24: project.baseWorkingHour;
+	let project = getCacheObject("project", null);
+	const baseWH =
+		project.baseWorkingHour === 0 || project.baseWorkingHour === null
+			? 24
+			: project.baseWorkingHour;
 	const [isCWOpen, setIsCWOpen] = useState(false);
 	const openCWModal = useCallback(() => setIsCWOpen(true), []);
 	const closeCWModal = useCallback(() => setIsCWOpen(false), []);
 	const [isParttimeSelected, setIsParttimeSelected] = useState(false);
 	const [skillsTable, setSkillsTable] = useState([]);
+	const [loadingDetail, setLoadingDetail] = useState(false);
 	const [loadingSubmit, setLoadingSubmit] = useState(false);
 	const [skillDB, setSkillDB] = useState([]);
 
 	const [workforcesJiraAccount, setWorkforcesJiraAccount] = useState([]);
 
-	useEffect(function () {
-		if (workforcesJiraAccount.length < 1) {
-			invoke("getAllUserJira")
-				.then(function (jiraUsersResponse) {
-					const jiraUsers = jiraUsersResponse
-						.filter((user) => user.accountType === "atlassian")
-						.map((user) => ({
-							accountId: user.accountId,
-							email: user.emailAddress,
-							accountType: user.accountType,
-							name: user.displayName,
-							avatar: user.avatarUrls["48x48"],
-							displayName: user.displayName,
-						}));
-					setWorkforcesJiraAccount(jiraUsers);
-				})
-				.catch(function (error) {
-					console.log(error);
-					Toastify.error(error.toString());
-				});
-		}
+	useEffect(() => {
+        setLoadingDetail(true);
+		Promise.all([invoke("getAllUserJira"), invoke("getAllSkills")])
+			.then(([jiraUsersResponse, resSkillDB]) => {
+				const jiraUsers = jiraUsersResponse
+					.filter((user) => user.accountType === "atlassian")
+					.map((user) => ({
+						accountId: user.accountId,
+						email: user.emailAddress,
+						accountType: user.accountType,
+						name: user.displayName,
+						avatar: user.avatarUrls["48x48"],
+						displayName: user.displayName,
+					}));
+				setWorkforcesJiraAccount(jiraUsers);
 
-		invoke("getAllSkills", {})
-			.then(function (res) {
-				setSkillDB(res);
-				localStorage.setItem("all_skills_DB", JSON.stringify(res));
+				setSkillDB(resSkillDB);
+				localStorage.setItem("all_skills_DB", JSON.stringify(resSkillDB));
+                setLoadingDetail(false);
 			})
 			.catch(function (error) {
 				console.log(error);
 				Toastify.error(error.toString());
-			});
+			})
 	}, [loadingSubmit]);
 
 	const handleCreateClicked = () => {
@@ -533,7 +531,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 		);
 	}
 
-    const OutScopeMessage = () => (
+	const OutScopeMessage = () => (
 		<ErrorMessage>Value raging from 0 to {baseWH}</ErrorMessage>
 	);
 
@@ -614,7 +612,13 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 								};
 								if (workforce_request.workingType == 0) {
 									workforce_request.workingEfforts = [
-										1, 1, 1, 1, 1, 1, 1,
+										baseWH,
+										baseWH,
+										baseWH,
+										baseWH,
+										baseWH,
+										baseWH,
+										baseWH,
 									];
 								}
 								console.log("Form data", workforce_request);
@@ -639,6 +643,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 												name="jiraAccount"
 												label="Jira Account (optional)"
 												defaultValue=""
+                                                isDisabled={loadingDetail}
 											>
 												{({ fieldProps, error }) => (
 													<Fragment>
@@ -659,6 +664,9 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															}
 															placeholder="Choose a Jira account"
 														/>
+                                                        {loadingDetail === true &&(
+                                                            <Spinner />
+                                                        )}
 														{!error && (
 															<HelperMessage></HelperMessage>
 														)}
@@ -881,7 +889,8 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															isRequired
 															validate={(value) =>
 																validateWorkingEffort(
-																	value, baseWH
+																	value,
+																	baseWH
 																)
 															}
 														>
@@ -904,7 +913,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																	)}
 																	{error ===
 																		"OUT_SCOPE" && (
-																		<OutScopeMessage/>
+																		<OutScopeMessage />
 																	)}
 																</Fragment>
 															)}
@@ -916,7 +925,8 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															isRequired
 															validate={(value) =>
 																validateWorkingEffort(
-																	value, baseWH
+																	value,
+																	baseWH
 																)
 															}
 														>
@@ -939,7 +949,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																	)}
 																	{error ===
 																		"OUT_SCOPE" && (
-																		<OutScopeMessage/>
+																		<OutScopeMessage />
 																	)}
 																</Fragment>
 															)}
@@ -951,7 +961,8 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															isRequired
 															validate={(value) =>
 																validateWorkingEffort(
-																	value, baseWH
+																	value,
+																	baseWH
 																)
 															}
 														>
@@ -974,7 +985,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																	)}
 																	{error ===
 																		"OUT_SCOPE" && (
-																		<OutScopeMessage/>
+																		<OutScopeMessage />
 																	)}
 																</Fragment>
 															)}
@@ -986,7 +997,8 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															isRequired
 															validate={(value) =>
 																validateWorkingEffort(
-																	value, baseWH
+																	value,
+																	baseWH
 																)
 															}
 														>
@@ -1009,7 +1021,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																	)}
 																	{error ===
 																		"OUT_SCOPE" && (
-																		<OutScopeMessage/>
+																		<OutScopeMessage />
 																	)}
 																</Fragment>
 															)}
@@ -1021,7 +1033,8 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															isRequired
 															validate={(value) =>
 																validateWorkingEffort(
-																	value, baseWH
+																	value,
+																	baseWH
 																)
 															}
 														>
@@ -1044,7 +1057,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																	)}
 																	{error ===
 																		"OUT_SCOPE" && (
-																		<OutScopeMessage/>
+																		<OutScopeMessage />
 																	)}
 																</Fragment>
 															)}
@@ -1056,7 +1069,8 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															isRequired
 															validate={(value) =>
 																validateWorkingEffort(
-																	value, baseWH
+																	value,
+																	baseWH
 																)
 															}
 														>
@@ -1079,7 +1093,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																	)}
 																	{error ===
 																		"OUT_SCOPE" && (
-																		<OutScopeMessage/>
+																		<OutScopeMessage />
 																	)}
 																</Fragment>
 															)}
@@ -1091,7 +1105,8 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															isRequired
 															validate={(value) =>
 																validateWorkingEffort(
-																	value, baseWH
+																	value,
+																	baseWH
 																)
 															}
 														>
@@ -1114,7 +1129,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																	)}
 																	{error ===
 																		"OUT_SCOPE" && (
-																		<OutScopeMessage/>
+																		<OutScopeMessage />
 																	)}
 																</Fragment>
 															)}
@@ -1127,6 +1142,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 												<Field
 													name="skills"
 													label="Skills"
+                                                    isDisabled={loadingDetail}
 												>
 													{({
 														fieldProps,
@@ -1142,12 +1158,13 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																		id: skill.id,
 																		value: skill.name,
 																		label: skill.name,
-																		level: skill.level,
+																		level: 1,
 																	})
 																)}
 																onSelectedValue={
 																	onSelectedValue
 																}
+                                                                isLoading={loadingDetail}
 															></CreatableAdvanced>
 															<HelperMessage>
 																<InfoIcon

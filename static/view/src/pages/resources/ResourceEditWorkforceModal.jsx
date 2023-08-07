@@ -276,7 +276,7 @@ function ResourceEditWorkforceModal({
 							};
 							if (workforce_request.workingType == 0) {
 								workforce_request.workingEfforts = [
-									8, 8, 8, 8, 8, 8, 8,
+									baseWH, baseWH, baseWH, baseWH, baseWH, baseWH, baseWH,
 								];
 							}
 							console.log("Form data", workforce_request);

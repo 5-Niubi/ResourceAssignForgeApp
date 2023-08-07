@@ -39,6 +39,7 @@ export const THREAD_STATUS = Object.freeze({
 
 export const THREAD_ACTION = Object.freeze({
 	JIRA_EXPORT: "jiraExport",
+    RUNNING_SCHEDULE: "runningSchedule"
 });
 
 export const THREAD_STATE_DEFAULT = Object.freeze({
@@ -75,7 +76,7 @@ export const COLOR_SKILL_LEVEL = [
     },
 ];
 
-export const RETRY_TIMES = 5;
+export const RETRY_TIMES = 3;
 export const SUBSCRIPTION = Object.freeze({
 	FREE_ID : 1,
 	PLUS_ID : 2

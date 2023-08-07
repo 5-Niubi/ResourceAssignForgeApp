@@ -15,35 +15,44 @@ import {
 	THREAD_ACTION,
 	THREAD_STATUS,
 } from "../common/contants";
-import { isArrayEmpty, isObjectEmpty, removeThreadInfo } from "../common/utils";
+import {
+	extractErrorMessage,
+	isArrayEmpty,
+	isObjectEmpty,
+	removeThreadInfo,
+} from "../common/utils";
+import { HttpStatus } from "../common/httpStatus";
 
+let retryNumber = RETRY_TIMES;
 function LoadingModalWithThread({ state }) {
 	const [modalState, setModalState] = state;
 	const { setAppContextState } = useContext(AppContext);
-	const closeModal = useCallback(
-		() => setModalState((prev) => ({ ...prev, threadId: null })),
-		[]
-	);
+	const closeModal = function () {
+		setModalState((prev) => ({ ...prev, threadId: null }));
+		removeThreadInfo();
+	};
 	const [progress, setProgress] = useState("...");
-	const [errorMsg, setErrorMsg] = useState("");
 
 	// --- Handle Loading
-	let retryNumber = RETRY_TIMES;
-	function checkingThread(intervalId) {
+
+	function checkingThread() {
 		invoke("getThreadResult", { threadId: modalState.threadId })
 			.then((res) => {
 				retryNumber = RETRY_TIMES;
-				handleThreadSuccess(res, intervalId);
+				handleThreadSuccess(res);
 			})
 			.catch((error) => {
-				Toastify.error(error.toString());
-				if (!--retryNumber) {
-					removeThreadInfo();
-					localStorage.removeItem(STORAGE.THREAD_INFO);
+				let errorMsg = extractErrorMessage(error);
+				if (errorMsg.status === HttpStatus.NOT_FOUND.code) {
+					Toastify.error(errorMsg.statusText);
 					closeModal();
-					if (intervalId) {
-						clearInterval(intervalId);
-					}
+				} else {
+					Toastify.error(errorMsg.message);
+				}
+
+				debugger;
+				if (--retryNumber === 0) {
+					closeModal();
 				}
 			});
 	}
@@ -51,12 +60,13 @@ function LoadingModalWithThread({ state }) {
 		checkingThread();
 		//assign interval to a variable to clear it.
 		const intervalId = setInterval(() => {
-			checkingThread(intervalId);
+			checkingThread();
 		}, INTERVAL_FETCH);
 
 		return () => clearInterval(intervalId); //This is important
 	}, []);
-	const handleThreadSuccess = useCallback((res, intervalId) => {
+
+	const handleThreadSuccess = useCallback((res) => {
 		console.log(res);
 
 		// Export thread success
@@ -71,52 +81,56 @@ function LoadingModalWithThread({ state }) {
 						`Export successfully: ${res.result.projectName} was created`
 					);
 				}
+				//define action running scheduling success
+				if (modalState.threadAction === THREAD_ACTION.RUNNING_SCHEDULE) {
+					Toastify.success("Schedule of threads is done.");
+				}
+				// Handle finish thread
 
-				removeThreadInfo();
 				closeModal();
 				break;
 			case THREAD_STATUS.ERROR:
-				let message, response, errorMessages, errors;
-				message = res.result.message;
+				if (modalState.threadAction === THREAD_ACTION.JIRA_EXPORT) {
+					let message, response, errorMessages, errors;
+					message = res.result.message;
 
-				if (res.result.response) {
-					response = JSON.parse(res.result.response);
-					errorMessages = response.errorMessages;
-					errors = response.errors;
+					if (res.result.response) {
+						response = JSON.parse(res.result.response);
+						errorMessages = response.errorMessages;
+						errors = response.errors;
+					}
+					// setErrorMsg(JSON.stringify(JSON.parse(res.result.response).errors));
+
+					const errorBody = (
+						<div>
+							{message && (
+								<div>
+									<h4>{message}</h4>
+								</div>
+							)}
+
+							{!isArrayEmpty(errorMessages) && (
+								<div>
+									Messages Error:
+									<ul>
+										{errorMessages.map((e, index) => (
+											<li key={index}>{e}</li>
+										))}
+									</ul>
+								</div>
+							)}
+							{!isObjectEmpty(errors) && (
+								<div>
+									Errors:
+									{JSON.stringify(errors)};
+								</div>
+							)}
+						</div>
+					);
+					setAppContextState((prev) => ({ ...prev, error: errorBody }));
 				}
-				// setErrorMsg(JSON.stringify(JSON.parse(res.result.response).errors));
 
-				const errorBody = (
-					<div>
-						{message && (
-							<div>
-								<h4>{message}</h4>
-							</div>
-						)}
-
-						{!isArrayEmpty(errorMessages) && (
-							<div>
-								Messages Error:
-								<ul>
-									{errorMessages.map((e, index) => (
-										<li key={index}>{e}</li>
-									))}
-								</ul>
-							</div>
-						)}
-						{!isObjectEmpty(errors) && (
-							<div>
-								Errors:
-								{JSON.stringify(errors)};
-							</div>
-						)}
-					</div>
-				);
-				setAppContextState((prev) => ({ ...prev, error: errorBody }));
-				if (intervalId) {
-					clearInterval(intervalId);
-				}
-				removeThreadInfo();
+				// Handle finish thread
 				closeModal();
 				break;
 		}
@@ -154,14 +168,6 @@ function LoadingModalWithThread({ state }) {
 				</ModalBody>
 				<ModalFooter></ModalFooter>
 			</Modal>
-			{errorMsg.length > 0 && (
-				<>
-					<Modal onClose={closeModal}>
-						<ModalBody>{errorMsg}</ModalBody>
-						<ModalFooter></ModalFooter>
-					</Modal>
-				</>
-			)}
 		</ModalTransition>
 	);
 }
