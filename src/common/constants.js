@@ -1,5 +1,5 @@
 export const EMPTY_STRING = "";
-export const BACKEND_dNET_DOMAIN = "https://spotty-books-raise.loca.lt";
+export const BACKEND_dNET_DOMAIN = "https://be.ai4cert.com";
 /**
  * Key of Storage
  */
