@@ -175,42 +175,46 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 			.catch(function (error) {
 				setIsScheduling(false);
 				let messageError = extractErrorMessage(error);
-				let messageDisplay = (
-					<ul>
-						{messageError.map((skillSet) => (
-							<li>
-								Task ID {skillSet.taskId} need workers with
-								skill sets{" "}
-								{skillSet.skillRequireds?.map((skill, i) => (
-									<span
-										style={{
-											marginRight: "2px",
-											marginLeft: "8px",
-										}}
-									>
-										<Lozenge
-											key={i}
-											style={{
-												backgroundColor:
-													COLOR_SKILL_LEVEL[
-														skill.level - 1
-													].color,
-												color:
-													skill.level === 1
-														? "#091e42"
-														: "white",
-											}}
-											isBold
-										>
-											{skill.name} - {skill.level}
-											<PiStarFill />
-										</Lozenge>
-									</span>
-								))}
-							</li>
-						))}
-					</ul>
-				);
+                let messageDisplay = messageError;
+                if(Array.isArray(messageError)){
+                    messageDisplay = (
+                        <ul>
+                            {messageError?.map((skillSet) => (
+                                <li>
+                                    Task ID {skillSet.taskId} need workers with
+                                    skill sets{" "}
+                                    {skillSet.skillRequireds?.map((skill, i) => (
+                                        <span
+                                            style={{
+                                                marginRight: "2px",
+                                                marginLeft: "8px",
+                                            }}
+                                        >
+                                            <Lozenge
+                                                key={i}
+                                                style={{
+                                                    backgroundColor:
+                                                        COLOR_SKILL_LEVEL[
+                                                            skill.level - 1
+                                                        ].color,
+                                                    color:
+                                                        skill.level === 1
+                                                            ? "#091e42"
+                                                            : "white",
+                                                }}
+                                                isBold
+                                            >
+                                                {skill.name} - {skill.level}
+                                                <PiStarFill />
+                                            </Lozenge>
+                                        </span>
+                                    ))}
+                                </li>
+                            ))}
+                        </ul>
+                    );
+                }
+				
 				handleCreateThreadFail(messageDisplay);
 			});
 	}
@@ -265,7 +269,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 										validate={(value) =>
 											validateNumberOnly(value)
 										}
-										defaultValue={budget}
+										defaultValue={budget ?? 0}
 									>
 										{({ fieldProps, error }) => (
 											<Fragment>

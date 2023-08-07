@@ -39,7 +39,7 @@ import {
 function ParameterWorkforceList() {
 	let { projectId } = useParams();
 	let project = getCacheObject("project", null);
-    const baseWH = (project.baseWorkingHour===0 ||project.baseWorkingHour === null) ? 24: project.baseWorkingHour;
+    const baseWH = (project?.baseWorkingHour===0 ||project?.baseWorkingHour === null) ? 24: project?.baseWorkingHour;
 	const [workforces, setWorkforces] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [skillDB, setSkillDB] = useState([]);

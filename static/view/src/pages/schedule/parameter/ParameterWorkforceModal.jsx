@@ -377,9 +377,9 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 	//CREATE WORKFORCE MODAL (CW)
 	let project = getCacheObject("project", null);
 	const baseWH =
-		project.baseWorkingHour === 0 || project.baseWorkingHour === null
+		project?.baseWorkingHour === 0 || project?.baseWorkingHour === null
 			? 24
-			: project.baseWorkingHour;
+			: project?.baseWorkingHour;
 	const [isCWOpen, setIsCWOpen] = useState(false);
 	const openCWModal = useCallback(() => setIsCWOpen(true), []);
 	const closeCWModal = useCallback(() => setIsCWOpen(false), []);
