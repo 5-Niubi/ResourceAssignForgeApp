@@ -6,6 +6,7 @@ import ParameterPageHeader from "./ParameterPageHeader";
 import ParameterWorkforceList from "./ParameterWorkforceList";
 import ParameterObjectInput from "./ParameterObjectInput";
 import ParameterEstimateMessage from "./ParameterEstimateMessage";
+import InfoMessageColor from "../../../components/InfoMessageColor";
 
 /**
  * Using as Demo Homepage

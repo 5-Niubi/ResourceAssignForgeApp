@@ -38,7 +38,8 @@ export async function removeThreadInfo() {
 export function calculateDuration({ startDate, endDate }) {
 	var a = moment(startDate);
 	var b = moment(endDate);
-	return b.diff(a, "days");
+    var result = b.diff(a, "days");
+    return (result>=1)?result: 0;
 }
 
 export function extractProjectKey(str) {
