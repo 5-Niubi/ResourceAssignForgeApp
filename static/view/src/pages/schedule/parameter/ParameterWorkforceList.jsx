@@ -39,7 +39,7 @@ import {
 function ParameterWorkforceList() {
 	let { projectId } = useParams();
 	let project = getCacheObject("project", null);
-    const baseWH = (project.baseWorkingHour===0 ||project.baseWorkingHour === null) ? 24: project.baseWorkingHour;
+    const baseWH = (project?.baseWorkingHour===0 ||project?.baseWorkingHour === null) ? 24: project?.baseWorkingHour;
 	const [workforces, setWorkforces] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [skillDB, setSkillDB] = useState([]);
@@ -302,6 +302,10 @@ function ParameterWorkforceList() {
 				) : (
 					<>
 						<h5>Total employees: {workforces?.length}</h5>
+                        {workforces?.length === 0 &&(
+                            <strong style={{color: "red"}}>Need add employee to be scheduled.</strong>
+                            )
+                        }
 						{workforces?.length > 0 &&
 							workforces
 								?.slice(0, displayedWorkforces)
@@ -420,7 +424,7 @@ function ParameterWorkforceList() {
 									};
 									if (workforce_request.workingType == 0) {
 										workforce_request.workingEfforts = [
-											8, 8, 8, 8, 8, 8, 8,
+											baseWH, baseWH, baseWH, baseWH, baseWH, baseWH, baseWH,
 										];
 									}
 									console.log("Form data", workforce_request);

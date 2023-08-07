@@ -1,4 +1,10 @@
-import React, { Fragment, useState, useCallback, useEffect , useContext} from "react";
+import React, {
+	Fragment,
+	useState,
+	useCallback,
+	useEffect,
+	useContext,
+} from "react";
 import Button from "@atlaskit/button/standard-button";
 import Form, {
 	Field,
@@ -14,6 +20,7 @@ import Range from "@atlaskit/range";
 import { Grid, GridColumn } from "@atlaskit/page";
 import { useParams } from "react-router";
 import Textfield from "@atlaskit/textfield";
+import Lozenge from "@atlaskit/lozenge";
 import { css, jsx } from "@emotion/react";
 import RecentIcon from "@atlaskit/icon/glyph/recent";
 import Modal, {
@@ -28,19 +35,28 @@ import { invoke } from "@forge/bridge";
 import __noop from "@atlaskit/ds-lib/noop";
 import Toastify from "../../../common/Toastify";
 import { ButtonGroup, LoadingButton } from "@atlaskit/button";
-import { DATE_FORMAT, MODAL_WIDTH, THREAD_ACTION } from "../../../common/contants";
+import {
+    COLOR_SKILL_LEVEL,
+	DATE_FORMAT,
+	MODAL_WIDTH,
+	THREAD_ACTION,
+} from "../../../common/contants";
 import { DatePicker } from "@atlaskit/datetime-picker";
 import {
 	getCurrentTime,
 	calculateDuration,
 	getCacheObject,
-    saveThreadInfo,
+	saveThreadInfo,
+	validateEnddate,
+	extractErrorMessage,
 } from "../../../common/utils";
 import Spinner from "@atlaskit/spinner";
 import { RadioGroup } from "@atlaskit/radio";
 import Page from "@atlaskit/page";
 import PageHeader from "@atlaskit/page-header";
 import { ThreadLoadingContext } from "../../../components/main/MainPage";
+import { AppContext } from "../../../App";
+import { PiStarFill } from "react-icons/pi";
 
 const objectiveItems = [
 	{ name: "time", value: "time", label: "Time" },
@@ -58,6 +74,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 	const [budgetUnit, setBudgetUnit] = useState(project_detail.budgetUnit);
 	const [isLoading, setIsLoading] = useState(false);
 	const [isScheduling, setIsScheduling] = useState(false);
+	const { setAppContextState } = useContext(AppContext);
 
 	const handleSetStartDate = useCallback(function (value) {
 		setStartDate(value);
@@ -99,6 +116,12 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 		saveThreadInfo(threadInfo);
 	}, []);
 
+	const handleCreateThreadFail = (messageRequiedSkills) => {
+		setAppContextState((prev) => ({
+			...prev,
+			error: messageRequiedSkills,
+		}));
+	};
 
 	function SaveParameters({ cost, objectives }) {
 		setIsScheduling(true);
@@ -126,62 +149,73 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 
 		invoke("saveParameters", { parameter: data })
 			.then(function (res) {
+				console.log("saveParameters response: ", res);
+				localStorage.setItem("parameterId", res.id);
+
+				return invoke("getThreadSchedule", { parameterId: res.id });
+			})
+			.then(function (res) {
 				if (res) {
-					// Toastify.info("Save successfully.");
-					// handleChangeTab(3);
-					// setIsScheduling(false);
-					localStorage.setItem("parameterId", res.id);
+					// handle open loading modal with thread
+					handleCreateThreadSuccess(res.threadId);
+					handleChangeTab(3);
+					setIsScheduling(false);
 
-					//call api to schedule
-					invoke("getThreadSchedule", { parameterId: res.id })
-						.then(function (res) {
-							if (res) {
-                                //handle open loading modal with thread
-                                handleCreateThreadSuccess(res.threadId);
-
-								//Getting result
-								var scheduleInterval = setInterval(function () {
-									invoke("schedule", {
-										threadId: res.threadId,
-									})
-										.then(function (res) {
-											setIsScheduling(false);
-											if (
-												res &&
-												res.status == "success"
-											) {
-												clearInterval(scheduleInterval);
-
-												Toastify.success(
-													"Schedule successfully."
-												);
-
-												handleChangeTab(3);
-											}
-										})
-										.catch(function (error) {
-											setIsScheduling(false);
-											Toastify.error(error.toString());
-										});
-								}, 5000);
-							}
-						})
-						.catch(function (error) {
-							setIsScheduling(false);
-							Toastify.error(error.toString());
-						});
+					return invoke("schedule", {
+						threadId: res.threadId,
+					});
+				}
+			})
+			.then(function (res) {
+				setIsScheduling(false);
+				if (res && res.status === "success") {
+					Toastify.success("Schedule successfully.");
 				}
 			})
 			.catch(function (error) {
-				// DISPLAY SUCCESSFUL MESSAGE OR NEED MORE SKILL REQUIRED MESSAGE
-				console.log("message required skills in task", res);
-				Toastify.info(
-					"These task id are missing skill: " +
-						res.taskSkillRequiredError?.map((task) => task.taskId)
-				);
 				setIsScheduling(false);
-				Toastify.error(error.toString());
-				setIsScheduling(false);
+				let messageError = extractErrorMessage(error);
+                let messageDisplay = messageError;
+                if(Array.isArray(messageError)){
+                    messageDisplay = (
+                        <ul>
+                            {messageError?.map((skillSet) => (
+                                <li>
+                                    Task ID {skillSet.taskId} need workers with
+                                    skill sets{" "}
+                                    {skillSet.skillRequireds?.map((skill, i) => (
+                                        <span
+                                            style={{
+                                                marginRight: "2px",
+                                                marginLeft: "8px",
+                                            }}
+                                        >
+                                            <Lozenge
+                                                key={i}
+                                                style={{
+                                                    backgroundColor:
+                                                        COLOR_SKILL_LEVEL[
+                                                            skill.level - 1
+                                                        ].color,
+                                                    color:
+                                                        skill.level === 1
+                                                            ? "#091e42"
+                                                            : "white",
+                                                }}
+                                                isBold
+                                            >
+                                                {skill.name} - {skill.level}
+                                                <PiStarFill />
+                                            </Lozenge>
+                                        </span>
+                                    ))}
+                                </li>
+                            ))}
+                        </ul>
+                    );
+                }
+				
+				handleCreateThreadFail(messageDisplay);
 			});
 	}
 
@@ -194,8 +228,9 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 				type="submit"
 				appearance="primary"
 				isLoading={isScheduling}
+				submitting
 			>
-				Scheduling
+				Schedule
 			</LoadingButton>
 		</ButtonGroup>
 	);
@@ -234,7 +269,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 										validate={(value) =>
 											validateNumberOnly(value)
 										}
-										defaultValue={budget}
+										defaultValue={budget ?? 0}
 									>
 										{({ fieldProps, error }) => (
 											<Fragment>
@@ -269,9 +304,10 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 										label="Start Date"
 										isRequired
 									>
-										{() => (
+										{({ fieldProps }) => (
 											<Fragment>
 												<DatePicker
+													{...fieldProps}
 													value={startDate}
 													onChange={
 														handleSetStartDate
@@ -290,9 +326,10 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 										label="End Date"
 										isRequired
 									>
-										{() => (
+										{({ fieldProps, error }) => (
 											<Fragment>
 												<DatePicker
+													{...fieldProps}
 													minDate={startDate}
 													value={endDate ?? startDate}
 													onChange={handleSetEndDate}
