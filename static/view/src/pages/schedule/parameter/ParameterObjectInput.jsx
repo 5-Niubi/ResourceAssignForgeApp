@@ -100,11 +100,8 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 		return undefined;
 	};
 
-	// State of Loading Thread Modal
-
 	const threadLoadingContext = useContext(ThreadLoadingContext);
 	const [threadStateValue, setThreadStateValue] = threadLoadingContext.state;
-	// --------
 
 	const handleCreateThreadSuccess = useCallback((threadId) => {
 		let threadAction = THREAD_ACTION.RUNNING_SCHEDULE;
@@ -158,9 +155,6 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 				if (res) {
 					// handle open loading modal with thread
 					handleCreateThreadSuccess(res.threadId);
-					handleChangeTab(3);
-					setIsScheduling(false);
-
 					return invoke("schedule", {
 						threadId: res.threadId,
 					});
@@ -169,6 +163,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 			.then(function (res) {
 				setIsScheduling(false);
 				if (res && res.status === "success") {
+					handleChangeTab(3);
 					Toastify.success("Schedule successfully.");
 				}
 			})
@@ -213,9 +208,10 @@ export default function ParameterObjectInput({ handleChangeTab }) {
                             ))}
                         </ul>
                     );
+    				handleCreateThreadFail(messageDisplay);
+                    return;
                 }
-				
-				handleCreateThreadFail(messageDisplay);
+                Toastify.error(messageDisplay);
 			});
 	}
 

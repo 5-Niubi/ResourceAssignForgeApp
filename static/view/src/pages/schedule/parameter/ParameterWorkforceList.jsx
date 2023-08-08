@@ -39,7 +39,7 @@ import {
 function ParameterWorkforceList() {
 	let { projectId } = useParams();
 	let project = getCacheObject("project", null);
-    const baseWH = (project?.baseWorkingHour===0 ||project?.baseWorkingHour === null) ? 24: project?.baseWorkingHour;
+    const baseWH = (project?.baseWorkingHour===0 ||project?.baseWorkingHour === null) ? 8: project?.baseWorkingHour;
 	const [workforces, setWorkforces] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [skillDB, setSkillDB] = useState([]);
@@ -144,9 +144,9 @@ function ParameterWorkforceList() {
 						accountId: selected.accountId,
 						email: selected.email,
 						accountType: selected.accountType,
-						name: selected.name,
+						name: selected.displayName,
 						avatar: selected.avatar,
-						displayName: selected.displayName,
+						// displayName: selected.displayName,
 						unitSalary: selected.unitSalary,
 						workingType: selected.workingType,
 						workingEfforts: selected.workingEfforts,
@@ -177,7 +177,7 @@ function ParameterWorkforceList() {
 			.then(function (res) {
 				if (res) {
 					console.log("updated workforce", res);
-					let workforce_name_display = res.name;
+					let workforce_name_display = res.displayName;
 					Toastify.success(
 						"Workforce '" + workforce_name_display + "' is saved"
 					);
@@ -185,7 +185,7 @@ function ParameterWorkforceList() {
                     let workforce_local = getCacheObject("workforce_parameter",[]);
                     for (let index = 0; index < workforce_local?.length; index++) {
                         if(workforce_local[index].id === res.id){
-                            workforce_local[index].name = res.name;///CHANGE NEW NAME
+                            workforce_local[index].name = res.displayName;///CHANGE NEW NAME
                         }
                     }
                     cache("workforce_parameter", JSON.stringify(workforce_local));
@@ -381,9 +381,9 @@ function ParameterWorkforceList() {
 										email: data.email,
 										accountType:
 											selectedWorkforce.accountType,
-										name: data.name,
+										name: null,
 										avatar: selectedWorkforce.avatar,
-										displayName: data.usernamejira,
+										displayName: data.name,
 										unitSalary: data.salary,
 										workingType:
 											isParttimeSelected === true ? 1 : 0,
@@ -500,13 +500,12 @@ function ParameterWorkforceList() {
 													</Field>
 												</GridColumn>
 												{/* USERNAME JIRA TEXTFIELD */}
-												<GridColumn medium={6}>
+												{/* <GridColumn medium={6}>
 													<Field
 														name="usernamejira"
 														label="Jira Username"
-														isRequired
 														defaultValue={
-															selectedWorkforce.displayName
+															selectedWorkforce.name
 														}
 														isDisabled={
 															loadingDetail
@@ -540,7 +539,7 @@ function ParameterWorkforceList() {
 															</Fragment>
 														)}
 													</Field>
-												</GridColumn>
+												</GridColumn> */}
 												{/* NAME TEXTFIELD */}
 												<GridColumn medium={6}>
 													<Field
@@ -589,7 +588,7 @@ function ParameterWorkforceList() {
 													</Field>
 												</GridColumn>
 												{/* SALARY TEXTFIELD */}
-												<GridColumn medium={12}>
+												<GridColumn medium={6}>
 													<Field
 														name="salary"
 														label="Salary (Hour)"
