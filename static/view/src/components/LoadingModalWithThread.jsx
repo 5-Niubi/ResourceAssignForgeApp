@@ -83,7 +83,7 @@ function LoadingModalWithThread({ state }) {
 				}
 				//define action running scheduling success
 				if (modalState.threadAction === THREAD_ACTION.RUNNING_SCHEDULE) {
-					Toastify.success("Schedule of threads is done.");
+                    modalState.callBack();
 				}
 				// Handle finish thread
 
@@ -129,6 +129,11 @@ function LoadingModalWithThread({ state }) {
 					);
 					setAppContextState((prev) => ({ ...prev, error: errorBody }));
 				}
+
+                if(modalState.threadAction === THREAD_ACTION.RUNNING_SCHEDULE){
+                    Toastify.error("Error at thread of Running Schedule: ", res.result.json());
+                }
+
 
 				// Handle finish thread
 				closeModal();
