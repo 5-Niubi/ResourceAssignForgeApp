@@ -100,17 +100,15 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 		return undefined;
 	};
 
-	// State of Loading Thread Modal
-
 	const threadLoadingContext = useContext(ThreadLoadingContext);
 	const [threadStateValue, setThreadStateValue] = threadLoadingContext.state;
-	// --------
 
 	const handleCreateThreadSuccess = useCallback((threadId) => {
 		let threadAction = THREAD_ACTION.RUNNING_SCHEDULE;
 		let threadInfo = {
 			threadId,
 			threadAction,
+            callBack: loadScheduleSuccess
 		};
 		setThreadStateValue(threadInfo);
 		saveThreadInfo(threadInfo);
@@ -147,60 +145,36 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 		};
 		console.log("Send parameter data: ", data);
 
-		invoke("saveParameters", { parameter: data })
-			.then(function (res) {
-				console.log("saveParameters response: ", res);
-				localStorage.setItem("parameterId", res.id);
-
-				return invoke("getThreadSchedule", { parameterId: res.id });
-			})
-			.then(function (res) {
-				if (res) {
-					// handle open loading modal with thread
-					handleCreateThreadSuccess(res.threadId);
-					handleChangeTab(3);
-					setIsScheduling(false);
-
-					return invoke("schedule", {
-						threadId: res.threadId,
-					});
-				}
-			})
-			.then(function (res) {
-				setIsScheduling(false);
-				if (res && res.status === "success") {
-					Toastify.success("Schedule successfully.");
-				}
-			})
-			.catch(function (error) {
-				setIsScheduling(false);
-				let messageError = extractErrorMessage(error);
+        async function saveAndSchedule() {
+            try {
+                let saveRes = await invoke("saveParameters", { parameter: data });
+                console.log("saveParameters response: ", saveRes);
+                localStorage.setItem("parameterId", saveRes.id);
+                let getThreadScheduleRes = await invoke("getThreadSchedule", { parameterId: saveRes.id });
+                if (getThreadScheduleRes) {
+                    handleCreateThreadSuccess(getThreadScheduleRes.threadId);
+                    setIsScheduling(false);
+                }
+            } catch (error) {
+                setIsScheduling(false);
+                let messageError = extractErrorMessage(error);
                 let messageDisplay = messageError;
-                if(Array.isArray(messageError)){
+                debugger
+                if (Array.isArray(messageError)) {
                     messageDisplay = (
                         <ul>
                             {messageError?.map((skillSet) => (
-                                <li>
-                                    Task ID {skillSet.taskId} need workers with
-                                    skill sets{" "}
+                                <li key={skillSet.taskId}>
+                                    Task ID {skillSet.taskId} needs workers with skill sets{" "}
                                     {skillSet.skillRequireds?.map((skill, i) => (
                                         <span
-                                            style={{
-                                                marginRight: "2px",
-                                                marginLeft: "8px",
-                                            }}
+                                            style={{ marginRight: "2px", marginLeft: "8px" }}
+                                            key={i}
                                         >
                                             <Lozenge
-                                                key={i}
                                                 style={{
-                                                    backgroundColor:
-                                                        COLOR_SKILL_LEVEL[
-                                                            skill.level - 1
-                                                        ].color,
-                                                    color:
-                                                        skill.level === 1
-                                                            ? "#091e42"
-                                                            : "white",
+                                                    backgroundColor: COLOR_SKILL_LEVEL[skill.level - 1].color,
+                                                    color: skill.level === 1 ? "#091e42" : "white",
                                                 }}
                                                 isBold
                                             >
@@ -213,11 +187,20 @@ export default function ParameterObjectInput({ handleChangeTab }) {
                             ))}
                         </ul>
                     );
+          
+                    handleCreateThreadFail(messageDisplay);
+                    return;
                 }
-				
-				handleCreateThreadFail(messageDisplay);
-			});
+                Toastify.error(messageDisplay);
+            }
+        }
+        saveAndSchedule();
 	}
+
+    function loadScheduleSuccess(){
+        handleChangeTab(3);
+        Toastify.success("Schedule successfully.");
+    }
 
 	const actionsContent = (
 		<ButtonGroup>

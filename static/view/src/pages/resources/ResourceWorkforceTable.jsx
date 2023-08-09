@@ -29,34 +29,23 @@ function ResourceWorkforceTable() {
 	const [workforces, setWorkforces] = useState([]);
 	const [createClicked, setCreateClicked] = useState(false);
 
-	useEffect(() => {
-		Promise.all([invoke("getAllWorkforces"), invoke("getAllUserJira")])
-			.then(([workforcesResponse, jiraUsersResponse]) => {
-				const workforces = workforcesResponse.map((workforce) => ({
+	useEffect(
+        function () {
+		invoke("getAllWorkforces")
+			.then(function (res){
+				const workforces = res.map((workforce) => ({
 					id: workforce.id,
 					accountId: workforce.accountId,
 					email: workforce.email,
 					accountType: workforce.accountType,
-					name: workforce.name,
+					name: workforce.displayName,
 					avatar: workforce.avatar,
-					displayName: workforce.displayName,
+					// displayName: workforce.name,
 					unitSalary: workforce.unitSalary,
 					workingType: workforce.workingType,
 					workingEffort: workforce.workingEffort,
 					skills: workforce.skills,
-				}));
-
-				console.log("GetAllUserJira", jiraUsersResponse);
-				const jiraUsers = jiraUsersResponse
-					.filter((user) => user.accountType === "atlassian")
-					.map((user) => ({
-						accountId: user.accountId,
-						email: user.emailAddress,
-						accountType: user.accountType,
-						name: user.displayName,
-						avatar: user.avatarUrls["48x48"],
-						displayName: user.displayName,
-					}));
+				}))
 
 				// setWorkforces([...workforces, ...jiraUsers]);
 				setWorkforces(workforces);
@@ -184,7 +173,7 @@ function ResourceWorkforceTable() {
 					key: "actions",
 					content: "Actions",
 					shouldTruncate: true,
-					width: 6,
+					width: 7,
 				},
 			],
 		};

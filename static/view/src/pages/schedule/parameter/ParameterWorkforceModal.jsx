@@ -64,11 +64,17 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 	const [workforces, setWorkforces] = useState([]);
 	const [selectedWorkforces, setSelectedWorkforces] = useState([]);
 	const [createClicked, setCreateClicked] = useState(false);
+    const [loadingDB, setLoadingDB] = useState(false);
 
 	const handleCreateClicked = () => {
 		setCreateClicked(true);
 		console.log("setCreateClicked", "Da click");
 	};
+
+    const handleLoadingDBClicked = () =>{
+        setTableLoadingState(true);
+        setCreateClicked(true);
+    }
 
 	useEffect(
 		function () {
@@ -91,6 +97,7 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 						};
 						workforces.push(itemWorkforce);
 					}
+                    setLoadingDB(false);
 					setTableLoadingState(false);
 					setWorkforces(workforces);
 
@@ -193,18 +200,27 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 			{
 				key: "no",
 				content: (
-					<Checkbox
-						size="xlarge"
-						isChecked={selectedWorkforces?.includes(
-							workforce.id.toString()
-						)}
-						onChange={() => handleCheckboxChange(workforce.id)}
-					/>
+					<div>
+						<Checkbox
+							size="large"
+							isChecked={selectedWorkforces?.includes(
+								workforce.id.toString()
+							)}
+							onChange={() => handleCheckboxChange(workforce.id)}
+						/>
+					</div>
 				),
 			},
 			{
 				key: "name",
-				content: workforce.name,
+				content: (
+					<div
+						onClick={() => handleCheckboxChange(workforce.id)}
+						style={{ cursor: "pointer" }}
+					>
+						{workforce.displayName}
+					</div>
+				),
 			},
 			{
 				key: "skills",
@@ -235,6 +251,9 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 				),
 			},
 		],
+		// onClick:(e) =>{
+		//     handleCheckboxChange(workforce.id);
+		// }
 	}));
 
 	function saveSelectedWorkforces() {
@@ -280,7 +299,7 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 					<Modal
 						onClose={closeSWModal}
 						shouldScrollInViewport={false}
-						width={"medium"}
+						width={"large"}
 					>
 						<ModalHeader>
 							<div style={{ flexWrap: "wrap" }}>
@@ -335,6 +354,9 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 													? "Deselect All"
 													: "Select All"}
 											</Button>
+                                            <Button
+                                                onClick={handleLoadingDBClicked}
+                                            >Load again</Button>
 										</ButtonGroup>
 									</div>
 								</div>
@@ -378,7 +400,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 	let project = getCacheObject("project", null);
 	const baseWH =
 		project?.baseWorkingHour === 0 || project?.baseWorkingHour === null
-			? 24
+			? 8
 			: project?.baseWorkingHour;
 	const [isCWOpen, setIsCWOpen] = useState(false);
 	const openCWModal = useCallback(() => setIsCWOpen(true), []);
@@ -392,7 +414,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 	const [workforcesJiraAccount, setWorkforcesJiraAccount] = useState([]);
 
 	useEffect(() => {
-        setLoadingDetail(true);
+		setLoadingDetail(true);
 		Promise.all([invoke("getAllUserJira"), invoke("getAllSkills")])
 			.then(([jiraUsersResponse, resSkillDB]) => {
 				const jiraUsers = jiraUsersResponse
@@ -408,13 +430,16 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 				setWorkforcesJiraAccount(jiraUsers);
 
 				setSkillDB(resSkillDB);
-				localStorage.setItem("all_skills_DB", JSON.stringify(resSkillDB));
-                setLoadingDetail(false);
+				localStorage.setItem(
+					"all_skills_DB",
+					JSON.stringify(resSkillDB)
+				);
+				setLoadingDetail(false);
 			})
 			.catch(function (error) {
 				console.log(error);
 				Toastify.error(error.toString());
-			})
+			});
 	}, [loadingSubmit]);
 
 	const handleCreateClicked = () => {
@@ -505,7 +530,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 			.then(function (res) {
 				if (res != null) {
 					console.log("create new workforce", res);
-					let workforce_name_display = res.name;
+					let workforce_name_display = res.displayName;
 					Toastify.success(
 						"Workforce '" + workforce_name_display + "' is created."
 					);
@@ -569,9 +594,9 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 											: null, //DEFAULT
 									email: data.email,
 									accountType: "atlassian", //DEFAULT
-									name: data.name,
+									name: null,
 									avatar: null, //DEFAULT
-									displayName: data.usernamejira,
+									displayName: data.name,
 									unitSalary: data.salary,
 									workingType:
 										isParttimeSelected === true ? 1 : 0,
@@ -643,7 +668,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 												name="jiraAccount"
 												label="Jira Account (optional)"
 												defaultValue=""
-                                                isDisabled={loadingDetail}
+												isDisabled={loadingDetail}
 											>
 												{({ fieldProps, error }) => (
 													<Fragment>
@@ -664,9 +689,8 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															}
 															placeholder="Choose a Jira account"
 														/>
-                                                        {loadingDetail === true &&(
-                                                            <Spinner />
-                                                        )}
+														{loadingDetail ===
+															true && <Spinner />}
 														{!error && (
 															<HelperMessage></HelperMessage>
 														)}
@@ -719,11 +743,10 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 												</Field>
 											</GridColumn>
 											{/* USERNAME JIRA TEXTFIELD */}
-											<GridColumn medium={6}>
+											{/* <GridColumn medium={6}>
 												<Field
 													name="usernamejira"
 													label="Jira Username"
-													isRequired
 												>
 													{({
 														fieldProps,
@@ -750,7 +773,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 														</Fragment>
 													)}
 												</Field>
-											</GridColumn>
+											</GridColumn> */}
 											{/* NAME TEXTFIELD */}
 											<GridColumn medium={6}>
 												<Field
@@ -789,7 +812,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 												</Field>
 											</GridColumn>
 											{/* SALARY TEXTFIELD */}
-											<GridColumn medium={12}>
+											<GridColumn medium={6}>
 												<Field
 													name="salary"
 													label="Salary (Hour)"
@@ -1142,7 +1165,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 												<Field
 													name="skills"
 													label="Skills"
-                                                    isDisabled={loadingDetail}
+													isDisabled={loadingDetail}
 												>
 													{({
 														fieldProps,
@@ -1164,7 +1187,9 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																onSelectedValue={
 																	onSelectedValue
 																}
-                                                                isLoading={loadingDetail}
+																isLoading={
+																	loadingDetail
+																}
 															></CreatableAdvanced>
 															<HelperMessage>
 																<InfoIcon

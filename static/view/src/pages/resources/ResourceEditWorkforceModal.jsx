@@ -43,7 +43,7 @@ function ResourceEditWorkforceModal({
 	const [isParttimeSelected, setIsParttimeSelected] = useState(
 		workforce.workingType === 1 ? true : false
 	);
-	const baseWH = 24; //Default out-side project
+	const baseWH = 8; //Default out-side project
 	const [skillDB, setSkillDB] = useState([]);
 	const [skillsTable, setSkillsTable] = useState([]);
 	const [loadingSubmit, setLoadingSubmit] = useState(false);
@@ -78,7 +78,7 @@ function ResourceEditWorkforceModal({
 			.then(function (res) {
 				if (res) {
 					console.log("updated workforce", res);
-					let workforce_name_display = res.name;
+					let workforce_name_display = res.displayName;
 					Toastify.success(
 						"Workforce '" + workforce_name_display + "' is saved"
 					);
@@ -235,9 +235,9 @@ function ResourceEditWorkforceModal({
 								accountId: selectedWorkforce.accountId,
 								email: data.email,
 								accountType: selectedWorkforce.accountType,
-								name: data.name,
+								name: null,
 								avatar: selectedWorkforce.avatar,
-								displayName: data.usernamejira,
+								displayName: data.name,
 								unitSalary: data.salary,
 								workingType:
 									isParttimeSelected === true ? 1 : 0,
@@ -337,11 +337,10 @@ function ResourceEditWorkforceModal({
 											</Field>
 										</GridColumn>
 										{/* USERNAME JIRA TEXTFIELD */}
-										<GridColumn medium={6}>
+										{/* <GridColumn medium={6}>
 											<Field
 												name="usernamejira"
 												label="Jira Username"
-												isRequired
 												defaultValue={
 													selectedWorkforce.displayName
 												}
@@ -367,7 +366,7 @@ function ResourceEditWorkforceModal({
 													</Fragment>
 												)}
 											</Field>
-										</GridColumn>
+										</GridColumn> */}
 										{/* NAME TEXTFIELD */}
 										<GridColumn medium={6}>
 											<Field
@@ -405,7 +404,7 @@ function ResourceEditWorkforceModal({
 											</Field>
 										</GridColumn>
 										{/* SALARY TEXTFIELD */}
-										<GridColumn medium={12}>
+										<GridColumn medium={6}>
 											<Field
 												name="salary"
 												label="Salary (Hour)"
