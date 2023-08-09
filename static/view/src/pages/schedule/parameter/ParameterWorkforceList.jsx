@@ -36,6 +36,7 @@ import {
 	getCacheObject,
     findObj,
 } from "../../../common/utils";
+import InstructionMessage from "../../../components/InstructionMessage";
 function ParameterWorkforceList() {
 	let { projectId } = useParams();
 	let project = getCacheObject("project", null);
@@ -293,7 +294,10 @@ function ParameterWorkforceList() {
 	return (
 		<div>
 			<div>
-				<PageHeader actions={buttonActions}>Employees</PageHeader>
+				<PageHeader actions={buttonActions}>Employees <InstructionMessage content={<p>
+                    
+                    </p>}></InstructionMessage></PageHeader>
+               
 			</div>
 			{/* DISPLAY WORKFORCE PARMETER BUTTONS  */}
 			<div>
