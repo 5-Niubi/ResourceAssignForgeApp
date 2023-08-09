@@ -9,13 +9,14 @@ import { Grid, GridColumn } from "@atlaskit/page";
 import React, { Fragment, useState, useCallback, useEffect } from "react";
 import TextField from "@atlaskit/textfield";
 import Form, { Field, FormSection, HelperMessage } from "@atlaskit/form";
-import { DatePicker } from "@atlaskit/datetime-picker";
+import { DatePicker, TimePicker } from "@atlaskit/datetime-picker";
 import { extractErrorMessage, getCurrentTime } from "../../../common/utils";
 import { invoke } from "@forge/bridge";
 import { DATE_FORMAT, MODAL_WIDTH } from "../../../common/contants";
 import Toastify from "../../../common/Toastify";
 import { useNavigate } from "react-router";
 import InlineMessageGuideProjectField from "../message/InlineMessageGuideProjectField";
+import WorkingTimeHours from "../form/WorkingTimeHours";
 
 const width = MODAL_WIDTH.M;
 function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
@@ -143,7 +144,8 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 															{...fieldProps}
 														/>
 														<HelperMessage>
-															Working hour must greater than 0 and smaller than 24.
+															Working hour must greater than 0 and smaller than
+															24.
 														</HelperMessage>
 													</Fragment>
 												)}
@@ -175,6 +177,9 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 											</Field>
 										</FormSection>
 										<FormSection>
+											<WorkingTimeHours />
+										</FormSection>
+										<FormSection>
 											<Grid spacing="compact" columns={columns}>
 												<GridColumn medium={8}>
 													<Field name="budget" label="Budget">
@@ -189,7 +194,7 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 													</Field>
 												</GridColumn>
 												<GridColumn medium={2}>
-													<Field name="budgetUnit" label="Unit">
+													<Field name="budgetUnit" label="Unit" isDisabled>
 														{(fieldProps) => (
 															<TextField
 																autoComplete="off"
