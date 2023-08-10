@@ -19,6 +19,7 @@ import EditorSearchIcon from "@atlaskit/icon/glyph/editor/search";
 import ResourceDeleteWorkforceModal from "./ResourceDeleteWorkforceModal";
 import { ResourceCreateWorkforceModal } from "./ResourceCreateWorkforceModal";
 import ResourceEditWorkforceModal from "./ResourceEditWorkforceModal";
+import { cache } from "../../common/utils";
 
 const modalInitState = { workforce: {}, isOpen: false };
 
@@ -27,37 +28,40 @@ function ResourceWorkforceTable() {
 	const [modalDeleteState, setModalDeleteState] = useState(modalInitState);
 	const [modalEditState, setModalEditState] = useState(modalInitState);
 	const [workforces, setWorkforces] = useState([]);
-	const [createClicked, setCreateClicked] = useState(false);
+    const [skillDB, setSkillDB] = useState([]);
 
-	useEffect(
-        function () {
-		invoke("getAllWorkforces")
-			.then(function (res){
-				const workforces = res.map((workforce) => ({
-					id: workforce.id,
-					accountId: workforce.accountId,
-					email: workforce.email,
-					accountType: workforce.accountType,
-					name: workforce.displayName,
-					avatar: workforce.avatar,
-					// displayName: workforce.name,
-					unitSalary: workforce.unitSalary,
-					workingType: workforce.workingType,
-					workingEffort: workforce.workingEffort,
-					skills: workforce.skills,
-				}))
-
-				// setWorkforces([...workforces, ...jiraUsers]);
-				setWorkforces(workforces);
-				setTableLoadingState(false);
-			})
-			.catch((error) => {
-				console.log(error);
-				Toastify.error(error.toString());
-				setTableLoadingState(false);
-			});
-		setCreateClicked(false);
-	}, [createClicked]);
+    useEffect(function () {
+        Promise.all([
+            invoke("getAllWorkforces"),
+            invoke("getAllSkills")
+        ])
+        .then(function ([workforcesResponse, skillsResponse]) {
+            console.log("getAllWorkforces", workforcesResponse);
+    
+            const workforces = workforcesResponse.map((workforce) => ({
+                id: workforce.id,
+                accountId: workforce.accountId,
+                email: workforce.email,
+                accountType: workforce.accountType,
+                name: workforce.displayName,
+                avatar: workforce.avatar,
+                unitSalary: workforce.unitSalary,
+                workingType: workforce.workingType,
+                workingEfforts: workforce.workingEfforts,
+                skills: workforce.skills,
+            }));
+    
+            setWorkforces(workforces);
+            setTableLoadingState(false);
+            
+            setSkillDB(skillsResponse);
+        })
+        .catch(function (error) {
+            console.log(error);
+            Toastify.error(error.toString());
+            setTableLoadingState(false);
+        });
+    }, [TableLoadingState]);
 
 	function createKey(input) {
 		return input
@@ -111,13 +115,18 @@ function ResourceWorkforceTable() {
 	}
 
 	const handleCreateClicked = () => {
-		setCreateClicked(true);
+		setTableLoadingState(true);
+	};
+
+    const handleEditClicked = () => {
+		setTableLoadingState(true);
 	};
 
 	const actionsContent = (
 		<ButtonGroup>
 			<ResourceCreateWorkforceModal
 				onCreatedClick={handleCreateClicked}
+                skillDB={skillDB}
 			/>
 		</ButtonGroup>
 	);
@@ -284,7 +293,8 @@ function ResourceWorkforceTable() {
 				<ResourceEditWorkforceModal
 					openState={modalEditState}
 					setOpenState={setModalEditState}
-					setWorkforcesListState={setWorkforces}
+                    onEditedClick={handleEditClicked}
+                    skillDB={skillDB}
 				/>
 			) : (
 				""

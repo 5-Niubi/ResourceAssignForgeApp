@@ -34,20 +34,19 @@ import {
 function ResourceEditWorkforceModal({
 	openState,
 	setOpenState,
-	setWorkforcesListState,
+    onEditedClick,
+    skillDB
 }) {
 	const workforce = openState.workforce;
-        workforce.workingEfforts = [];
 	console.log("ResourceEditWorkforceModal", workforce);
 	const [selectedWorkforce, setSelectedWorkforce] = useState(workforce);
 	const [isParttimeSelected, setIsParttimeSelected] = useState(
 		workforce.workingType === 1 ? true : false
 	);
-	const baseWH = 8; //Default out-side project
-	const [skillDB, setSkillDB] = useState([]);
 	const [skillsTable, setSkillsTable] = useState([]);
 	const [loadingSubmit, setLoadingSubmit] = useState(false);
 	const [loadingDetail, setLoadingDetail] = useState(false);
+
 	const closeModal = useCallback(
 		function () {
 			setOpenState({ workforce: workforce, isOpen: false });
@@ -55,64 +54,41 @@ function ResourceEditWorkforceModal({
 		[setOpenState]
 	);
 
+    const onSelectedValue = (childValue) => {
+		setSkillsTable(childValue.selectedValue);
+	};
+
     useEffect(
-		function () {
-			setLoadingDetail(true);
-			invoke("getAllSkills", {})
-				.then(function (res) {
-					setSkillDB(res);
-					localStorage.setItem("all_skills_DB", JSON.stringify(res));
-				})
-				.catch(function (error) {
-					console.log(error);
-					Toastify.error(error.toString());
-				});
-			setLoadingDetail(false);
-		},
-		[openState]
-	);
+        function () {
+            setLoadingDetail(true);
+            
+            setSkillsTable(
+                workforce.skills?.map((skill) => ({
+                    id: skill.id,
+                    label: skill.name,
+                    level: skill.level,
+                }))
+            );
+    
+            setLoadingDetail(false);
+        },
+        [openState]
+    );
+
+    const handleEditedClicked = () => {
+		onEditedClick();
+	};
 
 	const handleUpdate = useCallback((workforce_request) => {
 		setLoadingSubmit(true);
 		invoke("updateWorkforce", { workforce_request })
 			.then(function (res) {
 				if (res) {
-					console.log("updated workforce", res);
+                    handleEditedClicked();
 					let workforce_name_display = res.displayName;
 					Toastify.success(
 						"Workforce '" + workforce_name_display + "' is saved"
 					);
-					//UPDATE LOCAL STOREAGE
-					let workforce_local = getCacheObject(
-						"workforce_parameter",
-						[]
-					);
-					for (
-						let index = 0;
-						index < workforce_local?.length;
-						index++
-					) {
-						if (workforce_local[index].id === res.id) {
-							workforce_local[index].name = res.name; ///CHANGE NEW NAME
-						}
-					}
-					cache(
-						"workforce_parameter",
-						JSON.stringify(workforce_local)
-					);
-
-					setWorkforcesListState((prev) => {
-						return prev.map((item) => {
-							if (item.id === res.id) {
-								return {
-									...item,
-									res,
-								};
-							}
-							return item;
-						});
-					});
-
 					closeModal();
 					setLoadingSubmit(false);
 				}
@@ -130,9 +106,7 @@ function ResourceEditWorkforceModal({
 		{ label: "Part-time", value: 1 },
 	];
 
-	const onSelectedValue = (childValue) => {
-		setSkillsTable(childValue.selectedValue);
-	};
+
 
 	const headSkillTable = {
 		cells: [
@@ -206,7 +180,7 @@ function ResourceEditWorkforceModal({
 		: null;
 
 	const OutScopeMessage = () => (
-		<ErrorMessage>Value raging from 0 to {baseWH}</ErrorMessage>
+		<ErrorMessage>Value raging from 0 to 24</ErrorMessage>
 	);
 
 	return (
@@ -276,7 +250,7 @@ function ResourceEditWorkforceModal({
 							};
 							if (workforce_request.workingType == 0) {
 								workforce_request.workingEfforts = [
-									baseWH, baseWH, baseWH, baseWH, baseWH, baseWH, baseWH,
+									0, 0, 0, 0, 0, 0, 0,
 								];
 							}
 							console.log("Form data", workforce_request);
@@ -420,6 +394,7 @@ function ResourceEditWorkforceModal({
 												{({ fieldProps, error }) => (
 													<Fragment>
 														<TextField
+                                                        type="number"
 															autoComplete="off"
 															{...fieldProps}
 															placeholder="Number only"
@@ -449,6 +424,7 @@ function ResourceEditWorkforceModal({
 												label="Working Type"
 												name="workingType"
 												isRequired
+                                                defaultValue={selectedWorkforce?.workingType}
 												isDisabled={loadingDetail}
 											>
 												{({ fieldProps, error }) => (
@@ -503,8 +479,7 @@ function ResourceEditWorkforceModal({
 														}
 														validate={(value) =>
 															validateWorkingEffort(
-																value,
-																baseWH
+																value
 															)
 														}
 														isDisabled={
@@ -517,6 +492,7 @@ function ResourceEditWorkforceModal({
 														}) => (
 															<Fragment>
 																<TextField
+                                                                type="number"
 																	autoComplete="off"
 																	{...fieldProps}
 																	placeholder="Number only"
@@ -546,8 +522,7 @@ function ResourceEditWorkforceModal({
 														}
 														validate={(value) =>
 															validateWorkingEffort(
-																value,
-																baseWH
+																value
 															)
 														}
 														isDisabled={
@@ -560,6 +535,7 @@ function ResourceEditWorkforceModal({
 														}) => (
 															<Fragment>
 																<TextField
+                                                                type="number"
 																	autoComplete="off"
 																	{...fieldProps}
 																	placeholder="Number only"
@@ -589,8 +565,7 @@ function ResourceEditWorkforceModal({
 														}
 														validate={(value) =>
 															validateWorkingEffort(
-																value,
-																baseWH
+																value
 															)
 														}
 														isDisabled={
@@ -603,6 +578,7 @@ function ResourceEditWorkforceModal({
 														}) => (
 															<Fragment>
 																<TextField
+                                                                type="number"
 																	autoComplete="off"
 																	{...fieldProps}
 																	placeholder="Number only"
@@ -632,8 +608,7 @@ function ResourceEditWorkforceModal({
 														}
 														validate={(value) =>
 															validateWorkingEffort(
-																value,
-																baseWH
+																value
 															)
 														}
 														isDisabled={
@@ -646,6 +621,7 @@ function ResourceEditWorkforceModal({
 														}) => (
 															<Fragment>
 																<TextField
+                                                                type="number"
 																	autoComplete="off"
 																	{...fieldProps}
 																	placeholder="Number only"
@@ -675,8 +651,7 @@ function ResourceEditWorkforceModal({
 														}
 														validate={(value) =>
 															validateWorkingEffort(
-																value,
-																baseWH
+																value
 															)
 														}
 														isDisabled={
@@ -689,6 +664,7 @@ function ResourceEditWorkforceModal({
 														}) => (
 															<Fragment>
 																<TextField
+                                                                type="number"
 																	autoComplete="off"
 																	{...fieldProps}
 																	placeholder="Number only"
@@ -723,8 +699,7 @@ function ResourceEditWorkforceModal({
 														}
 														validate={(value) =>
 															validateWorkingEffort(
-																value,
-																baseWH
+																value
 															)
 														}
 														isDisabled={
@@ -737,6 +712,7 @@ function ResourceEditWorkforceModal({
 														}) => (
 															<Fragment>
 																<TextField
+                                                                type="number"
 																	autoComplete="off"
 																	{...fieldProps}
 																	placeholder="Number only"
@@ -766,8 +742,7 @@ function ResourceEditWorkforceModal({
 														}
 														validate={(value) =>
 															validateWorkingEffort(
-																value,
-																baseWH
+																value
 															)
 														}
 														isDisabled={
@@ -780,6 +755,7 @@ function ResourceEditWorkforceModal({
 														}) => (
 															<Fragment>
 																<TextField
+                                                                type="number"
 																	autoComplete="off"
 																	{...fieldProps}
 																	placeholder="Number only"
@@ -805,57 +781,60 @@ function ResourceEditWorkforceModal({
 											<>
 												{/* SKILL CREATABLE MULTIPLE SELECT */}
 												<GridColumn medium={12}>
-													<Field
-														name="skills"
-														label="Skills"
-													>
-														{({
-															fieldProps,
-															error,
-														}) => (
-															<Fragment>
-																<CreatableAdvanced
-																	isRequired
-																	defaultOptions={skillDB?.map(
-																		(
-																			skill
-																		) => ({
-																			id: skill.id,
-																			value: skill.name,
-																			label: skill.name,
-																			level: skill.level,
-																		})
-																	)}
-																	selectedValue={selectedWorkforce.skills?.map(
-																		(
-																			skill
-																		) => ({
-																			id: skill.id,
-																			value: skill.name,
-																			label: skill.name,
-																			level: skill.level,
-																		})
-																	)}
-																	onSelectedValue={
-																		onSelectedValue
-																	}
-																></CreatableAdvanced>
-																<HelperMessage>
-																	<InfoIcon
-																		size="small"
-																		content=""
-																	></InfoIcon>
-																	Change
-																	skill's
-																	level in
-																	table, can
-																	not store
-																	non-word
-																	characters
-																</HelperMessage>
-															</Fragment>
-														)}
-													</Field>
+                                                <Field
+																name="skills"
+																label="Skills"
+															>
+																{({
+																	fieldProps,
+																	error,
+																}) => (
+																	<Fragment>
+																		<CreatableAdvanced
+																			isRequired
+																			defaultOptions={skillDB?.map(
+																				(
+																					skill
+																				) => ({
+																					id: skill.id,
+																					value: skill.name,
+																					label: skill.name,
+																					level: skill.level,
+																				})
+																			)}
+																			selectedValue={selectedWorkforce.skills?.map(
+																				(
+																					skill
+																				) => ({
+																					id: skill.id,
+																					value: skill.name,
+																					label: skill.name,
+																					level: skill.level,
+																				})
+																			)}
+																			onSelectedValue={
+																				onSelectedValue
+																			}
+																		></CreatableAdvanced>
+																		<HelperMessage>
+																			<InfoIcon
+																				size="small"
+																				content=""
+																			></InfoIcon>
+																			Change
+																			skill's
+																			level
+																			in
+																			table,
+																			can
+																			not
+																			store
+																			non-word
+																			characters
+																		</HelperMessage>
+																	</Fragment>
+																)}
+															</Field>
 												</GridColumn>
 												{/* SKILL DISPLAYING WITH LEVEL TABLE */}
 												<GridColumn medium={12}>

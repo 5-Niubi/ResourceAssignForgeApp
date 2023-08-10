@@ -10,6 +10,9 @@ import { PiStarFill } from "react-icons/pi";
 import { findObj, getCache } from "../../../common/utils";
 import Toastify from "../../../common/Toastify";
 import Spinner from "@atlaskit/spinner";
+import InstructionMessage from "../../../components/InstructionMessage";
+import PageHeader from '@atlaskit/page-header';
+import InfoMessageColor from "../../../components/InfoMessageColor";
 
 export default function ParameterEstimateMessage() {
 	const [estimations, setEstimations] = useState([]);
@@ -20,7 +23,7 @@ export default function ParameterEstimateMessage() {
 		invoke("getEstimateOverallWorkforce", { projectId })
 			.then(function (res) {
 				setIsEstimating(false);
-					setEstimations(res);
+				setEstimations(res);
 				console.log("Get All Estimation", estimations);
 			})
 			.catch(function (error) {
@@ -32,11 +35,13 @@ export default function ParameterEstimateMessage() {
 
 	return (
 		<>
+			<PageHeader>
+				<div style={{ width: "100%" }}>Resource Suggestions <InfoMessageColor/></div>
+			</PageHeader>
 			{isEstimating ? (
 				<Spinner size={"large"} />
 			) : (
-				<div
-				>
+				<div>
 					<ul>
 						{estimations?.workforceWithMilestoneList?.map(
 							(workforceWithMilestone) =>
@@ -61,14 +66,15 @@ export default function ParameterEstimateMessage() {
 											<>
 												<li>
 													{workers.quantity} workers
-													with skills set  
+													with skills set
 													{workers.skillOutputList?.map(
 														(skill, i) => (
 															<span
 																style={{
 																	marginRight:
 																		"2px",
-                                                                    marginLeft: "8px"
+																	marginLeft:
+																		"8px",
 																}}
 															>
 																<Lozenge
@@ -80,7 +86,11 @@ export default function ParameterEstimateMessage() {
 																					1
 																			]
 																				.color,
-																		color: (skill.level===1)?"#091e42":"white",
+																		color:
+																			skill.level ===
+																			1
+																				? "#091e42"
+																				: "white",
 																	}}
 																	isBold
 																>

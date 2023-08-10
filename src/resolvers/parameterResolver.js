@@ -45,6 +45,18 @@ function parameterResolver(resolver) {
 		}
 	});
 
+    resolver.define("getExecuteAlgorithmDailyLimited", async function () {
+		try {
+			let response = await parameterService.getExecuteAlgorithmDailyLimted({});
+			console.log("getExecuteAlgorithmDailyLimited: ", response);
+			return response;
+		} catch (error) {
+			console.log("Error in getExecuteAlgorithmDailyLimited: ", error);
+			throw new Error(JSON.stringify(error));
+
+			return Promise.reject(error);
+		}
+	});
     
 }
 

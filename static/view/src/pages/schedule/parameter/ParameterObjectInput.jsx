@@ -36,7 +36,7 @@ import __noop from "@atlaskit/ds-lib/noop";
 import Toastify from "../../../common/Toastify";
 import { ButtonGroup, LoadingButton } from "@atlaskit/button";
 import {
-    COLOR_SKILL_LEVEL,
+	COLOR_SKILL_LEVEL,
 	DATE_FORMAT,
 	MODAL_WIDTH,
 	THREAD_ACTION,
@@ -49,6 +49,8 @@ import {
 	saveThreadInfo,
 	validateEnddate,
 	extractErrorMessage,
+    cache,
+    clearCache,
 } from "../../../common/utils";
 import Spinner from "@atlaskit/spinner";
 import { RadioGroup } from "@atlaskit/radio";
@@ -57,11 +59,13 @@ import PageHeader from "@atlaskit/page-header";
 import { ThreadLoadingContext } from "../../../components/main/MainPage";
 import { AppContext } from "../../../App";
 import { PiStarFill } from "react-icons/pi";
+import { validateNumberOnly } from "../../../common/utils";
+import InstructionMessage from "../../../components/InstructionMessage";
 
 const objectiveItems = [
-	{ name: "time", value: "time", label: "Time" },
-	{ name: "cost", value: "cost", label: "Cost" },
-	{ name: "experience", value: "quality", label: "Experience" },
+	{ name: "time", value: "time", label: "Execution time" },
+	{ name: "cost", value: "cost", label: "Total cost" },
+	{ name: "experience", value: "quality", label: "Total employees' experiences" },
 	{ name: "none", value: "", label: "Neutral" },
 ];
 
@@ -75,8 +79,15 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 	const [isLoading, setIsLoading] = useState(false);
 	const [isScheduling, setIsScheduling] = useState(false);
 	const { setAppContextState } = useContext(AppContext);
+	const [messageScheduleLimited, setMessageScheduleLimited] =
+		useState(Object);
 
 	const handleSetStartDate = useCallback(function (value) {
+        let a = new Date(value);
+        let b = new Date(endDate);
+		if (a>b) {
+			setEndDate(value);
+		}
 		setStartDate(value);
 	}, []);
 
@@ -84,21 +95,20 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 		setEndDate(value);
 	}, []);
 
-	const validateNumberOnly = (value) => {
-		//REQUIRES NOT NULL, NUMBER ONLY
-		if (!value) {
-			return "NOT_VALID";
-		}
-
-		if (isNaN(parseFloat(value))) {
-			return "NOT_VALID";
-		}
-		const regex = /^\d*\.?\d*$/;
-		if (!regex.test(value)) {
-			return "NOT_VALID";
-		}
-		return undefined;
-	};
+	useEffect(
+		function () {
+			invoke("getExecuteAlgorithmDailyLimited")
+				.then(function (res) {
+					console.log("getExecuteAlgorithmDailyLimited", res);
+					setMessageScheduleLimited(res);
+				})
+				.catch(function (error) {
+					console.log(error);
+					Toastify.error(error.toString());
+				});
+		},
+		[isScheduling]
+	);
 
 	const threadLoadingContext = useContext(ThreadLoadingContext);
 	const [threadStateValue, setThreadStateValue] = threadLoadingContext.state;
@@ -108,16 +118,16 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 		let threadInfo = {
 			threadId,
 			threadAction,
-            callBack: loadScheduleSuccess
+			callBack: loadScheduleSuccess,
 		};
 		setThreadStateValue(threadInfo);
 		saveThreadInfo(threadInfo);
 	}, []);
 
-	const handleCreateThreadFail = (messageRequiedSkills) => {
+	const handleCreateThreadFail = (messageBody) => {
 		setAppContextState((prev) => ({
 			...prev,
-			error: messageRequiedSkills,
+			error: messageBody,
 		}));
 	};
 
@@ -145,77 +155,109 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 		};
 		console.log("Send parameter data: ", data);
 
-        async function saveAndSchedule() {
-            try {
-                let saveRes = await invoke("saveParameters", { parameter: data });
-                console.log("saveParameters response: ", saveRes);
-                localStorage.setItem("parameterId", saveRes.id);
-                let getThreadScheduleRes = await invoke("getThreadSchedule", { parameterId: saveRes.id });
-                if (getThreadScheduleRes) {
-                    handleCreateThreadSuccess(getThreadScheduleRes.threadId);
-                    setIsScheduling(false);
-                }
-            } catch (error) {
-                setIsScheduling(false);
-                let messageError = extractErrorMessage(error);
-                let messageDisplay = messageError;
-                debugger
-                if (Array.isArray(messageError)) {
-                    messageDisplay = (
-                        <ul>
-                            {messageError?.map((skillSet) => (
-                                <li key={skillSet.taskId}>
-                                    Task ID {skillSet.taskId} needs workers with skill sets{" "}
-                                    {skillSet.skillRequireds?.map((skill, i) => (
-                                        <span
-                                            style={{ marginRight: "2px", marginLeft: "8px" }}
-                                            key={i}
-                                        >
-                                            <Lozenge
-                                                style={{
-                                                    backgroundColor: COLOR_SKILL_LEVEL[skill.level - 1].color,
-                                                    color: skill.level === 1 ? "#091e42" : "white",
-                                                }}
-                                                isBold
-                                            >
-                                                {skill.name} - {skill.level}
-                                                <PiStarFill />
-                                            </Lozenge>
-                                        </span>
-                                    ))}
-                                </li>
-                            ))}
-                        </ul>
-                    );
-          
-                    handleCreateThreadFail(messageDisplay);
-                    return;
-                }
-                Toastify.error(messageDisplay);
-            }
-        }
-        saveAndSchedule();
+		async function saveAndSchedule() {
+			try {
+				let saveRes = await invoke("saveParameters", {
+					parameter: data,
+				});
+				console.log("saveParameters response: ", saveRes);
+				localStorage.setItem("parameterId", saveRes.id);
+				let getThreadScheduleRes;
+				try {
+					getThreadScheduleRes = await invoke("getThreadSchedule", {
+						parameterId: saveRes.id,
+					});
+				} catch (error) {
+					setIsScheduling(false);
+					let messageError = extractErrorMessage(error);
+					handleCreateThreadFail(<p>{messageError.message}</p>);
+				}
+				if (getThreadScheduleRes) {
+					handleCreateThreadSuccess(getThreadScheduleRes.threadId);
+					setIsScheduling(false);
+				}
+			} catch (error) {
+				setIsScheduling(false);
+				let messageError = extractErrorMessage(error);
+				let messageDisplay = messageError;
+				debugger;
+				if (Array.isArray(messageError)) {
+					messageDisplay = (
+						<ul>
+							{messageError?.map((skillSet) => (
+								<li key={skillSet.taskId}>
+									Task ID {skillSet.taskId} needs workers with
+									skill sets{" "}
+									{skillSet.skillRequireds?.map(
+										(skill, i) => (
+											<span
+												style={{
+													marginRight: "2px",
+													marginLeft: "8px",
+												}}
+												key={i}
+											>
+												<Lozenge
+													style={{
+														backgroundColor:
+															COLOR_SKILL_LEVEL[
+																skill.level - 1
+															].color,
+														color:
+															skill.level === 1
+																? "#091e42"
+																: "white",
+													}}
+													isBold
+												>
+													{skill.name} - {skill.level}
+													<PiStarFill />
+												</Lozenge>
+											</span>
+										)
+									)}
+								</li>
+							))}
+						</ul>
+					);
+                    
+                    //STORE MESSAGE MISSING WORKFORCE
+                    cache("message_missing_workforce",JSON.stringify(messageError));
+					handleCreateThreadFail(messageDisplay);
+					return;
+				}
+				Toastify.error(messageDisplay);
+			}
+		}
+		saveAndSchedule();
 	}
 
-    function loadScheduleSuccess(){
-        handleChangeTab(3);
-        Toastify.success("Schedule successfully.");
-    }
+	function loadScheduleSuccess() {
+		handleChangeTab(3);
+		Toastify.success("Schedule successfully.");
+        clearCache("message_missing_workforce");
+	}
 
 	const actionsContent = (
-		<ButtonGroup>
-			<LoadingButton onClick={() => handleChangeTab(1)}>
-				Back
-			</LoadingButton>
-			<LoadingButton
-				type="submit"
-				appearance="primary"
-				isLoading={isScheduling}
-				submitting
-			>
-				Schedule
-			</LoadingButton>
-		</ButtonGroup>
+		<>
+			<ButtonGroup>
+				<LoadingButton onClick={() => handleChangeTab(1)}>
+					Back
+				</LoadingButton>
+				<LoadingButton
+					type="submit"
+					appearance="primary"
+					isLoading={isScheduling}
+					submitting
+				>
+					Schedule
+				</LoadingButton>
+			</ButtonGroup>
+			<HelperMessage>
+				Number of schedule today:{" "}
+				{messageScheduleLimited?.usageExecuteAlgorithm}
+			</HelperMessage>
+		</>
 	);
 
 	return (
@@ -239,25 +281,39 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 				{({ formProps, submitting }) => (
 					<form {...formProps}>
 						<PageHeader actions={actionsContent}>
-							<div style={{ width: "100%" }}>Parameters</div>
+                                    Parameters 
+                                    <InstructionMessage content={<p>
+                                    <ul>
+                                        <li><strong>Expected Cost</strong>: The estimated total cost required for personnel payment</li>
+                                        <li><strong>Expected Start Date</strong>: The desired project start date</li>
+                                        <li><strong>Expected End Date</strong>: The desired project completion date</li>
+                                        <li>
+                                        <strong>Project Objective</strong>: The goals that the project aims to achieve including:
+                                        <ul>
+                                            <li><strong>Execution Time</strong>: Prioritize minimizing the time to complete the project</li>
+                                            <li><strong>Total Cost</strong>: Prioritize minimizing the costs required for personnel payment</li>
+                                            <li><strong>Total Employees' Experiences</strong>: Prioritize maximizing the quality of personnel throughout the project</li>
+                                            <li><strong>Neutral</strong>: Maintain a balanced approach among the above objectives</li>
+                                        </ul>
+                                        </li>
+                                    </ul>
+                                </p>} /> 
 						</PageHeader>
+                       
 						<FormSection>
 							<Grid layout="fluid" medium={0}>
 								{/* EXPECTED COST TEXTFIELD */}
 								<GridColumn medium={0}>
 									<Field
-										isRequired
 										label="Expected Cost"
 										name="cost"
-										validate={(value) =>
-											validateNumberOnly(value)
-										}
 										defaultValue={budget ?? 0}
 									>
 										{({ fieldProps, error }) => (
 											<Fragment>
 												<Textfield
 													{...fieldProps}
+                                                    type="number"
 													placeholder="What expected maximize project's cost?"
 													elemBeforeInput={
 														<p
@@ -271,11 +327,6 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 														</p>
 													}
 												/>
-												{error === "NOT_VALID" && (
-													<ErrorMessage>
-														Wrong input.
-													</ErrorMessage>
-												)}
 											</Fragment>
 										)}
 									</Field>
