@@ -1,3 +1,5 @@
+import { generateTimeFrom00To23 } from "./utils";
+
 export const APP_NAME = "WoTaas";
 export const APP_NAME_DESCRIPTOR = "Worker - Task Auto Assign";
 export const PROJECT_NAME_DESCRIPTOR = "Software Project";
@@ -86,7 +88,7 @@ export const DOMAIN_SUBSCRIPTION_SERVER = "https://admin.ai4cert.com";
 
 export const DEFAULT_WORKING_TIMERANGE = [
 	{
-		start: "9:00",
+		start: "8:00",
 		finish: "12:00",
 	},
 	{
@@ -94,3 +96,5 @@ export const DEFAULT_WORKING_TIMERANGE = [
 		finish: "17:00",
 	},
 ];
+
+export const TIME_SELECTBOX_VALUE = generateTimeFrom00To23();

@@ -1,4 +1,6 @@
 import Button, { ButtonGroup, LoadingButton } from "@atlaskit/button";
+import { DatePicker } from "@atlaskit/datetime-picker";
+import Form, { Field, FormSection, HelperMessage } from "@atlaskit/form";
 import Modal, {
 	ModalBody,
 	ModalFooter,
@@ -6,21 +8,19 @@ import Modal, {
 	ModalTransition,
 } from "@atlaskit/modal-dialog";
 import { Grid, GridColumn } from "@atlaskit/page";
-import React, { Fragment, useState, useCallback, useEffect } from "react";
 import TextField from "@atlaskit/textfield";
-import Form, { Field, FormSection, HelperMessage, Label } from "@atlaskit/form";
-import { DatePicker, TimePicker } from "@atlaskit/datetime-picker";
-import { extractErrorMessage, getCurrentTime } from "../../../common/utils";
 import { invoke } from "@forge/bridge";
+import React, { Fragment, useState } from "react";
+import { useNavigate } from "react-router";
+import Toastify from "../../../common/Toastify";
 import {
 	DATE_FORMAT,
 	DEFAULT_WORKING_TIMERANGE,
 	MODAL_WIDTH,
 } from "../../../common/contants";
-import Toastify from "../../../common/Toastify";
-import { useNavigate } from "react-router";
-import InlineMessageGuideProjectField from "../message/InlineMessageGuideProjectField";
+import { extractErrorMessage, getCurrentTime } from "../../../common/utils";
 import WorkingTimeHours from "../form/WorkingTimeHours";
+import InlineMessageGuideProjectField from "../message/InlineMessageGuideProjectField";
 
 const width = MODAL_WIDTH.M;
 
@@ -33,7 +33,7 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 	const [endDate, setEndDate] = useState(startDate);
 	const [budget, setBudget] = useState(0);
 	const [unit, setUnit] = useState("$");
-	const [baseWorkingHour, setBaseWorkingHour] = useState(8);
+	const [baseWorkingHour, setBaseWorkingHour] = useState(0);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const timeRangeValueState = useState(DEFAULT_WORKING_TIMERANGE);
 
@@ -193,33 +193,14 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 											<WorkingTimeHours
 												timeRangeValueState={timeRangeValueState}
 												isDisable={false}
-												label="Working times"
+												label="Working Time Slots"
 												onSetBaseWorkingHours={setBaseWorkingHour}
 											/>
 
-											<Field
-												aria-required={true}
-												name="projectBaseWorkHour"
-												label="Total Working Hours/Day"
-												isRequired
-											>
-												{(fieldProps) => (
-													<Fragment>
-														<TextField
-															autoComplete="off"
-															value={baseWorkingHour}
-															onChange={handleSetBaseWorkHour}
-															type="number"
-															{...fieldProps}
-															isDisabled
-														/>
-														<HelperMessage>
-															Working hour must greater than 0 and smaller than
-															24.
-														</HelperMessage>
-													</Fragment>
-												)}
-											</Field>
+											<hr style={{ marginTop: "1.5em" }} />
+											<p>
+												Total Working: <b>{baseWorkingHour}</b> Hours/Day
+											</p>
 										</FormSection>
 									</GridColumn>
 								</Grid>
