@@ -31,4 +31,13 @@ async function GetEstimateOverallWorkforce(projectId) {
 	}
 }
 
-export { saveParameters, getWorkforceParamter, GetEstimateOverallWorkforce };
+async function getExecuteAlgorithmDailyLimted(projectId) {
+	try {
+		let response = await APIServices.get("/api/Algorithm/GetExecuteAlgorithmDailyLimited", {});
+		return response;
+	} catch (error) {
+		return Promise.reject(error);
+	}
+}
+
+export { saveParameters, getWorkforceParamter, GetEstimateOverallWorkforce, getExecuteAlgorithmDailyLimted };
