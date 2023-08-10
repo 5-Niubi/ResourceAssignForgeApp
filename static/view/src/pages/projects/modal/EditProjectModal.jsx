@@ -19,8 +19,8 @@ import {
 	DEFAULT_WORKING_TIMERANGE,
 	MODAL_WIDTH,
 } from "../../../common/contants";
-import WorkingTimeHours from "../form/WorkingTimeHours";
 import { extractErrorMessage } from "../../../common/utils";
+import WorkingTimeHours from "../form/WorkingTimeHours";
 const width = MODAL_WIDTH.M;
 const columns = 10;
 
@@ -52,7 +52,7 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 				setEndDate(projectRes.deadline);
 				setBudget(projectRes.budget);
 				setUnit(projectRes.budgetUnit);
-				setBaseWorkingHour(projectRes.baseWorkingHour);
+				// setBaseWorkingHour(projectRes.baseWorkingHour);
 				projectRes.workingTimes && setTimeRangeValue(projectRes.workingTimes);
 				setProject(projectRes);
 				setIsLoaded(true);
@@ -237,31 +237,13 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 											<WorkingTimeHours
 												timeRangeValueState={timeRangeValueState}
 												isDisable={!isLoaded}
-												label="Working times"
+												label="Working Time Slots"
+												onSetBaseWorkingHours={setBaseWorkingHour}
 											/>
-											<Field
-												aria-required={true}
-												name="projectBaseWorkHour"
-												label="Total Working Hours/Day"
-												isRequired
-											>
-												{(fieldProps) => (
-													<Fragment>
-														<TextField
-															autoComplete="off"
-															value={baseWorkingHour}
-															onChange={handleSetBaseWorkHour}
-															type="number"
-															isDisabled={true}
-															{...fieldProps}
-														/>
-														<HelperMessage>
-															Working hour must greater than 0 and smaller than
-															24.
-														</HelperMessage>
-													</Fragment>
-												)}
-											</Field>
+											<hr style={{ marginTop: "1.5em" }} />
+											<p>
+												Total Working: <b>{baseWorkingHour}</b> Hours/Day
+											</p>
 										</FormSection>
 									</GridColumn>
 								</Grid>
