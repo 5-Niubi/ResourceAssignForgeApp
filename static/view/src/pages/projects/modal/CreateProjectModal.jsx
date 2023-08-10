@@ -8,17 +8,22 @@ import Modal, {
 import { Grid, GridColumn } from "@atlaskit/page";
 import React, { Fragment, useState, useCallback, useEffect } from "react";
 import TextField from "@atlaskit/textfield";
-import Form, { Field, FormSection, HelperMessage } from "@atlaskit/form";
+import Form, { Field, FormSection, HelperMessage, Label } from "@atlaskit/form";
 import { DatePicker, TimePicker } from "@atlaskit/datetime-picker";
 import { extractErrorMessage, getCurrentTime } from "../../../common/utils";
 import { invoke } from "@forge/bridge";
-import { DATE_FORMAT, MODAL_WIDTH } from "../../../common/contants";
+import {
+	DATE_FORMAT,
+	DEFAULT_WORKING_TIMERANGE,
+	MODAL_WIDTH,
+} from "../../../common/contants";
 import Toastify from "../../../common/Toastify";
 import { useNavigate } from "react-router";
 import InlineMessageGuideProjectField from "../message/InlineMessageGuideProjectField";
 import WorkingTimeHours from "../form/WorkingTimeHours";
 
 const width = MODAL_WIDTH.M;
+
 function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 	const columns = 10;
 	const navigate = useNavigate();
@@ -30,6 +35,7 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 	const [unit, setUnit] = useState("$");
 	const [baseWorkingHour, setBaseWorkingHour] = useState(8);
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const timeRangeValueState = useState(DEFAULT_WORKING_TIMERANGE);
 
 	const handleSetProjectName = function (e) {
 		setProjectName(e.target.value);
@@ -72,6 +78,7 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 			budget,
 			budgetUnit: unit,
 			baseWorkingHour,
+			workingTimes: timeRangeValueState[0],
 		};
 		invoke("createNewProjectProjectLists", { projectObjRequest })
 			.then(function (res) {
@@ -84,7 +91,7 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 				setIsSubmitting(false);
 
 				let errorMsg = extractErrorMessage(error);
-				Toastify.error(errorMsg.message);
+				Toastify.error(errorMsg.message || errorMsg.title || errorMsg);
 			});
 	}
 
@@ -128,28 +135,6 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 													</Fragment>
 												)}
 											</Field>
-											<Field
-												aria-required={true}
-												name="projectBaseWorkHour"
-												label="Working Hours/Day"
-												isRequired
-											>
-												{(fieldProps) => (
-													<Fragment>
-														<TextField
-															autoComplete="off"
-															value={baseWorkingHour}
-															onChange={handleSetBaseWorkHour}
-															type="number"
-															{...fieldProps}
-														/>
-														<HelperMessage>
-															Working hour must greater than 0 and smaller than
-															24.
-														</HelperMessage>
-													</Fragment>
-												)}
-											</Field>
 										</FormSection>
 										<FormSection>
 											<Field name="startDate" label="Start Date">
@@ -175,9 +160,6 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 													</Fragment>
 												)}
 											</Field>
-										</FormSection>
-										<FormSection>
-											<WorkingTimeHours />
 										</FormSection>
 										<FormSection>
 											<Grid spacing="compact" columns={columns}>
@@ -206,6 +188,38 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 													</Field>
 												</GridColumn>
 											</Grid>
+										</FormSection>
+										<FormSection>
+											<WorkingTimeHours
+												timeRangeValueState={timeRangeValueState}
+												isDisable={false}
+												label="Working times"
+												onSetBaseWorkingHours={setBaseWorkingHour}
+											/>
+
+											<Field
+												aria-required={true}
+												name="projectBaseWorkHour"
+												label="Total Working Hours/Day"
+												isRequired
+											>
+												{(fieldProps) => (
+													<Fragment>
+														<TextField
+															autoComplete="off"
+															value={baseWorkingHour}
+															onChange={handleSetBaseWorkHour}
+															type="number"
+															{...fieldProps}
+															isDisabled
+														/>
+														<HelperMessage>
+															Working hour must greater than 0 and smaller than
+															24.
+														</HelperMessage>
+													</Fragment>
+												)}
+											</Field>
 										</FormSection>
 									</GridColumn>
 								</Grid>

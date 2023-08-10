@@ -1,100 +1,132 @@
 import Button from "@atlaskit/button";
 import { TimePicker } from "@atlaskit/datetime-picker";
-import { Field, FormSection, HelperMessage } from "@atlaskit/form";
+import {
+	ErrorMessage,
+	Field,
+	FormSection,
+	HelperMessage,
+	Label,
+} from "@atlaskit/form";
 import AddCircleIcon from "@atlaskit/icon/glyph/add-circle";
 import CrossIcon from "@atlaskit/icon/glyph/cross";
 import { Grid, GridColumn } from "@atlaskit/page";
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
+import { parseForTimeOnly } from "../../../common/utils";
 
 const columns = 9;
-let timeRange = {
-	start: "9",
-	finish: "12",
-};
-function WorkingTimeHours() {
-	const removeButton = (index) => (
+
+function WorkingTimeHours({
+	timeRangeValueState,
+	isDisable = false,
+	label = "",
+	onSetBaseWorkingHours,
+}) {
+	const [error, setError] = useState("");
+	const RemoveButton = (index) => (
 		<Button
-			iconBefore={<CrossIcon label="v" />}
+			iconBefore={<CrossIcon label="" />}
 			appearance="subtle"
 			onClick={() => handleRemoveBtnClick(index)}
+			isDisabled={isDisable}
 		></Button>
 	);
-	const addButton = () => (
+	const AddButton = () => (
 		<Button
 			iconBefore={<AddCircleIcon label="v" />}
 			appearance="subtle"
 			onClick={handleAddBtnClick}
+			isDisabled={isDisable}
 		></Button>
 	);
 
+	const FieldTimeInput = (actionButton, timeRange, index) => (
+		<div style={{ marginBottom: "0.5em" }}>
+			<Grid columns={columns} layout="fluid" spacing="compact">
+				<GridColumn medium={1}>{actionButton}</GridColumn>
+				<GridColumn medium={4}>
+					<TimePicker
+						value={timeRange.start}
+						onChange={(e) => {
+							setTimeRangeStart(e, index);
+						}}
+						isDisabled={isDisable}
+					/>
+				</GridColumn>
+				<GridColumn medium={4}>
+					<TimePicker
+						value={timeRange.finish}
+						onChange={(e) => {
+							setTimeRangeFinish(e, index);
+						}}
+						isDisabled={isDisable}
+					/>
+				</GridColumn>
+			</Grid>
+		</div>
+	);
+
 	function setTimeRangeStart(e, index) {
-		console.log(e);
-		setTimeRangeValues((prev) => {
-			prev[index].finish = e;
-			return prev;
-		});
+		const newItems = [...timeRangeValues];
+		newItems[index] = { start: e, finish: newItems[index].finish };
+		setTimeRangeValues(newItems);
 	}
 
 	function setTimeRangeFinish(e, index) {
-		console.log(e);
-		setTimeRangeValues((prev) => {
-			prev[index].finish = e;
-			return prev;
-		});
+		const newItems = [...timeRangeValues];
+		newItems[index] = { start: newItems[index].start, finish: e };
+		setTimeRangeValues(newItems);
 	}
 
-	const [timeRangeValues, setTimeRangeValues] = useState([timeRange, timeRange]);
+	const [timeRangeValues, setTimeRangeValues] = timeRangeValueState;
 
-	let fieldTimeInput = (actionButton, index) => (
-		<Grid columns={columns} layout="fluid" spacing="compact">
-			<GridColumn medium={1}>{actionButton}</GridColumn>
-			<GridColumn medium={4}>
-				<TimePicker
-					value={timeRangeValues[index].start}
-					onChange={(e) => {
-						setTimeRangeStart(e, index);
-					}}
-				/>
-			</GridColumn>
-			<GridColumn medium={4}>
-				<TimePicker
-					value={timeRangeValues[index].finish}
-					onChange={(e) => {
-						setTimeRangeFinish(e, index);
-					}}
-				/>
-			</GridColumn>
-		</Grid>
-	);
-
-	const [arrWorkingHourInput, setArrWorkingHourInput] = useState([
-		fieldTimeInput,
-	]);
+	useEffect(() => {
+		setError("");
+		let baseWkingHrs = 0;
+		for (let i = 0; i < timeRangeValues.length; i++) {
+			let timeRange = timeRangeValues[i];
+			let start = parseForTimeOnly(timeRange.start);
+			let finish = parseForTimeOnly(timeRange.finish);
+			if (
+				i > 0 &&
+				start.isBefore(parseForTimeOnly(timeRangeValues[i - 1].finish))
+			) {
+				setError("Start time and finish time of two range value is overlap");
+			} else if (start.isSame(finish)) {
+				setError("Start time and finish time are the same value");
+			} else if (start.isAfter(finish)) {
+				setError("Start time is later than finish time ");
+			} else baseWkingHrs += finish.diff(start);
+		}
+		onSetBaseWorkingHours(baseWkingHrs);
+	}, [timeRangeValues]);
 
 	function handleAddBtnClick() {
-		let timeRangeAdd = {
-			start: "9:30",
-			finish: "12:30",
+		let lastTimeRange = timeRangeValues[timeRangeValues.length - 1];
+		let newTime = {
+			start: lastTimeRange.finish,
+			finish: lastTimeRange.finish,
 		};
-		setTimeRangeValues((prev) => [...prev, timeRange]);
-		setArrWorkingHourInput((prev) => [...prev, fieldTimeInput]);
+		setTimeRangeValues((prev) => [...prev, newTime]);
 	}
 
 	function handleRemoveBtnClick(index) {
-		setArrWorkingHourInput((prev) => prev.filter((e, i) => i != index));
-		setTimeRangeValues((prev) => prev.filter((e, i) => i != index));
+		const newItems = [...timeRangeValues];
+		newItems.splice(index, 1);
+		setTimeRangeValues(newItems);
 	}
 
 	return (
 		<Fragment>
-			{arrWorkingHourInput.map((element, index) => {
-				let actionButton = removeButton(index);
-
-				if (index == arrWorkingHourInput.length - 1) {
-					actionButton = addButton();
+			<Label htmlFor="">{label}</Label>
+			{timeRangeValues.map((element, index) => {
+				let actionButton = <RemoveButton index={index} />;
+				if (index == timeRangeValues.length - 1) {
+					actionButton = <AddButton />;
 				}
-				return element(actionButton, index);
+
+				return FieldTimeInput(actionButton, element, index);
 			})}
+			{!!error.length && <ErrorMessage>{error}</ErrorMessage>}
 		</Fragment>
 	);
 }
