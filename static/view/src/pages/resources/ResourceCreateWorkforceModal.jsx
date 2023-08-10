@@ -167,7 +167,7 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 			.then(function (res) {
 				if (res != null) {
 					console.log("create new workforce", res);
-					let workforce_name_display = res.name;
+					let workforce_name_display = res.displayName;
 					Toastify.success(
 						"Workforce '" + workforce_name_display + "' is created."
 					);
@@ -232,9 +232,9 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 											: null, //DEFAULT
 									email: data.email,
 									accountType: "atlassian", //DEFAULT
-									name: data.name,
+									name: null,
 									avatar: null, //DEFAULT
-									displayName: data.usernamejira,
+									displayName: data.name,
 									unitSalary: data.salary,
 									workingType:
 										isParttimeSelected === true ? 1 : 0,
@@ -372,11 +372,10 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 												</Field>
 											</GridColumn>
 											{/* USERNAME JIRA TEXTFIELD */}
-											<GridColumn medium={6}>
+											{/* <GridColumn medium={6}>
 												<Field
 													name="usernamejira"
 													label="Jira Username"
-													isRequired
 												>
 													{({
 														fieldProps,
@@ -403,7 +402,7 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 														</Fragment>
 													)}
 												</Field>
-											</GridColumn>
+											</GridColumn> */}
 											{/* NAME TEXTFIELD */}
 											<GridColumn medium={6}>
 												<Field
@@ -442,7 +441,7 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 												</Field>
 											</GridColumn>
 											{/* SALARY TEXTFIELD */}
-											<GridColumn medium={12}>
+											<GridColumn medium={6}>
 												<Field
 													name="salary"
 													label="Salary (Hour)"
