@@ -39,7 +39,7 @@ export const THREAD_STATUS = Object.freeze({
 
 export const THREAD_ACTION = Object.freeze({
 	JIRA_EXPORT: "jiraExport",
-    RUNNING_SCHEDULE: "runningSchedule"
+	RUNNING_SCHEDULE: "runningSchedule",
 });
 
 export const THREAD_STATE_DEFAULT = Object.freeze({
@@ -54,30 +54,43 @@ export const STORAGE = Object.freeze({
 export const INTERVAL_FETCH = 10000;
 
 export const COLOR_SKILL_LEVEL = [
-    {
-        level: 1,
-        color: "#CCE0FF",
-    },
-    {
-        level: 2,
-        color: "#579DFF",
-    },
-    {
-        level: 3,
-        color: "#1D7AFC",
-    },
-    {
-        level: 4,
-        color: "#0055CC",
-    },
-    {
-        level: 5,
-        color: "#092957",
-    },
+	{
+		level: 1,
+		color: "#CCE0FF",
+	},
+	{
+		level: 2,
+		color: "#579DFF",
+	},
+	{
+		level: 3,
+		color: "#1D7AFC",
+	},
+	{
+		level: 4,
+		color: "#0055CC",
+	},
+	{
+		level: 5,
+		color: "#092957",
+	},
 ];
 
 export const RETRY_TIMES = 3;
 export const SUBSCRIPTION = Object.freeze({
-	FREE_ID : 1,
-	PLUS_ID : 2
+	FREE_ID: 1,
+	PLUS_ID: 2,
 });
+
+export const DOMAIN_SUBSCRIPTION_SERVER = "https://admin.ai4cert.com";
+
+export const DEFAULT_WORKING_TIMERANGE = [
+	{
+		start: "9:00",
+		finish: "12:00",
+	},
+	{
+		start: "13:00",
+		finish: "17:00",
+	},
+];

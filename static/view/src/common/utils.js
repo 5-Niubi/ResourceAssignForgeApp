@@ -38,8 +38,8 @@ export async function removeThreadInfo() {
 export function calculateDuration({ startDate, endDate }) {
 	var a = moment(startDate);
 	var b = moment(endDate);
-    var result = b.diff(a, "days");
-    return (result>=1)?result: 0;
+	var result = b.diff(a, "days");
+	return result >= 1 ? result : 0;
 }
 
 export function extractProjectKey(str) {
@@ -135,7 +135,7 @@ export const validateNumberOnly = (value) => {
 	return undefined;
 };
 
-export const validateWorkingEffort = (value,maxValue) => {
+export const validateWorkingEffort = (value, maxValue) => {
 	//REQUIRES NOT NULL, NUMBER ONLY, FROM 0.0 TO 24.0
 	if (!value) {
 		return "NOT_VALID";
@@ -204,10 +204,14 @@ export function extractErrorMessage(error) {
 }
 
 export function formatText(input) {
-    //UPPERCASE AND REMOVE ANY NON-WORD CHARACTER
-    const formattedText = input.toUpperCase().replace(/\W+/g, ' ');
-  
-    //REPLACE SPACES WITH "-"
-    const result = formattedText.replace(/\s+/g, '-').trim();
-    return result;
-  }
+	//UPPERCASE AND REMOVE ANY NON-WORD CHARACTER
+	const formattedText = input.toUpperCase().replace(/\W+/g, " ");
+
+	//REPLACE SPACES WITH "-"
+	const result = formattedText.replace(/\s+/g, "-").trim();
+	return result;
+}
+
+export function parseForTimeOnly(timeString) {
+	return moment(timeString, ["h:m a", "H:m"]);
+}

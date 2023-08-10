@@ -7,7 +7,7 @@ import "../styles.css";
 import { extractErrorMessage, formatDateDMY } from "../../../common/utils";
 import Spinner from "@atlaskit/spinner";
 import { router, view } from "@forge/bridge";
-import { SUBSCRIPTION } from "../../../common/contants";
+import { DOMAIN_SUBSCRIPTION_SERVER, SUBSCRIPTION } from "../../../common/contants";
 import Toastify from "../../../common/Toastify";
 
 const columns = 12;
@@ -30,7 +30,7 @@ function UserInfoGrid() {
 	}, []);
 
 	function handleChangePlanClick() {
-		router.open(`https://localhost:5242/Upgrade?token=${subscription.token}`);
+		router.open(`${DOMAIN_SUBSCRIPTION_SERVER}/Upgrade?token=${subscription.token}`);
 	}
 
 	return subscription ? (
