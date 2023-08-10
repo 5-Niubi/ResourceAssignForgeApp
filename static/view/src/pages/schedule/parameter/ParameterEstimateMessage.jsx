@@ -12,6 +12,7 @@ import Toastify from "../../../common/Toastify";
 import Spinner from "@atlaskit/spinner";
 import InstructionMessage from "../../../components/InstructionMessage";
 import PageHeader from '@atlaskit/page-header';
+import InfoMessageColor from "../../../components/InfoMessageColor";
 
 export default function ParameterEstimateMessage() {
 	const [estimations, setEstimations] = useState([]);
@@ -35,7 +36,7 @@ export default function ParameterEstimateMessage() {
 	return (
 		<>
 			<PageHeader>
-				<div style={{ width: "100%" }}>Resource Suggestions <InstructionMessage content={<p></p>}/></div>
+				<div style={{ width: "100%" }}>Resource Suggestions <InfoMessageColor/></div>
 			</PageHeader>
 			{isEstimating ? (
 				<Spinner size={"large"} />

@@ -49,6 +49,8 @@ import {
 	saveThreadInfo,
 	validateEnddate,
 	extractErrorMessage,
+    cache,
+    clearCache,
 } from "../../../common/utils";
 import Spinner from "@atlaskit/spinner";
 import { RadioGroup } from "@atlaskit/radio";
@@ -61,9 +63,9 @@ import { validateNumberOnly } from "../../../common/utils";
 import InstructionMessage from "../../../components/InstructionMessage";
 
 const objectiveItems = [
-	{ name: "time", value: "time", label: "Time" },
-	{ name: "cost", value: "cost", label: "Cost" },
-	{ name: "experience", value: "quality", label: "Experience" },
+	{ name: "time", value: "time", label: "Execution time" },
+	{ name: "cost", value: "cost", label: "Total cost" },
+	{ name: "experience", value: "quality", label: "Total employees' experiences" },
 	{ name: "none", value: "", label: "Neutral" },
 ];
 
@@ -81,9 +83,11 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 		useState(Object);
 
 	const handleSetStartDate = useCallback(function (value) {
-        if(startDate>endDate){
-            setEndDate(value);
-        }
+        let a = new Date(value);
+        let b = new Date(endDate);
+		if (a>b) {
+			setEndDate(value);
+		}
 		setStartDate(value);
 	}, []);
 
@@ -158,18 +162,15 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 				});
 				console.log("saveParameters response: ", saveRes);
 				localStorage.setItem("parameterId", saveRes.id);
-                let getThreadScheduleRes;
+				let getThreadScheduleRes;
 				try {
-					getThreadScheduleRes = await invoke(
-						"getThreadSchedule",
-						{
-							parameterId: saveRes.id,
-						}
-					);
+					getThreadScheduleRes = await invoke("getThreadSchedule", {
+						parameterId: saveRes.id,
+					});
 				} catch (error) {
-                    setIsScheduling(false);
-				    let messageError = extractErrorMessage(error);
-                    handleCreateThreadFail(<p>{messageError.message}</p>);
+					setIsScheduling(false);
+					let messageError = extractErrorMessage(error);
+					handleCreateThreadFail(<p>{messageError.message}</p>);
 				}
 				if (getThreadScheduleRes) {
 					handleCreateThreadSuccess(getThreadScheduleRes.threadId);
@@ -219,7 +220,9 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 							))}
 						</ul>
 					);
-
+                    
+                    //STORE MESSAGE MISSING WORKFORCE
+                    cache("message_missing_workforce",JSON.stringify(messageError));
 					handleCreateThreadFail(messageDisplay);
 					return;
 				}
@@ -232,6 +235,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 	function loadScheduleSuccess() {
 		handleChangeTab(3);
 		Toastify.success("Schedule successfully.");
+        clearCache("message_missing_workforce");
 	}
 
 	const actionsContent = (
@@ -249,7 +253,10 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 					Schedule
 				</LoadingButton>
 			</ButtonGroup>
-            <HelperMessage>Number of schedule today: {messageScheduleLimited?.usageExecuteAlgorithm}</HelperMessage>
+			<HelperMessage>
+				Number of schedule today:{" "}
+				{messageScheduleLimited?.usageExecuteAlgorithm}
+			</HelperMessage>
 		</>
 	);
 
@@ -274,10 +281,25 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 				{({ formProps, submitting }) => (
 					<form {...formProps}>
 						<PageHeader actions={actionsContent}>
-							<div style={{ width: "100%" }}>Parameters <InstructionMessage content={<p>
-                                
-                            </p>}/></div>
+                                    Parameters 
+                                    <InstructionMessage content={<p>
+                                    <ul>
+                                        <li><strong>Expected Cost</strong>: The estimated total cost required for personnel payment</li>
+                                        <li><strong>Expected Start Date</strong>: The desired project start date</li>
+                                        <li><strong>Expected End Date</strong>: The desired project completion date</li>
+                                        <li>
+                                        <strong>Project Objective</strong>: The goals that the project aims to achieve including:
+                                        <ul>
+                                            <li><strong>Execution Time</strong>: Prioritize minimizing the time to complete the project</li>
+                                            <li><strong>Total Cost</strong>: Prioritize minimizing the costs required for personnel payment</li>
+                                            <li><strong>Total Employees' Experiences</strong>: Prioritize maximizing the quality of personnel throughout the project</li>
+                                            <li><strong>Neutral</strong>: Maintain a balanced approach among the above objectives</li>
+                                        </ul>
+                                        </li>
+                                    </ul>
+                                </p>} /> 
 						</PageHeader>
+                       
 						<FormSection>
 							<Grid layout="fluid" medium={0}>
 								{/* EXPECTED COST TEXTFIELD */}
@@ -285,15 +307,13 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 									<Field
 										label="Expected Cost"
 										name="cost"
-										validate={(value) =>
-											validateNumberOnly(value)
-										}
 										defaultValue={budget ?? 0}
 									>
 										{({ fieldProps, error }) => (
 											<Fragment>
 												<Textfield
 													{...fieldProps}
+                                                    type="number"
 													placeholder="What expected maximize project's cost?"
 													elemBeforeInput={
 														<p
@@ -307,11 +327,6 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 														</p>
 													}
 												/>
-												{error === "NOT_VALID" && (
-													<ErrorMessage>
-														Wrong input.
-													</ErrorMessage>
-												)}
 											</Fragment>
 										)}
 									</Field>

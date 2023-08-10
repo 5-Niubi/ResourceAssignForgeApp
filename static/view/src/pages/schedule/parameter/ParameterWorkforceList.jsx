@@ -38,9 +38,6 @@ import {
 } from "../../../common/utils";
 import InstructionMessage from "../../../components/InstructionMessage";
 function ParameterWorkforceList() {
-	let { projectId } = useParams();
-	let project = getCacheObject("project", null);
-    const baseWH = (project?.baseWorkingHour===0 ||project?.baseWorkingHour === null) ? 8: project?.baseWorkingHour;
 	const [workforces, setWorkforces] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [skillDB, setSkillDB] = useState([]);
@@ -66,29 +63,6 @@ function ParameterWorkforceList() {
 		}
 
 		setIsLoading(false);
-
-		// invoke("getWorkforceParameter", { projectId })
-		// 	.then(function (res) {
-		// 		let workforces = [];
-		// 		for (let workforce of res) {
-		// 			let itemWorkforce = {
-		// 				id: workforce.id,
-		// 				name: workforce.name,
-		// 			};
-		// 			workforces.push(itemWorkforce);
-		// 		}
-		// 		setIsLoading(false);
-		// 		cache(
-		// 			"workforce_parameter",
-		// 			JSON.stringify(workforces)
-		// 		);
-		// 		setWorkforces(workforces);
-		// 		console.log("Cac workforce", workforces);
-		// 	})
-		// 	.catch(function (error) {
-		// 		console.log(error);
-		// 		Toastify.error(error.toString());
-		// 	});
 
 		invoke("getAllSkills", {})
 			.then(function (res) {
@@ -288,15 +262,13 @@ function ParameterWorkforceList() {
 	};
 
     const OutScopeMessage = () => (
-		<ErrorMessage>Value raging from 0 to {baseWH}</ErrorMessage>
+		<ErrorMessage>Value raging from 0 to 24</ErrorMessage>
 	);
 
 	return (
 		<div>
 			<div>
-				<PageHeader actions={buttonActions}>Employees <InstructionMessage content={<p>
-                    
-                    </p>}></InstructionMessage></PageHeader>
+				<PageHeader actions={buttonActions}>Employees</PageHeader>
                
 			</div>
 			{/* DISPLAY WORKFORCE PARMETER BUTTONS  */}
@@ -428,7 +400,7 @@ function ParameterWorkforceList() {
 									};
 									if (workforce_request.workingType == 0) {
 										workforce_request.workingEfforts = [
-											baseWH, baseWH, baseWH, baseWH, baseWH, baseWH, baseWH,
+											0, 0, 0, 0, 0, 0, 0
 										];
 									}
 									console.log("Form data", workforce_request);
@@ -615,6 +587,7 @@ function ParameterWorkforceList() {
 														}) => (
 															<Fragment>
 																<TextField
+                                                                type="number"
 																	autoComplete="off"
 																	{...fieldProps}
 																	placeholder="Number only"
@@ -711,7 +684,7 @@ function ParameterWorkforceList() {
 																	value
 																) =>
 																	validateWorkingEffort(
-																		value, baseWH
+																		value
 																	)
 																}
 																isDisabled={
@@ -724,6 +697,7 @@ function ParameterWorkforceList() {
 																}) => (
 																	<Fragment>
 																		<TextField
+                                                                        type="number"
 																			autoComplete="off"
 																			{...fieldProps}
 																			placeholder="Number only"
@@ -755,7 +729,7 @@ function ParameterWorkforceList() {
 																	value
 																) =>
 																	validateWorkingEffort(
-																		value, baseWH
+																		value
 																	)
 																}
 																isDisabled={
@@ -768,6 +742,7 @@ function ParameterWorkforceList() {
 																}) => (
 																	<Fragment>
 																		<TextField
+                                                                        type="number"
 																			autoComplete="off"
 																			{...fieldProps}
 																			placeholder="Number only"
@@ -799,7 +774,7 @@ function ParameterWorkforceList() {
 																	value
 																) =>
 																	validateWorkingEffort(
-																		value, baseWH
+																		value
 																	)
 																}
 																isDisabled={
@@ -812,6 +787,7 @@ function ParameterWorkforceList() {
 																}) => (
 																	<Fragment>
 																		<TextField
+                                                                        type="number"
 																			autoComplete="off"
 																			{...fieldProps}
 																			placeholder="Number only"
@@ -843,7 +819,7 @@ function ParameterWorkforceList() {
 																	value
 																) =>
 																	validateWorkingEffort(
-																		value, baseWH
+																		value
 																	)
 																}
 																isDisabled={
@@ -856,6 +832,7 @@ function ParameterWorkforceList() {
 																}) => (
 																	<Fragment>
 																		<TextField
+                                                                        type="number"
 																			autoComplete="off"
 																			{...fieldProps}
 																			placeholder="Number only"
@@ -887,7 +864,7 @@ function ParameterWorkforceList() {
 																	value
 																) =>
 																	validateWorkingEffort(
-																		value, baseWH
+																		value
 																	)
 																}
 																isDisabled={
@@ -900,6 +877,7 @@ function ParameterWorkforceList() {
 																}) => (
 																	<Fragment>
 																		<TextField
+                                                                        type="number"
 																			autoComplete="off"
 																			{...fieldProps}
 																			placeholder="Number only"
@@ -938,7 +916,7 @@ function ParameterWorkforceList() {
 																	value
 																) =>
 																	validateWorkingEffort(
-																		value, baseWH
+																		value
 																	)
 																}
 																isDisabled={
@@ -951,6 +929,7 @@ function ParameterWorkforceList() {
 																}) => (
 																	<Fragment>
 																		<TextField
+                                                                        type="number"
 																			autoComplete="off"
 																			{...fieldProps}
 																			placeholder="Number only"
@@ -982,7 +961,7 @@ function ParameterWorkforceList() {
 																	value
 																) =>
 																	validateWorkingEffort(
-																		value, baseWH
+																		value
 																	)
 																}
 																isDisabled={
@@ -995,6 +974,7 @@ function ParameterWorkforceList() {
 																}) => (
 																	<Fragment>
 																		<TextField
+                                                                        type="number"
 																			autoComplete="off"
 																			{...fieldProps}
 																			placeholder="Number only"
