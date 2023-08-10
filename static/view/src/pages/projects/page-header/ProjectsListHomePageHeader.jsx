@@ -33,9 +33,9 @@ function ProjecstListHomePageHeader({
 					value={searchBoxValue}
 				/>
 			</div>
-			<div style={{ flex: "0 0 200px", marginLeft: token("space.100", "8px") }}>
+			{/* <div style={{ flex: "0 0 200px", marginLeft: token("space.100", "8px") }}>
 				<Button onClick={onSearchButtonClick}>Search</Button>
-			</div>
+			</div> */}
 		</div>
 	);
 	return (

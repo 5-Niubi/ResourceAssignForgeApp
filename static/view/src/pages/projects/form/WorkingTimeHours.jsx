@@ -11,7 +11,8 @@ import AddCircleIcon from "@atlaskit/icon/glyph/add-circle";
 import CrossIcon from "@atlaskit/icon/glyph/cross";
 import { Grid, GridColumn } from "@atlaskit/page";
 import React, { Fragment, useEffect, useState } from "react";
-import { parseForTimeOnly } from "../../../common/utils";
+import { milisecondToHours, parseForTimeOnly } from "../../../common/utils";
+import { TIME_SELECTBOX_VALUE } from "../../../common/contants";
 
 const columns = 9;
 
@@ -22,24 +23,26 @@ function WorkingTimeHours({
 	onSetBaseWorkingHours,
 }) {
 	const [error, setError] = useState("");
-	const RemoveButton = (index) => (
+	const RemoveButton = ({ index }) => (
 		<Button
-			iconBefore={<CrossIcon label="" />}
+			iconBefore={<CrossIcon label="remove" />}
 			appearance="subtle"
 			onClick={() => handleRemoveBtnClick(index)}
 			isDisabled={isDisable}
+			shouldFitContainer
 		></Button>
 	);
 	const AddButton = () => (
 		<Button
-			iconBefore={<AddCircleIcon label="v" />}
+			iconBefore={<AddCircleIcon label="add" />}
 			appearance="subtle"
 			onClick={handleAddBtnClick}
 			isDisabled={isDisable}
+			shouldFitContainer
 		></Button>
 	);
 
-	const FieldTimeInput = (actionButton, timeRange, index) => (
+	const FieldTimeInput = ({ actionButton, timeRange, index }) => (
 		<div style={{ marginBottom: "0.5em" }}>
 			<Grid columns={columns} layout="fluid" spacing="compact">
 				<GridColumn medium={1}>{actionButton}</GridColumn>
@@ -50,6 +53,7 @@ function WorkingTimeHours({
 							setTimeRangeStart(e, index);
 						}}
 						isDisabled={isDisable}
+						times={TIME_SELECTBOX_VALUE}
 					/>
 				</GridColumn>
 				<GridColumn medium={4}>
@@ -59,6 +63,7 @@ function WorkingTimeHours({
 							setTimeRangeFinish(e, index);
 						}}
 						isDisabled={isDisable}
+						times={TIME_SELECTBOX_VALUE}
 					/>
 				</GridColumn>
 			</Grid>
@@ -95,7 +100,7 @@ function WorkingTimeHours({
 				setError("Start time and finish time are the same value");
 			} else if (start.isAfter(finish)) {
 				setError("Start time is later than finish time ");
-			} else baseWkingHrs += finish.diff(start);
+			} else baseWkingHrs += milisecondToHours(finish.diff(start));
 		}
 		onSetBaseWorkingHours(baseWkingHrs);
 	}, [timeRangeValues]);
@@ -110,8 +115,9 @@ function WorkingTimeHours({
 	}
 
 	function handleRemoveBtnClick(index) {
-		const newItems = [...timeRangeValues];
+		let newItems = [...timeRangeValues];
 		newItems.splice(index, 1);
+
 		setTimeRangeValues(newItems);
 	}
 
@@ -124,7 +130,13 @@ function WorkingTimeHours({
 					actionButton = <AddButton />;
 				}
 
-				return FieldTimeInput(actionButton, element, index);
+				return (
+					<FieldTimeInput
+						actionButton={actionButton}
+						timeRange={element}
+						index={index}
+					/>
+				);
 			})}
 			{!!error.length && <ErrorMessage>{error}</ErrorMessage>}
 		</Fragment>

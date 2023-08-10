@@ -215,3 +215,23 @@ export function formatText(input) {
 export function parseForTimeOnly(timeString) {
 	return moment(timeString, ["h:m a", "H:m"]);
 }
+
+export function generateTimeFrom00To23() {
+	let resultArr = [];
+	for (let i = 0; i <= 23; i++) {
+		let hour = i;
+		let minute = "00";
+		let time = `${hour}:${minute}`;
+		resultArr.push(time);
+
+		minute = "30";
+		time = `${hour}:${minute}`;
+		resultArr.push(time);
+	}
+
+	return resultArr;
+}
+
+export function milisecondToHours(miliseconds){
+	return miliseconds / (1000 * 60 * 60);
+}
