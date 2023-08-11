@@ -264,8 +264,13 @@ function ResourceWorkforceTable() {
 
 	return (
 		<>
-			<PageHeader actions={actionsContent} bottomBar={barContent}>
-				Employee List <InfoMessageColor />
+			<PageHeader actions={actionsContent} bottomBar={barContent} disableTitleStyles={true}>
+            <div style={{display: "inline-flex"}}>
+                    <h2>Employee List</h2>
+                    <div style={{marginLeft: 5}}>
+                        <InfoMessageColor/>
+                    </div>
+                </div>
 			</PageHeader>
 
             <h5>Total employees: {workforcesFilter?.length}</h5>

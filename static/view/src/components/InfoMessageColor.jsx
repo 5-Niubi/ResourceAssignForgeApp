@@ -8,7 +8,7 @@ const InfoMessageColor = () => {
 	return (
 		<InlineMessage appearance="info" >
 			<p>
-				<h6>Levels go with color's rule</h6>
+				<strong>LEVELS GO WITH COLORS'RULE</strong>
 			</p>
 			<p>
 				{COLOR_SKILL_LEVEL?.map((skill, i) => (

@@ -5,10 +5,10 @@ import InlineMessage from "@atlaskit/inline-message";
 const InstructionMessage = ({ content }) => {
 	return (
 		<InlineMessage appearance="info">
-			<p>
+			<div>
 				<strong>INFORMATION</strong>
-			</p>
-			<p>{content}</p>
+			</div>
+			<div>{content}</div>
 		</InlineMessage>
 	);
 };
