@@ -1,3 +1,4 @@
+import Image from "@atlaskit/image";
 import Modal, {
 	ModalBody,
 	ModalFooter,
@@ -7,21 +8,21 @@ import ProgressBar from "@atlaskit/progress-bar";
 import { invoke } from "@forge/bridge";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { AppContext } from "../App";
+import ProcessImg from "../assets/images/wired-flat-1325-code-fork.gif";
 import Toastify from "../common/Toastify";
 import {
 	INTERVAL_FETCH,
 	RETRY_TIMES,
-	STORAGE,
 	THREAD_ACTION,
 	THREAD_STATUS,
 } from "../common/contants";
+import { HttpStatus } from "../common/httpStatus";
 import {
 	extractErrorMessage,
 	isArrayEmpty,
 	isObjectEmpty,
 	removeThreadInfo,
 } from "../common/utils";
-import { HttpStatus } from "../common/httpStatus";
 
 let retryNumber = RETRY_TIMES;
 function LoadingModalWithThread({ state }) {
@@ -31,10 +32,9 @@ function LoadingModalWithThread({ state }) {
 		setModalState((prev) => ({ ...prev, threadId: null }));
 		removeThreadInfo();
 	};
-	const [progress, setProgress] = useState("...");
+	const [progress, setProgress] = useState("");
 
 	// --- Handle Loading
-
 	function checkingThread() {
 		invoke("getThreadResult", { threadId: modalState.threadId })
 			.then((res) => {
@@ -54,15 +54,15 @@ function LoadingModalWithThread({ state }) {
 				}
 			});
 	}
-	useEffect(() => {
-		checkingThread();
-		//assign interval to a variable to clear it.
-		const intervalId = setInterval(() => {
-			checkingThread();
-		}, INTERVAL_FETCH);
+	// useEffect(() => {
+	// 	checkingThread();
+	// 	//assign interval to a variable to clear it.
+	// 	const intervalId = setInterval(() => {
+	// 		checkingThread();
+	// 	}, INTERVAL_FETCH);
 
-		return () => clearInterval(intervalId); //This is important
-	}, []);
+	// 	return () => clearInterval(intervalId); //This is important
+	// }, []);
 
 	const handleThreadSuccess = useCallback((res) => {
 		console.log(res);
@@ -81,7 +81,7 @@ function LoadingModalWithThread({ state }) {
 				}
 				//define action running scheduling success
 				if (modalState.threadAction === THREAD_ACTION.RUNNING_SCHEDULE) {
-                    modalState.callBack();
+					modalState.callBack();
 				}
 				// Handle finish thread
 
@@ -128,10 +128,11 @@ function LoadingModalWithThread({ state }) {
 					setAppContextState((prev) => ({ ...prev, error: errorBody }));
 				}
 
-                if(modalState.threadAction === THREAD_ACTION.RUNNING_SCHEDULE){
-                    Toastify.error("Error at thread of Running Schedule: ", res.result.json());
-                }
-
+				if (modalState.threadAction === THREAD_ACTION.RUNNING_SCHEDULE) {
+					Toastify.error(
+						"Error at thread of Running Schedule: " + JSON.stringify(res.result)
+					);
+				}
 
 				// Handle finish thread
 				closeModal();
@@ -146,8 +147,8 @@ function LoadingModalWithThread({ state }) {
 				<ModalBody>
 					<div
 						style={{
-							height: "120px",
-							marginTop: "10px",
+							height: "5em",
+							marginTop: "1em",
 							display: "flex",
 							alignItems: "center",
 							justifyContent: "center",
@@ -165,7 +166,13 @@ function LoadingModalWithThread({ state }) {
 							justifyContent: "center",
 						}}
 					>
-						<p style={{ fontSize: "16px" }}>({progress})</p>
+						{!progress || progress.length === 0 ? (
+							<div style={{ width: "5em" }}>
+								<Image src={ProcessImg} />
+							</div>
+						) : (
+							<p style={{ fontSize: "16px" }}>({progress})</p>
+						)}
 					</div>
 					<ProgressBar ariaLabel="Loading" isIndeterminate></ProgressBar>
 				</ModalBody>

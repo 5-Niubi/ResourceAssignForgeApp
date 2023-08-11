@@ -13,6 +13,7 @@ import { Grid, GridColumn } from "@atlaskit/page";
 import React, { Fragment, useEffect, useState } from "react";
 import { milisecondToHours, parseForTimeOnly } from "../../../common/utils";
 import { TIME_SELECTBOX_VALUE } from "../../../common/contants";
+import { SlideIn } from "@atlaskit/motion";
 
 const columns = 9;
 
@@ -42,8 +43,8 @@ function WorkingTimeHours({
 		></Button>
 	);
 
-	const FieldTimeInput = ({ actionButton, timeRange, index }) => (
-		<div style={{ marginBottom: "0.5em" }}>
+	const FieldTimeInput = ({ actionButton, timeRange, index, ...props }) => (
+		<div style={{ marginBottom: "0.5em" }} {...props}>
 			<Grid columns={columns} layout="fluid" spacing="compact">
 				<GridColumn medium={1}>{actionButton}</GridColumn>
 				<GridColumn medium={4}>
@@ -131,11 +132,16 @@ function WorkingTimeHours({
 				}
 
 				return (
-					<FieldTimeInput
-						actionButton={actionButton}
-						timeRange={element}
-						index={index}
-					/>
+					<SlideIn enterFrom={"bottom"} fade={"in"}>
+						{(props) => (
+							<FieldTimeInput
+								actionButton={actionButton}
+								timeRange={element}
+								index={index}
+								{...props}
+							/>
+						)}
+					</SlideIn>
 				);
 			})}
 			{!!error.length && <ErrorMessage>{error}</ErrorMessage>}

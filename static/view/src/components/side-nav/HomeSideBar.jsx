@@ -3,7 +3,7 @@ import React, { useCallback, useState } from "react";
 import ActivityIcon from "@atlaskit/icon/glyph/activity";
 import PeopleGroupIcon from "@atlaskit/icon/glyph/people-group";
 import LightBulb from "@atlaskit/icon/glyph/lightbulb";
-import { ReactComponent as LogoSvg } from "../../resources/reshot-icon-planning-SJ7W8K623A.svg";
+import { ReactComponent as LogoSvg } from "../../assets/svg/Logo.svg";
 
 import {
 	Header,
