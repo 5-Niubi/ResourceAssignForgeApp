@@ -35,8 +35,13 @@ export default function ParameterEstimateMessage() {
 
 	return (
 		<>
-			<PageHeader>
-				<div style={{ width: "100%" }}>Resource Suggestions <InfoMessageColor/></div>
+			<PageHeader disableTitleStyles={true}>
+                <div style={{display: "inline-flex"}}>
+                    <h2>Resource Suggestions</h2>
+                    <div style={{marginLeft: 5}}>
+                        <InfoMessageColor/>
+                    </div>
+                </div>
 			</PageHeader>
 			{isEstimating ? (
 				<Spinner size={"large"} />

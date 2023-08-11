@@ -49,8 +49,8 @@ import {
 	saveThreadInfo,
 	validateEnddate,
 	extractErrorMessage,
-    cache,
-    clearCache,
+	cache,
+	clearCache,
 } from "../../../common/utils";
 import Spinner from "@atlaskit/spinner";
 import { RadioGroup } from "@atlaskit/radio";
@@ -61,13 +61,22 @@ import { AppContext } from "../../../App";
 import { PiStarFill } from "react-icons/pi";
 import { validateNumberOnly } from "../../../common/utils";
 import InstructionMessage from "../../../components/InstructionMessage";
+import { color } from "highcharts";
 
 const objectiveItems = [
 	{ name: "time", value: "time", label: "Execution time" },
 	{ name: "cost", value: "cost", label: "Total cost" },
-	{ name: "experience", value: "quality", label: "Total employees' experiences" },
+	{
+		name: "experience",
+		value: "quality",
+		label: "Total employees' experiences",
+	},
 	{ name: "none", value: "", label: "Neutral" },
 ];
+
+const strongTextStyle = {
+	color: "red",
+};
 
 export default function ParameterObjectInput({ handleChangeTab }) {
 	let project_detail = getCacheObject("project", []);
@@ -81,13 +90,13 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 	const { setAppContextState } = useContext(AppContext);
 	const [messageScheduleLimited, setMessageScheduleLimited] =
 		useState(Object);
-    const [canClickSchedule, setCanClickSchedule] = useState(false);
-    const [numberOfScheduleCanClick, setNumberOfScheduleCanClick] = useState(0);
+	const [canClickSchedule, setCanClickSchedule] = useState(false);
+	const [numberOfScheduleCanClick, setNumberOfScheduleCanClick] = useState(0);
 
 	const handleSetStartDate = useCallback(function (value) {
-        let a = new Date(value);
-        let b = new Date(endDate);
-		if (a>b) {
+		let a = new Date(value);
+		let b = new Date(endDate);
+		if (a > b) {
 			setEndDate(value);
 		}
 		setStartDate(value);
@@ -103,7 +112,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 				.then(function (res) {
 					console.log("getExecuteAlgorithmDailyLimited", res);
 					setMessageScheduleLimited(res);
-                    handleExecuteAlgorithmDailyLimited(res);
+					handleExecuteAlgorithmDailyLimited(res);
 				})
 				.catch(function (error) {
 					console.log(error);
@@ -113,22 +122,21 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 		[isScheduling]
 	);
 
-    function handleExecuteAlgorithmDailyLimited(res){
-        let numberExecuted = res?.usageExecuteAlgorithm;
-        //CHECK PLAN ID
-        if(res?.planId === 1){
-            let numberScheduleToday = (3-numberExecuted);
-            if(numberScheduleToday > 0){
-                setCanClickSchedule(true);
-                setNumberOfScheduleCanClick(numberScheduleToday)
-            }
-        }
-        
-        if(res?.planId === 2){
-            setCanClickSchedule(true);
-        }
+	function handleExecuteAlgorithmDailyLimited(res) {
+		let numberExecuted = res?.usageExecuteAlgorithm;
+		//CHECK PLAN ID
+		if (res?.planId === 1) {
+			let numberScheduleToday = 3 - numberExecuted;
+			if (numberScheduleToday > 0) {
+				setCanClickSchedule(true);
+				setNumberOfScheduleCanClick(numberScheduleToday);
+			}
+		}
 
-    }
+		if (res?.planId === 2) {
+			setCanClickSchedule(true);
+		}
+	}
 
 	const threadLoadingContext = useContext(ThreadLoadingContext);
 	const [threadStateValue, setThreadStateValue] = threadLoadingContext.state;
@@ -240,9 +248,12 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 							))}
 						</ul>
 					);
-                    
-                    //STORE MESSAGE MISSING WORKFORCE
-                    cache("message_missing_workforce",JSON.stringify(messageError));
+
+					//STORE MESSAGE MISSING WORKFORCE
+					cache(
+						"message_missing_workforce",
+						JSON.stringify(messageError)
+					);
 					handleCreateThreadFail(messageDisplay);
 					return;
 				}
@@ -255,7 +266,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 	function loadScheduleSuccess() {
 		handleChangeTab(3);
 		Toastify.success("Schedule successfully.");
-        clearCache("message_missing_workforce");
+		clearCache("message_missing_workforce");
 	}
 
 	const actionsContent = (
@@ -269,18 +280,17 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 					appearance="primary"
 					isLoading={isScheduling}
 					submitting
-                    isDisabled={!canClickSchedule}
+					isDisabled={!canClickSchedule}
 				>
 					Schedule
 				</LoadingButton>
 			</ButtonGroup>
-            {canClickSchedule && (messageScheduleLimited?.planId === 1) && (
-                <HelperMessage>
-                   Free account - Number of schedule today: {numberOfScheduleCanClick}
-                </HelperMessage>
-            )
-            }
-
+			{canClickSchedule && messageScheduleLimited?.planId === 1 && (
+				<HelperMessage>
+					Free account - Number of schedule today:{" "}
+					{numberOfScheduleCanClick}
+				</HelperMessage>
+			)}
 		</>
 	);
 
@@ -304,26 +314,100 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 			>
 				{({ formProps, submitting }) => (
 					<form {...formProps}>
-						<PageHeader actions={actionsContent}>
-                                    Parameters 
-                                    <InstructionMessage content={<p>
-                                    <ul>
-                                        <li><strong>Expected Cost</strong>: The estimated total cost required for personnel payment</li>
-                                        <li><strong>Expected Start Date</strong>: The desired project start date</li>
-                                        <li><strong>Expected End Date</strong>: The desired project completion date</li>
-                                        <li>
-                                        <strong>Project Objective</strong>: The goals that the project aims to achieve including:
-                                        <ul>
-                                            <li><strong>Execution Time</strong>: Prioritize minimizing the time to complete the project</li>
-                                            <li><strong>Total Cost</strong>: Prioritize minimizing the costs required for personnel payment</li>
-                                            <li><strong>Total Employees' Experiences</strong>: Prioritize maximizing the quality of personnel throughout the project</li>
-                                            <li><strong>Neutral</strong>: Maintain a balanced approach among the above objectives</li>
-                                        </ul>
-                                        </li>
-                                    </ul>
-                                </p>} /> 
+						<PageHeader
+							actions={actionsContent}
+							disableTitleStyles={true}
+						>
+							<div style={{ display: "inline-flex" }}>
+								<h2>Parameters</h2>
+								<div style={{ marginLeft: 5 }}>
+									<InstructionMessage
+										content={
+											<ul>
+												<li>
+													<strong
+														style={strongTextStyle}
+													>
+														Expected Cost
+													</strong>
+													: The estimated total cost
+													required for personnel
+													payment
+												</li>
+												<li>
+													<strong
+														style={strongTextStyle}
+													>
+														Expected Start Date
+													</strong>
+													: The desired project start
+													date
+												</li>
+												<li>
+													<strong
+														style={strongTextStyle}
+													>
+														Expected End Date
+													</strong>
+													: The desired project
+													completion date
+												</li>
+												<li>
+													<strong
+														style={strongTextStyle}
+													>
+														Project Objective
+													</strong>
+													: The goals that the project
+													aims to achieve including:
+													<ul>
+														<li>
+															<strong>
+																Execution Time
+															</strong>
+															: Prioritize
+															minimizing the time
+															to complete the
+															project
+														</li>
+														<li>
+															<strong>
+																Total Cost
+															</strong>
+															: Prioritize
+															minimizing the costs
+															required for
+															personnel payment
+														</li>
+														<li>
+															<strong>
+																Total Employees'
+																Experiences
+															</strong>
+															: Prioritize
+															maximizing the
+															quality of personnel
+															throughout the
+															project
+														</li>
+														<li>
+															<strong>
+																Neutral
+															</strong>
+															: Maintain a
+															balanced approach
+															among the above
+															objectives
+														</li>
+													</ul>
+												</li>
+											</ul>
+										}
+									/>
+								</div>
+							</div>
 						</PageHeader>
-                       
+
 						<FormSection>
 							<Grid layout="fluid" medium={0}>
 								{/* EXPECTED COST TEXTFIELD */}
@@ -337,7 +421,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 											<Fragment>
 												<Textfield
 													{...fieldProps}
-                                                    type="number"
+													type="number"
 													placeholder="What expected maximize project's cost?"
 													elemBeforeInput={
 														<p
@@ -401,7 +485,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 								{/* SLECT OBJECT RADIO */}
 								<GridColumn medium={18}>
 									<Field
-										label="Objective Estimation"
+										label="Project Objectives"
 										name="objectives"
 										defaultValue=""
 										isRequired
