@@ -81,6 +81,8 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 	const { setAppContextState } = useContext(AppContext);
 	const [messageScheduleLimited, setMessageScheduleLimited] =
 		useState(Object);
+    const [canClickSchedule, setCanClickSchedule] = useState(false);
+    const [numberOfScheduleCanClick, setNumberOfScheduleCanClick] = useState(0);
 
 	const handleSetStartDate = useCallback(function (value) {
         let a = new Date(value);
@@ -101,6 +103,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 				.then(function (res) {
 					console.log("getExecuteAlgorithmDailyLimited", res);
 					setMessageScheduleLimited(res);
+                    handleExecuteAlgorithmDailyLimited(res);
 				})
 				.catch(function (error) {
 					console.log(error);
@@ -109,6 +112,23 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 		},
 		[isScheduling]
 	);
+
+    function handleExecuteAlgorithmDailyLimited(res){
+        let numberExecuted = res?.usageExecuteAlgorithm;
+        //CHECK PLAN ID
+        if(res?.planId === 1){
+            let numberScheduleToday = (3-numberExecuted);
+            if(numberScheduleToday > 0){
+                setCanClickSchedule(true);
+                setNumberOfScheduleCanClick(numberScheduleToday)
+            }
+        }
+        
+        if(res?.planId === 2){
+            setCanClickSchedule(true);
+        }
+
+    }
 
 	const threadLoadingContext = useContext(ThreadLoadingContext);
 	const [threadStateValue, setThreadStateValue] = threadLoadingContext.state;
@@ -249,14 +269,18 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 					appearance="primary"
 					isLoading={isScheduling}
 					submitting
+                    isDisabled={!canClickSchedule}
 				>
 					Schedule
 				</LoadingButton>
 			</ButtonGroup>
-			<HelperMessage>
-				Number of schedule today:{" "}
-				{messageScheduleLimited?.usageExecuteAlgorithm}
-			</HelperMessage>
+            {canClickSchedule && (messageScheduleLimited?.planId === 1) && (
+                <HelperMessage>
+                   Free account - Number of schedule today: {numberOfScheduleCanClick}
+                </HelperMessage>
+            )
+            }
+
 		</>
 	);
 
