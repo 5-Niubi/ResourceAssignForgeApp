@@ -285,9 +285,9 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 					Schedule
 				</LoadingButton>
 			</ButtonGroup>
-			{canClickSchedule && messageScheduleLimited?.planId === 1 && (
+			{messageScheduleLimited?.planId === 1 && (
 				<HelperMessage>
-					Free account - Number of schedule today:{" "}
+					Number of schedule today:{" "}
 					{numberOfScheduleCanClick}
 				</HelperMessage>
 			)}

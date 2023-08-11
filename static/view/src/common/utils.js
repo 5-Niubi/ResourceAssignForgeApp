@@ -161,7 +161,7 @@ export const validateName = (value) => {
 	if (!value) {
 		return "NOT_VALID";
 	}
-	const regex = /^[A-Za-z ]{6,}$/;
+	const regex = /^[A-Za-zÀ-ỹà-ỳĂ-ưă-ưẠ-ỵạ-ỵ ]{6,}$/;
 	if (!regex.test(value)) {
 		return "NOT_VALID";
 	}
@@ -203,13 +203,21 @@ export function extractErrorMessage(error) {
 	return JSON.parse(stringErr);
 }
 
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 export function formatText(input) {
 	//UPPERCASE AND REMOVE ANY NON-WORD CHARACTER
-	const formattedText = input.toUpperCase().replace(/\W+/g, " ");
+	const formattedText = input.toLowerCase().replace(/[^\p{L}\d]+/gu, " ");
 
-	//REPLACE SPACES WITH "-"
-	const result = formattedText.replace(/\s+/g, "-").trim();
-	return result;
+  // REPLACE SPACES WITH " "
+  const result = formattedText.replace(/\s+/g, " ").trim();
+  
+  // CAPITALIZE FIRST LETTERS
+  const capitalizedResult = result.split(" ").map(capitalizeFirstLetter).join(" ");
+  
+  return capitalizedResult;
 }
 
 export function parseForTimeOnly(timeString) {

@@ -188,12 +188,14 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 				key: "skills",
 				content: "Skills",
 				width: 62,
+                shouldTruncate: false,
+                isSortable: true,
 			},
 		],
 	};
 
 	const rows = workforcesFilter?.map((workforce, index) => ({
-		key: workforce.id,
+		key: `row-${index}-${workforce.name}`,
 		cells: [
 			{
 				key: "no",
@@ -221,7 +223,7 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 				),
 			},
 			{
-				key: "skills",
+				key: workforce.skills,
 				content: (
 					<div>
 						{workforce.skills?.map((skill, i) => (
