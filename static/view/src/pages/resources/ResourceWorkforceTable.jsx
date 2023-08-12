@@ -164,6 +164,7 @@ function ResourceWorkforceTable() {
 					key: "skill",
 					content: "Skills",
 					shouldTruncate: false,
+					isSortable: true,
 					width: withWidth ? 50 : undefined,
 				},
 				{
