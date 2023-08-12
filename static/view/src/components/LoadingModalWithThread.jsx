@@ -6,7 +6,7 @@ import Modal, {
 } from "@atlaskit/modal-dialog";
 import ProgressBar from "@atlaskit/progress-bar";
 import { invoke } from "@forge/bridge";
-import React, { useCallback, useContext, useState } from "react";
+import React, { useCallback, useContext, useState, useEffect } from "react";
 import { AppContext } from "../App";
 import ProcessImg from "../assets/images/wired-flat-1325-code-fork.gif";
 import SnakeLink from "../assets/images/wired-flat-1213-snake.gif";
