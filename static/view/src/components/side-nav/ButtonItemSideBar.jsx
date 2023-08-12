@@ -18,7 +18,8 @@ const useCurrentPath = (pathMatch) => {
 
 function ButtonItemSideBar({ rootPath, pathTo, text, iconBefore }) {
 	const navigate = useNavigate();
-	const isMatchPath = useCurrentPath(rootPath.rootPath + pathTo);
+	const isMatchPath = useCurrentPath(rootPath + pathTo);
+	debugger;
 	return (
 		<ButtonItem
 			isSelected={isMatchPath}

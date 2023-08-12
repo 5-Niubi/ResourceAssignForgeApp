@@ -6,15 +6,15 @@ import Modal, {
 } from "@atlaskit/modal-dialog";
 import ProgressBar from "@atlaskit/progress-bar";
 import { invoke } from "@forge/bridge";
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useState } from "react";
 import { AppContext } from "../App";
 import ProcessImg from "../assets/images/wired-flat-1325-code-fork.gif";
+import SnakeLink from "../assets/images/wired-flat-1213-snake.gif";
 import Toastify from "../common/Toastify";
 import {
-	INTERVAL_FETCH,
 	RETRY_TIMES,
 	THREAD_ACTION,
-	THREAD_STATUS,
+	THREAD_STATUS
 } from "../common/contants";
 import { HttpStatus } from "../common/httpStatus";
 import {
@@ -54,15 +54,15 @@ function LoadingModalWithThread({ state }) {
 				}
 			});
 	}
-	// useEffect(() => {
-	// 	checkingThread();
-	// 	//assign interval to a variable to clear it.
-	// 	const intervalId = setInterval(() => {
-	// 		checkingThread();
-	// 	}, INTERVAL_FETCH);
+	useEffect(() => {
+		checkingThread();
+		//assign interval to a variable to clear it.
+		const intervalId = setInterval(() => {
+			checkingThread();
+		}, INTERVAL_FETCH);
 
-	// 	return () => clearInterval(intervalId); //This is important
-	// }, []);
+		return () => clearInterval(intervalId); //This is important
+	}, []);
 
 	const handleThreadSuccess = useCallback((res) => {
 		console.log(res);
@@ -141,6 +141,12 @@ function LoadingModalWithThread({ state }) {
 	}, []);
 	// ----------------
 
+	let animation;
+	if (modalState.threadAction === THREAD_ACTION.JIRA_EXPORT) {
+		animation = <Image src={SnakeLink} />;
+	} else if (modalState.threadAction === THREAD_ACTION.RUNNING_SCHEDULE) {
+		animation = <Image src={ProcessImg} />;
+	}
 	return (
 		<ModalTransition>
 			<Modal>
@@ -166,13 +172,12 @@ function LoadingModalWithThread({ state }) {
 							justifyContent: "center",
 						}}
 					>
-						{!progress || progress.length === 0 ? (
-							<div style={{ width: "5em" }}>
-								<Image src={ProcessImg} />
-							</div>
-						) : (
-							<p style={{ fontSize: "16px" }}>({progress})</p>
-						)}
+						<div style={{ width: "5em" }}>{animation}</div>
+
+						{!progress ||
+							(progress.length === 0 && (
+								<p style={{ fontSize: "16px" }}>({progress})</p>
+							))}
 					</div>
 					<ProgressBar ariaLabel="Loading" isIndeterminate></ProgressBar>
 				</ModalBody>

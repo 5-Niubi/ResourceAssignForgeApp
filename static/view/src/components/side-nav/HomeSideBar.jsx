@@ -19,7 +19,7 @@ import { APP_NAME, APP_NAME_DESCRIPTOR } from "../../common/contants";
 import { HelperMessage } from "@atlaskit/form";
 import MoreSection from "./MoreSection";
 
-function HomeSideBar(rootPath) {
+function HomeSideBar({rootPath = ""}) {
 	return (
 		<SideNavigation label="project" testId="side-navigation">
 			<NavigationHeader>
