@@ -1,5 +1,4 @@
-import { LoadingButton } from "@atlaskit/button";
-import Button from "@atlaskit/button";
+import Button, { LoadingButton } from "@atlaskit/button";
 import { Field, HelperMessage } from "@atlaskit/form";
 import Modal, {
 	ModalBody,
@@ -67,6 +66,10 @@ function JiraCreateProjectExport({ state, onCreateClick, isLoading }) {
 								/>
 								<HelperMessage>
 									<ul>
+										<li>
+											If you want to export to an existed project. Please
+											provide project key.
+										</li>
 										<li>
 											Project keys must start with an uppercase letter, followed
 											by one or more uppercase alphanumeric characters.
