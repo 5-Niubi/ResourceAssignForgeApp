@@ -4,7 +4,7 @@ import Image from "@atlaskit/image";
 import { Grid, GridColumn } from "@atlaskit/page";
 import { Box, xcss } from "@atlaskit/primitives";
 import React from "react";
-import jiraSoftwarelogo from "../../../assets/images/Jira-Emblem.png";
+import jiraSoftwarelogo from "../../../assets/images/Jira-Emblem_resized.png";
 import { MODAL_WIDTH } from "../../../common/contants";
 
 const width = MODAL_WIDTH.M;
