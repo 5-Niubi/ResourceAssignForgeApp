@@ -74,6 +74,16 @@ const objectiveItems = [
 	{ name: "none", value: "", label: "Neutral" },
 ];
 
+const optimizerItems = [
+    {
+		name: "Mathematical Optimizer",
+		value: 1,
+		label: "Mathematical Optimizer",
+	},
+	{ name: "General Optimizer (Genetic Algorithm)", value: 0, label: "General Optimizer" },
+
+];
+
 const strongTextStyle = {
 	color: "red",
 };
@@ -159,7 +169,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 		}));
 	};
 
-	function SaveParameters({ cost, objectives }) {
+	function SaveParameters({ cost, objectives, optimizer }) {
 		setIsScheduling(true);
 		var parameterResourcesLocal = getCacheObject("workforce_parameter", []);
 		let parameterResources = [];
@@ -176,6 +186,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 			ObjectiveTime: objectives === "time" ? 1 : null,
 			ObjectiveCost: objectives === "cost" ? 1 : null,
 			ObjectiveQuality: objectives === "quality" ? 1 : null,
+            Optimizer: optimizer ?? 0,
 			StartDate: startDate,
 			DeadLine: endDate,
 			Budget: Number(cost),
@@ -298,9 +309,9 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 		<div style={{ width: "100%" }}>
 			{isLoading ? <Spinner size={"large"} /> : null}
 			<Form
-				onSubmit={({ cost, objectives }) => {
+				onSubmit={({ cost, objectives, optimizer }) => {
 					console.log("Form Submitted: ", objectives);
-					SaveParameters({ cost, objectives });
+					SaveParameters({ cost, objectives, optimizer });
 					return new Promise((resolve) =>
 						setTimeout(resolve, 2000)
 					).then(() =>
@@ -482,8 +493,10 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 										)}
 									</Field>
 								</GridColumn>
-								{/* SLECT OBJECT RADIO */}
-								<GridColumn medium={18}>
+							</Grid>
+							<Grid layout="fluid" medium={0}>
+								{/* SELECT OBJECT RADIO */}
+								<GridColumn medium={4.5}>
 									<Field
 										label="Project Objectives"
 										name="objectives"
@@ -494,6 +507,21 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 											<RadioGroup
 												{...fieldProps}
 												options={objectiveItems}
+											/>
+										)}
+									</Field>
+								</GridColumn>
+                                <GridColumn medium={6.5}>
+									<Field
+										label="Optimizer"
+										name="optimizer"
+										defaultValue= {0}
+										isRequired
+									>
+										{({ fieldProps }) => (
+											<RadioGroup
+												{...fieldProps}
+												options={optimizerItems}
 											/>
 										)}
 									</Field>
