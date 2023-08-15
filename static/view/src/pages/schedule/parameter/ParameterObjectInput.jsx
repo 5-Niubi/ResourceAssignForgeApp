@@ -75,13 +75,16 @@ const objectiveItems = [
 ];
 
 const optimizerItems = [
-    {
+	{
 		name: "Mathematical Optimizer",
 		value: 1,
 		label: "Mathematical Optimizer",
 	},
-	{ name: "General Optimizer (Genetic Algorithm)", value: 0, label: "General Optimizer" },
-
+	{
+		name: "General Optimizer (Genetic Algorithm)",
+		value: 0,
+		label: "General Optimizer (Genetic Algorithm)",
+	},
 ];
 
 const strongTextStyle = {
@@ -95,6 +98,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 	const [endDate, setEndDate] = useState(project_detail.deadline);
 	const [budget, setBudget] = useState(project_detail.budget);
 	const [budgetUnit, setBudgetUnit] = useState(project_detail.budgetUnit);
+    const [selectedOptimizer, setSelectedOptimizer] = useState(0);
 	const [isLoading, setIsLoading] = useState(false);
 	const [isScheduling, setIsScheduling] = useState(false);
 	const { setAppContextState } = useContext(AppContext);
@@ -186,7 +190,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 			ObjectiveTime: objectives === "time" ? 1 : null,
 			ObjectiveCost: objectives === "cost" ? 1 : null,
 			ObjectiveQuality: objectives === "quality" ? 1 : null,
-            Optimizer: optimizer ?? 0,
+			Optimizer: optimizer ?? 0,
 			StartDate: startDate,
 			DeadLine: endDate,
 			Budget: Number(cost),
@@ -298,8 +302,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 			</ButtonGroup>
 			{messageScheduleLimited?.planId === 1 && (
 				<HelperMessage>
-					Number of schedule today:{" "}
-					{numberOfScheduleCanClick}
+					Number of schedule today: {numberOfScheduleCanClick}
 				</HelperMessage>
 			)}
 		</>
@@ -511,18 +514,19 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 										)}
 									</Field>
 								</GridColumn>
-                                <GridColumn medium={6.5}>
+								<GridColumn medium={6.5}>
 									<Field
 										label="Optimizer"
 										name="optimizer"
-										defaultValue= {0}
 										isRequired
 									>
 										{({ fieldProps }) => (
 											<RadioGroup
-												{...fieldProps}
-												options={optimizerItems}
-											/>
+                                            {...fieldProps}
+                                            options={optimizerItems}
+                                            value={selectedOptimizer}
+                                            onChange={(e) => setSelectedOptimizer(e.target.value)} 
+                                        />
 										)}
 									</Field>
 								</GridColumn>
