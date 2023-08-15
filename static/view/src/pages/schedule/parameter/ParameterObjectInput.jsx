@@ -77,12 +77,12 @@ const objectiveItems = [
 const optimizerItems = [
 	{
 		name: "Mathematical Optimizer",
-		value: 1,
+		value: "1",
 		label: "Mathematical Optimizer",
 	},
-	{
+    {
 		name: "General Optimizer (Genetic Algorithm)",
-		value: 0,
+		value: "0",
 		label: "General Optimizer (Genetic Algorithm)",
 	},
 ];
@@ -519,13 +519,12 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 										label="Optimizer"
 										name="optimizer"
 										isRequired
+                                        defaultValue={"0"}
 									>
 										{({ fieldProps }) => (
 											<RadioGroup
                                             {...fieldProps}
                                             options={optimizerItems}
-                                            value={selectedOptimizer}
-                                            onChange={(e) => setSelectedOptimizer(e.target.value)} 
                                         />
 										)}
 									</Field>
