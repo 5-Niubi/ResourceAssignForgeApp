@@ -150,8 +150,8 @@ function ResourceWorkforceTable() {
 		return {
 			cells: [
 				{
-					key: "id",
-					content: "ID",
+					key: "no",
+					content: "No",
 					width: withWidth ? 5 : undefined,
 				},
 				{
@@ -171,6 +171,7 @@ function ResourceWorkforceTable() {
 					key: "salary",
 					content: "Salary (Hour)",
 					shouldTruncate: false,
+                    isSortable: true,
 					width: withWidth ? 7 : undefined,
 				},
 				{
@@ -196,8 +197,8 @@ function ResourceWorkforceTable() {
 		isHighlighted: false,
 		cells: [
 			{
-				key: workforce.id,
-				content: "#"+workforce.id,
+				key: "no",
+				content: (index + 1),
 			},
 			{
 				key: createKey(workforce.name),

@@ -28,6 +28,7 @@ import {
 	validateWorkingEffort,
 	validateName,
 	getCacheObject,
+    formatText,
 } from "../../common/utils";
 
 const options = [
@@ -230,7 +231,7 @@ export function ResourceCreateWorkforceModal({ onCreatedClick, skillDB }) {
 									accountType: "atlassian", //DEFAULT
 									name: null,
 									avatar: null, //DEFAULT
-									displayName: data.name,
+									displayName: formatText(data.name),
 									unitSalary: data.salary,
 									workingType:
 										isParttimeSelected === true ? 1 : 0,
@@ -305,13 +306,20 @@ export function ResourceCreateWorkforceModal({ onCreatedClick, skillDB }) {
 															className="single-select"
 															classNamePrefix="react-select"
 															{...fieldProps}
-															options={workforcesJiraAccount?.map(
+															options={[
+                                                                {
+                                                                    label: "None",
+                                                                    value: null,
+                                                                    avatar: null
+                                                                },
+                                                                ...workforcesJiraAccount?.map(
 																(user) => ({
 																	label: user.displayName,
 																	value: user.accountId,
 																	avatar: user.avatar,
 																})
-															)}
+															)]
+                                                            }
 															formatOptionLabel={
 																formatOptionLabel
 															}
