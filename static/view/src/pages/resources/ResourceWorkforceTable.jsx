@@ -171,6 +171,7 @@ function ResourceWorkforceTable() {
 					key: "salary",
 					content: "Salary (Hour)",
 					shouldTruncate: false,
+                    isSortable: true,
 					width: withWidth ? 7 : undefined,
 				},
 				{
