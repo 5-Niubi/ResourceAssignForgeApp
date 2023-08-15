@@ -190,7 +190,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 			ObjectiveTime: objectives === "time" ? 1 : null,
 			ObjectiveCost: objectives === "cost" ? 1 : null,
 			ObjectiveQuality: objectives === "quality" ? 1 : null,
-			Optimizer: optimizer ?? 0,
+			Optimizer: (optimizer === "0")? 0 : 1,
 			StartDate: startDate,
 			DeadLine: endDate,
 			Budget: Number(cost),
