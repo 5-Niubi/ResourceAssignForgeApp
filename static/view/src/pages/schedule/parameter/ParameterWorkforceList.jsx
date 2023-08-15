@@ -340,7 +340,7 @@ function ParameterWorkforceList() {
 						>
 							<ModalHeader>
 								<ModalTitle>
-									Workforce #{selectedWorkforce.id}
+									Edit employee
 								</ModalTitle>
 								{loadingDetail ? (
 									<Spinner size={"medium"}></Spinner>
