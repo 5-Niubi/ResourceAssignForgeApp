@@ -735,13 +735,20 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															className="single-select"
 															classNamePrefix="react-select"
 															{...fieldProps}
-															options={workforcesJiraAccount?.map(
+															options={[
+                                                                {
+                                                                    label: "None",
+                                                                    value: null,
+                                                                    avatar: null
+                                                                },
+                                                                ...workforcesJiraAccount?.map(
 																(user) => ({
 																	label: user.displayName,
 																	value: user.accountId,
 																	avatar: user.avatar,
 																})
-															)}
+															)]
+                                                            }
 															formatOptionLabel={
 																formatOptionLabel
 															}
