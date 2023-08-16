@@ -37,6 +37,8 @@ import {
     findObj,
 } from "../../../common/utils";
 import InstructionMessage from "../../../components/InstructionMessage";
+import { MESSAGE_PLACEHOLDER_WORKING_EFFORTS } from "../../../common/contants";
+
 function ParameterWorkforceList() {
 	const [workforces, setWorkforces] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
@@ -590,7 +592,7 @@ function ParameterWorkforceList() {
                                                                 type="number"
 																	autoComplete="off"
 																	{...fieldProps}
-																	placeholder="Number only"
+																	
 																	elemBeforeInput={
 																		<p
 																			style={{
@@ -700,7 +702,8 @@ function ParameterWorkforceList() {
                                                                         type="number"
 																			autoComplete="off"
 																			{...fieldProps}
-																			placeholder="Number only"
+																			placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                            elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																		/>
 																		{error ===
 																			"NOT_VALID" && (
@@ -745,7 +748,8 @@ function ParameterWorkforceList() {
                                                                         type="number"
 																			autoComplete="off"
 																			{...fieldProps}
-																			placeholder="Number only"
+																			placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                            elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																		/>
 																		{error ===
 																			"NOT_VALID" && (
@@ -790,7 +794,8 @@ function ParameterWorkforceList() {
                                                                         type="number"
 																			autoComplete="off"
 																			{...fieldProps}
-																			placeholder="Number only"
+																			placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                            elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																		/>
 																		{error ===
 																			"NOT_VALID" && (
@@ -835,7 +840,8 @@ function ParameterWorkforceList() {
                                                                         type="number"
 																			autoComplete="off"
 																			{...fieldProps}
-																			placeholder="Number only"
+																			placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                            elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																		/>
 																		{error ===
 																			"NOT_VALID" && (
@@ -880,7 +886,8 @@ function ParameterWorkforceList() {
                                                                         type="number"
 																			autoComplete="off"
 																			{...fieldProps}
-																			placeholder="Number only"
+																			placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                            elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																		/>
 																		{error ===
 																			"NOT_VALID" && (
@@ -932,7 +939,8 @@ function ParameterWorkforceList() {
                                                                         type="number"
 																			autoComplete="off"
 																			{...fieldProps}
-																			placeholder="Number only"
+																			placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                            elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																		/>
 																		{error ===
 																			"NOT_VALID" && (
@@ -977,7 +985,8 @@ function ParameterWorkforceList() {
                                                                         type="number"
 																			autoComplete="off"
 																			{...fieldProps}
-																			placeholder="Number only"
+																			placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                            elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																		/>
 																		{error ===
 																			"NOT_VALID" && (
