@@ -4,7 +4,7 @@ import Image from "@atlaskit/image";
 import { Grid, GridColumn } from "@atlaskit/page";
 import { Box, xcss } from "@atlaskit/primitives";
 import React from "react";
-import MSPLogo from "../../../assets/images/Microsoft-Project-2019.png";
+import MSPLogo from "../../../assets/images/Microsoft-Project-2019_resized.png";
 const columns = 10;
 
 const containerStyles = xcss({
