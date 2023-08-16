@@ -149,10 +149,10 @@ export const validateWorkingEffort = (value) => {
 		return "OUT_SCOPE";
 	}
 
-	const regex = /^\d*\.?\d*$/;
-	if (!regex.test(value)) {
-		return "NOT_VALID";
-	}
+    const regex = /^\d*\.?\d{1}$/;
+    if (!regex.test(value)) {
+      return "NOT_VALID";
+    }
 	return undefined;
 };
 

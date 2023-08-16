@@ -55,6 +55,7 @@ const options = [
 	{ name: "workingType", value: 0, label: "Fulltime" },
 	{ name: "workingType", value: 1, label: "Part-time" },
 ];
+import { MESSAGE_PLACEHOLDER_WORKING_EFFORTS } from "../../../common/contants";
 
 export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 	//SELECT WORKFORCE MODAL (SW)
@@ -898,7 +899,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																type="number"
 																autoComplete="off"
 																{...fieldProps}
-																placeholder="Number only"
+																
 																elemBeforeInput={
 																	<p
 																		style={{
@@ -964,7 +965,8 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															size="small"
 															content=""
 														></InfoIcon>
-														Working hours per day
+														Working hours per day.<br/>
+                                                        The hours require exactly one digit after the decimal point.
 													</HelperMessage>
 												)}
 											</GridColumn>
@@ -992,7 +994,8 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																		type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder="Number only"
+																		placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                        elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -1028,7 +1031,8 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																		type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder="Number only"
+																		placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                        elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -1064,7 +1068,8 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																		type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder="Number only"
+																		placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                        elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -1100,7 +1105,8 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																		type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder="Number only"
+																		placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                        elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -1136,7 +1142,8 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																		type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder="Number only"
+																		placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                        elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -1172,7 +1179,8 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																		type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder="Number only"
+																		placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                        elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -1208,7 +1216,8 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																		type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder="Number only"
+																		placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                        elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (

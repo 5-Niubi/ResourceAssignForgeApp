@@ -31,6 +31,8 @@ import {
 	getCacheObject,
 	findObj,
 } from "../../common/utils";
+import { MESSAGE_PLACEHOLDER_WORKING_EFFORTS } from "../../common/contants";
+
 function ResourceEditWorkforceModal({
 	openState,
 	setOpenState,
@@ -397,7 +399,7 @@ function ResourceEditWorkforceModal({
                                                         type="number"
 															autoComplete="off"
 															{...fieldProps}
-															placeholder="Number only"
+															
 															elemBeforeInput={
 																<p
 																	style={{
@@ -460,7 +462,8 @@ function ResourceEditWorkforceModal({
 														size="small"
 														content=""
 													></InfoIcon>
-													Working hours per day
+													Working hours per day.<br/>
+                                                        The hours require exactly one digit after the decimal point.
 												</HelperMessage>
 											)}
 										</GridColumn>
@@ -495,7 +498,8 @@ function ResourceEditWorkforceModal({
                                                                 type="number"
 																	autoComplete="off"
 																	{...fieldProps}
-																	placeholder="Number only"
+																	placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                    elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																/>
 																{error ===
 																	"NOT_VALID" && (
@@ -538,7 +542,8 @@ function ResourceEditWorkforceModal({
                                                                 type="number"
 																	autoComplete="off"
 																	{...fieldProps}
-																	placeholder="Number only"
+																	placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                    elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																/>
 																{error ===
 																	"NOT_VALID" && (
@@ -581,7 +586,8 @@ function ResourceEditWorkforceModal({
                                                                 type="number"
 																	autoComplete="off"
 																	{...fieldProps}
-																	placeholder="Number only"
+																	placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                    elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																/>
 																{error ===
 																	"NOT_VALID" && (
@@ -624,7 +630,8 @@ function ResourceEditWorkforceModal({
                                                                 type="number"
 																	autoComplete="off"
 																	{...fieldProps}
-																	placeholder="Number only"
+																	placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                    elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																/>
 																{error ===
 																	"NOT_VALID" && (
@@ -667,7 +674,8 @@ function ResourceEditWorkforceModal({
                                                                 type="number"
 																	autoComplete="off"
 																	{...fieldProps}
-																	placeholder="Number only"
+																	placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                    elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																/>
 																{error ===
 																	"NOT_VALID" && (
@@ -715,7 +723,8 @@ function ResourceEditWorkforceModal({
                                                                 type="number"
 																	autoComplete="off"
 																	{...fieldProps}
-																	placeholder="Number only"
+																	placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                    elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																/>
 																{error ===
 																	"NOT_VALID" && (
@@ -758,7 +767,8 @@ function ResourceEditWorkforceModal({
                                                                 type="number"
 																	autoComplete="off"
 																	{...fieldProps}
-																	placeholder="Number only"
+																	placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                    elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																/>
 																{error ===
 																	"NOT_VALID" && (

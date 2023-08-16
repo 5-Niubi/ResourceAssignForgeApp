@@ -98,3 +98,5 @@ export const DEFAULT_WORKING_TIMERANGE = [
 ];
 
 export const TIME_SELECTBOX_VALUE = generateTimeFrom00To23();
+
+export const MESSAGE_PLACEHOLDER_WORKING_EFFORTS = "Number Only";

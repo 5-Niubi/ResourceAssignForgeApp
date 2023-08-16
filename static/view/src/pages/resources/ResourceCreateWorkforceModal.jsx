@@ -30,6 +30,7 @@ import {
 	getCacheObject,
     formatText,
 } from "../../common/utils";
+import { MESSAGE_PLACEHOLDER_WORKING_EFFORTS } from "../../common/contants";
 
 const options = [
 	{ name: "workingType", value: 0, label: "Fulltime" },
@@ -467,7 +468,7 @@ export function ResourceCreateWorkforceModal({ onCreatedClick, skillDB }) {
                                                             type="number"
 																autoComplete="off"
 																{...fieldProps}
-																placeholder="Number only"
+																
 																elemBeforeInput={
 																	<p
 																		style={{
@@ -533,7 +534,8 @@ export function ResourceCreateWorkforceModal({ onCreatedClick, skillDB }) {
 															size="small"
 															content=""
 														></InfoIcon>
-														Working hours per day
+														Working hours per day.<br/>
+                                                        The hours require exactly one digit after the decimal point.
 													</HelperMessage>
 												)}
 											</GridColumn>
@@ -561,7 +563,8 @@ export function ResourceCreateWorkforceModal({ onCreatedClick, skillDB }) {
                                                                     type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder="Number only"
+																		placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                        elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -597,7 +600,8 @@ export function ResourceCreateWorkforceModal({ onCreatedClick, skillDB }) {
                                                                     type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder="Number only"
+																		placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                        elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -633,7 +637,8 @@ export function ResourceCreateWorkforceModal({ onCreatedClick, skillDB }) {
                                                                     type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder="Number only"
+																		placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                        elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -669,7 +674,8 @@ export function ResourceCreateWorkforceModal({ onCreatedClick, skillDB }) {
                                                                     type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder="Number only"
+																		placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                        elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -705,7 +711,8 @@ export function ResourceCreateWorkforceModal({ onCreatedClick, skillDB }) {
                                                                     type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder="Number only"
+																		placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                        elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -741,7 +748,8 @@ export function ResourceCreateWorkforceModal({ onCreatedClick, skillDB }) {
                                                                     type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder="Number only"
+																		placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                        elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -777,7 +785,8 @@ export function ResourceCreateWorkforceModal({ onCreatedClick, skillDB }) {
                                                                     type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder="Number only"
+																		placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                        elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
