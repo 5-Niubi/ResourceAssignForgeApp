@@ -4,7 +4,7 @@ modules:
       resource: main
       resolver:
         function: resolver
-      title: WoTaas-Huy
+      title: WoTaas
       layout: blank
   # Khai báo webtrigger cho server callback lúc grant quyền
   webtrigger:
