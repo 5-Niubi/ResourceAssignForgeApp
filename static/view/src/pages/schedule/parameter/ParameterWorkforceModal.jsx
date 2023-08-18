@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, Fragment } from "react";
+import { useCallback, useEffect, useState, Fragment, useContext } from "react";
 import { css, jsx } from "@emotion/react";
 import DynamicTable from "@atlaskit/dynamic-table";
 import Button, { ButtonGroup } from "@atlaskit/button";
@@ -22,6 +22,7 @@ import LoadingButton from "@atlaskit/button";
 import { Checkbox } from "@atlaskit/checkbox";
 import Lozenge from "@atlaskit/lozenge";
 import TextField from "@atlaskit/textfield";
+import EditorWarningIcon from "@atlaskit/icon/glyph/editor/warning";
 import Form, {
 	CheckboxField,
 	ErrorMessage,
@@ -56,6 +57,7 @@ const options = [
 	{ name: "workingType", value: 1, label: "Part-time" },
 ];
 import { MESSAGE_PLACEHOLDER_WORKING_EFFORTS } from "../../../common/contants";
+import { AppContext } from "../../../App";
 
 export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 	//SELECT WORKFORCE MODAL (SW)
@@ -173,6 +175,14 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 		});
 	}
 
+	const { setAppContextState } = useContext(AppContext);
+	const handleCreateThreadFail = (messageBody) => {
+		setAppContextState((prev) => ({
+			...prev,
+			error: messageBody,
+		}));
+	};
+
 	const head = {
 		cells: [
 			{
@@ -189,8 +199,8 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 				key: "skills",
 				content: "Skills",
 				width: 62,
-                shouldTruncate: false,
-                isSortable: true,
+				shouldTruncate: false,
+				isSortable: true,
 			},
 		],
 	};
@@ -284,6 +294,47 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 		setSelectAll(!selectAll);
 	}
 
+	const missing_resource = (
+		<p>
+			<ul>
+				{getCacheObject("message_missing_workforce", [])?.map(
+					(skillSet) => (
+						<li key={skillSet.taskId}>
+							Task ID {skillSet.taskId} needs workers with skill
+							sets{" "}
+							{skillSet.skillRequireds?.map((skill, i) => (
+								<span
+									style={{
+										marginRight: "2px",
+										marginLeft: "8px",
+									}}
+									key={i}
+								>
+									<Lozenge
+										style={{
+											backgroundColor:
+												COLOR_SKILL_LEVEL[
+													skill.level - 1
+												].color,
+											color:
+												skill.level === 1
+													? "#091e42"
+													: "white",
+										}}
+										isBold
+									>
+										{skill.name} - {skill.level}
+										<PiStarFill />
+									</Lozenge>
+								</span>
+							))}
+						</li>
+					)
+				)}
+			</ul>
+		</p>
+	);
+
 	return (
 		<div>
 			<Button appearance="primary" onClick={openSWModal}>
@@ -357,69 +408,22 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 											marginTop: "10px",
 										}}
 									>
-										<InlineMessage
-											appearance="warning"
-											secondaryText="You need add more employee"
+										<Button
+											onClick={() =>
+												handleCreateThreadFail(
+													missing_resource
+												)
+											}
+											appearance="subtle-link"
+											iconBefore={
+												<EditorWarningIcon
+													primaryColor="#e2b203"
+													label="edit"
+												/>
+											}
 										>
-											<p>
-												<ul>
-													{getCacheObject(
-														"message_missing_workforce",
-														[]
-													)?.map((skillSet) => (
-														<li
-															key={
-																skillSet.taskId
-															}
-														>
-															Task ID{" "}
-															{skillSet.taskId}{" "}
-															needs workers with
-															skill sets{" "}
-															{skillSet.skillRequireds?.map(
-																(skill, i) => (
-																	<span
-																		style={{
-																			marginRight:
-																				"2px",
-																			marginLeft:
-																				"8px",
-																		}}
-																		key={i}
-																	>
-																		<Lozenge
-																			style={{
-																				backgroundColor:
-																					COLOR_SKILL_LEVEL[
-																						skill.level -
-																							1
-																					]
-																						.color,
-																				color:
-																					skill.level ===
-																					1
-																						? "#091e42"
-																						: "white",
-																			}}
-																			isBold
-																		>
-																			{
-																				skill.name
-																			}{" "}
-																			-{" "}
-																			{
-																				skill.level
-																			}
-																			<PiStarFill />
-																		</Lozenge>
-																	</span>
-																)
-															)}
-														</li>
-													))}
-												</ul>
-											</p>
-										</InlineMessage>
+											You need add more employee
+										</Button>
 									</div>
 								)}
 							</div>
@@ -695,13 +699,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 								};
 								if (workforce_request.workingType == 0) {
 									workforce_request.workingEfforts = [
-										0,
-										0,
-										0,
-										0,
-										0,
-										0,
-										0,
+										0, 0, 0, 0, 0, 0, 0,
 									];
 								}
 								console.log("Form data", workforce_request);
@@ -722,51 +720,58 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 									<ModalBody>
 										<Grid layout="fluid" spacing="compact">
 											{/* USER ACCOUNT */}
-                                            <GridColumn medium={4}>
-											<Field
-												name="jiraAccount"
-												label="Jira Account (optional)"
-												defaultValue=""
-												isDisabled={loadingDetail}
-											>
-												{({ fieldProps, error }) => (
-													<Fragment>
-														<Select
-															inputId="single-select-example"
-															className="single-select"
-															classNamePrefix="react-select"
-															{...fieldProps}
-															options={[
-                                                                {
-                                                                    label: "None",
-                                                                    value: null,
-                                                                    avatar: null
-                                                                },
-                                                                ...workforcesJiraAccount?.map(
-																(user) => ({
-																	label: user.displayName,
-																	value: user.accountId,
-																	avatar: user.avatar,
-																})
-															)]
-                                                            }
-															formatOptionLabel={
-																formatOptionLabel
-															}
-															placeholder="Choose a Jira account"
-														/>
-														{loadingDetail ===
-															true && <Spinner />}
-														{!error && (
-															<HelperMessage></HelperMessage>
-														)}
-														{error && (
-															<ErrorMessage></ErrorMessage>
-														)}
-													</Fragment>
-												)}
-											</Field>
-                                            </GridColumn>
+											<GridColumn medium={4}>
+												<Field
+													name="jiraAccount"
+													label="Jira Account (optional)"
+													defaultValue=""
+													isDisabled={loadingDetail}
+												>
+													{({
+														fieldProps,
+														error,
+													}) => (
+														<Fragment>
+															<Select
+																inputId="single-select-example"
+																className="single-select"
+																classNamePrefix="react-select"
+																{...fieldProps}
+																options={[
+																	{
+																		label: "None",
+																		value: null,
+																		avatar: null,
+																	},
+																	...workforcesJiraAccount?.map(
+																		(
+																			user
+																		) => ({
+																			label: user.displayName,
+																			value: user.accountId,
+																			avatar: user.avatar,
+																		})
+																	),
+																]}
+																formatOptionLabel={
+																	formatOptionLabel
+																}
+																placeholder="Choose a Jira account"
+															/>
+															{loadingDetail ===
+																true && (
+																<Spinner />
+															)}
+															{!error && (
+																<HelperMessage></HelperMessage>
+															)}
+															{error && (
+																<ErrorMessage></ErrorMessage>
+															)}
+														</Fragment>
+													)}
+												</Field>
+											</GridColumn>
 											{/* EMAIL TEXTFIELD */}
 											<GridColumn medium={8}>
 												<Field
@@ -899,7 +904,6 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																type="number"
 																autoComplete="off"
 																{...fieldProps}
-																
 																elemBeforeInput={
 																	<p
 																		style={{
@@ -965,8 +969,11 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															size="small"
 															content=""
 														></InfoIcon>
-														Working hours per day.<br/>
-                                                        The hours require exactly one digit after the decimal point.
+														Working hours per day.
+														<br />
+														The hours require
+														exactly one digit after
+														the decimal point.
 													</HelperMessage>
 												)}
 											</GridColumn>
@@ -994,8 +1001,18 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																		type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
-                                                                        elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
+																		placeholder={
+																			MESSAGE_PLACEHOLDER_WORKING_EFFORTS
+																		}
+																		elemAfterInput={
+																			<div
+																				style={{
+																					margin: "10px",
+																				}}
+																			>
+																				Hours
+																			</div>
+																		}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -1031,8 +1048,18 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																		type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
-                                                                        elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
+																		placeholder={
+																			MESSAGE_PLACEHOLDER_WORKING_EFFORTS
+																		}
+																		elemAfterInput={
+																			<div
+																				style={{
+																					margin: "10px",
+																				}}
+																			>
+																				Hours
+																			</div>
+																		}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -1068,8 +1095,18 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																		type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
-                                                                        elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
+																		placeholder={
+																			MESSAGE_PLACEHOLDER_WORKING_EFFORTS
+																		}
+																		elemAfterInput={
+																			<div
+																				style={{
+																					margin: "10px",
+																				}}
+																			>
+																				Hours
+																			</div>
+																		}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -1105,8 +1142,18 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																		type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
-                                                                        elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
+																		placeholder={
+																			MESSAGE_PLACEHOLDER_WORKING_EFFORTS
+																		}
+																		elemAfterInput={
+																			<div
+																				style={{
+																					margin: "10px",
+																				}}
+																			>
+																				Hours
+																			</div>
+																		}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -1142,8 +1189,18 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																		type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
-                                                                        elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
+																		placeholder={
+																			MESSAGE_PLACEHOLDER_WORKING_EFFORTS
+																		}
+																		elemAfterInput={
+																			<div
+																				style={{
+																					margin: "10px",
+																				}}
+																			>
+																				Hours
+																			</div>
+																		}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -1179,8 +1236,18 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																		type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
-                                                                        elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
+																		placeholder={
+																			MESSAGE_PLACEHOLDER_WORKING_EFFORTS
+																		}
+																		elemAfterInput={
+																			<div
+																				style={{
+																					margin: "10px",
+																				}}
+																			>
+																				Hours
+																			</div>
+																		}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -1216,8 +1283,18 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																		type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
-                                                                        elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
+																		placeholder={
+																			MESSAGE_PLACEHOLDER_WORKING_EFFORTS
+																		}
+																		elemAfterInput={
+																			<div
+																				style={{
+																					margin: "10px",
+																				}}
+																			>
+																				Hours
+																			</div>
+																		}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (

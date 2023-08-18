@@ -62,7 +62,7 @@ import { PiStarFill } from "react-icons/pi";
 import { validateNumberOnly } from "../../../common/utils";
 import InstructionMessage from "../../../components/InstructionMessage";
 import { color } from "highcharts";
-
+import InfoIcon from '@atlaskit/icon/glyph/info';
 const objectiveItems = [
 	{ name: "time", value: "time", label: "Execution time" },
 	{ name: "cost", value: "cost", label: "Total cost" },
@@ -81,9 +81,9 @@ const optimizerItems = [
 		label: "Mathematical Optimizer",
 	},
     {
-		name: "General Optimizer (Genetic Algorithm)",
+		name: "General Optimizer",
 		value: "0",
-		label: "General Optimizer (Genetic Algorithm)",
+		label: "General Optimizer",
 	},
 ];
 
@@ -98,7 +98,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 	const [endDate, setEndDate] = useState(project_detail.deadline);
 	const [budget, setBudget] = useState(project_detail.budget);
 	const [budgetUnit, setBudgetUnit] = useState(project_detail.budgetUnit);
-    const [selectedOptimizer, setSelectedOptimizer] = useState(0);
+    const [selectedOptimizer, setSelectedOptimizer] = useState("0");
 	const [isLoading, setIsLoading] = useState(false);
 	const [isScheduling, setIsScheduling] = useState(false);
 	const { setAppContextState } = useContext(AppContext);
@@ -525,9 +525,23 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 											<RadioGroup
                                             {...fieldProps}
                                             options={optimizerItems}
+                                            value={selectedOptimizer}
+                                            onChange={(v) => setSelectedOptimizer((v.target.value))}
                                         />
 										)}
 									</Field>
+                                    {selectedOptimizer === "0" && (
+                                        <HelperMessage>
+                                        An optimization tool based on Genetic Algorithm aims to generate local optimal solutions quickly.
+                                        </HelperMessage>
+                                    )}
+                                    {selectedOptimizer === "1" && (
+                                        <HelperMessage>
+                                        An optimization tool based on Mathematical Optimizer aims to generate a globally optimal solution. For supporting large problems, please contact us directly via trungbuiducbuiduc@gmail.com.
+                                    </HelperMessage>
+                                    )}
+                                   
+                                    
 								</GridColumn>
 							</Grid>
 						</FormSection>
