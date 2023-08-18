@@ -1,13 +1,14 @@
 import API, { storage } from "@forge/api";
-import { BACKEND_dNET_DOMAIN, STORAGE } from "../../common/constants";
+import { STORAGE } from "../../common/constants";
 import { HttpStatus } from "../../common/httpStatus";
 import AuthenWithBE from "../authens/AuthenWithBE";
+import { BACKEND_SERVER_DOMAIN } from "../../common/environment";
 
 /**
  * Using for get api from .NET server
  */
 class APIServices {
-	DOMAIN = BACKEND_dNET_DOMAIN;
+	DOMAIN = BACKEND_SERVER_DOMAIN;
 	
 	/**
 	 * @param {string} url

@@ -1,6 +1,7 @@
 import { storage, webTrigger } from "@forge/api";
-import { APP_CLIENT_ID, STORAGE } from "../../common/constants";
+import { STORAGE } from "../../common/constants";
 import { Base64 } from "../../common/utils";
+import { APP_CLIENT_ID } from "../../common/environment";
 
 class AuthenWithBE {
 	clientId = APP_CLIENT_ID;
