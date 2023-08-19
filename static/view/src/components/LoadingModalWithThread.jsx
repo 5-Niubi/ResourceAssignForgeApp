@@ -20,6 +20,7 @@ import {
 import { HttpStatus } from "../common/httpStatus";
 import {
 	extractErrorMessage,
+	hasJsonStructure,
 	isArrayEmpty,
 	isObjectEmpty,
 	removeThreadInfo,
@@ -130,13 +131,16 @@ function LoadingModalWithThread({ state }) {
 				}
 
 				if (modalState.threadAction === THREAD_ACTION.RUNNING_SCHEDULE) {
-					Toastify.error(
-						"Error at thread of Running Schedule: " + JSON.stringify(res.result)
-					);
-					Toastify.error(
-						"Error at thread of Running Schedule: " +
-							JSON.parse(res.result.response).message
-					);
+					if (hasJsonStructure(res.result.response))
+						Toastify.error(
+							"Error at thread of Running Schedule: " +
+								JSON.parse(res.result.response).message
+						);
+					else {
+						Toastify.error(
+							"Error at thread of Running Schedule: " + res.result.message
+						);
+					}
 				}
 
 				// Handle finish thread
