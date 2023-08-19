@@ -133,6 +133,10 @@ function LoadingModalWithThread({ state }) {
 					Toastify.error(
 						"Error at thread of Running Schedule: " + JSON.stringify(res.result)
 					);
+					Toastify.error(
+						"Error at thread of Running Schedule: " +
+							JSON.parse(res.result.response).message
+					);
 				}
 
 				// Handle finish thread
@@ -144,9 +148,9 @@ function LoadingModalWithThread({ state }) {
 
 	let animation;
 	if (modalState.threadAction === THREAD_ACTION.JIRA_EXPORT) {
-		animation = <Image style={{width: "5em"}} src={SnakeLink} />;
+		animation = <Image style={{ width: "5em" }} src={SnakeLink} />;
 	} else if (modalState.threadAction === THREAD_ACTION.RUNNING_SCHEDULE) {
-		animation = <Image style={{width: "5em"}} src={ProcessImg} />;
+		animation = <Image style={{ width: "5em" }} src={ProcessImg} />;
 	}
 	return (
 		<ModalTransition>
