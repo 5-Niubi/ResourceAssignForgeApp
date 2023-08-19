@@ -173,7 +173,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 		}));
 	};
 
-	function SaveParameters({ cost, objectives, optimizer }) {
+	function SaveParameters({ cost, objectives }) {
 		setIsScheduling(true);
 		var parameterResourcesLocal = getCacheObject("workforce_parameter", []);
 		let parameterResources = [];
@@ -190,7 +190,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 			ObjectiveTime: objectives === "time" ? 1 : null,
 			ObjectiveCost: objectives === "cost" ? 1 : null,
 			ObjectiveQuality: objectives === "quality" ? 1 : null,
-			Optimizer: (optimizer === "0")? 0 : 1,
+			Optimizer: Number(selectedOptimizer),
 			StartDate: startDate,
 			DeadLine: endDate,
 			Budget: Number(cost),
@@ -312,9 +312,9 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 		<div style={{ width: "100%" }}>
 			{isLoading ? <Spinner size={"large"} /> : null}
 			<Form
-				onSubmit={({ cost, objectives, optimizer }) => {
+				onSubmit={({ cost, objectives }) => {
 					console.log("Form Submitted: ", objectives);
-					SaveParameters({ cost, objectives, optimizer });
+					SaveParameters({ cost, objectives });
 					return new Promise((resolve) =>
 						setTimeout(resolve, 2000)
 					).then(() =>
@@ -523,10 +523,11 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 									>
 										{({ fieldProps }) => (
 											<RadioGroup
-                                            {...fieldProps}
                                             options={optimizerItems}
                                             value={selectedOptimizer}
-                                            onChange={(v) => setSelectedOptimizer((v.target.value))}
+                                            onChange={(v) => 
+                                                setSelectedOptimizer((v.target.value))
+                                            }
                                         />
 										)}
 									</Field>
