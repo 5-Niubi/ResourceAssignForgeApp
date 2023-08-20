@@ -51,6 +51,7 @@ import {
 	extractErrorMessage,
 	cache,
 	clearCache,
+    validateIntegerOnly,
 } from "../../../common/utils";
 import Spinner from "@atlaskit/spinner";
 import { RadioGroup } from "@atlaskit/radio";
@@ -430,6 +431,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 										label="Expected Cost"
 										name="cost"
 										defaultValue={budget ?? 0}
+                                        validate={(v)=> validateIntegerOnly(v)}
 									>
 										{({ fieldProps, error }) => (
 											<Fragment>
@@ -449,6 +451,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 														</p>
 													}
 												/>
+                                                {error && <ErrorMessage>{error}</ErrorMessage>}
 											</Fragment>
 										)}
 									</Field>

@@ -149,10 +149,10 @@ export const validateWorkingEffort = (value) => {
 		return "OUT_SCOPE";
 	}
 
-    const regex = /^\d*\.?\d{1}$/;
-    if (!regex.test(value)) {
-      return "NOT_VALID";
-    }
+	const regex = /^\d*\.?\d{1}$/;
+	if (!regex.test(value)) {
+		return "NOT_VALID";
+	}
 	return undefined;
 };
 
@@ -204,20 +204,23 @@ export function extractErrorMessage(error) {
 }
 
 function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
+	return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 export function formatText(input) {
 	//UPPERCASE AND REMOVE ANY NON-WORD CHARACTER
 	const formattedText = input.toLowerCase().replace(/[^\p{L}\d]+/gu, " ");
 
-  // REPLACE SPACES WITH " "
-  const result = formattedText.replace(/\s+/g, " ").trim();
-  
-  // CAPITALIZE FIRST LETTERS
-  const capitalizedResult = result.split(" ").map(capitalizeFirstLetter).join(" ");
-  
-  return capitalizedResult;
+	// REPLACE SPACES WITH " "
+	const result = formattedText.replace(/\s+/g, " ").trim();
+
+	// CAPITALIZE FIRST LETTERS
+	const capitalizedResult = result
+		.split(" ")
+		.map(capitalizeFirstLetter)
+		.join(" ");
+
+	return capitalizedResult;
 }
 
 export function parseForTimeOnly(timeString) {
@@ -240,6 +243,14 @@ export function generateTimeFrom00To23() {
 	return resultArr;
 }
 
-export function milisecondToHours(miliseconds){
+export function milisecondToHours(miliseconds) {
 	return miliseconds / (1000 * 60 * 60);
+}
+
+export function validateIntegerOnly(value) {
+    //REQUIRES INTEGER NUMBER
+	if (!/^\d*$/.test(value)) {
+		return "Input integer Only.";
+	}
+	return undefined;
 }
