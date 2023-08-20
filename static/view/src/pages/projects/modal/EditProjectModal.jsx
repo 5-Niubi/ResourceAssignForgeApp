@@ -1,23 +1,26 @@
 import Button, { ButtonGroup, LoadingButton } from "@atlaskit/button";
+import { DatePicker } from "@atlaskit/datetime-picker";
+import Form, { Field, FormSection, HelperMessage } from "@atlaskit/form";
 import Modal, {
 	ModalBody,
 	ModalFooter,
 	ModalHeader,
 	ModalTitle,
 	ModalTransition,
-	useModal,
 } from "@atlaskit/modal-dialog";
 import { Grid, GridColumn } from "@atlaskit/page";
-import React, { Fragment, useState, useCallback, useEffect } from "react";
-import TextField from "@atlaskit/textfield";
-import Form, { Field, FormSection } from "@atlaskit/form";
-import { DatePicker } from "@atlaskit/datetime-picker";
-import ObjectiveRange from "../form/ObjectiveRange";
-import { getCurrentTime } from "../../../common/utils";
-import { invoke } from "@forge/bridge";
-import { DATE_FORMAT, MODAL_WIDTH } from "../../../common/contants";
-import Toastify from "../../../common/Toastify";
 import Spinner from "@atlaskit/spinner";
+import TextField from "@atlaskit/textfield";
+import { invoke } from "@forge/bridge";
+import React, { Fragment, useEffect, useState } from "react";
+import Toastify from "../../../common/Toastify";
+import {
+	DATE_FORMAT,
+	DEFAULT_WORKING_TIMERANGE,
+	MODAL_WIDTH,
+} from "../../../common/contants";
+import { extractErrorMessage } from "../../../common/utils";
+import WorkingTimeHours from "../form/WorkingTimeHours";
 const width = MODAL_WIDTH.M;
 const columns = 10;
 
@@ -25,14 +28,17 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 	const [project, setProject] = useState(openState.project);
 	const [projectName, setProjectName] = useState(project.name);
 	const [startDate, setStartDate] = useState(project.startDate);
-	const [endDate, setEndDate] = useState(startDate);
+	const [endDate, setEndDate] = useState(project.deadline);
 	const [budget, setBudget] = useState(0);
 	const [unit, setUnit] = useState("");
-	// const [objTime, setObjTime] = useState(50);
-	// const [objCost, setObjCost] = useState(50);
-	// const [objQuality, setObjQuality] = useState(50);
-	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [baseWorkingHour, setBaseWorkingHour] = useState(
+		project.baseWorkingHour || 0
+	);
+	const timeRangeValueState = useState(DEFAULT_WORKING_TIMERANGE);
+	const [timeRangeValues, setTimeRangeValue] = timeRangeValueState;
 
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [isLoaded, setIsLoaded] = useState(false);
 	const closeModal = function () {
 		setOpenState({ project: {}, isOpen: false });
 	};
@@ -40,30 +46,22 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 	useEffect(function () {
 		invoke("getProjectDetail", { projectId: project.id })
 			.then(function (res) {
-				let project = res;
-				project.isLoaded = true;
-				setProjectName(project.name);
-				setStartDate(project.startDate);
-				setEndDate(project.deadline);
-				setBudget(project.budget);
-				setUnit(project.budgetUnit);
-				setProject(project);
+				let projectRes = res;
+				setProjectName(projectRes.name);
+				setStartDate(projectRes.startDate);
+				setEndDate(projectRes.deadline);
+				setBudget(projectRes.budget);
+				setUnit(projectRes.budgetUnit);
+				// setBaseWorkingHour(projectRes.baseWorkingHour);
+				projectRes.workingTimes && setTimeRangeValue(projectRes.workingTimes);
+				setProject(projectRes);
+				setIsLoaded(true);
 			})
 			.catch(function (error) {
-				Toastify.error(error.toString());
+				let errorObj = extractErrorMessage(error);
+				Toastify.error(errorObj.message || errorObj);
 			});
 	}, []);
-
-	// useEffect(
-	// 	function () {
-	// 		setProjectName(project.name);
-	// 		setStartDate(project.startDate);
-	// 		setEndDate(project.deadline);
-	// 		setBudget(project.budget);
-	// 		setUnit(project.budgetUnit);
-	// 	},
-	// 	[project]
-	// );
 
 	const handleSetProjectName = function (e) {
 		setProjectName(e.target.value);
@@ -88,30 +86,11 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 		setUnit(e.target.value);
 	};
 
-	// const handleSetObjTime = useCallback(function (e) {
-	// 	setObjTime(e.target.value);
-	// }, []);
+	const handleSetBaseWorkHour = function (e) {
+		let workHour = Number(e.target.value);
+		if (0 <= workHour && workHour <= 24) setBaseWorkingHour(workHour);
+	};
 
-	// const handleRangeSetObjTime = useCallback(function (value) {
-	// 	setObjTime(value);
-	// }, []);
-
-	// const handleSetObjCost = useCallback(function (e) {
-	// 	setObjCost(e.target.value);
-	// }, []);
-
-	// const handleRangeSetObjCost = useCallback(function (value) {
-	// 	setObjCost(value);
-	// }, []);
-
-	// const handleSetObjQuality = useCallback(function (e) {
-	// 	setObjQuality(e.target.value);
-	// }, []);
-
-	// const handleRangeSetObjQuality = useCallback(function (value) {
-	// 	setObjQuality(value);
-	// }, []);
-	
 	function handleSubmitCreate() {
 		setIsSubmitting(true);
 		let projectObjRequest = {
@@ -121,9 +100,8 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 			deadline: endDate,
 			budget,
 			budgetUnit: unit,
-			// objectiveTime: objTime,
-			// objectiveCost: objCost,
-			// objectiveQuality: objQuality,
+			baseWorkingHour,
+			workingTimes: timeRangeValues,
 		};
 
 		invoke("editProject", { projectObjRequest })
@@ -135,7 +113,8 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 				Toastify.success("Saved");
 			})
 			.catch(function (error) {
-				Toastify.error(error.toString());
+				let errorObj = extractErrorMessage(error);
+				Toastify.error(errorObj.message || errorObj);
 			});
 	}
 
@@ -148,8 +127,18 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 					{({ formProps }) => (
 						<form id="form-with-id" {...formProps}>
 							<ModalHeader>
-								<ModalTitle>{project.name}</ModalTitle>
-								{project.isLoaded ? "" : <Spinner size={"medium"}></Spinner>}
+								<ModalTitle>
+									<div
+										style={{
+											whiteSpace: "nowrap",
+											overflow: "hidden",
+											textOverflow: "ellipsis",
+										}}
+									>
+										{project.name}
+									</div>
+								</ModalTitle>
+								{!isLoaded && <Spinner size={"medium"}></Spinner>}
 							</ModalHeader>
 							<ModalBody>
 								<Grid layout="fluid" spacing="compact" columns={columns}>
@@ -162,13 +151,18 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 												isRequired
 											>
 												{() => (
-													<TextField
-														autoComplete="off"
-														value={projectName}
-														onChange={handleSetProjectName}
-														isDisabled={!project.isLoaded}
-														isRequired
-													/>
+													<Fragment>
+														<TextField
+															autoComplete="off"
+															value={projectName}
+															onChange={handleSetProjectName}
+															isDisabled={!isLoaded}
+															isRequired
+														/>
+														<HelperMessage>
+															Project name must start with uppercase letter.
+														</HelperMessage>
+													</Fragment>
 												)}
 											</Field>
 										</FormSection>
@@ -180,7 +174,7 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 															value={startDate}
 															onChange={handleSetStartDate}
 															dateFormat={DATE_FORMAT.DMY}
-															isDisabled={!project.isLoaded}
+															isDisabled={!isLoaded}
 														/>
 													</Fragment>
 												)}
@@ -193,12 +187,13 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 															value={endDate}
 															onChange={handleSetEndDate}
 															dateFormat={DATE_FORMAT.DMY}
-															isDisabled={!project.isLoaded}
+															isDisabled={!isLoaded}
 														/>
 													</Fragment>
 												)}
 											</Field>
 										</FormSection>
+
 										<FormSection>
 											<Grid spacing="compact" columns={columns}>
 												<GridColumn medium={8}>
@@ -206,16 +201,15 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 														aria-required={true}
 														name="budget"
 														label="Budget"
-														isRequired
 													>
-														{() => (
+														{(fieldProps) => (
 															<TextField
 																autoComplete="off"
 																value={budget}
 																onChange={handleSetBudget}
 																type="number"
-																isDisabled={!project.isLoaded}
-																isRequired
+																isDisabled={!isLoaded}
+																{...fieldProps}
 															/>
 														)}
 													</Field>
@@ -225,44 +219,32 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 														aria-required={true}
 														name="budgetUnit"
 														label="Unit"
-														isRequired={true}
 													>
-														{() => (
+														{(fieldProps) => (
 															<TextField
 																autoComplete="off"
 																value={unit}
 																onChange={handleSetUnit}
-																isDisabled={!project.isLoaded}
-																isRequired={true}
+																isDisabled={!isLoaded}
+																{...fieldProps}
 															/>
 														)}
 													</Field>
 												</GridColumn>
 											</Grid>
 										</FormSection>
-										{/* <FormSection>
-												<ObjectiveRange
-													label="Objective Time"
-													name="ObjectiveTime"
-													value={objTime}
-													onChange={handleSetObjTime}
-													rangeOnChange={handleRangeSetObjTime}
-												/>
-												<ObjectiveRange
-													name="ObjectiveCost"
-													label="Objective Cost"
-													value={objCost}
-													onChange={handleSetObjCost}
-													rangeOnChange={handleRangeSetObjCost}
-												/>
-												<ObjectiveRange
-													name="ObjectiveQuality"
-													label="Objective Quality"
-													value={objQuality}
-													onChange={handleSetObjQuality}
-													rangeOnChange={handleRangeSetObjQuality}
-												/>
-											</FormSection> */}
+										<FormSection>
+											<WorkingTimeHours
+												timeRangeValueState={timeRangeValueState}
+												isDisable={!isLoaded}
+												label="Working Time Slots"
+												onSetBaseWorkingHours={setBaseWorkingHour}
+											/>
+											<hr style={{ marginTop: "1.5em" }} />
+											<p>
+												Total Working: <b>{baseWorkingHour}</b> Hours/Day
+											</p>
+										</FormSection>
 									</GridColumn>
 								</Grid>
 							</ModalBody>
@@ -272,20 +254,15 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 									<Button appearance="default" onClick={closeModal}>
 										Cancel
 									</Button>
-									{isSubmitting ? (
-										<LoadingButton appearance="primary" isLoading>
-											Create
-										</LoadingButton>
-									) : (
-										<Button
-											type="submit"
-											appearance="primary"
-											onClick={handleSubmitCreate}
-											isDisabled={!project.isLoaded}
-										>
-											Save
-										</Button>
-									)}
+									<LoadingButton
+										type="submit"
+										appearance="primary"
+										onClick={handleSubmitCreate}
+										isDisabled={!isLoaded}
+										isLoading={isSubmitting}
+									>
+										Save
+									</LoadingButton>
 								</ButtonGroup>
 							</ModalFooter>
 						</form>

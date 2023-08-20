@@ -18,7 +18,7 @@ class AuthenWithBE {
 			`https://auth.atlassian.com/authorize?audience=api.atlassian.com` +
 			`&client_id=${this.clientId}` +
 			`&scope=manage%3Ajira-project%20write%3Ajira-work%20read%3Ajira-work%20manage%3Ajira-configuration%20read%3Ajira-user%20offline_access` +
-			`&redirect_uri=http%3A%2F%2Flocalhost%3A5126%2FAuthentication%2FCallback` +
+			`&redirect_uri=https%3A%2F%2Fbe.ai4cert.com%2FAuthentication%2FCallback` +
 			`&state=${stateData}` +
 			`&response_type=code` +
 			`&prompt=consent`;
@@ -29,13 +29,13 @@ class AuthenWithBE {
 		storage.delete(STORAGE.IS_AUTHENTICATED);
 		storage.deleteSecret(STORAGE.TOKEN);
 	}
-
+ 
 	/**
 	 * @param {Object} data
 	 */
 	async handleAuthenCallbackFromNET(data) {
 		// Fixed accessToken BE
-		data.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJKV1RTZXJ2aWNlQWNjZXNzVG9rZW4iLCJqdGkiOiIwNGQzYTkzMC1iNTliLTQ5ZWMtODk5Zi04NGIwNzVjOTQyOGQiLCJpYXQiOiI2LzI1LzIwMjMgMDg6MTI6NDQiLCJhY2NvdW50X2lkIjoiNjFlMWI3MmYwNTg2YTIwMDY5ZGUyOGZlIiwiY2xvdWRfaWQiOiJlYTQ4ZGRjNy1lZDU2LTRkNjAtOWI1NS0wMjY2NzcyNDg0OWQiLCJleHAiOjE3MTkzMDMxNjQsImlzcyI6IkpXVEF1dGhlbnRpY2F0aW9uU2VydmVyIiwiYXVkIjoiSmlyYUNsb3VkIn0.j7VXUPxU3OK7sfIfHsFtr3op4lfzTNAlXtJyJlpPnqY";
+		// data.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJKV1RTZXJ2aWNlQWNjZXNzVG9rZW4iLCJqdGkiOiJjOWZiMzMwOS1iNTk0LTRmNTAtODVkNy02ZDlkNzE0MGQyYzciLCJpYXQiOiIwOC8xMC8yMDIzIDE3OjA3OjM3IiwiYWNjb3VudF9pZCI6IjYxZTFiNzJmMDU4NmEyMDA2OWRlMjhmZSIsImNsb3VkX2lkIjoiMzFhOGE5MzMtYWFmZC00YzY3LWFmMmEtOTg3MmM0YzAwMGEwIiwiZXhwIjoxNzIzMzA5NjU3LCJpc3MiOiJKV1RBdXRoZW50aWNhdGlvblNlcnZlciIsImF1ZCI6IkppcmFDbG91ZCJ9.KLhYQTKQAasCCHwHuJcisgv64tgJiA04uq75wfI2aXU";
 		await storage.setSecret(STORAGE.TOKEN, data.token);
 		await storage.set(STORAGE.IS_AUTHENTICATED, true);
 	}

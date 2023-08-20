@@ -22,4 +22,22 @@ async function getWorkforceParamter(projectId) {
 	}
 }
 
-export { saveParameters, getWorkforceParamter };
+async function GetEstimateOverallWorkforce(projectId) {
+	try {
+		let response = await APIServices.get("/api/Algorithm/GetEstimateOverallWorkforce", {projectId: projectId});
+		return response;
+	} catch (error) {
+		return Promise.reject(error);
+	}
+}
+
+async function getExecuteAlgorithmDailyLimted(projectId) {
+	try {
+		let response = await APIServices.get("/api/Algorithm/GetExecuteAlgorithmDailyLimited", {});
+		return response;
+	} catch (error) {
+		return Promise.reject(error);
+	}
+}
+
+export { saveParameters, getWorkforceParamter, GetEstimateOverallWorkforce, getExecuteAlgorithmDailyLimted };

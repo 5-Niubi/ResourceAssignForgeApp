@@ -1,64 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import TaskDetail from "./TaskDetail";
-import { Field, Label } from "@atlaskit/form";
-import { DatePicker } from "@atlaskit/datetime-picker";
 import PertChart from "./PertChart";
 import { invoke } from "@forge/bridge";
 import { Content, Main, PageLayout, RightSidebar } from "@atlaskit/page-layout";
 import TasksCompact from "./TasksCompact";
 import Toastify from "../../../common/Toastify";
 import PageHeader from "@atlaskit/page-header";
-import Button, { ButtonGroup, LoadingButton } from "@atlaskit/button";
+import Button, { LoadingButton } from "@atlaskit/button";
 import "./style.css";
-
-export const colorsBank = [
-	"#FF5733",
-	"#A569BD",
-	"#85C1E9",
-	"#F4D03F",
-	"#58D68D",
-	"#CD6155",
-	"#F7DC6F",
-	"#5DADE2",
-	"#F5B7B1",
-	"#48C9B0",
-	"#F8C471",
-	"#7FB3D5",
-	"#82E0AA",
-	"#EC7063",
-	"#F9E79F",
-	"#5499C7",
-	"#FAD7A0",
-	"#5DADE2",
-	"#F1948A",
-	"#ABEBC6",
-	"#F4D03F",
-	"#85C1E9",
-	"#E59866",
-	"#82E0AA",
-	"#F8C471",
-	"#E6B0AA",
-	"#5499C7",
-	"#F7DC6F",
-	"#A569BD",
-	"#FAD7A0",
-];
-
-/**
- * Find an object in a list of objects by its id
- * @param {array} arr
- * @param {*} id
- * @returns object | null
- */
-export const findObj = (arr, id) => {
-	for (let i = 0; i < arr.length; i++) {
-		if (arr[i].id == id) {
-			return arr[i];
-		}
-	}
-	return null;
-};
+import { cache, extractErrorMessage, findObj, getCache } from "../../../common/utils";
+import ChevronRightCircleIcon from "@atlaskit/icon/glyph/chevron-right-circle";
+import ChevronLeftCircleIcon from "@atlaskit/icon/glyph/chevron-left-circle";
 
 /**
  * Using as Page to show pert chart and task dependences
@@ -74,23 +27,30 @@ function VisualizeTasksPage({ handleChangeTab }) {
 
 	const [isSaving, setIsSaving] = useState(false);
 	const [isEstimating, setIsEstimating] = useState(false);
+	const [tasksError, setTasksError] = useState([]);
+
+	const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false);
+	const handleCollapseRightPanel = () => {
+		document.getElementsByClassName("tasks-compact")[0].classList.toggle("-collapsed");
+		setRightPanelCollapsed(document.getElementsByClassName("tasks-compact")[0].classList.contains("-collapsed"));
+	};
 
 	function handleEstimate() {
 		setIsEstimating(true);
 		invoke("estimate", { projectId })
 			.then(function (res) {
-				// console.log(res);
-				if (res.id || res.id === 0){
-					Toastify.info("Estimated successfully");
+				setIsEstimating(false);
+				if (res.id || res.id === 0) {
+					Toastify.success("Estimated successfully");
 					localStorage.setItem("estimation", JSON.stringify(res));
 					//move to next tab
 					handleChangeTab(1);
-					setIsEstimating(false);
 				} else {
 					Toastify.error("Error in estimate");
 				}
 			})
 			.catch(function (error) {
+				setIsEstimating(false);
 				console.log(error);
 				Toastify.error(error.toString());
 			});
@@ -119,83 +79,123 @@ function VisualizeTasksPage({ handleChangeTab }) {
 
 		invoke("saveTasks", { tasks: data })
 			.then(function (res) {
-				if (res) {
-					Toastify.info("Saved successfully");
+				setIsSaving(false);
+				//function return true or list of error task
+				if (res == true) {
 					setCanEstimate(true);
-					setIsSaving(false);
+					setTasksError([]);
+					Toastify.success("Saved successfully");
 				}
 			})
 			.catch(function (error) {
+				setCanEstimate(false);
+				setIsSaving(false);
 				console.log(error);
-				Toastify.error(error.toString());
+				let errorMsg = extractErrorMessage(error);
+				if (errorMsg.message){
+					console.log(errorMsg.message);
+					Toastify.error(errorMsg.message);
+				} else {
+					var tasksError = [];
+					errorMsg.forEach((e) =>{
+						let task = findObj(tasks, e.taskId);
+						if (task){
+							tasksError.push(e);
+							Toastify.error(`${task.name}: ${e.messages}`);
+						}
+					});
+					setTasksError(tasksError);
+				}
 			});
-	}
-
-	//get from Local Storage
-	var tasksData = JSON.parse(localStorage.getItem("tasks"));
-	if (!tasksData) {
-		tasksData = [];
-	}
-	var selectedData = JSON.parse(localStorage.getItem("selected"));
-	if (!selectedData) {
-		selectedData = [];
 	}
 
 	//tasks represent list of all tasks in the pool of current project
 	//-which are shown in the right panel
-	const [tasks, setTasks] = useState([]);
-	const [skills, setSkills] = useState([]);
-	const [milestones, setMilestones] = useState([]);
+	var tasksCache = getCache("tasks");
+	if (!tasksCache) {
+		tasksCache = [];
+	} else {
+		tasksCache = JSON.parse(tasksCache);
+	}
+
+	var skillsCache = getCache("skills");
+	if (!skillsCache) {
+		skillsCache = [];
+	} else {
+		skillsCache = JSON.parse(skillsCache);
+	}
+
+	var milestonesCache = getCache("milestones");
+	if (!milestonesCache) {
+		milestonesCache = [];
+	} else {
+		milestonesCache = JSON.parse(milestonesCache);
+	}
+	const [tasks, setTasks] = useState(tasksCache);
+	const [skills, setSkills] = useState(skillsCache);
+	const [milestones, setMilestones] = useState(milestonesCache);
+	const [loadingTasks, setLoadingTasks] = useState(tasks.length == 0);
 	useEffect(function () {
-		invoke("getTasksList", { projectId: Number(projectId) })
-			.then(function (res) {
-				// if (!tasksData || tasksData.length === 0) {
-				// }
-				setTasks(res);
+		setLoadingTasks(false);
+		var tasksCache = getCache("tasks");
+		if (!tasksCache) {
+			setLoadingTasks(true);
+			invoke("getTasksList", { projectId })
+				.then(function (res) {
+					setLoadingTasks(false);
+					if (res) {
+						setTasks(res);
+						cache("tasks", JSON.stringify(res));
+					}
+				})
+				.catch(function (error) {
+					setLoadingTasks(false);
+					console.log(error);
+					Toastify.error(error.toString());
+				});
+		}
 
-				// storage.set("projectId", projectId);
-				// storage.set("tasks", JSON.stringify(tasks));
-			})
-			.catch(function (error) {
-				console.log(error);
-				Toastify.error(error.toString());
-			});
-		setTasks(tasksData);
+		var skillsCache = getCache("skills");
+		if (!skillsCache) {
+			invoke("getAllSkills", {})
+				.then(function (res) {
+					if (Object.keys(res).length !== 0) {
+						setSkills(res);
+						cache("skills", JSON.stringify(res));
+					}
+				})
+				.catch(function (error) {
+					console.log(error);
+					Toastify.error(error.toString());
+				});
+		}
 
-		invoke("getAllSkills", {})
-			.then(function (res) {
-				if (Object.keys(res).length !== 0) {
-					setSkills(res);
-				} else setSkills([]);
-			})
-			.catch(function (error) {
-				console.log(error);
-				Toastify.error(error.toString());
-			});
-		setSkills([]);
-
-		invoke("getAllMilestones", { projectId })
-			.then(function (res) {
-				if (Object.keys(res).length !== 0) {
-					setMilestones(res);
-				} else setMilestones([]);
-			})
-			.catch(function (error) {
-				console.log(error);
-				Toastify.error(error.toString());
-			});
-		setMilestones([]);
-		return;
+		var milestonesCache = getCache("milestones");
+		if (!milestonesCache) {
+			invoke("getAllMilestones", { projectId })
+				.then(function (res) {
+					if (Object.keys(res).length !== 0) {
+						setMilestones(res);
+						cache("milestones", JSON.stringify(res));
+					}
+				})
+				.catch(function (error) {
+					console.log(error);
+					Toastify.error(error.toString());
+				});
+		}
 	}, []);
 
 	//currentTask represents the selected task to be shown in the bottom panel
-	const [currentTaskId, setCurrentTaskId] = useState(null);
+	const [currentTaskId, setCurrentTaskId] = useState(
+		tasks.length ? tasks[0].id : null
+	);
 	const updateCurrentTaskId = (taskId) => {
 		setCurrentTaskId(taskId);
 	};
 
 	//selectedTask represents the all the tasks that are currently selected for the pert chart
-	const [selectedIds, setSelectedIds] = useState(selectedData);
+	const [selectedIds, setSelectedIds] = useState([]);
 	const updateSelectedTaskIds = (taskIds) => {
 		setSelectedIds(taskIds);
 	};
@@ -215,16 +215,23 @@ function VisualizeTasksPage({ handleChangeTab }) {
 		setTaskMilestoneChanged(dataChanged);
 	};
 
-	const updateTasks = (tasks) => {
-		setTasks(tasks);
+	const [currentTaskChanged, setCurrentTaskChanged] = useState(null);
+	const updateCurrentTaskChanged = (dataChanged) => {
+		setCurrentTaskChanged(dataChanged);
 	};
 
-	useEffect(() => {
-		localStorage.setItem("selected", JSON.stringify(selectedIds));
-		localStorage.setItem("tasks", JSON.stringify(tasks));
-		localStorage.setItem("milestones", JSON.stringify(milestones));
-		localStorage.setItem("skills", JSON.stringify(skills));
-	}, [selectedIds, tasks, milestones, skills]);
+	const updateTasks = (tasks) => {
+		cache("tasks", JSON.stringify(tasks));
+		setTasks(tasks);
+	};
+	const updateSkills = (skills) => {
+		cache("skills", JSON.stringify(skills));
+		setSkills(skills);
+	};
+	const updateMilestones = (milestones) => {
+		cache("milestones", JSON.stringify(milestones));
+		setMilestones(milestones);
+	};
 
 	const actionsContent = (
 		<div
@@ -236,30 +243,24 @@ function VisualizeTasksPage({ handleChangeTab }) {
 			}}
 		>
 			{canEstimate ? (
-				isEstimating ? (
-					<LoadingButton appearance="primary" isLoading>
-						Estimating...
-					</LoadingButton>
-				) : (
-					<Button appearance="primary" onClick={handleEstimate}>
-						Estimate
-					</Button>
-				)
-			) : isSaving ? (
-				<LoadingButton appearance="primary" isLoading>
-					Saving...
-				</LoadingButton>
+				<LoadingButton
+				appearance="primary"
+				isLoading={isEstimating}
+				onClick={handleEstimate}
+			>
+				Estimate
+			</LoadingButton>
 			) : (
-				<Button appearance="primary" onClick={handleSave}>
+				<LoadingButton isLoading={isSaving} onClick={handleSave}>
 					Save
-				</Button>
+				</LoadingButton>
 			)}
+			
 		</div>
 	);
 
 	return (
-		<div class="visualize-tasks" style={{ width: "100%", height: "90vh" }}>
-			{/* {console.log("Render")} */}
+		<div class="visualize-tasks">
 			<PageLayout>
 				<Content>
 					<Main testId="main2" id="main2">
@@ -286,17 +287,21 @@ function VisualizeTasksPage({ handleChangeTab }) {
 								updateDependenciesChanged
 							}
 							updateTaskSkillsChanged={updateTaskSkillsChanged}
-							updateTaskMilestoneChanged={updateTaskMilestoneChanged}
+							updateCurrentTaskChanged={updateCurrentTaskChanged}
+							updateTaskMilestoneChanged={
+								updateTaskMilestoneChanged
+							}
 							updateCanEstimate={updateCanEstimate}
+							updateSkills={updateSkills}
+							updateMilestones={updateMilestones}
 						/>
 					</Main>
 					<div
+						className="right-sidebar tasks-compact"
 						style={{
-							backgroundColor: "#fafbfc",
 							boxSizing: "border-box",
 							borderLeft: "1px solid #e5e5e5",
 							marginLeft: "2rem",
-							marginRight: "-2rem",
 						}}
 					>
 						<RightSidebar
@@ -304,8 +309,18 @@ function VisualizeTasksPage({ handleChangeTab }) {
 							id="right-sidebar"
 							skipLinkTitle="Right Sidebar"
 							isFixed={false}
-							width={400}
+							width={300}
 						>
+							<div
+								className="collapse-button"
+								onClick={handleCollapseRightPanel}
+							>
+								{rightPanelCollapsed ? (
+									<ChevronLeftCircleIcon />
+								) : (
+									<ChevronRightCircleIcon />
+								)}
+							</div>
 							<div
 								style={{
 									minHeight: "95vh",
@@ -315,12 +330,17 @@ function VisualizeTasksPage({ handleChangeTab }) {
 							>
 								<TasksCompact
 									tasks={tasks}
+									loadingTasks={loadingTasks}
+									tasksError={tasksError}
 									milestones={milestones}
 									skills={skills}
 									selectedIds={selectedIds}
+									currentTaskId={currentTaskId}
 									setSelectedIds={updateSelectedTaskIds}
 									updateCurrentTaskId={updateCurrentTaskId}
 									updateTasks={updateTasks}
+									updateSkills={updateSkills}
+									updateMilestones={updateMilestones}
 								/>
 							</div>
 						</RightSidebar>

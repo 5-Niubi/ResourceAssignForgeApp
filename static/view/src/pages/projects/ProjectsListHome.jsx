@@ -15,6 +15,7 @@ import DeleteProjectModal from "./modal/DeleteProjectModal";
 import Toastify from "../../common/Toastify";
 import EmptyState from "@atlaskit/empty-state";
 import Button from "@atlaskit/button";
+import { cache, clearAllCache, getCache, getCacheObject } from "../../common/utils";
 
 const width = MODAL_WIDTH.M;
 const modalInitState = { project: {}, isOpen: false };
@@ -22,7 +23,7 @@ export const ModalStateContext = createContext();
 const columns = 10;
 
 function ProjectListHome() {
-	
+	clearAllCache();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const isDesktopOrLaptop = useMediaQuery({
 		query: `(min-width: ${MEDIA_QUERY.DESKTOP_LAPTOP.MIN}px)`,
@@ -38,20 +39,26 @@ function ProjectListHome() {
 		searchParams.get("q") ? searchParams.get("q") : ""
 	);
 
-	const [projects, setProjects] = useState([]);
+	let projectsCache = getCacheObject("projects", []);
+	const [projects, setProjects] = useState(projectsCache);
 	const [projectsForDisplay, setProjectsForDisplay] = useState(projects);
 
-	const filterProjectName = useCallback(function (projects, query) {
-		setProjectsForDisplay(
-			projects.filter((e) => e.name.toLowerCase().includes(query.toLowerCase()))
-		);
-	}, [projects]);
+	const filterProjectName = useCallback(
+		function (projects, query) {
+			setProjectsForDisplay(
+				projects.filter((e) =>
+					e.name.toLowerCase().includes(query.toLowerCase())
+				)
+			);
+		},
+		[projects]
+	);
 
 	useEffect(
 		function () {
 			filterProjectName(projects, searchBoxValue);
 		},
-		[projects]
+		[projects, searchBoxValue]
 	);
 	useEffect(function () {
 		invoke("getProjectsList")
@@ -65,12 +72,15 @@ function ProjectListHome() {
 						imageAvatar: project.imageAvatar,
 						name: project.name,
 						startDate: project.startDate,
+						deadline: project.deadline,
 						tasks: project.taskCount,
+						createDatetime: project.createDatetime,
 					};
 					projectsList.push(itemProject);
 				}
 				setProjects(projectsList);
 				filterProjectName(projectsList, searchBoxValue);
+				cache("projects", JSON.stringify(projectsList));
 			})
 			.catch(function (error) {
 				setProjectTableLoadingState(false);
@@ -113,7 +123,7 @@ function ProjectListHome() {
 					</GridColumn>
 				) : (
 					<>
-						<GridColumn medium={isDesktopOrLaptop ? 7 : columns}>
+						<GridColumn medium={columns}>
 							<div style={{ marginBottom: "1rem" }}>
 								<ModalStateContext.Provider
 									value={{ setModalEditState, setModalDeleteState }}
@@ -125,9 +135,9 @@ function ProjectListHome() {
 								</ModalStateContext.Provider>
 							</div>
 						</GridColumn>
-						<Desktop>
-							<GridColumn medium={3}>{/* <div>Hover panel</div> */}</GridColumn>
-						</Desktop>
+						{/* <Desktop>
+							<GridColumn medium={0}><div>Hover panel</div></GridColumn>
+						</Desktop> */}
 					</>
 				)}
 			</Grid>

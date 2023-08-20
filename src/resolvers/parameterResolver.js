@@ -13,6 +13,8 @@ function parameterResolver(resolver) {
 			return response;
 		} catch (error) {
 			console.log("Error in save parameters: ", error);
+			throw new Error(JSON.stringify(error));
+
 			return Promise.reject(error);
 		}
 	});
@@ -24,9 +26,38 @@ function parameterResolver(resolver) {
 			return response;
 		} catch (error) {
 			console.log("Error in workforce parameters: ", error);
+			throw new Error(JSON.stringify(error));
+
 			return Promise.reject(error);
 		}
 	});
+
+    resolver.define("getEstimateOverallWorkforce", async function (req) {
+		try {
+			let response = await parameterService.GetEstimateOverallWorkforce(req.payload.projectId);
+			console.log("GetEstimateOverallWorkforce: ", response);
+			return response;
+		} catch (error) {
+			console.log("Error in GetEstimateOverallWorkforce: ", error);
+			throw new Error(JSON.stringify(error));
+
+			return Promise.reject(error);
+		}
+	});
+
+    resolver.define("getExecuteAlgorithmDailyLimited", async function () {
+		try {
+			let response = await parameterService.getExecuteAlgorithmDailyLimted({});
+			console.log("getExecuteAlgorithmDailyLimited: ", response);
+			return response;
+		} catch (error) {
+			console.log("Error in getExecuteAlgorithmDailyLimited: ", error);
+			throw new Error(JSON.stringify(error));
+
+			return Promise.reject(error);
+		}
+	});
+    
 }
 
 export default parameterResolver;

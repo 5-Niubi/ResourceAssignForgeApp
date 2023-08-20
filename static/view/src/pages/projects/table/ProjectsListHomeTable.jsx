@@ -3,9 +3,6 @@ import TableTree, { Rows } from "@atlaskit/table-tree";
 import React, { useCallback, useState } from "react";
 import Link from "../../../components/common/Link";
 import ProjectActionDropdown from "../dropdown/ProjectActionDropdown";
-import DeleteProjectModal from "../modal/DeleteProjectModal";
-import EditProjectModal from "../modal/EditProjectModal";
-import { ModalDialog } from "@forge/ui";
 import { formatDateDMY } from "../../../common/utils";
 
 function ProjectsListHomeTable({ items }) {

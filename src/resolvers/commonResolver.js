@@ -21,18 +21,21 @@ function commonResolver(resolver) {
 				authenUrl,
 			});
 		} catch (error) {
-			return Promise.reject(error);
+			throw new Error(JSON.stringify(error));
+			// return Promise.reject(error);
 		}
 	});
 
 	resolver.define("getIsAuthenticated", async function (req) {
 		try {
 			let isAuthenticated = await storage.get("isAuthenticated");
+			console.log(STORAGE.TOKEN, ": ", await storage.getSecret(STORAGE.TOKEN));
 			return Promise.resolve({
 				isAuthenticated,
 			});
 		} catch (error) {
-			return Promise.reject(error);
+			throw new Error(JSON.stringify(error));
+			// return Promise.reject(error);
 		}
 	});
 
@@ -41,7 +44,8 @@ function commonResolver(resolver) {
 			await AuthenWithBE.handleUnauthorizedStatus();
 			return Promise.resolve();
 		} catch (error) {
-			return Promise.reject(error);
+			throw new Error(JSON.stringify(error));
+			// return Promise.reject(error);
 		}
 	});
 

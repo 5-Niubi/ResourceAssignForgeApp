@@ -1,11 +1,11 @@
-import RoadmapIcon from "@atlaskit/icon/glyph/roadmap";
-import IssuesIcon from "@atlaskit/icon/glyph/issues";
-import GraphLineIcon from "@atlaskit/icon/glyph/graph-line";
 import ArrowLeftCircleIcon from "@atlaskit/icon/glyph/arrow-left-circle";
+import IssuesIcon from "@atlaskit/icon/glyph/issues";
+import RoadmapIcon from "@atlaskit/icon/glyph/roadmap";
 import { ButtonItem } from "@atlaskit/side-navigation";
-import { invoke } from "@forge/bridge";
 import Spinner from "@atlaskit/spinner";
+import { invoke } from "@forge/bridge";
 
+import Avatar from "@atlaskit/avatar";
 import {
 	Header,
 	NavigationFooter,
@@ -15,11 +15,11 @@ import {
 	SideNavigation,
 } from "@atlaskit/side-navigation";
 import React, { useEffect, useState } from "react";
-import ButtonItemSideBar from "./ButtonItemSideBar";
 import { useNavigate, useParams } from "react-router";
-import { AtlassianIcon } from "@atlaskit/logo";
+import { APP_NAME, PROJECT_NAME_DESCRIPTOR } from "../../common/contants";
+import ButtonItemSideBar from "./ButtonItemSideBar";
 
-function ProjectSideBar(rootPath = "") {
+function ProjectSideBar({ rootPath = "" }) {
 	const navigate = useNavigate();
 	const [projectSidebar, setProjectSidebar] = useState(Object);
 	const { projectId } = useParams();
@@ -36,8 +36,15 @@ function ProjectSideBar(rootPath = "") {
 		<SideNavigation label="project" testId="side-navigation">
 			<NavigationHeader>
 				<Header
-					description="Sidebar header description"
-					iconBefore={<AtlassianIcon appearance="neutral" />}
+					description={PROJECT_NAME_DESCRIPTOR}
+					iconBefore={
+						<Avatar
+							size="small"
+							appearance="square"
+							src={""}
+							name="Project Avatar"
+						/>
+					}
 				>
 					{projectSidebar.name ? (
 						projectSidebar.name
@@ -74,18 +81,13 @@ function ProjectSideBar(rootPath = "") {
 						pathTo={"tasks"}
 						iconBefore={<IssuesIcon label="" />}
 					/>
-					<ButtonItemSideBar
-						key="reports"
-						rootPath={rootPath}
-						text={"Reports"}
-						pathTo={"reports"}
-						iconBefore={<GraphLineIcon label="" />}
-					/>
 				</Section>
 			</NestableNavigationContent>
 
 			<NavigationFooter>
-				<div></div>
+				<p style={{ textAlign: "center", fontSize: "12px" }}>
+					You are in {APP_NAME}
+				</p>
 			</NavigationFooter>
 		</SideNavigation>
 	);

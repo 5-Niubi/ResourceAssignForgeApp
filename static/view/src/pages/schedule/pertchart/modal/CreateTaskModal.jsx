@@ -5,15 +5,14 @@ import Modal, {
 	ModalHeader,
 	ModalTitle,
 	ModalTransition,
-	useModal,
 } from "@atlaskit/modal-dialog";
-import Select from "@atlaskit/select";
-import { Grid, GridColumn } from "@atlaskit/page";
+import Select, { CreatableSelect } from "@atlaskit/select";
 import React, { Fragment, useState, useCallback, useEffect } from "react";
 import TextField from "@atlaskit/textfield";
 import Form, { Field, FormSection } from "@atlaskit/form";
 import { invoke } from "@forge/bridge";
-import { findObj } from "../VisualizeTasks";
+import { cache, extractErrorMessage, findObj } from "../../../../common/utils";
+import Toastify from "../../../../common/Toastify";
 
 function CreateTaskModal({
 	isOpen,
@@ -24,17 +23,38 @@ function CreateTaskModal({
 	skills,
 	updateTasks,
 	updateCurrentTaskId,
+	updateSkills,
+	updateMilestones,
+	taskEdit,
+	updateTaskEdit,
 }) {
-	const [taskName, setTaskName] = useState("");
-	const [duration, setDuration] = useState(0);
-	const [milestone, setMilestone] = useState(null);
-	const [reqSkills, setReqSkills] = useState([]);
-	const [precedences, setPrecedences] = useState([]);
+	const [taskName, setTaskName] = useState(taskEdit ? taskEdit.name : "");
+	const [duration, setDuration] = useState(taskEdit ? taskEdit.duration : 0);
 
+	var initMilestone = null;
+	if (taskEdit) {
+		initMilestone = findObj(milestones, taskEdit.milestoneId);
+		if (initMilestone) {
+			initMilestone = {
+				value: initMilestone.id,
+				label: initMilestone.name,
+			};
+		}
+	}
+	const [milestone, setMilestone] = useState(initMilestone);
+	const [reqSkills, setReqSkills] = useState(
+		taskEdit ? taskEdit.skillRequireds : []
+	);
+	const [precedences, setPrecedences] = useState(
+		taskEdit ? taskEdit.precedences : []
+	);
+
+	const [ms, setMilestones] = useState(milestones);
+	const [skillsPage, setSkillsPage] = useState(skills);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	var milestoneOpts = [];
-	milestones?.forEach((milestone) => {
+	ms?.forEach((milestone) => {
 		milestoneOpts.push({
 			value: milestone.id,
 			label: milestone.name,
@@ -54,7 +74,7 @@ function CreateTaskModal({
 
 	var skillOpts = [];
 	var skillValues = [];
-	skills?.forEach((skill) => {
+	skillsPage?.forEach((skill) => {
 		for (let i = 1; i <= 5; i++) {
 			skillOpts.push({
 				value: skill.id + "-" + i,
@@ -63,7 +83,7 @@ function CreateTaskModal({
 		}
 	});
 	reqSkills?.forEach((s) => {
-		var skill = findObj(skills, s.skillId);
+		var skill = findObj(skillsPage, s.skillId);
 		if (skill) {
 			skillValues.push({
 				value: skill.id + "-" + s.level,
@@ -83,12 +103,16 @@ function CreateTaskModal({
 	}, []);
 
 	const updateMilestone = useCallback(function (objValue) {
-		var milestone = findObj(milestones, objValue.value);
-		if (milestone) {
-			setMilestone({
-				value: milestone.id,
-				label: milestone.name,
-			});
+		if (!objValue) {
+			setMilestone(null);
+		} else {
+			var milestone = findObj(ms, objValue.value);
+			if (milestone) {
+				setMilestone({
+					value: milestone.id,
+					label: milestone.name,
+				});
+			}
 		}
 	}, []);
 
@@ -97,18 +121,72 @@ function CreateTaskModal({
 		values?.forEach((item) => {
 			var items = item.value.split("-");
 			if (items.length != 2) return;
-			skills.push({ skillId: items[0], level: items[1] });
+
+			//check duplicate skill; update leve if needed
+			let existed = false;
+			skills?.forEach((s) => {
+				if (s.skillId == items[0]) {
+					s.level = items[1];
+					existed = true;
+				}
+			});
+			if (!existed) {
+				skills.push({ skillId: items[0], level: items[1] });
+			}
 		});
 		setReqSkills(skills);
 	}, []);
 
 	const updatePrecedences = useCallback(function (values) {
 		var pres = [];
-		values?.forEach((item) =>
-			pres.push({ precedenceId: item.value })
-		);
+		values?.forEach((item) => pres.push({ precedenceId: item.value }));
 		setPrecedences(pres);
 	}, []);
+
+	const handleCreateMilestone = (inputValue) => {
+		let reqMilestone = {
+			Name: inputValue,
+			ProjectId: projectId,
+		};
+		setIsSubmitting(true);
+		invoke("createMilestone", { milestoneObjRequest: reqMilestone })
+			.then(function (res) {
+				setIsSubmitting(false);
+				if (res.id) {
+					setMilestones([...ms, res]);
+					setMilestone({
+						value: res.id,
+						label: res.name,
+					});
+					cache("milestones", JSON.stringify([...ms, res]));
+				}
+			})
+			.catch((error) => {
+				setIsSubmitting(false);
+				console.log(error);
+				Toastify.error(error.toString());
+			});
+	};
+
+	const handleCreateSkill = (inputValue) => {
+		setIsSubmitting(true);
+		invoke("createSkill", { skillReq: { name: inputValue } })
+			.then(function (res) {
+				setIsSubmitting(false);
+				if (res.id) {
+					setSkillsPage([...skillsPage, res]);
+
+					setReqSkills([...reqSkills, { skillId: res.id, level: 1 }]);
+
+					cache("skills", JSON.stringify([...skillsPage, res]));
+				}
+			})
+			.catch((error) => {
+				setIsSubmitting(false);
+				console.log(error);
+				Toastify.error(error.toString());
+			});
+	};
 
 	useEffect(function () {
 		setIsSubmitting(false);
@@ -131,18 +209,60 @@ function CreateTaskModal({
 			skillRequireds: reqSkills,
 			precedences,
 		};
-		invoke("createNewTask", { taskObjRequest })
-			.then(function (res) {
-				// setProjectsDisplay((prevs) => [res, ...prevs]);
-				console.log(res);
-				if (res.id){
-					tasks.push(res);
-					updateTasks(tasks);
-					updateCurrentTaskId(res.id);
-				}
-				closeModal();
-			})
-			.catch();
+		if (taskEdit) {
+			taskObjRequest.id = taskEdit.id;
+			//update current task
+			invoke("updateTask", { task: taskObjRequest })
+				.then(function (res) {
+					setIsSubmitting(false);
+					if (res.id) {
+						for(let i=0; i<tasks.length; i++) {
+							if (tasks[i].id == res.id) tasks[i] = res;
+						};
+						updateTasks(tasks);
+						if (updateTaskEdit){
+							updateTaskEdit({...taskEdit});
+						}
+						updateSkills(skillsPage);
+						updateMilestones(ms);
+						Toastify.success("Updated task successfully");
+						closeModal();
+					} else if (res.messages) {
+						Toastify.error(res.messages);
+					}
+				})
+				.catch((error) => {
+					setIsSubmitting(false);
+					let errorMsg = extractErrorMessage(error);
+					console.log(errorMsg.message);
+					Toastify.error(errorMsg.message);
+				});
+		} else {
+			//create new
+			invoke("createNewTask", { taskObjRequest })
+				.then(function (res) {
+					setIsSubmitting(false);
+					if (res.id) {
+						tasks.push(res);
+						updateTasks(tasks);
+						if (updateCurrentTaskId) {
+							updateCurrentTaskId(res.id);
+						}
+						updateSkills(skillsPage);
+						updateMilestones(ms);
+						Toastify.success("Created task successfully");
+						closeModal();
+					} else if (res.messages) {
+						Toastify.error(res.messages);
+					}
+				})
+				.catch((error) => {
+					setIsSubmitting(false);
+					let errorMsg = extractErrorMessage(error);
+					console.log(errorMsg.message);
+					Toastify.error(errorMsg.message);
+				});
+		}
 	}
 
 	return (
@@ -157,7 +277,9 @@ function CreateTaskModal({
 						{({ formProps }) => (
 							<form id="form-with-id" {...formProps}>
 								<ModalHeader>
-									<ModalTitle>Create new Task</ModalTitle>
+									<ModalTitle>
+										{taskEdit ? "Edit task" : "Create new task"}
+									</ModalTitle>
 								</ModalHeader>
 								<ModalBody>
 									<FormSection>
@@ -175,8 +297,7 @@ function CreateTaskModal({
 												/>
 											)}
 										</Field>
-									</FormSection>
-									<FormSection>
+
 										<Field
 											name="duration"
 											label="Duration"
@@ -187,28 +308,43 @@ function CreateTaskModal({
 													autoComplete="off"
 													value={duration}
 													onChange={updateDuration}
+													elemAfterInput={
+														<span
+															style={{
+																paddingRight:
+																	"10px",
+															}}
+														>
+															DAYS
+														</span>
+													}
 												/>
 											)}
 										</Field>
 										<Field
-											label="Milestone"
+											label="Group"
 											name="milestone"
 											defaultValue=""
 											isRequired
 										>
 											{({ fieldProps }) => (
 												<Fragment>
-													<Select
+													<CreatableSelect
 														{...fieldProps}
 														inputId="select-milestone"
 														className="select-milestone"
+														isClearable
 														options={milestoneOpts}
 														value={milestone}
 														onChange={
 															updateMilestone
 														}
+														onCreateOption={
+															handleCreateMilestone
+														}
 														isSearchable={true}
-														placeholder="Choose milestone"
+														placeholder="Choose group"
+														menuPosition="fixed"
 													/>
 												</Fragment>
 											)}
@@ -217,22 +353,27 @@ function CreateTaskModal({
 											label="Required skills"
 											name="skills"
 											defaultValue=""
+											isRequired={true}
 										>
 											{({ fieldProps }) => (
 												<Fragment>
-													<Select
+													<CreatableSelect
 														{...fieldProps}
-														inputId="multi-select-example"
-														className="multi-select"
-														classNamePrefix="react-select"
+														inputId="select-skills"
+														className="select-skills"
+														isClearable
 														options={skillOpts}
 														value={skillValues}
-														isMulti
-														isSearchable={true}
 														onChange={
 															updateReqSkills
 														}
+														onCreateOption={
+															handleCreateSkill
+														}
+														isMulti
+														isSearchable={true}
 														placeholder="Choose skills"
+														menuPosition="fixed"
 													/>
 												</Fragment>
 											)}
@@ -257,6 +398,7 @@ function CreateTaskModal({
 														isMulti
 														isSearchable={true}
 														placeholder="Choose precedence tasks"
+														menuPosition="fixed"
 													/>
 												</Fragment>
 											)}
@@ -276,14 +418,16 @@ function CreateTaskModal({
 											<LoadingButton
 												appearance="primary"
 												isLoading
-											>Saving...</LoadingButton>
+											>
+												Saving...
+											</LoadingButton>
 										) : (
 											<Button
 												type="submit"
 												appearance="primary"
 												onClick={handleSubmitCreate}
 											>
-												Create
+												{taskEdit ? "Save" : "Create"}
 											</Button>
 										)}
 									</ButtonGroup>

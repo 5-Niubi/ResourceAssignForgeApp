@@ -1,10 +1,11 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as go from "gojs";
 import "gojs/extensions/DrawCommandHandler";
 import "gojs/extensions/Figures";
 import "gojs/extensions/GeometryReshapingTool";
-import { colorsBank, findObj } from "./VisualizeTasks";
-import { color } from "highcharts";
+import { findObj, getColor } from "../../../common/utils";
+import ChevronUpCircleIcon from "@atlaskit/icon/glyph/chevron-up-circle";
+import ChevronDownCircleIcon from "@atlaskit/icon/glyph/chevron-down-circle";
 
 const PertChart = ({
 	tasks,
@@ -266,7 +267,7 @@ const PertChart = ({
 					let color = "#fff";
 					for (let i = 0; i < milestones.length; i++) {
 						if (milestones[i].id == id) {
-							color = colorsBank[i % 30];
+							color = getColor(milestones[i].id);
 							break;
 						}
 					}
@@ -335,7 +336,7 @@ const PertChart = ({
 					let color = blue;
 					for (let i = 0; i < milestones.length; i++) {
 						if (milestones[i].id == obj.part.data.id) {
-							color = colorsBank[i % 30];
+							color = getColor(milestones[i].id);
 							break;
 						}
 					}
@@ -347,7 +348,7 @@ const PertChart = ({
 					let color = blue;
 					for (let i = 0; i < milestones.length; i++) {
 						if (milestones[i].id == part.data.id) {
-							color = colorsBank[i % 30];
+							color = getColor(milestones[i].id);
 							break;
 						}
 					}
@@ -438,7 +439,9 @@ const PertChart = ({
 			}
 			task.precedences?.forEach((pre) => {
 				var preObj = findObj(tasks, pre.precedenceId);
-				preObj.isNotEnd = true;
+				if (preObj){
+					preObj.isNotEnd = true;
+				}
 			});
 		});
 		tasks.forEach((task) => {
@@ -453,12 +456,32 @@ const PertChart = ({
 		});
 	}
 
+	const [chartExpanded, setChartExpanded] = useState(false);
+	const handleExpandChart = () => {
+		document
+			.getElementsByClassName("pert-chart")[0]
+			.classList.toggle("-expanded");
+		setChartExpanded(
+			document
+				.getElementsByClassName("pert-chart")[0]
+				.classList.contains("-expanded")
+		);
+	};
+
 	return (
-		<div
-			ref={diagramRef}
-			className="diagram-component"
-			style={{ height: "40vh", width: "100%" }}
-		></div>
+		<div className="pert-chart">
+			<div ref={diagramRef} className="diagram-component"></div>
+			<div
+				className="expand-button"
+				onClick={handleExpandChart}
+			>
+				{chartExpanded ? (
+					<ChevronUpCircleIcon />
+				) : (
+					<ChevronDownCircleIcon />
+				)}
+			</div>
+		</div>
 	);
 };
 

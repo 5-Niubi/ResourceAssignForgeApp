@@ -1,37 +1,41 @@
 import Button, { ButtonGroup, LoadingButton } from "@atlaskit/button";
+import { DatePicker } from "@atlaskit/datetime-picker";
+import Form, { Field, FormSection, HelperMessage } from "@atlaskit/form";
 import Modal, {
 	ModalBody,
 	ModalFooter,
 	ModalHeader,
-	ModalTitle,
 	ModalTransition,
-	useModal,
 } from "@atlaskit/modal-dialog";
 import { Grid, GridColumn } from "@atlaskit/page";
-import React, { Fragment, useState, useCallback, useEffect } from "react";
 import TextField from "@atlaskit/textfield";
-import Form, { Field, FormSection } from "@atlaskit/form";
-import { DatePicker } from "@atlaskit/datetime-picker";
-import ObjectiveRange from "../form/ObjectiveRange";
-import { getCurrentTime } from "../../../common/utils";
 import { invoke } from "@forge/bridge";
-import { DATE_FORMAT, MODAL_WIDTH } from "../../../common/contants";
+import React, { Fragment, useState } from "react";
+import { useNavigate } from "react-router";
 import Toastify from "../../../common/Toastify";
+import {
+	DATE_FORMAT,
+	DEFAULT_WORKING_TIMERANGE,
+	MODAL_WIDTH,
+} from "../../../common/contants";
+import { extractErrorMessage, getCurrentTime } from "../../../common/utils";
+import WorkingTimeHours from "../form/WorkingTimeHours";
+import InlineMessageGuideProjectField from "../message/InlineMessageGuideProjectField";
 
 const width = MODAL_WIDTH.M;
+
 function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 	const columns = 10;
+	const navigate = useNavigate();
 
 	const [projectName, setProjectName] = useState("");
 	const [startDate, setStartDate] = useState(getCurrentTime());
 	const [endDate, setEndDate] = useState(startDate);
 	const [budget, setBudget] = useState(0);
-	const [unit, setUnit] = useState("");
-	const [objTime, setObjTime] = useState(50);
-	const [objCost, setObjCost] = useState(50);
-	const [objQuality, setObjQuality] = useState(50);
-
+	const [unit, setUnit] = useState("$");
+	const [baseWorkingHour, setBaseWorkingHour] = useState(0);
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const timeRangeValueState = useState(DEFAULT_WORKING_TIMERANGE);
 
 	const handleSetProjectName = function (e) {
 		setProjectName(e.target.value);
@@ -56,28 +60,9 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 		setUnit(e.target.value);
 	};
 
-	const handleSetObjTime = function (e) {
-		setObjTime(e.target.value);
-	};
-
-	const handleRangeSetObjTime = function (value) {
-		setObjTime(value);
-	};
-
-	const handleSetObjCost = function (e) {
-		setObjCost(e.target.value);
-	};
-
-	const handleRangeSetObjCost = function (value) {
-		setObjCost(value);
-	};
-
-	const handleSetObjQuality = function (e) {
-		setObjQuality(e.target.value);
-	};
-
-	const handleRangeSetObjQuality = function (value) {
-		setObjQuality(value);
+	const handleSetBaseWorkHour = function (e) {
+		let workHour = Number(e.target.value);
+		if (0 <= workHour && workHour <= 24) setBaseWorkingHour(workHour);
 	};
 
 	const closeModal = function () {
@@ -92,19 +77,21 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 			deadline: endDate,
 			budget,
 			budgetUnit: unit,
-			objectiveTime: objTime,
-			objectiveCost: objCost,
-			objectiveQuality: objQuality,
+			baseWorkingHour,
+			workingTimes: timeRangeValueState[0],
 		};
 		invoke("createNewProjectProjectLists", { projectObjRequest })
 			.then(function (res) {
 				res.tasks = 0;
 				setProjectsDisplay((prevs) => [res, ...prevs]);
 				closeModal();
+				navigate(`${res.id}/schedule`);
 			})
 			.catch((error) => {
 				setIsSubmitting(false);
-				Toastify.error(error.toString());
+
+				let errorMsg = extractErrorMessage(error);
+				Toastify.error(errorMsg.message || errorMsg.title || errorMsg);
 			});
 	}
 
@@ -117,7 +104,12 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 					{({ formProps }) => (
 						<form id="form-with-id" {...formProps}>
 							<ModalHeader>
-								<ModalTitle>Create new Software Project</ModalTitle>
+								<div>
+									<h2 style={{ display: "inline" }}>
+										Create new Software Project
+									</h2>
+									<InlineMessageGuideProjectField />
+								</div>
 							</ModalHeader>
 							<ModalBody>
 								<Grid layout="fluid" spacing="compact" columns={columns}>
@@ -127,18 +119,25 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 												aria-required={true}
 												name="projectName"
 												label="Project Name"
+												isRequired
 											>
-												{() => (
-													<TextField
-														autoComplete="off"
-														value={projectName}
-														onChange={handleSetProjectName}
-													/>
+												{(fieldProps) => (
+													<Fragment>
+														<TextField
+															autoComplete="off"
+															value={projectName}
+															onChange={handleSetProjectName}
+															{...fieldProps}
+														/>
+														<HelperMessage>
+															Project name must start with uppercase letter.
+														</HelperMessage>
+													</Fragment>
 												)}
 											</Field>
 										</FormSection>
 										<FormSection>
-											<Field name="startDate" label="Start Date" isRequired>
+											<Field name="startDate" label="Start Date">
 												{() => (
 													<Fragment>
 														<DatePicker
@@ -149,7 +148,7 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 													</Fragment>
 												)}
 											</Field>
-											<Field name="endDate" label="End Date" isRequired>
+											<Field name="endDate" label="End Date">
 												{() => (
 													<Fragment>
 														<DatePicker
@@ -165,11 +164,7 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 										<FormSection>
 											<Grid spacing="compact" columns={columns}>
 												<GridColumn medium={8}>
-													<Field
-														aria-required={true}
-														name="budget"
-														label="Budget"
-													>
+													<Field name="budget" label="Budget">
 														{() => (
 															<TextField
 																autoComplete="off"
@@ -181,53 +176,32 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 													</Field>
 												</GridColumn>
 												<GridColumn medium={2}>
-													<Field
-														aria-required={true}
-														name="budgetUnit"
-														label="Unit"
-													>
-														{() => (
+													<Field name="budgetUnit" label="Unit" isDisabled>
+														{(fieldProps) => (
 															<TextField
 																autoComplete="off"
 																value={unit}
 																onChange={handleSetUnit}
+																{...fieldProps}
 															/>
 														)}
 													</Field>
 												</GridColumn>
 											</Grid>
 										</FormSection>
-										{/* <FormSection>
-												<ObjectiveRange
-													label="Objective Time"
-													name="ObjectiveTime"
-													value={objTime}
-													onChange={handleSetObjTime}
-													rangeOnChange={
-														handleRangeSetObjTime
-													}
-												/>
-												<ObjectiveRange
-													name="ObjectiveCost"
-													label="Objective Cost"
-													value={objCost}
-													onChange={handleSetObjCost}
-													rangeOnChange={
-														handleRangeSetObjCost
-													}
-												/>
-												<ObjectiveRange
-													name="ObjectiveQuality"
-													label="Objective Quality"
-													value={objQuality}
-													onChange={
-														handleSetObjQuality
-													}
-													rangeOnChange={
-														handleRangeSetObjQuality
-													}
-												/>
-											</FormSection> */}
+										<FormSection>
+											<WorkingTimeHours
+												timeRangeValueState={timeRangeValueState}
+												isDisable={false}
+												label="Working Time Slots"
+												onSetBaseWorkingHours={setBaseWorkingHour}
+											/>
+
+											<hr style={{ marginTop: "1.5em" }} />
+											<p>
+												Total Working: <b>{baseWorkingHour}</b> Hours/Day
+											</p>
+										</FormSection>
 									</GridColumn>
 								</Grid>
 							</ModalBody>
@@ -237,19 +211,15 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 									<Button appearance="default" onClick={closeModal}>
 										Cancel
 									</Button>
-									{isSubmitting ? (
-										<LoadingButton appearance="primary" isLoading>
-											Create
-										</LoadingButton>
-									) : (
-										<Button
-											type="submit"
-											appearance="primary"
-											onClick={handleSubmitCreate}
-										>
-											Create
-										</Button>
-									)}
+
+									<LoadingButton
+										type="submit"
+										appearance="primary"
+										onClick={handleSubmitCreate}
+										isLoading={isSubmitting}
+									>
+										Create
+									</LoadingButton>
 								</ButtonGroup>
 							</ModalFooter>
 						</form>

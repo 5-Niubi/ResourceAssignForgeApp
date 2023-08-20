@@ -23,7 +23,7 @@ async function getThreadState() {
 	}
 }
 
-async function removeThreadState(threadId) {
+async function removeThreadState() {
 	try {
 		await storage.delete(STORAGE.THREAD_STATE);
 	} catch (error) {

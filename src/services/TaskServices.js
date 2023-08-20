@@ -18,6 +18,7 @@ async function createTask(taskRequest) {
 		);
 		return response;
 	} catch (error) {
+		// throw new Error(error.messages || "Error in create new task");
 		return Promise.reject(error);
 	}
 }
@@ -46,4 +47,29 @@ async function saveTasks(tasks) {
 	}
 }
 
-export { getTasks, createTask, getTask, saveTasks };
+async function updateTask(task) {
+	try {
+		let response = await APIServices.put(
+			`/api/Tasks/UpdateTask`,
+			null,
+			task
+		);
+		return response;
+	} catch (error) {
+		return Promise.reject(error);
+	}
+}
+
+async function deleteTask(id) {
+	try {
+		let response = await APIServices.delete(
+			`/api/Tasks/DeleteTask`,
+			{Id: id}
+		);
+		return response;
+	} catch (error) {
+		return Promise.reject(error);
+	}
+}
+
+export { getTasks, createTask, getTask, saveTasks, updateTask, deleteTask };
