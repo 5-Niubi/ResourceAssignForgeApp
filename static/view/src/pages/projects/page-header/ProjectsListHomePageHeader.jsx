@@ -40,8 +40,8 @@ function ProjecstListHomePageHeader({
 	);
 	return (
 		<PageHeader actions={actionsContent} bottomBar={barContent}>
-			<Heading level="h900">Choose Your Project To Start</Heading>
-			<Heading level="h400">Only Jira Software Project</Heading>
+			<Heading level="h900" as="div">Choose Your Project To Start</Heading>
+			<Heading level="h400" as="div">Only Jira Software Project</Heading>
 		</PageHeader>
 	);
 }

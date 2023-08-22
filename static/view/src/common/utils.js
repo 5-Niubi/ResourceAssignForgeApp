@@ -14,6 +14,9 @@ export function getCurrentTime() {
 }
 
 export function formatDateDMY(date) {
+	moment.updateLocale("us", {
+		invalidDate: "",
+	});
 	return moment(date).format("DD-MM-YYYY");
 }
 
@@ -248,7 +251,8 @@ export function milisecondToHours(miliseconds) {
 }
 
 export function validateIntegerOnly(value) {
-    //REQUIRES INTEGER NUMBER
+	//REQUIRES INTEGER NUMBER
+	debugger
 	if (!/^\d*$/.test(value)) {
 		return "Input integer Only.";
 	}

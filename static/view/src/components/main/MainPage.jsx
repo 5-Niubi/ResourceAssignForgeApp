@@ -40,7 +40,6 @@ function MainPage({ history, historyState }) {
 		}
 		invoke("getThreadStateInfo")
 			.then(function (res) {
-				console.log(res);
 				if (res.threadId)
 					setThreadStateValue({
 						threadId: res.threadId,
@@ -104,10 +103,10 @@ function MainPage({ history, historyState }) {
 									<Route path="/" element={<ProjectListHome />}></Route>
 									<Route path="/startup" element={<StartUpPage />}></Route>
 
-									<Route path="/resources" element={<ResourcesPage />}></Route>
+									<Route path="/employees" element={<ResourcesPage />}></Route>
 									<Route path="/skills" element={<SkillsPage />}></Route>
 									<Route path="/subscription" element={<MorePage />}></Route>
-									<Route path="/modals" element={<TestModal />}></Route>
+									{/* <Route path="/modals" element={<TestModal />}></Route> */}
 
 									<Route path="/:projectId">
 										<Route path="" element={<SchedulePage />}></Route>

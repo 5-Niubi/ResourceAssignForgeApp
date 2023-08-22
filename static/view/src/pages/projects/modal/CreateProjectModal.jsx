@@ -1,6 +1,6 @@
 import Button, { ButtonGroup, LoadingButton } from "@atlaskit/button";
 import { DatePicker } from "@atlaskit/datetime-picker";
-import Form, { Field, FormSection, HelperMessage } from "@atlaskit/form";
+import Form, { ErrorMessage, Field, FormSection, HelperMessage } from "@atlaskit/form";
 import Modal, {
 	ModalBody,
 	ModalFooter,
@@ -18,7 +18,11 @@ import {
 	DEFAULT_WORKING_TIMERANGE,
 	MODAL_WIDTH,
 } from "../../../common/contants";
-import { extractErrorMessage, getCurrentTime } from "../../../common/utils";
+import {
+	extractErrorMessage,
+	getCurrentTime,
+	validateIntegerOnly,
+} from "../../../common/utils";
 import WorkingTimeHours from "../form/WorkingTimeHours";
 import InlineMessageGuideProjectField from "../message/InlineMessageGuideProjectField";
 
@@ -99,7 +103,7 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 		<ModalTransition>
 			<Modal onClose={closeModal} width={width}>
 				<Form
-					onSubmit={(formState) => console.log("form submitted", formState)}
+					onSubmit={handleSubmitCreate}
 				>
 					{({ formProps }) => (
 						<form id="form-with-id" {...formProps}>
@@ -121,13 +125,13 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 												label="Project Name"
 												isRequired
 											>
-												{(fieldProps) => (
+												{({fieldProps}) => (
 													<Fragment>
 														<TextField
+															{...fieldProps}
 															autoComplete="off"
 															value={projectName}
 															onChange={handleSetProjectName}
-															{...fieldProps}
 														/>
 														<HelperMessage>
 															Project name must start with uppercase letter.
@@ -164,23 +168,29 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 										<FormSection>
 											<Grid spacing="compact" columns={columns}>
 												<GridColumn medium={columns}>
-													<Field name="budget" label="Price">
-														{() => (
-															<TextField
-																autoComplete="off"
-																value={budget}
-																onChange={handleSetBudget}
-																type="number"
-																elemBeforeInput={
-																	<p
-																		style={{
-																			marginLeft: 10,
-																		}}
-																	>
-																		$
-																	</p>
-																}
-															/>
+													<Field
+														name="budget"
+														label="Price"
+														// validate={validateIntegerOnly}
+													>
+														{({error}) => (
+															<Fragment>
+																<TextField
+																	autoComplete="off"
+																	value={budget}
+																	onChange={handleSetBudget}
+																	type="number"
+																	elemBeforeInput={
+																		<p
+																			style={{
+																				marginLeft: 10,
+																			}}
+																		>
+																			$
+																		</p>
+																	}
+																/>
+															</Fragment>
 														)}
 													</Field>
 												</GridColumn>
@@ -225,7 +235,6 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 									<LoadingButton
 										type="submit"
 										appearance="primary"
-										onClick={handleSubmitCreate}
 										isLoading={isSubmitting}
 									>
 										Create
