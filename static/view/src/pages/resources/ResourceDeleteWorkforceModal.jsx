@@ -41,7 +41,6 @@ export default function ResourceDeleteWorkforceModal({
 		invoke("deleteWorkforce", { id: workforce_id })
 			.then(function (res) {
 				Toastify.success(`Delete ${workforce.name} successfully`);
-				console.log(res);
 				closeModal();
 				setWorkforcesListState((prev) =>
 					prev.filter((item) => item.id !== workforce_id)

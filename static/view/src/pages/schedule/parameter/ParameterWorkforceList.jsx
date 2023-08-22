@@ -83,10 +83,7 @@ function ParameterWorkforceList() {
 	];
 
 	const onSelectedValue = (childValue) => {
-		console.log("Received value from child:", childValue);
-
 		setSkillsTable(childValue.selectedValue);
-		console.log("Received value display in table:", skillsTable);
 	};
 
 	const buttonActions = (
@@ -153,7 +150,6 @@ function ParameterWorkforceList() {
 		invoke("updateWorkforce", { workforce_request })
 			.then(function (res) {
 				if (res) {
-					console.log("updated workforce", res);
 					let workforce_name_display = res.displayName;
 					Toastify.success(
 						"Workforce '" + workforce_name_display + "' is saved"
@@ -405,7 +401,6 @@ function ParameterWorkforceList() {
 											0, 0, 0, 0, 0, 0, 0
 										];
 									}
-									console.log("Form data", workforce_request);
 									updateWorkforce(workforce_request);
 									return new Promise((resolve) =>
 										setTimeout(resolve, 2000)

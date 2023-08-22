@@ -11,10 +11,9 @@ const InfoMessageColor = () => {
 				<strong>LEVELS GO WITH COLORS'RULE</strong>
 			</p>
 			<p>
-				{COLOR_SKILL_LEVEL?.map((skill, i) => (
-					<span style={{ marginRight: "2px" }}>
+				{COLOR_SKILL_LEVEL?.map((skill, index) => (
+					<span key={index} style={{ marginRight: "2px" }}>
 						<Lozenge
-							key={i}
 							style={{
 								marginLeft: "8px",
 								backgroundColor:

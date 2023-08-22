@@ -164,7 +164,6 @@ export function ResourceCreateWorkforceModal({ onCreatedClick, skillDB }) {
 		invoke("createWorkforce", { workforce_request })
 			.then(function (res) {
 				if (res != null) {
-					console.log("create new workforce", res);
 					let workforce_name_display = res.displayName;
 					Toastify.success(
 						"Workforce '" + workforce_name_display + "' is created."
@@ -276,7 +275,6 @@ export function ResourceCreateWorkforceModal({ onCreatedClick, skillDB }) {
 										0, 0, 0, 0, 0, 0, 0,
 									];
 								}
-								console.log("Form data", workforce_request);
 								createNewWorkforce(workforce_request);
 								return new Promise((resolve) =>
 									setTimeout(resolve, 2000)
