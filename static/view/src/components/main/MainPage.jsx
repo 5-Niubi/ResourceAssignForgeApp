@@ -40,7 +40,6 @@ function MainPage({ history, historyState }) {
 		}
 		invoke("getThreadStateInfo")
 			.then(function (res) {
-				console.log(res);
 				if (res.threadId)
 					setThreadStateValue({
 						threadId: res.threadId,

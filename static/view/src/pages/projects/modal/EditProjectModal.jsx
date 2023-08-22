@@ -122,7 +122,7 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 		<ModalTransition>
 			<Modal onClose={closeModal} width={width}>
 				<Form
-					onSubmit={(formState) => console.log("form submitted", formState)}
+					onSubmit={handleSubmitCreate}
 				>
 					{({ formProps }) => (
 						<form id="form-with-id" {...formProps}>
@@ -265,7 +265,6 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 									<LoadingButton
 										type="submit"
 										appearance="primary"
-										onClick={handleSubmitCreate}
 										isDisabled={!isLoaded}
 										isLoading={isSubmitting}
 									>
