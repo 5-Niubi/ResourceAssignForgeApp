@@ -23,11 +23,11 @@ function MoreSection({ rootPath }) {
 	}, []);
 
 	return (
-		<NestingItem id="2" title="More" iconBefore={<MoreIcon label="" />}>
+		<NestingItem id="2" title="Miscellaneous" iconBefore={<MoreIcon label="" />}>
 			<Section>
 				<ButtonItemSideBar
 					rootPath={rootPath}
-					text={"Subscription info"}
+					text={"Subscription Info"}
 					pathTo={"subscription"}
 					iconBefore={<InfoIcon label="" />}
 				/>
@@ -39,7 +39,7 @@ function MoreSection({ rootPath }) {
 					iconAfter={signOutLoading && <Spinner size={"medium"} />}
 					isDisabled={signOutLoading}
 				>
-					Re-grant access
+					Re-grant Access
 				</ButtonItem>
 			</Section>
 		</NestingItem>

@@ -28,6 +28,7 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 	const [project, setProject] = useState(openState.project);
 	const [projectName, setProjectName] = useState(project.name);
 	const [startDate, setStartDate] = useState(project.startDate);
+	debugger;
 	const [endDate, setEndDate] = useState(project.deadline);
 	const [budget, setBudget] = useState(0);
 	const [unit, setUnit] = useState("");
@@ -121,9 +122,7 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 	return (
 		<ModalTransition>
 			<Modal onClose={closeModal} width={width}>
-				<Form
-					onSubmit={handleSubmitCreate}
-				>
+				<Form onSubmit={handleSubmitCreate}>
 					{({ formProps }) => (
 						<form id="form-with-id" {...formProps}>
 							<ModalHeader>
@@ -202,8 +201,9 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 														name="budget"
 														label="Price"
 													>
-														{(fieldProps) => (
+														{({ fieldProps }) => (
 															<TextField
+																{...fieldProps}
 																autoComplete="off"
 																value={budget}
 																onChange={handleSetBudget}
@@ -218,7 +218,6 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 																		$
 																	</p>
 																}
-																{...fieldProps}
 															/>
 														)}
 													</Field>
