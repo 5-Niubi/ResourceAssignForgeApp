@@ -51,8 +51,9 @@ function VisualizeTasksPage({ handleChangeTab }) {
 			})
 			.catch(function (error) {
 				setIsEstimating(false);
-				console.log(error);
-				Toastify.error(error.toString());
+				let errorMsg = extractErrorMessage(error);
+				console.log(errorMsg);
+				Toastify.error(errorMsg.message);
 			});
 	}
 

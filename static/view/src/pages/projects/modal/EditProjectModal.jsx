@@ -196,11 +196,11 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 
 										<FormSection>
 											<Grid spacing="compact" columns={columns}>
-												<GridColumn medium={8}>
+												<GridColumn medium={columns}>
 													<Field
 														aria-required={true}
 														name="budget"
-														label="Budget"
+														label="Price"
 													>
 														{(fieldProps) => (
 															<TextField
@@ -209,28 +209,36 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 																onChange={handleSetBudget}
 																type="number"
 																isDisabled={!isLoaded}
+																elemBeforeInput={
+																	<p
+																		style={{
+																			marginLeft: 10,
+																		}}
+																	>
+																		$
+																	</p>
+																}
 																{...fieldProps}
 															/>
 														)}
 													</Field>
 												</GridColumn>
-												<GridColumn medium={2}>
+												{/* <GridColumn medium={2}>
 													<Field
-														aria-required={true}
 														name="budgetUnit"
 														label="Unit"
 													>
 														{(fieldProps) => (
 															<TextField
 																autoComplete="off"
-																value={unit}
-																onChange={handleSetUnit}
-																isDisabled={!isLoaded}
+																value="$"
+																isReadOnly
 																{...fieldProps}
+																
 															/>
 														)}
 													</Field>
-												</GridColumn>
+												</GridColumn> */}
 											</Grid>
 										</FormSection>
 										<FormSection>

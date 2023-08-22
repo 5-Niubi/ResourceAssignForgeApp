@@ -12,7 +12,7 @@ export const AppContext = createContext();
 
 function App() {
 	// Enable auto change theme Dark/light mode within Jira
-	view.theme.enable();
+	// view.theme.enable();
 
 	const [history, setHistory] = useState();
 	const [historyState, setHistoryState] = useState();

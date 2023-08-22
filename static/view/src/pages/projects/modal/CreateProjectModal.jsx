@@ -163,30 +163,40 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 										</FormSection>
 										<FormSection>
 											<Grid spacing="compact" columns={columns}>
-												<GridColumn medium={8}>
-													<Field name="budget" label="Budget">
+												<GridColumn medium={columns}>
+													<Field name="budget" label="Price">
 														{() => (
 															<TextField
 																autoComplete="off"
 																value={budget}
 																onChange={handleSetBudget}
 																type="number"
+																elemBeforeInput={
+																	<p
+																		style={{
+																			marginLeft: 10,
+																		}}
+																	>
+																		$
+																	</p>
+																}
 															/>
 														)}
 													</Field>
 												</GridColumn>
-												<GridColumn medium={2}>
-													<Field name="budgetUnit" label="Unit" isDisabled>
+												{/* <GridColumn medium={2}>
+													<Field name="budgetUnit" label="Unit" >
 														{(fieldProps) => (
 															<TextField
 																autoComplete="off"
-																value={unit}
-																onChange={handleSetUnit}
+																value={"$"}
+																isReadOnly
+																isDisabled
 																{...fieldProps}
 															/>
 														)}
 													</Field>
-												</GridColumn>
+												</GridColumn> */}
 											</Grid>
 										</FormSection>
 										<FormSection>
