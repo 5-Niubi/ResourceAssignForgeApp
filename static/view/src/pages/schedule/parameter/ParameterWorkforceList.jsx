@@ -36,10 +36,10 @@ import {
 	getCacheObject,
     findObj,
 } from "../../../common/utils";
+import InstructionMessage from "../../../components/InstructionMessage";
+import { MESSAGE_PLACEHOLDER_WORKING_EFFORTS } from "../../../common/contants";
+
 function ParameterWorkforceList() {
-	let { projectId } = useParams();
-	let project = getCacheObject("project", null);
-    const baseWH = (project.baseWorkingHour===0 ||project.baseWorkingHour === null) ? 24: project.baseWorkingHour;
 	const [workforces, setWorkforces] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [skillDB, setSkillDB] = useState([]);
@@ -65,29 +65,6 @@ function ParameterWorkforceList() {
 		}
 
 		setIsLoading(false);
-
-		// invoke("getWorkforceParameter", { projectId })
-		// 	.then(function (res) {
-		// 		let workforces = [];
-		// 		for (let workforce of res) {
-		// 			let itemWorkforce = {
-		// 				id: workforce.id,
-		// 				name: workforce.name,
-		// 			};
-		// 			workforces.push(itemWorkforce);
-		// 		}
-		// 		setIsLoading(false);
-		// 		cache(
-		// 			"workforce_parameter",
-		// 			JSON.stringify(workforces)
-		// 		);
-		// 		setWorkforces(workforces);
-		// 		console.log("Cac workforce", workforces);
-		// 	})
-		// 	.catch(function (error) {
-		// 		console.log(error);
-		// 		Toastify.error(error.toString());
-		// 	});
 
 		invoke("getAllSkills", {})
 			.then(function (res) {
@@ -144,9 +121,9 @@ function ParameterWorkforceList() {
 						accountId: selected.accountId,
 						email: selected.email,
 						accountType: selected.accountType,
-						name: selected.name,
+						name: selected.displayName,
 						avatar: selected.avatar,
-						displayName: selected.displayName,
+						// displayName: selected.displayName,
 						unitSalary: selected.unitSalary,
 						workingType: selected.workingType,
 						workingEfforts: selected.workingEfforts,
@@ -177,7 +154,7 @@ function ParameterWorkforceList() {
 			.then(function (res) {
 				if (res) {
 					console.log("updated workforce", res);
-					let workforce_name_display = res.name;
+					let workforce_name_display = res.displayName;
 					Toastify.success(
 						"Workforce '" + workforce_name_display + "' is saved"
 					);
@@ -185,7 +162,7 @@ function ParameterWorkforceList() {
                     let workforce_local = getCacheObject("workforce_parameter",[]);
                     for (let index = 0; index < workforce_local?.length; index++) {
                         if(workforce_local[index].id === res.id){
-                            workforce_local[index].name = res.name;///CHANGE NEW NAME
+                            workforce_local[index].name = res.displayName;///CHANGE NEW NAME
                         }
                     }
                     cache("workforce_parameter", JSON.stringify(workforce_local));
@@ -287,13 +264,14 @@ function ParameterWorkforceList() {
 	};
 
     const OutScopeMessage = () => (
-		<ErrorMessage>Value raging from 0 to {baseWH}</ErrorMessage>
+		<ErrorMessage>Value raging from 0 to 24</ErrorMessage>
 	);
 
 	return (
 		<div>
 			<div>
 				<PageHeader actions={buttonActions}>Employees</PageHeader>
+               
 			</div>
 			{/* DISPLAY WORKFORCE PARMETER BUTTONS  */}
 			<div>
@@ -302,6 +280,10 @@ function ParameterWorkforceList() {
 				) : (
 					<>
 						<h5>Total employees: {workforces?.length}</h5>
+                        {workforces?.length === 0 &&(
+                            <strong style={{color: "red"}}>Need add employee to be scheduled.</strong>
+                            )
+                        }
 						{workforces?.length > 0 &&
 							workforces
 								?.slice(0, displayedWorkforces)
@@ -360,7 +342,7 @@ function ParameterWorkforceList() {
 						>
 							<ModalHeader>
 								<ModalTitle>
-									Workforce #{selectedWorkforce.id}
+									Edit employee
 								</ModalTitle>
 								{loadingDetail ? (
 									<Spinner size={"medium"}></Spinner>
@@ -377,9 +359,9 @@ function ParameterWorkforceList() {
 										email: data.email,
 										accountType:
 											selectedWorkforce.accountType,
-										name: data.name,
+										name: null,
 										avatar: selectedWorkforce.avatar,
-										displayName: data.usernamejira,
+										displayName: data.name,
 										unitSalary: data.salary,
 										workingType:
 											isParttimeSelected === true ? 1 : 0,
@@ -420,7 +402,7 @@ function ParameterWorkforceList() {
 									};
 									if (workforce_request.workingType == 0) {
 										workforce_request.workingEfforts = [
-											8, 8, 8, 8, 8, 8, 8,
+											0, 0, 0, 0, 0, 0, 0
 										];
 									}
 									console.log("Form data", workforce_request);
@@ -496,13 +478,12 @@ function ParameterWorkforceList() {
 													</Field>
 												</GridColumn>
 												{/* USERNAME JIRA TEXTFIELD */}
-												<GridColumn medium={6}>
+												{/* <GridColumn medium={6}>
 													<Field
 														name="usernamejira"
 														label="Jira Username"
-														isRequired
 														defaultValue={
-															selectedWorkforce.displayName
+															selectedWorkforce.name
 														}
 														isDisabled={
 															loadingDetail
@@ -536,7 +517,7 @@ function ParameterWorkforceList() {
 															</Fragment>
 														)}
 													</Field>
-												</GridColumn>
+												</GridColumn> */}
 												{/* NAME TEXTFIELD */}
 												<GridColumn medium={6}>
 													<Field
@@ -585,7 +566,7 @@ function ParameterWorkforceList() {
 													</Field>
 												</GridColumn>
 												{/* SALARY TEXTFIELD */}
-												<GridColumn medium={12}>
+												<GridColumn medium={6}>
 													<Field
 														name="salary"
 														label="Salary (Hour)"
@@ -608,9 +589,10 @@ function ParameterWorkforceList() {
 														}) => (
 															<Fragment>
 																<TextField
+                                                                type="number"
 																	autoComplete="off"
 																	{...fieldProps}
-																	placeholder="Number only"
+																	
 																	elemBeforeInput={
 																		<p
 																			style={{
@@ -704,7 +686,7 @@ function ParameterWorkforceList() {
 																	value
 																) =>
 																	validateWorkingEffort(
-																		value, baseWH
+																		value
 																	)
 																}
 																isDisabled={
@@ -717,9 +699,11 @@ function ParameterWorkforceList() {
 																}) => (
 																	<Fragment>
 																		<TextField
+                                                                        type="number"
 																			autoComplete="off"
 																			{...fieldProps}
-																			placeholder="Number only"
+																			placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                            elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																		/>
 																		{error ===
 																			"NOT_VALID" && (
@@ -748,7 +732,7 @@ function ParameterWorkforceList() {
 																	value
 																) =>
 																	validateWorkingEffort(
-																		value, baseWH
+																		value
 																	)
 																}
 																isDisabled={
@@ -761,9 +745,11 @@ function ParameterWorkforceList() {
 																}) => (
 																	<Fragment>
 																		<TextField
+                                                                        type="number"
 																			autoComplete="off"
 																			{...fieldProps}
-																			placeholder="Number only"
+																			placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                            elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																		/>
 																		{error ===
 																			"NOT_VALID" && (
@@ -792,7 +778,7 @@ function ParameterWorkforceList() {
 																	value
 																) =>
 																	validateWorkingEffort(
-																		value, baseWH
+																		value
 																	)
 																}
 																isDisabled={
@@ -805,9 +791,11 @@ function ParameterWorkforceList() {
 																}) => (
 																	<Fragment>
 																		<TextField
+                                                                        type="number"
 																			autoComplete="off"
 																			{...fieldProps}
-																			placeholder="Number only"
+																			placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                            elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																		/>
 																		{error ===
 																			"NOT_VALID" && (
@@ -836,7 +824,7 @@ function ParameterWorkforceList() {
 																	value
 																) =>
 																	validateWorkingEffort(
-																		value, baseWH
+																		value
 																	)
 																}
 																isDisabled={
@@ -849,9 +837,11 @@ function ParameterWorkforceList() {
 																}) => (
 																	<Fragment>
 																		<TextField
+                                                                        type="number"
 																			autoComplete="off"
 																			{...fieldProps}
-																			placeholder="Number only"
+																			placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                            elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																		/>
 																		{error ===
 																			"NOT_VALID" && (
@@ -880,7 +870,7 @@ function ParameterWorkforceList() {
 																	value
 																) =>
 																	validateWorkingEffort(
-																		value, baseWH
+																		value
 																	)
 																}
 																isDisabled={
@@ -893,9 +883,11 @@ function ParameterWorkforceList() {
 																}) => (
 																	<Fragment>
 																		<TextField
+                                                                        type="number"
 																			autoComplete="off"
 																			{...fieldProps}
-																			placeholder="Number only"
+																			placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                            elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																		/>
 																		{error ===
 																			"NOT_VALID" && (
@@ -931,7 +923,7 @@ function ParameterWorkforceList() {
 																	value
 																) =>
 																	validateWorkingEffort(
-																		value, baseWH
+																		value
 																	)
 																}
 																isDisabled={
@@ -944,9 +936,11 @@ function ParameterWorkforceList() {
 																}) => (
 																	<Fragment>
 																		<TextField
+                                                                        type="number"
 																			autoComplete="off"
 																			{...fieldProps}
-																			placeholder="Number only"
+																			placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                            elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																		/>
 																		{error ===
 																			"NOT_VALID" && (
@@ -975,7 +969,7 @@ function ParameterWorkforceList() {
 																	value
 																) =>
 																	validateWorkingEffort(
-																		value, baseWH
+																		value
 																	)
 																}
 																isDisabled={
@@ -988,9 +982,11 @@ function ParameterWorkforceList() {
 																}) => (
 																	<Fragment>
 																		<TextField
+                                                                        type="number"
 																			autoComplete="off"
 																			{...fieldProps}
-																			placeholder="Number only"
+																			placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                            elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																		/>
 																		{error ===
 																			"NOT_VALID" && (

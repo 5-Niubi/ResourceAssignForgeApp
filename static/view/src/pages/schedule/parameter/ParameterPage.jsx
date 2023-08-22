@@ -2,7 +2,6 @@ import "react-vertical-timeline-component/style.min.css";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import __noop from "@atlaskit/ds-lib/noop";
-import ParameterPageHeader from "./ParameterPageHeader";
 import ParameterWorkforceList from "./ParameterWorkforceList";
 import ParameterObjectInput from "./ParameterObjectInput";
 import ParameterEstimateMessage from "./ParameterEstimateMessage";
@@ -15,7 +14,6 @@ function ParameterPage({handleChangeTab}) {
 	let navigate = useNavigate();
 	return (
 		<div style={{width:"100%"}}>
-			<ParameterPageHeader name={"Resource Estimation"}></ParameterPageHeader>
 			<ParameterEstimateMessage></ParameterEstimateMessage>
 			<ParameterObjectInput handleChangeTab={handleChangeTab}></ParameterObjectInput>
 			<ParameterWorkforceList></ParameterWorkforceList>

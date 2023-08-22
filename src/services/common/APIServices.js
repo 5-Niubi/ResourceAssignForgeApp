@@ -1,14 +1,15 @@
 import API, { storage } from "@forge/api";
-import { BACKEND_dNET_DOMAIN, STORAGE } from "../../common/constants";
+import { STORAGE } from "../../common/constants";
 import { HttpStatus } from "../../common/httpStatus";
 import AuthenWithBE from "../authens/AuthenWithBE";
+import { BACKEND_SERVER_DOMAIN } from "../../common/environment";
 
 /**
  * Using for get api from .NET server
  */
 class APIServices {
-	DOMAIN = BACKEND_dNET_DOMAIN;
-	
+	DOMAIN = BACKEND_SERVER_DOMAIN;
+
 	/**
 	 * @param {string} url
 	 */
@@ -23,7 +24,7 @@ class APIServices {
 			let response = await API.fetch(fetchUrl.toString(), {
 				method: "GET",
 				headers: {
-					Authorization: `Bearer ${await storage.getSecret(STORAGE.TOKEN)}`
+					Authorization: `Bearer ${await storage.getSecret(STORAGE.TOKEN)}`,
 				},
 			});
 			switch (response.status) {
@@ -33,6 +34,8 @@ class APIServices {
 					AuthenWithBE.handleUnauthorizedStatus();
 					break;
 				case HttpStatus.BAD_REQUEST.code:
+					return Promise.reject(await response.json());
+				case HttpStatus.BAD_GATEWAY.code:
 					return Promise.reject(await response.json());
 			}
 			return Promise.reject(response);
@@ -58,7 +61,7 @@ class APIServices {
 				headers: {
 					Authorization: `Bearer ${await storage.getSecret(STORAGE.TOKEN)}`,
 				},
-				body:JSON.stringify(data),
+				body: JSON.stringify(data),
 			});
 			switch (response.status) {
 				case HttpStatus.OK.code:
@@ -68,8 +71,10 @@ class APIServices {
 					break;
 				case HttpStatus.BAD_REQUEST.code:
 					return Promise.reject(await response.json());
-                case HttpStatus.PRECONDITION_FAILED.code:
-                    return await response.json();
+				case HttpStatus.PRECONDITION_FAILED.code:
+					return Promise.reject(await response.json());
+				case HttpStatus.BAD_GATEWAY.code:
+					return Promise.reject(await response.json());
 			}
 			return Promise.reject(response);
 		} catch (err) {
@@ -104,6 +109,8 @@ class APIServices {
 					break;
 				case HttpStatus.BAD_REQUEST.code:
 					return Promise.reject(await response.json());
+				case HttpStatus.BAD_GATEWAY.code:
+					return Promise.reject(await response.json());
 			}
 		} catch (err) {
 			return Promise.reject(err);
@@ -135,6 +142,8 @@ class APIServices {
 					AuthenWithBE.handleUnauthorizedStatus();
 					break;
 				case HttpStatus.BAD_REQUEST.code:
+					return Promise.reject(await response.json());
+				case HttpStatus.BAD_GATEWAY.code:
 					return Promise.reject(await response.json());
 			}
 		} catch (err) {

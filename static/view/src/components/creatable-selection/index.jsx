@@ -1,6 +1,7 @@
 import React, { Component, useState } from "react";
 import { Label } from "@atlaskit/form";
 import CreatableSelect from "react-select/creatable";
+import { formatText } from "../../common/utils";
 
 const createOption = (label) => ({
     id: null,
@@ -8,15 +9,6 @@ const createOption = (label) => ({
 	value: formatText(label),
     level: 1
 });
-
-export function formatText(input) {
-    //UPPERCASE AND REMOVE ANY NON-WORD CHARACTER
-    const formattedText = input.toUpperCase().replace(/\W+/g, ' ');
-  
-    //REPLACE SPACES WITH "-"
-    const result = formattedText.replace(/\s+/g, '-').trim();
-    return result;
-  }
 
 export default function CreatableAdvanced({
 	defaultOptions,

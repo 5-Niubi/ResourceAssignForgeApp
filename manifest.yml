@@ -38,9 +38,7 @@ permissions:
       backend:
         - "*.ngrok-free.app"
         - "https://be.ai4cert.com"
-    images:
-      - https://i.ibb.co/znTzdzQ/2346px-Microsoft-Project-2019-present-svg.png
-      - https://i.ibb.co/wR3CZ6v/Jira-Emblem.png
+        - "*.loca.lt"
   content:
     styles:
       - unsafe-inline

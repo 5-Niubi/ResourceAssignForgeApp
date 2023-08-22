@@ -3,7 +3,7 @@ import React, { useCallback, useState } from "react";
 import ActivityIcon from "@atlaskit/icon/glyph/activity";
 import PeopleGroupIcon from "@atlaskit/icon/glyph/people-group";
 import LightBulb from "@atlaskit/icon/glyph/lightbulb";
-import { ReactComponent as LogoSvg } from "../../resources/reshot-icon-planning-SJ7W8K623A.svg";
+import { ReactComponent as LogoSvg } from "../../assets/svg/Logo.svg";
 
 import {
 	Header,
@@ -19,7 +19,7 @@ import { APP_NAME, APP_NAME_DESCRIPTOR } from "../../common/contants";
 import { HelperMessage } from "@atlaskit/form";
 import MoreSection from "./MoreSection";
 
-function HomeSideBar(rootPath) {
+function HomeSideBar({rootPath = ""}) {
 	return (
 		<SideNavigation label="project" testId="side-navigation">
 			<NavigationHeader>

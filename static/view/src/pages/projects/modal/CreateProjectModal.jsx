@@ -1,4 +1,6 @@
 import Button, { ButtonGroup, LoadingButton } from "@atlaskit/button";
+import { DatePicker } from "@atlaskit/datetime-picker";
+import Form, { Field, FormSection, HelperMessage } from "@atlaskit/form";
 import Modal, {
 	ModalBody,
 	ModalFooter,
@@ -6,18 +8,22 @@ import Modal, {
 	ModalTransition,
 } from "@atlaskit/modal-dialog";
 import { Grid, GridColumn } from "@atlaskit/page";
-import React, { Fragment, useState, useCallback, useEffect } from "react";
 import TextField from "@atlaskit/textfield";
-import Form, { Field, FormSection, HelperMessage } from "@atlaskit/form";
-import { DatePicker } from "@atlaskit/datetime-picker";
-import { extractErrorMessage, getCurrentTime } from "../../../common/utils";
 import { invoke } from "@forge/bridge";
-import { DATE_FORMAT, MODAL_WIDTH } from "../../../common/contants";
-import Toastify from "../../../common/Toastify";
+import React, { Fragment, useState } from "react";
 import { useNavigate } from "react-router";
+import Toastify from "../../../common/Toastify";
+import {
+	DATE_FORMAT,
+	DEFAULT_WORKING_TIMERANGE,
+	MODAL_WIDTH,
+} from "../../../common/contants";
+import { extractErrorMessage, getCurrentTime } from "../../../common/utils";
+import WorkingTimeHours from "../form/WorkingTimeHours";
 import InlineMessageGuideProjectField from "../message/InlineMessageGuideProjectField";
 
 const width = MODAL_WIDTH.M;
+
 function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 	const columns = 10;
 	const navigate = useNavigate();
@@ -27,8 +33,9 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 	const [endDate, setEndDate] = useState(startDate);
 	const [budget, setBudget] = useState(0);
 	const [unit, setUnit] = useState("$");
-	const [baseWorkingHour, setBaseWorkingHour] = useState(8);
+	const [baseWorkingHour, setBaseWorkingHour] = useState(0);
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const timeRangeValueState = useState(DEFAULT_WORKING_TIMERANGE);
 
 	const handleSetProjectName = function (e) {
 		setProjectName(e.target.value);
@@ -71,6 +78,7 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 			budget,
 			budgetUnit: unit,
 			baseWorkingHour,
+			workingTimes: timeRangeValueState[0],
 		};
 		invoke("createNewProjectProjectLists", { projectObjRequest })
 			.then(function (res) {
@@ -83,7 +91,7 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 				setIsSubmitting(false);
 
 				let errorMsg = extractErrorMessage(error);
-				Toastify.error(errorMsg.message);
+				Toastify.error(errorMsg.message || errorMsg.title || errorMsg);
 			});
 	}
 
@@ -127,27 +135,6 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 													</Fragment>
 												)}
 											</Field>
-											<Field
-												aria-required={true}
-												name="projectBaseWorkHour"
-												label="Working Hours/Day"
-												isRequired
-											>
-												{(fieldProps) => (
-													<Fragment>
-														<TextField
-															autoComplete="off"
-															value={baseWorkingHour}
-															onChange={handleSetBaseWorkHour}
-															type="number"
-															{...fieldProps}
-														/>
-														<HelperMessage>
-															Working hour must greater than 0 and smaller than 24.
-														</HelperMessage>
-													</Fragment>
-												)}
-											</Field>
 										</FormSection>
 										<FormSection>
 											<Field name="startDate" label="Start Date">
@@ -176,31 +163,54 @@ function CreateProjectModal({ isOpen, setIsOpen, setProjectsDisplay }) {
 										</FormSection>
 										<FormSection>
 											<Grid spacing="compact" columns={columns}>
-												<GridColumn medium={8}>
-													<Field name="budget" label="Budget">
+												<GridColumn medium={columns}>
+													<Field name="budget" label="Price">
 														{() => (
 															<TextField
 																autoComplete="off"
 																value={budget}
 																onChange={handleSetBudget}
 																type="number"
+																elemBeforeInput={
+																	<p
+																		style={{
+																			marginLeft: 10,
+																		}}
+																	>
+																		$
+																	</p>
+																}
 															/>
 														)}
 													</Field>
 												</GridColumn>
-												<GridColumn medium={2}>
-													<Field name="budgetUnit" label="Unit">
+												{/* <GridColumn medium={2}>
+													<Field name="budgetUnit" label="Unit" >
 														{(fieldProps) => (
 															<TextField
 																autoComplete="off"
-																value={unit}
-																onChange={handleSetUnit}
+																value={"$"}
+																isReadOnly
+																isDisabled
 																{...fieldProps}
 															/>
 														)}
 													</Field>
-												</GridColumn>
+												</GridColumn> */}
 											</Grid>
+										</FormSection>
+										<FormSection>
+											<WorkingTimeHours
+												timeRangeValueState={timeRangeValueState}
+												isDisable={false}
+												label="Working Time Slots"
+												onSetBaseWorkingHours={setBaseWorkingHour}
+											/>
+
+											<hr style={{ marginTop: "1.5em" }} />
+											<p>
+												Total Working: <b>{baseWorkingHour}</b> Hours/Day
+											</p>
 										</FormSection>
 									</GridColumn>
 								</Grid>

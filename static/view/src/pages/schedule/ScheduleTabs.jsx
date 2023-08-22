@@ -7,17 +7,24 @@ import { createContext, useCallback, useEffect, useState } from "react";
 import ResultPage from "./resultpage/ResultPage";
 import React from "react";
 import { invoke, router } from "@forge/bridge";
-import { useParams } from "react-router";
 import Toastify from "../../common/Toastify";
 import { cache, clearProjectBasedCache, getCache } from "../../common/utils";
 import Link from "../../components/common/Link";
-
+import { useParams, useLocation } from "react-router";
 const projectInfoContextInit = {};
 export const ProjectInfoContext = createContext(projectInfoContextInit);
 
 export default function ScheduleTabs() {
 	const { projectId } = useParams();
-	const [selected, setSelected] = useState(0);
+	// const [selected, setSelected] = useState(0);
+
+	const [selected, setSelected] = useState(
+		parseInt(getCache("tab_selected")) || 0
+	);
+
+	useEffect(() => {
+		cache("tab_selected", selected);
+	}, [selected]);
 
 	var project = getCache("project");
 	if (!project) {

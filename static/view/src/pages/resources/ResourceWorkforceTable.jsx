@@ -19,6 +19,7 @@ import EditorSearchIcon from "@atlaskit/icon/glyph/editor/search";
 import ResourceDeleteWorkforceModal from "./ResourceDeleteWorkforceModal";
 import { ResourceCreateWorkforceModal } from "./ResourceCreateWorkforceModal";
 import ResourceEditWorkforceModal from "./ResourceEditWorkforceModal";
+import { cache } from "../../common/utils";
 
 const modalInitState = { workforce: {}, isOpen: false };
 
@@ -27,48 +28,40 @@ function ResourceWorkforceTable() {
 	const [modalDeleteState, setModalDeleteState] = useState(modalInitState);
 	const [modalEditState, setModalEditState] = useState(modalInitState);
 	const [workforces, setWorkforces] = useState([]);
-	const [createClicked, setCreateClicked] = useState(false);
+    const [skillDB, setSkillDB] = useState([]);
 
-	useEffect(() => {
-		Promise.all([invoke("getAllWorkforces"), invoke("getAllUserJira")])
-			.then(([workforcesResponse, jiraUsersResponse]) => {
-				const workforces = workforcesResponse.map((workforce) => ({
-					id: workforce.id,
-					accountId: workforce.accountId,
-					email: workforce.email,
-					accountType: workforce.accountType,
-					name: workforce.name,
-					avatar: workforce.avatar,
-					displayName: workforce.displayName,
-					unitSalary: workforce.unitSalary,
-					workingType: workforce.workingType,
-					workingEffort: workforce.workingEffort,
-					skills: workforce.skills,
-				}));
-
-				console.log("GetAllUserJira", jiraUsersResponse);
-				const jiraUsers = jiraUsersResponse
-					.filter((user) => user.accountType === "atlassian")
-					.map((user) => ({
-						accountId: user.accountId,
-						email: user.emailAddress,
-						accountType: user.accountType,
-						name: user.displayName,
-						avatar: user.avatarUrls["48x48"],
-						displayName: user.displayName,
-					}));
-
-				// setWorkforces([...workforces, ...jiraUsers]);
-				setWorkforces(workforces);
-				setTableLoadingState(false);
-			})
-			.catch((error) => {
-				console.log(error);
-				Toastify.error(error.toString());
-				setTableLoadingState(false);
-			});
-		setCreateClicked(false);
-	}, [createClicked]);
+    useEffect(function () {
+        Promise.all([
+            invoke("getAllWorkforces"),
+            invoke("getAllSkills")
+        ])
+        .then(function ([workforcesResponse, skillsResponse]) {
+            console.log("getAllWorkforces", workforcesResponse);
+    
+            const workforces = workforcesResponse.map((workforce) => ({
+                id: workforce.id,
+                accountId: workforce.accountId,
+                email: workforce.email,
+                accountType: workforce.accountType,
+                name: workforce.displayName,
+                avatar: workforce.avatar,
+                unitSalary: workforce.unitSalary,
+                workingType: workforce.workingType,
+                workingEfforts: workforce.workingEfforts,
+                skills: workforce.skills,
+            }));
+    
+            setWorkforces(workforces);
+            setTableLoadingState(false);
+            
+            setSkillDB(skillsResponse);
+        })
+        .catch(function (error) {
+            console.log(error);
+            Toastify.error(error.toString());
+            setTableLoadingState(false);
+        });
+    }, [TableLoadingState]);
 
 	function createKey(input) {
 		return input
@@ -122,13 +115,18 @@ function ResourceWorkforceTable() {
 	}
 
 	const handleCreateClicked = () => {
-		setCreateClicked(true);
+		setTableLoadingState(true);
+	};
+
+    const handleEditClicked = () => {
+		setTableLoadingState(true);
 	};
 
 	const actionsContent = (
 		<ButtonGroup>
 			<ResourceCreateWorkforceModal
 				onCreatedClick={handleCreateClicked}
+                skillDB={skillDB}
 			/>
 		</ButtonGroup>
 	);
@@ -152,8 +150,8 @@ function ResourceWorkforceTable() {
 		return {
 			cells: [
 				{
-					key: "id",
-					content: "ID",
+					key: "no",
+					content: "No",
 					width: withWidth ? 5 : undefined,
 				},
 				{
@@ -166,12 +164,14 @@ function ResourceWorkforceTable() {
 					key: "skill",
 					content: "Skills",
 					shouldTruncate: false,
+					isSortable: true,
 					width: withWidth ? 50 : undefined,
 				},
 				{
 					key: "salary",
 					content: "Salary (Hour)",
 					shouldTruncate: false,
+                    isSortable: true,
 					width: withWidth ? 7 : undefined,
 				},
 				{
@@ -184,7 +184,7 @@ function ResourceWorkforceTable() {
 					key: "actions",
 					content: "Actions",
 					shouldTruncate: true,
-					width: 6,
+					width: 7,
 				},
 			],
 		};
@@ -197,8 +197,8 @@ function ResourceWorkforceTable() {
 		isHighlighted: false,
 		cells: [
 			{
-				key: workforce.id,
-				content: <strong>#{workforce.id}</strong>,
+				key: "no",
+				content: (index + 1),
 			},
 			{
 				key: createKey(workforce.name),
@@ -266,14 +266,16 @@ function ResourceWorkforceTable() {
 
 	return (
 		<>
-			<PageHeader actions={actionsContent} bottomBar={barContent}>
-				Employee List <InfoMessageColor />
+			<PageHeader actions={actionsContent} bottomBar={barContent} disableTitleStyles={true}>
+            <div style={{display: "inline-flex"}}>
+                    <h2>Employee List</h2>
+                    <div style={{marginLeft: 5}}>
+                        <InfoMessageColor/>
+                    </div>
+                </div>
 			</PageHeader>
 
-			<InlineMessage
-				title={"Total employee: "}
-				secondaryText={workforcesFilter.length}
-			/>
+            <h5>Total employees: {workforcesFilter?.length}</h5>
 
 			<DynamicTable
 				head={head}
@@ -298,7 +300,8 @@ function ResourceWorkforceTable() {
 				<ResourceEditWorkforceModal
 					openState={modalEditState}
 					setOpenState={setModalEditState}
-					setWorkforcesListState={setWorkforces}
+                    onEditedClick={handleEditClicked}
+                    skillDB={skillDB}
 				/>
 			) : (
 				""

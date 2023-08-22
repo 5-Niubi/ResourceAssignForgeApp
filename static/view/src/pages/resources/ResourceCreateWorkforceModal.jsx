@@ -28,21 +28,21 @@ import {
 	validateWorkingEffort,
 	validateName,
 	getCacheObject,
+    formatText,
 } from "../../common/utils";
+import { MESSAGE_PLACEHOLDER_WORKING_EFFORTS } from "../../common/contants";
 
 const options = [
 	{ name: "workingType", value: 0, label: "Fulltime" },
 	{ name: "workingType", value: 1, label: "Part-time" },
 ];
 
-export function ResourceCreateWorkforceModal({ onCreatedClick }) {
-	const baseWH = 8; //Default out-side project
+export function ResourceCreateWorkforceModal({ onCreatedClick, skillDB }) {
 	const [isCWOpen, setIsCWOpen] = useState(false);
 	const closeCWModal = useCallback(() => setIsCWOpen(false), []);
 	const [isParttimeSelected, setIsParttimeSelected] = useState(false);
 	const [skillsTable, setSkillsTable] = useState([]);
 	const [loadingSubmit, setLoadingSubmit] = useState(false);
-	const [skillDB, setSkillDB] = useState([]);
 
 	const [workforcesJiraAccount, setWorkforcesJiraAccount] = useState([]);
 
@@ -68,18 +68,16 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 						Toastify.error(error.toString());
 					});
 			}
-
-			invoke("getAllSkills", {})
-				.then(function (res) {
-					setSkillDB(res);
-					localStorage.setItem("all_skills_DB", JSON.stringify(res));
-				})
-				.catch(function (error) {
-					console.log(error);
-					Toastify.error(error.toString());
-				});
+            invoke("getAllSkills", {})
+			.then(function (res) {
+				skillDB = res;
+			})
+			.catch(function (error) {
+				console.log(error);
+				Toastify.error(error.toString());
+			});
 		},
-		[loadingSubmit]
+		[skillDB]
 	);
 
 	const handleCreateClicked = () => {
@@ -167,7 +165,7 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 			.then(function (res) {
 				if (res != null) {
 					console.log("create new workforce", res);
-					let workforce_name_display = res.name;
+					let workforce_name_display = res.displayName;
 					Toastify.success(
 						"Workforce '" + workforce_name_display + "' is created."
 					);
@@ -194,7 +192,7 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 	}
 
 	const OutScopeMessage = () => (
-		<ErrorMessage>Value raging from 0 to {baseWH}</ErrorMessage>
+		<ErrorMessage>Value raging from 0 to 24</ErrorMessage>
 	);
 
 	return (
@@ -232,9 +230,9 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 											: null, //DEFAULT
 									email: data.email,
 									accountType: "atlassian", //DEFAULT
-									name: data.name,
+									name: null,
 									avatar: null, //DEFAULT
-									displayName: data.usernamejira,
+									displayName: formatText(data.name),
 									unitSalary: data.salary,
 									workingType:
 										isParttimeSelected === true ? 1 : 0,
@@ -275,7 +273,7 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 								};
 								if (workforce_request.workingType == 0) {
 									workforce_request.workingEfforts = [
-										1, 1, 1, 1, 1, 1, 1,
+										0, 0, 0, 0, 0, 0, 0,
 									];
 								}
 								console.log("Form data", workforce_request);
@@ -296,6 +294,7 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 									<ModalBody>
 										<Grid layout="fluid" spacing="compact">
 											{/* USER ACCOUNT */}
+                                            <GridColumn medium={4}>
 											<Field
 												name="jiraAccount"
 												label="Jira Account (optional)"
@@ -308,13 +307,20 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 															className="single-select"
 															classNamePrefix="react-select"
 															{...fieldProps}
-															options={workforcesJiraAccount?.map(
+															options={[
+                                                                {
+                                                                    label: "None",
+                                                                    value: null,
+                                                                    avatar: null
+                                                                },
+                                                                ...workforcesJiraAccount?.map(
 																(user) => ({
 																	label: user.displayName,
 																	value: user.accountId,
 																	avatar: user.avatar,
 																})
-															)}
+															)]
+                                                            }
 															formatOptionLabel={
 																formatOptionLabel
 															}
@@ -329,8 +335,9 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 													</Fragment>
 												)}
 											</Field>
+                                            </GridColumn>
 											{/* EMAIL TEXTFIELD */}
-											<GridColumn medium={12}>
+											<GridColumn medium={8}>
 												<Field
 													name="email"
 													label="Email"
@@ -372,11 +379,10 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 												</Field>
 											</GridColumn>
 											{/* USERNAME JIRA TEXTFIELD */}
-											<GridColumn medium={6}>
+											{/* <GridColumn medium={6}>
 												<Field
 													name="usernamejira"
 													label="Jira Username"
-													isRequired
 												>
 													{({
 														fieldProps,
@@ -403,7 +409,7 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 														</Fragment>
 													)}
 												</Field>
-											</GridColumn>
+											</GridColumn> */}
 											{/* NAME TEXTFIELD */}
 											<GridColumn medium={6}>
 												<Field
@@ -442,7 +448,7 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 												</Field>
 											</GridColumn>
 											{/* SALARY TEXTFIELD */}
-											<GridColumn medium={12}>
+											<GridColumn medium={6}>
 												<Field
 													name="salary"
 													label="Salary (Hour)"
@@ -459,9 +465,10 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 													}) => (
 														<Fragment>
 															<TextField
+                                                            type="number"
 																autoComplete="off"
 																{...fieldProps}
-																placeholder="Number only"
+																
 																elemBeforeInput={
 																	<p
 																		style={{
@@ -527,7 +534,8 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 															size="small"
 															content=""
 														></InfoIcon>
-														Working hours per day
+														Working hours per day.<br/>
+                                                        The hours require exactly one digit after the decimal point.
 													</HelperMessage>
 												)}
 											</GridColumn>
@@ -542,8 +550,7 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 															isRequired
 															validate={(value) =>
 																validateWorkingEffort(
-																	value,
-																	baseWH
+																	value
 																)
 															}
 														>
@@ -553,9 +560,11 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 															}) => (
 																<Fragment>
 																	<TextField
+                                                                    type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder="Number only"
+																		placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                        elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -578,8 +587,7 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 															isRequired
 															validate={(value) =>
 																validateWorkingEffort(
-																	value,
-																	baseWH
+																	value
 																)
 															}
 														>
@@ -589,9 +597,11 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 															}) => (
 																<Fragment>
 																	<TextField
+                                                                    type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder="Number only"
+																		placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                        elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -614,8 +624,7 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 															isRequired
 															validate={(value) =>
 																validateWorkingEffort(
-																	value,
-																	baseWH
+																	value
 																)
 															}
 														>
@@ -625,9 +634,11 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 															}) => (
 																<Fragment>
 																	<TextField
+                                                                    type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder="Number only"
+																		placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                        elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -650,8 +661,7 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 															isRequired
 															validate={(value) =>
 																validateWorkingEffort(
-																	value,
-																	baseWH
+																	value
 																)
 															}
 														>
@@ -661,9 +671,11 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 															}) => (
 																<Fragment>
 																	<TextField
+                                                                    type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder="Number only"
+																		placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                        elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -686,8 +698,7 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 															isRequired
 															validate={(value) =>
 																validateWorkingEffort(
-																	value,
-																	baseWH
+																	value
 																)
 															}
 														>
@@ -697,9 +708,11 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 															}) => (
 																<Fragment>
 																	<TextField
+                                                                    type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder="Number only"
+																		placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                        elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -722,8 +735,7 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 															isRequired
 															validate={(value) =>
 																validateWorkingEffort(
-																	value,
-																	baseWH
+																	value
 																)
 															}
 														>
@@ -733,9 +745,11 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 															}) => (
 																<Fragment>
 																	<TextField
+                                                                    type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder="Number only"
+																		placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                        elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -758,8 +772,7 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 															isRequired
 															validate={(value) =>
 																validateWorkingEffort(
-																	value,
-																	baseWH
+																	value
 																)
 															}
 														>
@@ -769,9 +782,11 @@ export function ResourceCreateWorkforceModal({ onCreatedClick }) {
 															}) => (
 																<Fragment>
 																	<TextField
+                                                                    type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder="Number only"
+																		placeholder={MESSAGE_PLACEHOLDER_WORKING_EFFORTS}
+                                                                        elemAfterInput={<div style={{margin: "10px"}}>Hours</div>}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (

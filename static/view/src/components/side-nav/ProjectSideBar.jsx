@@ -1,12 +1,11 @@
-import RoadmapIcon from "@atlaskit/icon/glyph/roadmap";
-import IssuesIcon from "@atlaskit/icon/glyph/issues";
-import GraphLineIcon from "@atlaskit/icon/glyph/graph-line";
-import FolderIcon from "@atlaskit/icon/glyph/folder";
 import ArrowLeftCircleIcon from "@atlaskit/icon/glyph/arrow-left-circle";
+import IssuesIcon from "@atlaskit/icon/glyph/issues";
+import RoadmapIcon from "@atlaskit/icon/glyph/roadmap";
 import { ButtonItem } from "@atlaskit/side-navigation";
-import { invoke } from "@forge/bridge";
 import Spinner from "@atlaskit/spinner";
+import { invoke } from "@forge/bridge";
 
+import Avatar from "@atlaskit/avatar";
 import {
 	Header,
 	NavigationFooter,
@@ -16,13 +15,9 @@ import {
 	SideNavigation,
 } from "@atlaskit/side-navigation";
 import React, { useEffect, useState } from "react";
-import ButtonItemSideBar from "./ButtonItemSideBar";
 import { useNavigate, useParams } from "react-router";
-import { AtlassianIcon } from "@atlaskit/logo";
-import Avatar from "@atlaskit/avatar";
 import { APP_NAME, PROJECT_NAME_DESCRIPTOR } from "../../common/contants";
-import { HelperMessage } from "@atlaskit/form";
-import MoreSection from "./MoreSection";
+import ButtonItemSideBar from "./ButtonItemSideBar";
 
 function ProjectSideBar({ rootPath = "" }) {
 	const navigate = useNavigate();

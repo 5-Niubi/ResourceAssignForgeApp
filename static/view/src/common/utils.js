@@ -38,7 +38,8 @@ export async function removeThreadInfo() {
 export function calculateDuration({ startDate, endDate }) {
 	var a = moment(startDate);
 	var b = moment(endDate);
-	return b.diff(a, "days");
+	var result = b.diff(a, "days");
+	return result >= 1 ? result : 0;
 }
 
 export function extractProjectKey(str) {
@@ -134,7 +135,7 @@ export const validateNumberOnly = (value) => {
 	return undefined;
 };
 
-export const validateWorkingEffort = (value,maxValue) => {
+export const validateWorkingEffort = (value) => {
 	//REQUIRES NOT NULL, NUMBER ONLY, FROM 0.0 TO 24.0
 	if (!value) {
 		return "NOT_VALID";
@@ -144,11 +145,11 @@ export const validateWorkingEffort = (value,maxValue) => {
 		return "NOT_VALID";
 	}
 
-	if (value < 0.0 || value > maxValue) {
+	if (value < 0.0 || value > 24) {
 		return "OUT_SCOPE";
 	}
 
-	const regex = /^\d*\.?\d*$/;
+	const regex = /^\d*\.?\d{1}$/;
 	if (!regex.test(value)) {
 		return "NOT_VALID";
 	}
@@ -160,7 +161,7 @@ export const validateName = (value) => {
 	if (!value) {
 		return "NOT_VALID";
 	}
-	const regex = /^[A-Za-z ]{6,}$/;
+	const regex = /^[A-Za-zÀ-ỹà-ỳĂ-ưă-ưẠ-ỵạ-ỵ ]{6,}$/;
 	if (!regex.test(value)) {
 		return "NOT_VALID";
 	}
@@ -200,4 +201,56 @@ export function extractErrorMessage(error) {
 		return stringErr;
 	}
 	return JSON.parse(stringErr);
+}
+
+function capitalizeFirstLetter(string) {
+	return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+export function formatText(input) {
+	//UPPERCASE AND REMOVE ANY NON-WORD CHARACTER
+	const formattedText = input.toLowerCase().replace(/[^\p{L}\d]+/gu, " ");
+
+	// REPLACE SPACES WITH " "
+	const result = formattedText.replace(/\s+/g, " ").trim();
+
+	// CAPITALIZE FIRST LETTERS
+	const capitalizedResult = result
+		.split(" ")
+		.map(capitalizeFirstLetter)
+		.join(" ");
+
+	return capitalizedResult;
+}
+
+export function parseForTimeOnly(timeString) {
+	return moment(timeString, ["h:m a", "H:m"]);
+}
+
+export function generateTimeFrom00To23() {
+	let resultArr = [];
+	for (let i = 0; i <= 23; i++) {
+		let hour = i;
+		let minute = "00";
+		let time = `${hour}:${minute}`;
+		resultArr.push(time);
+
+		minute = "30";
+		time = `${hour}:${minute}`;
+		resultArr.push(time);
+	}
+
+	return resultArr;
+}
+
+export function milisecondToHours(miliseconds) {
+	return miliseconds / (1000 * 60 * 60);
+}
+
+export function validateIntegerOnly(value) {
+    //REQUIRES INTEGER NUMBER
+	if (!/^\d*$/.test(value)) {
+		return "Input integer Only.";
+	}
+	return undefined;
 }

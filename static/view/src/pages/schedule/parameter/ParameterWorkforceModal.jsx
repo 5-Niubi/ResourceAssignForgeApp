@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, Fragment } from "react";
+import { useCallback, useEffect, useState, Fragment, useContext } from "react";
 import { css, jsx } from "@emotion/react";
 import DynamicTable from "@atlaskit/dynamic-table";
 import Button, { ButtonGroup } from "@atlaskit/button";
@@ -14,6 +14,7 @@ import Modal, {
 	ModalTitle,
 	ModalTransition,
 } from "@atlaskit/modal-dialog";
+import Spinner from "@atlaskit/spinner";
 import { invoke } from "@forge/bridge";
 import Toastify from "../../../common/Toastify";
 import { RadioGroup } from "@atlaskit/radio";
@@ -21,6 +22,7 @@ import LoadingButton from "@atlaskit/button";
 import { Checkbox } from "@atlaskit/checkbox";
 import Lozenge from "@atlaskit/lozenge";
 import TextField from "@atlaskit/textfield";
+import EditorWarningIcon from "@atlaskit/icon/glyph/editor/warning";
 import Form, {
 	CheckboxField,
 	ErrorMessage,
@@ -44,12 +46,18 @@ import {
 	validateName,
 	getCacheObject,
 	cache,
+	getCache,
 } from "../../../common/utils";
-
+import InlineMessage from "@atlaskit/inline-message";
+import Flag from "@atlaskit/flag";
+import Tooltip from "@atlaskit/tooltip";
+import InstructionMessage from "../../../components/InstructionMessage";
 const options = [
 	{ name: "workingType", value: 0, label: "Fulltime" },
 	{ name: "workingType", value: 1, label: "Part-time" },
 ];
+import { MESSAGE_PLACEHOLDER_WORKING_EFFORTS } from "../../../common/contants";
+import { AppContext } from "../../../App";
 
 export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 	//SELECT WORKFORCE MODAL (SW)
@@ -62,11 +70,14 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 	const [searchInput, setSearchInput] = useState("");
 	const [workforces, setWorkforces] = useState([]);
 	const [selectedWorkforces, setSelectedWorkforces] = useState([]);
-	const [createClicked, setCreateClicked] = useState(false);
+	const [selectAll, setSelectAll] = useState(false);
 
 	const handleCreateClicked = () => {
-		setCreateClicked(true);
-		console.log("setCreateClicked", "Da click");
+		setTableLoadingState(true);
+	};
+
+	const handleLoadingDBClicked = () => {
+		setTableLoadingState(true);
 	};
 
 	useEffect(
@@ -80,9 +91,9 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 							accountId: workforce.accountId,
 							email: workforce.email,
 							accountType: workforce.accountType,
-							name: workforce.name,
+							name: workforce.displayName,
 							avatar: workforce.avatar,
-							displayName: workforce.displayName,
+							// name: workforce.displayName,
 							unitSalary: workforce.unitSalary,
 							workingType: workforce.workingType,
 							workingEfforts: workforce.workingEfforts,
@@ -94,14 +105,13 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 					setWorkforces(workforces);
 
 					let localWorkforceIds = [];
-                    if(workforce_local?.length>0){
-                        localWorkforceIds = workforce_local?.map(
-                            (workforce) => workforce?.id?.toString()
-                        );
-                    }
+					if (workforce_local?.length > 0) {
+						localWorkforceIds = workforce_local?.map((workforce) =>
+							workforce?.id?.toString()
+						);
+					}
 					setSelectedWorkforces(localWorkforceIds);
 
-					//CHECK BUTTON SELECT ALL
 					if (workforces?.length == localWorkforceIds?.length) {
 						setSelectAll(true);
 					}
@@ -110,9 +120,8 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 					console.log(error);
 					Toastify.error(error.toString());
 				});
-			setCreateClicked(false);
 		},
-		[createClicked]
+		[TableLoadingState]
 	);
 
 	//FILTER WORKFORCE SELECT TABLE
@@ -166,6 +175,14 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 		});
 	}
 
+	const { setAppContextState } = useContext(AppContext);
+	const handleCreateThreadFail = (messageBody) => {
+		setAppContextState((prev) => ({
+			...prev,
+			error: messageBody,
+		}));
+	};
+
 	const head = {
 		cells: [
 			{
@@ -182,31 +199,42 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 				key: "skills",
 				content: "Skills",
 				width: 62,
+				shouldTruncate: false,
+				isSortable: true,
 			},
 		],
 	};
 
 	const rows = workforcesFilter?.map((workforce, index) => ({
-		key: workforce.id,
+		key: `row-${index}-${workforce.name}`,
 		cells: [
 			{
 				key: "no",
 				content: (
-					<Checkbox
-						size="xlarge"
-						isChecked={selectedWorkforces?.includes(
-							workforce.id.toString()
-						)}
-						onChange={() => handleCheckboxChange(workforce.id)}
-					/>
+					<div>
+						<Checkbox
+							size="large"
+							isChecked={selectedWorkforces?.includes(
+								workforce.id.toString()
+							)}
+							onChange={() => handleCheckboxChange(workforce.id)}
+						/>
+					</div>
 				),
 			},
 			{
 				key: "name",
-				content: workforce.name,
+				content: (
+					<div
+						onClick={() => handleCheckboxChange(workforce.id)}
+						style={{ cursor: "pointer" }}
+					>
+						{workforce.name}
+					</div>
+				),
 			},
 			{
-				key: "skills",
+				key: workforce.skills,
 				content: (
 					<div>
 						{workforce.skills?.map((skill, i) => (
@@ -234,9 +262,12 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 				),
 			},
 		],
+		// onClick:(e) =>{
+		//     handleCheckboxChange(workforce.id);
+		// }
 	}));
 
-	function saveSelectedWorkforces() {
+	function handleConfirm() {
 		const selectedWorkforcesArray = selectedWorkforces?.map(
 			(workforceId) => {
 				return workforces.find(
@@ -247,15 +278,10 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 		cache("workforce_parameter", JSON.stringify(selectedWorkforcesArray));
 
 		onSelectedWorkforces(selectedWorkforcesArray);
-	}
 
-	function handleConfirm() {
-		saveSelectedWorkforces();
 		closeSWModal();
 	}
 
-	//SELECT ALL BUTTON
-	const [selectAll, setSelectAll] = useState(false);
 	function handleSelectAll() {
 		if (selectAll) {
 			setSelectedWorkforces([]);
@@ -268,6 +294,47 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 		setSelectAll(!selectAll);
 	}
 
+	const missing_resource = (
+		<p>
+			<ul>
+				{getCacheObject("message_missing_workforce", [])?.map(
+					(skillSet) => (
+						<li key={skillSet.taskId}>
+							Task ID {skillSet.taskId} needs workers with skill
+							sets{" "}
+							{skillSet.skillRequireds?.map((skill, i) => (
+								<span
+									style={{
+										marginRight: "2px",
+										marginLeft: "8px",
+									}}
+									key={i}
+								>
+									<Lozenge
+										style={{
+											backgroundColor:
+												COLOR_SKILL_LEVEL[
+													skill.level - 1
+												].color,
+											color:
+												skill.level === 1
+													? "#091e42"
+													: "white",
+										}}
+										isBold
+									>
+										{skill.name} - {skill.level}
+										<PiStarFill />
+									</Lozenge>
+								</span>
+							))}
+						</li>
+					)
+				)}
+			</ul>
+		</p>
+	);
+
 	return (
 		<div>
 			<Button appearance="primary" onClick={openSWModal}>
@@ -279,7 +346,7 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 					<Modal
 						onClose={closeSWModal}
 						shouldScrollInViewport={false}
-						width={"medium"}
+						width={"large"}
 					>
 						<ModalHeader>
 							<div style={{ flexWrap: "wrap" }}>
@@ -312,14 +379,6 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 										}}
 									>
 										<ButtonGroup>
-											{/* <Button
-												appearance="primary"
-												onClick={() => {
-													closeSWModal();
-												}}
-											>
-												Create new
-											</Button> */}
 											<ParameterCreareWorkforceModal
 												onCreatedClick={
 													handleCreateClicked
@@ -334,9 +393,39 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 													? "Deselect All"
 													: "Select All"}
 											</Button>
+											<Button
+												onClick={handleLoadingDBClicked}
+											>
+												Refresh
+											</Button>
 										</ButtonGroup>
 									</div>
 								</div>
+								{getCacheObject("message_missing_workforce", [])
+									?.length > 0 && (
+									<div
+										style={{
+											marginTop: "10px",
+										}}
+									>
+										<Button
+											onClick={() =>
+												handleCreateThreadFail(
+													missing_resource
+												)
+											}
+											appearance="subtle-link"
+											iconBefore={
+												<EditorWarningIcon
+													primaryColor="#e2b203"
+													label="edit"
+												/>
+											}
+										>
+											You need add more employee
+										</Button>
+									</div>
+								)}
 							</div>
 						</ModalHeader>
 						<ModalBody>
@@ -374,44 +463,40 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 
 export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 	//CREATE WORKFORCE MODAL (CW)
-    let project = getCacheObject("project", null);
-    const baseWH = (project.baseWorkingHour===0 ||project.baseWorkingHour === null) ? 24: project.baseWorkingHour;
+	let project = getCacheObject("project", null);
 	const [isCWOpen, setIsCWOpen] = useState(false);
 	const openCWModal = useCallback(() => setIsCWOpen(true), []);
 	const closeCWModal = useCallback(() => setIsCWOpen(false), []);
 	const [isParttimeSelected, setIsParttimeSelected] = useState(false);
 	const [skillsTable, setSkillsTable] = useState([]);
+	const [loadingDetail, setLoadingDetail] = useState(false);
 	const [loadingSubmit, setLoadingSubmit] = useState(false);
 	const [skillDB, setSkillDB] = useState([]);
 
 	const [workforcesJiraAccount, setWorkforcesJiraAccount] = useState([]);
 
-	useEffect(function () {
-		if (workforcesJiraAccount.length < 1) {
-			invoke("getAllUserJira")
-				.then(function (jiraUsersResponse) {
-					const jiraUsers = jiraUsersResponse
-						.filter((user) => user.accountType === "atlassian")
-						.map((user) => ({
-							accountId: user.accountId,
-							email: user.emailAddress,
-							accountType: user.accountType,
-							name: user.displayName,
-							avatar: user.avatarUrls["48x48"],
-							displayName: user.displayName,
-						}));
-					setWorkforcesJiraAccount(jiraUsers);
-				})
-				.catch(function (error) {
-					console.log(error);
-					Toastify.error(error.toString());
-				});
-		}
+	useEffect(() => {
+		setLoadingDetail(true);
+		Promise.all([invoke("getAllUserJira"), invoke("getAllSkills")])
+			.then(([jiraUsersResponse, resSkillDB]) => {
+				const jiraUsers = jiraUsersResponse
+					.filter((user) => user.accountType === "atlassian")
+					.map((user) => ({
+						accountId: user.accountId,
+						email: user.emailAddress,
+						accountType: user.accountType,
+						name: user.displayName,
+						avatar: user.avatarUrls["48x48"],
+						displayName: user.displayName,
+					}));
+				setWorkforcesJiraAccount(jiraUsers);
 
-		invoke("getAllSkills", {})
-			.then(function (res) {
-				setSkillDB(res);
-				localStorage.setItem("all_skills_DB", JSON.stringify(res));
+				setSkillDB(resSkillDB);
+				localStorage.setItem(
+					"all_skills_DB",
+					JSON.stringify(resSkillDB)
+				);
+				setLoadingDetail(false);
 			})
 			.catch(function (error) {
 				console.log(error);
@@ -507,7 +592,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 			.then(function (res) {
 				if (res != null) {
 					console.log("create new workforce", res);
-					let workforce_name_display = res.name;
+					let workforce_name_display = res.displayName;
 					Toastify.success(
 						"Workforce '" + workforce_name_display + "' is created."
 					);
@@ -533,8 +618,8 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 		);
 	}
 
-    const OutScopeMessage = () => (
-		<ErrorMessage>Value raging from 0 to {baseWH}</ErrorMessage>
+	const OutScopeMessage = () => (
+		<ErrorMessage>Value raging from 0 to 24</ErrorMessage>
 	);
 
 	return (
@@ -571,9 +656,9 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 											: null, //DEFAULT
 									email: data.email,
 									accountType: "atlassian", //DEFAULT
-									name: data.name,
+									name: null,
 									avatar: null, //DEFAULT
-									displayName: data.usernamejira,
+									displayName: data.name,
 									unitSalary: data.salary,
 									workingType:
 										isParttimeSelected === true ? 1 : 0,
@@ -614,7 +699,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 								};
 								if (workforce_request.workingType == 0) {
 									workforce_request.workingEfforts = [
-										1, 1, 1, 1, 1, 1, 1,
+										0, 0, 0, 0, 0, 0, 0,
 									];
 								}
 								console.log("Form data", workforce_request);
@@ -635,41 +720,60 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 									<ModalBody>
 										<Grid layout="fluid" spacing="compact">
 											{/* USER ACCOUNT */}
-											<Field
-												name="jiraAccount"
-												label="Jira Account (optional)"
-												defaultValue=""
-											>
-												{({ fieldProps, error }) => (
-													<Fragment>
-														<Select
-															inputId="single-select-example"
-															className="single-select"
-															classNamePrefix="react-select"
-															{...fieldProps}
-															options={workforcesJiraAccount?.map(
-																(user) => ({
-																	label: user.displayName,
-																	value: user.accountId,
-																	avatar: user.avatar,
-																})
+											<GridColumn medium={4}>
+												<Field
+													name="jiraAccount"
+													label="Jira Account (optional)"
+													defaultValue=""
+													isDisabled={loadingDetail}
+												>
+													{({
+														fieldProps,
+														error,
+													}) => (
+														<Fragment>
+															<Select
+																inputId="single-select-example"
+																className="single-select"
+																classNamePrefix="react-select"
+																{...fieldProps}
+																options={[
+																	{
+																		label: "None",
+																		value: null,
+																		avatar: null,
+																	},
+																	...workforcesJiraAccount?.map(
+																		(
+																			user
+																		) => ({
+																			label: user.displayName,
+																			value: user.accountId,
+																			avatar: user.avatar,
+																		})
+																	),
+																]}
+																formatOptionLabel={
+																	formatOptionLabel
+																}
+																placeholder="Choose a Jira account"
+															/>
+															{loadingDetail ===
+																true && (
+																<Spinner />
 															)}
-															formatOptionLabel={
-																formatOptionLabel
-															}
-															placeholder="Choose a Jira account"
-														/>
-														{!error && (
-															<HelperMessage></HelperMessage>
-														)}
-														{error && (
-															<ErrorMessage></ErrorMessage>
-														)}
-													</Fragment>
-												)}
-											</Field>
+															{!error && (
+																<HelperMessage></HelperMessage>
+															)}
+															{error && (
+																<ErrorMessage></ErrorMessage>
+															)}
+														</Fragment>
+													)}
+												</Field>
+											</GridColumn>
 											{/* EMAIL TEXTFIELD */}
-											<GridColumn medium={12}>
+											<GridColumn medium={8}>
 												<Field
 													name="email"
 													label="Email"
@@ -711,11 +815,10 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 												</Field>
 											</GridColumn>
 											{/* USERNAME JIRA TEXTFIELD */}
-											<GridColumn medium={6}>
+											{/* <GridColumn medium={6}>
 												<Field
 													name="usernamejira"
 													label="Jira Username"
-													isRequired
 												>
 													{({
 														fieldProps,
@@ -742,7 +845,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 														</Fragment>
 													)}
 												</Field>
-											</GridColumn>
+											</GridColumn> */}
 											{/* NAME TEXTFIELD */}
 											<GridColumn medium={6}>
 												<Field
@@ -781,7 +884,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 												</Field>
 											</GridColumn>
 											{/* SALARY TEXTFIELD */}
-											<GridColumn medium={12}>
+											<GridColumn medium={6}>
 												<Field
 													name="salary"
 													label="Salary (Hour)"
@@ -798,9 +901,9 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 													}) => (
 														<Fragment>
 															<TextField
+																type="number"
 																autoComplete="off"
 																{...fieldProps}
-																placeholder="Number only"
 																elemBeforeInput={
 																	<p
 																		style={{
@@ -866,7 +969,11 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															size="small"
 															content=""
 														></InfoIcon>
-														Working hours per day
+														Working hours per day.
+														<br />
+														The hours require
+														exactly one digit after
+														the decimal point.
 													</HelperMessage>
 												)}
 											</GridColumn>
@@ -881,7 +988,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															isRequired
 															validate={(value) =>
 																validateWorkingEffort(
-																	value, baseWH
+																	value
 																)
 															}
 														>
@@ -891,9 +998,21 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															}) => (
 																<Fragment>
 																	<TextField
+																		type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder="Number only"
+																		placeholder={
+																			MESSAGE_PLACEHOLDER_WORKING_EFFORTS
+																		}
+																		elemAfterInput={
+																			<div
+																				style={{
+																					margin: "10px",
+																				}}
+																			>
+																				Hours
+																			</div>
+																		}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -904,7 +1023,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																	)}
 																	{error ===
 																		"OUT_SCOPE" && (
-																		<OutScopeMessage/>
+																		<OutScopeMessage />
 																	)}
 																</Fragment>
 															)}
@@ -916,7 +1035,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															isRequired
 															validate={(value) =>
 																validateWorkingEffort(
-																	value, baseWH
+																	value
 																)
 															}
 														>
@@ -926,9 +1045,21 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															}) => (
 																<Fragment>
 																	<TextField
+																		type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder="Number only"
+																		placeholder={
+																			MESSAGE_PLACEHOLDER_WORKING_EFFORTS
+																		}
+																		elemAfterInput={
+																			<div
+																				style={{
+																					margin: "10px",
+																				}}
+																			>
+																				Hours
+																			</div>
+																		}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -939,7 +1070,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																	)}
 																	{error ===
 																		"OUT_SCOPE" && (
-																		<OutScopeMessage/>
+																		<OutScopeMessage />
 																	)}
 																</Fragment>
 															)}
@@ -951,7 +1082,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															isRequired
 															validate={(value) =>
 																validateWorkingEffort(
-																	value, baseWH
+																	value
 																)
 															}
 														>
@@ -961,9 +1092,21 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															}) => (
 																<Fragment>
 																	<TextField
+																		type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder="Number only"
+																		placeholder={
+																			MESSAGE_PLACEHOLDER_WORKING_EFFORTS
+																		}
+																		elemAfterInput={
+																			<div
+																				style={{
+																					margin: "10px",
+																				}}
+																			>
+																				Hours
+																			</div>
+																		}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -974,7 +1117,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																	)}
 																	{error ===
 																		"OUT_SCOPE" && (
-																		<OutScopeMessage/>
+																		<OutScopeMessage />
 																	)}
 																</Fragment>
 															)}
@@ -986,7 +1129,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															isRequired
 															validate={(value) =>
 																validateWorkingEffort(
-																	value, baseWH
+																	value
 																)
 															}
 														>
@@ -996,9 +1139,21 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															}) => (
 																<Fragment>
 																	<TextField
+																		type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder="Number only"
+																		placeholder={
+																			MESSAGE_PLACEHOLDER_WORKING_EFFORTS
+																		}
+																		elemAfterInput={
+																			<div
+																				style={{
+																					margin: "10px",
+																				}}
+																			>
+																				Hours
+																			</div>
+																		}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -1009,7 +1164,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																	)}
 																	{error ===
 																		"OUT_SCOPE" && (
-																		<OutScopeMessage/>
+																		<OutScopeMessage />
 																	)}
 																</Fragment>
 															)}
@@ -1021,7 +1176,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															isRequired
 															validate={(value) =>
 																validateWorkingEffort(
-																	value, baseWH
+																	value
 																)
 															}
 														>
@@ -1031,9 +1186,21 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															}) => (
 																<Fragment>
 																	<TextField
+																		type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder="Number only"
+																		placeholder={
+																			MESSAGE_PLACEHOLDER_WORKING_EFFORTS
+																		}
+																		elemAfterInput={
+																			<div
+																				style={{
+																					margin: "10px",
+																				}}
+																			>
+																				Hours
+																			</div>
+																		}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -1044,7 +1211,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																	)}
 																	{error ===
 																		"OUT_SCOPE" && (
-																		<OutScopeMessage/>
+																		<OutScopeMessage />
 																	)}
 																</Fragment>
 															)}
@@ -1056,7 +1223,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															isRequired
 															validate={(value) =>
 																validateWorkingEffort(
-																	value, baseWH
+																	value
 																)
 															}
 														>
@@ -1066,9 +1233,21 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															}) => (
 																<Fragment>
 																	<TextField
+																		type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder="Number only"
+																		placeholder={
+																			MESSAGE_PLACEHOLDER_WORKING_EFFORTS
+																		}
+																		elemAfterInput={
+																			<div
+																				style={{
+																					margin: "10px",
+																				}}
+																			>
+																				Hours
+																			</div>
+																		}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -1079,7 +1258,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																	)}
 																	{error ===
 																		"OUT_SCOPE" && (
-																		<OutScopeMessage/>
+																		<OutScopeMessage />
 																	)}
 																</Fragment>
 															)}
@@ -1091,7 +1270,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															isRequired
 															validate={(value) =>
 																validateWorkingEffort(
-																	value, baseWH
+																	value
 																)
 															}
 														>
@@ -1101,9 +1280,21 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 															}) => (
 																<Fragment>
 																	<TextField
+																		type="number"
 																		autoComplete="off"
 																		{...fieldProps}
-																		placeholder="Number only"
+																		placeholder={
+																			MESSAGE_PLACEHOLDER_WORKING_EFFORTS
+																		}
+																		elemAfterInput={
+																			<div
+																				style={{
+																					margin: "10px",
+																				}}
+																			>
+																				Hours
+																			</div>
+																		}
 																	/>
 																	{error ===
 																		"NOT_VALID" && (
@@ -1114,7 +1305,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																	)}
 																	{error ===
 																		"OUT_SCOPE" && (
-																		<OutScopeMessage/>
+																		<OutScopeMessage />
 																	)}
 																</Fragment>
 															)}
@@ -1127,6 +1318,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 												<Field
 													name="skills"
 													label="Skills"
+													isDisabled={loadingDetail}
 												>
 													{({
 														fieldProps,
@@ -1142,11 +1334,14 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 																		id: skill.id,
 																		value: skill.name,
 																		label: skill.name,
-																		level: skill.level,
+																		level: 1,
 																	})
 																)}
 																onSelectedValue={
 																	onSelectedValue
+																}
+																isLoading={
+																	loadingDetail
 																}
 															></CreatableAdvanced>
 															<HelperMessage>
