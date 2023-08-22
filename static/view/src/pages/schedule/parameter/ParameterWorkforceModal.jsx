@@ -163,7 +163,6 @@ export function ParameterSelectWorkforceModal({ onSelectedWorkforces }) {
 
 	function handleCheckboxChange(workforceId) {
 		setSelectedWorkforces((prevSelectedWorkforces) => {
-			console.log("prevSelectedWorkforces:", prevSelectedWorkforces);
 
 			if (prevSelectedWorkforces?.includes(workforceId.toString())) {
 				return prevSelectedWorkforces.filter(
@@ -509,10 +508,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 	};
 
 	const onSelectedValue = (childValue) => {
-		console.log("Received value from child:", childValue);
-
 		setSkillsTable(childValue.selectedValue);
-		console.log("Received value display in table:", skillsTable);
 	};
 
 	const headSkillTable = {
@@ -591,7 +587,6 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 		invoke("createWorkforce", { workforce_request })
 			.then(function (res) {
 				if (res != null) {
-					console.log("create new workforce", res);
 					let workforce_name_display = res.displayName;
 					Toastify.success(
 						"Workforce '" + workforce_name_display + "' is created."
@@ -702,7 +697,6 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 										0, 0, 0, 0, 0, 0, 0,
 									];
 								}
-								console.log("Form data", workforce_request);
 								createNewWorkforce(workforce_request);
 								return new Promise((resolve) =>
 									setTimeout(resolve, 2000)

@@ -40,7 +40,6 @@ function ResourceEditWorkforceModal({
     skillDB
 }) {
 	const workforce = openState.workforce;
-	console.log("ResourceEditWorkforceModal", workforce);
 	const [selectedWorkforce, setSelectedWorkforce] = useState(workforce);
 	const [isParttimeSelected, setIsParttimeSelected] = useState(
 		workforce.workingType === 1 ? true : false
@@ -255,7 +254,6 @@ function ResourceEditWorkforceModal({
 									0, 0, 0, 0, 0, 0, 0,
 								];
 							}
-							console.log("Form data", workforce_request);
 							handleUpdate(workforce_request);
 							return new Promise((resolve) =>
 								setTimeout(resolve, 2000)
