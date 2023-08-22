@@ -237,7 +237,7 @@ const TaskDetail = ({
 
 	return (
 		<div className="task-details">
-			<PageHeader actions={actionsContent}>Task details:</PageHeader>
+			<PageHeader actions={actionsContent}>Task details</PageHeader>
 			<div>
 				<pre>
 					{currentTask ? (

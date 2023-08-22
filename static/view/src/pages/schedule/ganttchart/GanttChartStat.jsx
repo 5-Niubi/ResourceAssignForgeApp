@@ -52,37 +52,36 @@ const GanttChartStats = ({ selectedSolution, solutionTasks }) => {
 		if (t.startDate < start) {
 			start = t.startDate;
 		}
-		if (t.endDate > end) {
+		if (t.endDate >= end) {
 			end= t.endDate;
 		}
 	});
 
 	start = new Date(start);
 	end = new Date(end);
-
 	return selectedSolution ? (
 		<Grid spacing="comfortable" columns={12}>
 			<GridColumn medium={4}>
 				<GanttChartStat
-					title="Duration"
+					title="Project Duration"
 					value={selectedSolution.duration + " days"}
 					info={
-						start.toLocaleDateString("en-US") +
+						start.toLocaleDateString("vi-VN") +
 						" to " +
-						end.toLocaleDateString("en-US")
+						end.toLocaleDateString("vi-VN")
 					}
 				/>
 			</GridColumn>
 			<GridColumn medium={4}>
 				<GanttChartStat
-					title="Cost"
+					title="Total Salary"
 					value={selectedSolution.cost + " " + project.budgetUnit}
 				/>
 			</GridColumn>
 			<GridColumn medium={4}>
 				<GanttChartStat
-					title="Quality"
-					value={selectedSolution.quality + "%"}
+					title="Total Employee Experiences"
+					value={selectedSolution.quality}
 				/>
 			</GridColumn>
 		</Grid>
