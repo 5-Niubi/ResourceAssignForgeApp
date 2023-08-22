@@ -1,23 +1,12 @@
-import API, { route } from "@forge/api";
-import APIJiraServices from "./common/APIJiraServices";
+import { BACKEND_SERVER_DOMAIN } from "../common/environment";
 import APIServices from "./common/APIServices";
-import { BACKEND_dNET_DOMAIN } from "../common/constants";
 
 async function exportToJira(context, scheduleId, projectCreate) {
 	try {
-		// let body = {};
-		// body.key = projectCreate.projectKey;
-		// body.leadAccountId = context.accountId;
-		// body.name = projectCreate.projectName;
-		// body.projectTemplateKey = "com.pyxis.greenhopper.jira:gh-simplified-basic";
-		// body.projectTypeKey = "software";
-
-		// let response = await APIJiraServices.post("/rest/api/3/project", null, body);
-		
 		const result = await APIServices.get(`/api/Export/ExportToJira`, {
 			scheduleId,
 			projectKey: projectCreate.projectKey,
-			projectName: projectCreate.projectName
+			projectName: projectCreate.projectName,
 		});
 		return result;
 	} catch (error) {
@@ -35,7 +24,7 @@ async function getUrlexportToMSXml(scheduleId) {
 		let token = result.token;
 
 		let apiDownload = "/api/Export/ExportToMicrosoftProject";
-		let url = new URL(`${BACKEND_dNET_DOMAIN}${apiDownload}`);
+		let url = new URL(`${BACKEND_SERVER_DOMAIN}${apiDownload}`);
 		url.searchParams.append("scheduleId", scheduleId);
 		url.searchParams.append("token", token);
 		return url.toString();
@@ -44,7 +33,7 @@ async function getUrlexportToMSXml(scheduleId) {
 	}
 }
 
-async function checkPrivileges(context){
+async function checkPrivileges(context) {
 	// try {
 	// 	console.log(context);
 	// 	const result = await APIJiraServices.get(
@@ -58,4 +47,4 @@ async function checkPrivileges(context){
 	// }
 }
 
-export { exportToJira, getUrlexportToMSXml, checkPrivileges };
+export { checkPrivileges, exportToJira, getUrlexportToMSXml };

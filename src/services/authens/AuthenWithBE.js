@@ -1,9 +1,10 @@
 import { storage, webTrigger } from "@forge/api";
 import { STORAGE } from "../../common/constants";
 import { Base64 } from "../../common/utils";
+import { APP_CLIENT_ID } from "../../common/environment";
 
 class AuthenWithBE {
-	clientId = "wDzzxAZSrrM9DtPwZ295BMT3YoFR6KeD";
+	clientId = APP_CLIENT_ID;
 
 	async generateOAuthURL(context) {
 		let urlTrigger = await webTrigger.getUrl("authen-app-web-trigger-key");
