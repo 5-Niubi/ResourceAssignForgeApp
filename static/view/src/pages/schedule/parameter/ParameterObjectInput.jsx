@@ -124,7 +124,6 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 		function () {
 			invoke("getExecuteAlgorithmDailyLimited")
 				.then(function (res) {
-					console.log("getExecuteAlgorithmDailyLimited", res);
 					setMessageScheduleLimited(res);
 					handleExecuteAlgorithmDailyLimited(res);
 				})
@@ -196,14 +195,12 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 			Budget: Number(cost),
 			ParameterResources: parameterResources,
 		};
-		console.log("Send parameter data: ", data);
 
 		async function saveAndSchedule() {
 			try {
 				let saveRes = await invoke("saveParameters", {
 					parameter: data,
 				});
-				console.log("saveParameters response: ", saveRes);
 				localStorage.setItem("parameterId", saveRes.id);
 				let getThreadScheduleRes;
 				try {
@@ -223,7 +220,6 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 				setIsScheduling(false);
 				let messageError = extractErrorMessage(error);
 				let messageDisplay = messageError;
-				debugger;
 				if (Array.isArray(messageError)) {
 					messageDisplay = (
 						<ul>
@@ -300,7 +296,6 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 			{isLoading ? <Spinner size={"large"} /> : null}
 			<Form
 				onSubmit={({ cost, objectives }) => {
-					console.log("Form Submitted: ", objectives);
 					SaveParameters({ cost, objectives });
 					return new Promise((resolve) => setTimeout(resolve, 2000)).then(() =>
 						data.username === "error"
