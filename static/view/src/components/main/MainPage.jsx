@@ -72,7 +72,7 @@ function MainPage({ history, historyState }) {
 											element={<HomeSideBar rootPath="/" />}
 										></Route>
 										<Route
-											path="/resources"
+											path="/employees"
 											element={<HomeSideBar rootPath="/" />}
 										></Route>
 										<Route
