@@ -39,14 +39,14 @@ function HomeSideBar({rootPath = ""}) {
 				<Section hasSeparator>
 					<ButtonItemSideBar
 						rootPath={rootPath}
-						text={"Project Lists"}
+						text={"Projects"}
 						pathTo={""}
 						iconBefore={<ActivityIcon label="" />}
 					/>
 					<ButtonItemSideBar
 						rootPath={rootPath}
-						text={"Resources"}
-						pathTo={"resources"}
+						text={"Employees"}
+						pathTo={"employees"}
 						iconBefore={<PeopleGroupIcon label="" />}
 					/>
 					<ButtonItemSideBar

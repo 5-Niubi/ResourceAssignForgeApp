@@ -28,6 +28,7 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 	const [project, setProject] = useState(openState.project);
 	const [projectName, setProjectName] = useState(project.name);
 	const [startDate, setStartDate] = useState(project.startDate);
+	debugger;
 	const [endDate, setEndDate] = useState(project.deadline);
 	const [budget, setBudget] = useState(0);
 	const [unit, setUnit] = useState("");
@@ -121,9 +122,7 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 	return (
 		<ModalTransition>
 			<Modal onClose={closeModal} width={width}>
-				<Form
-					onSubmit={(formState) => console.log("form submitted", formState)}
-				>
+				<Form onSubmit={handleSubmitCreate}>
 					{({ formProps }) => (
 						<form id="form-with-id" {...formProps}>
 							<ModalHeader>
@@ -196,41 +195,49 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 
 										<FormSection>
 											<Grid spacing="compact" columns={columns}>
-												<GridColumn medium={8}>
+												<GridColumn medium={columns}>
 													<Field
 														aria-required={true}
 														name="budget"
-														label="Budget"
+														label="Price"
 													>
-														{(fieldProps) => (
+														{({ fieldProps }) => (
 															<TextField
+																{...fieldProps}
 																autoComplete="off"
 																value={budget}
 																onChange={handleSetBudget}
 																type="number"
 																isDisabled={!isLoaded}
-																{...fieldProps}
+																elemBeforeInput={
+																	<p
+																		style={{
+																			marginLeft: 10,
+																		}}
+																	>
+																		$
+																	</p>
+																}
 															/>
 														)}
 													</Field>
 												</GridColumn>
-												<GridColumn medium={2}>
+												{/* <GridColumn medium={2}>
 													<Field
-														aria-required={true}
 														name="budgetUnit"
 														label="Unit"
 													>
 														{(fieldProps) => (
 															<TextField
 																autoComplete="off"
-																value={unit}
-																onChange={handleSetUnit}
-																isDisabled={!isLoaded}
+																value="$"
+																isReadOnly
 																{...fieldProps}
+																
 															/>
 														)}
 													</Field>
-												</GridColumn>
+												</GridColumn> */}
 											</Grid>
 										</FormSection>
 										<FormSection>
@@ -257,7 +264,6 @@ function EditProjectModal({ openState, setOpenState, setProjectsListState }) {
 									<LoadingButton
 										type="submit"
 										appearance="primary"
-										onClick={handleSubmitCreate}
 										isDisabled={!isLoaded}
 										isLoading={isSubmitting}
 									>

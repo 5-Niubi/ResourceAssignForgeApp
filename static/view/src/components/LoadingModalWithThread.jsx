@@ -20,6 +20,7 @@ import {
 import { HttpStatus } from "../common/httpStatus";
 import {
 	extractErrorMessage,
+	hasJsonStructure,
 	isArrayEmpty,
 	isObjectEmpty,
 	removeThreadInfo,
@@ -130,9 +131,16 @@ function LoadingModalWithThread({ state }) {
 				}
 
 				if (modalState.threadAction === THREAD_ACTION.RUNNING_SCHEDULE) {
-					Toastify.error(
-						"Error at thread of Running Schedule: " + JSON.stringify(res.result)
-					);
+					if (hasJsonStructure(res.result.response))
+						Toastify.error(
+							"Error at thread of Running Schedule: " +
+								JSON.parse(res.result.response).message
+						);
+					else {
+						Toastify.error(
+							"Error at thread of Running Schedule: " + res.result.message
+						);
+					}
 				}
 
 				// Handle finish thread
@@ -144,9 +152,9 @@ function LoadingModalWithThread({ state }) {
 
 	let animation;
 	if (modalState.threadAction === THREAD_ACTION.JIRA_EXPORT) {
-		animation = <Image style={{width: "5em"}} src={SnakeLink} />;
+		animation = <Image style={{ width: "5em" }} src={SnakeLink} />;
 	} else if (modalState.threadAction === THREAD_ACTION.RUNNING_SCHEDULE) {
-		animation = <Image style={{width: "5em"}} src={ProcessImg} />;
+		animation = <Image style={{ width: "5em" }} src={ProcessImg} />;
 	}
 	return (
 		<ModalTransition>

@@ -51,7 +51,7 @@ import {
 	extractErrorMessage,
 	cache,
 	clearCache,
-    validateIntegerOnly,
+	validateIntegerOnly,
 } from "../../../common/utils";
 import Spinner from "@atlaskit/spinner";
 import { RadioGroup } from "@atlaskit/radio";
@@ -63,7 +63,7 @@ import { PiStarFill } from "react-icons/pi";
 import { validateNumberOnly } from "../../../common/utils";
 import InstructionMessage from "../../../components/InstructionMessage";
 import { color } from "highcharts";
-import InfoIcon from '@atlaskit/icon/glyph/info';
+import InfoIcon from "@atlaskit/icon/glyph/info";
 const objectiveItems = [
 	{ name: "time", value: "time", label: "Execution time" },
 	{ name: "cost", value: "cost", label: "Total cost" },
@@ -81,7 +81,7 @@ const optimizerItems = [
 		value: "1",
 		label: "Mathematical Optimizer",
 	},
-    {
+	{
 		name: "General Optimizer",
 		value: "0",
 		label: "General Optimizer",
@@ -99,12 +99,11 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 	const [endDate, setEndDate] = useState(project_detail.deadline);
 	const [budget, setBudget] = useState(project_detail.budget);
 	const [budgetUnit, setBudgetUnit] = useState(project_detail.budgetUnit);
-    const [selectedOptimizer, setSelectedOptimizer] = useState("0");
+	const [selectedOptimizer, setSelectedOptimizer] = useState("0");
 	const [isLoading, setIsLoading] = useState(false);
 	const [isScheduling, setIsScheduling] = useState(false);
 	const { setAppContextState } = useContext(AppContext);
-	const [messageScheduleLimited, setMessageScheduleLimited] =
-		useState(Object);
+	const [messageScheduleLimited, setMessageScheduleLimited] = useState(Object);
 	const [canClickSchedule, setCanClickSchedule] = useState(false);
 	const [numberOfScheduleCanClick, setNumberOfScheduleCanClick] = useState(0);
 
@@ -226,46 +225,35 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 						<ul>
 							{messageError?.map((skillSet) => (
 								<li key={skillSet.taskId}>
-									Task ID {skillSet.taskId} needs workers with
-									skill sets{" "}
-									{skillSet.skillRequireds?.map(
-										(skill, i) => (
-											<span
+									Task ID {skillSet.taskId} needs workers with skill sets{" "}
+									{skillSet.skillRequireds?.map((skill, i) => (
+										<span
+											style={{
+												marginRight: "2px",
+												marginLeft: "8px",
+											}}
+											key={i}
+										>
+											<Lozenge
 												style={{
-													marginRight: "2px",
-													marginLeft: "8px",
+													backgroundColor:
+														COLOR_SKILL_LEVEL[skill.level - 1].color,
+													color: skill.level === 1 ? "#091e42" : "white",
 												}}
-												key={i}
+												isBold
 											>
-												<Lozenge
-													style={{
-														backgroundColor:
-															COLOR_SKILL_LEVEL[
-																skill.level - 1
-															].color,
-														color:
-															skill.level === 1
-																? "#091e42"
-																: "white",
-													}}
-													isBold
-												>
-													{skill.name} - {skill.level}
-													<PiStarFill />
-												</Lozenge>
-											</span>
-										)
-									)}
+												{skill.name} - {skill.level}
+												<PiStarFill />
+											</Lozenge>
+										</span>
+									))}
 								</li>
 							))}
 						</ul>
 					);
 
 					//STORE MESSAGE MISSING WORKFORCE
-					cache(
-						"message_missing_workforce",
-						JSON.stringify(messageError)
-					);
+					cache("message_missing_workforce", JSON.stringify(messageError));
 					handleCreateThreadFail(messageDisplay);
 					return;
 				}
@@ -284,9 +272,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 	const actionsContent = (
 		<>
 			<ButtonGroup>
-				<LoadingButton onClick={() => handleChangeTab(1)}>
-					Back
-				</LoadingButton>
+				<LoadingButton onClick={() => handleChangeTab(1)}>Back</LoadingButton>
 				<LoadingButton
 					type="submit"
 					appearance="primary"
@@ -311,9 +297,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 			<Form
 				onSubmit={({ cost, objectives }) => {
 					SaveParameters({ cost, objectives });
-					return new Promise((resolve) =>
-						setTimeout(resolve, 2000)
-					).then(() =>
+					return new Promise((resolve) => setTimeout(resolve, 2000)).then(() =>
 						data.username === "error"
 							? {
 									username: "IN_USE",
@@ -324,10 +308,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 			>
 				{({ formProps, submitting }) => (
 					<form {...formProps}>
-						<PageHeader
-							actions={actionsContent}
-							disableTitleStyles={true}
-						>
+						<PageHeader actions={actionsContent} disableTitleStyles={true}>
 							<div style={{ display: "inline-flex" }}>
 								<h2>Parameters</h2>
 								<div style={{ marginLeft: 5 }}>
@@ -335,79 +316,45 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 										content={
 											<ul>
 												<li>
-													<strong
-														style={strongTextStyle}
-													>
-														Expected Cost
-													</strong>
-													: The estimated total cost
-													required for personnel
+													<strong style={strongTextStyle}>Expected Cost</strong>
+													: The estimated total cost required for personnel
 													payment
 												</li>
 												<li>
-													<strong
-														style={strongTextStyle}
-													>
+													<strong style={strongTextStyle}>
 														Expected Start Date
 													</strong>
-													: The desired project start
-													date
+													: The desired project start date
 												</li>
 												<li>
-													<strong
-														style={strongTextStyle}
-													>
+													<strong style={strongTextStyle}>
 														Expected End Date
 													</strong>
-													: The desired project
-													completion date
+													: The desired project completion date
 												</li>
 												<li>
-													<strong
-														style={strongTextStyle}
-													>
+													<strong style={strongTextStyle}>
 														Project Objective
 													</strong>
-													: The goals that the project
-													aims to achieve including:
+													: The goals that the project aims to achieve
+													including:
 													<ul>
 														<li>
-															<strong>
-																Execution Time
-															</strong>
-															: Prioritize
-															minimizing the time
-															to complete the
-															project
+															<strong>Execution Time</strong>: Prioritize
+															minimizing the time to complete the project
 														</li>
 														<li>
-															<strong>
-																Total Cost
-															</strong>
-															: Prioritize
-															minimizing the costs
-															required for
-															personnel payment
+															<strong>Total Cost</strong>: Prioritize minimizing
+															the costs required for personnel payment
 														</li>
 														<li>
-															<strong>
-																Total Employees'
-																Experiences
-															</strong>
-															: Prioritize
-															maximizing the
-															quality of personnel
-															throughout the
-															project
+															<strong>Total Employees' Experiences</strong>:
+															Prioritize maximizing the quality of personnel
+															throughout the project
 														</li>
 														<li>
-															<strong>
-																Neutral
-															</strong>
-															: Maintain a
-															balanced approach
-															among the above
-															objectives
+															<strong>Neutral</strong>: Maintain a balanced
+															approach among the above objectives
 														</li>
 													</ul>
 												</li>
@@ -426,7 +373,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 										label="Expected Cost"
 										name="cost"
 										defaultValue={budget ?? 0}
-                                        validate={(v)=> validateIntegerOnly(v)}
+										validate={(v) => validateIntegerOnly(v)}
 									>
 										{({ fieldProps, error }) => (
 											<Fragment>
@@ -438,34 +385,27 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 														<p
 															style={{
 																marginLeft: 10,
-																fontWeight:
-																	"bold",
+																fontWeight: "bold",
 															}}
 														>
 															{budgetUnit}
 														</p>
 													}
 												/>
-                                                {error && <ErrorMessage>{error}</ErrorMessage>}
+												{error && <ErrorMessage>{error}</ErrorMessage>}
 											</Fragment>
 										)}
 									</Field>
 								</GridColumn>
 								{/* START DATE DATETIMEPICKER */}
 								<GridColumn medium={0}>
-									<Field
-										name="startDate"
-										label="Start Date"
-										isRequired
-									>
+									<Field name="startDate" label="Start Date" isRequired>
 										{({ fieldProps }) => (
 											<Fragment>
 												<DatePicker
 													{...fieldProps}
 													value={startDate}
-													onChange={
-														handleSetStartDate
-													}
+													onChange={handleSetStartDate}
 													dateFormat={DATE_FORMAT.DMY}
 													isRequired
 												/>
@@ -475,11 +415,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 								</GridColumn>
 								{/* END DATE DATETIMEPICKER */}
 								<GridColumn medium={0}>
-									<Field
-										name="endDate"
-										label="End Date"
-										isRequired
-									>
+									<Field name="endDate" label="End Date" isRequired>
 										{({ fieldProps, error }) => (
 											<Fragment>
 												<DatePicker
@@ -505,10 +441,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 										isRequired
 									>
 										{({ fieldProps }) => (
-											<RadioGroup
-												{...fieldProps}
-												options={objectiveItems}
-											/>
+											<RadioGroup {...fieldProps} options={objectiveItems} />
 										)}
 									</Field>
 								</GridColumn>
@@ -517,30 +450,30 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 										label="Optimizer"
 										name="optimizer"
 										isRequired
-                                        defaultValue={"0"}
+										defaultValue={"0"}
 									>
 										{({ fieldProps }) => (
 											<RadioGroup
-                                            options={optimizerItems}
-                                            value={selectedOptimizer}
-                                            onChange={(v) => 
-                                                setSelectedOptimizer((v.target.value))
-                                            }
-                                        />
+												options={optimizerItems}
+												value={selectedOptimizer}
+												onChange={(v) => setSelectedOptimizer(v.target.value)}
+											/>
 										)}
 									</Field>
-                                    {selectedOptimizer === "0" && (
-                                        <HelperMessage>
-                                        An optimization tool based on Genetic Algorithm aims to generate local optimal solutions quickly.
-                                        </HelperMessage>
-                                    )}
-                                    {selectedOptimizer === "1" && (
-                                        <HelperMessage>
-                                        An optimization tool based on Mathematical Optimizer aims to generate a globally optimal solution. For supporting large problems, please contact us directly via trungbuiducbuiduc@gmail.com.
-                                    </HelperMessage>
-                                    )}
-                                   
-                                    
+									{selectedOptimizer === "0" && (
+										<HelperMessage>
+											An optimization tool based on Genetic Algorithm aims to
+											generate local optimal solutions quickly.
+										</HelperMessage>
+									)}
+									{selectedOptimizer === "1" && (
+										<HelperMessage>
+											An optimization tool based on Mathematical Optimizer aims
+											to generate a globally optimal solution. For supporting
+											large problems, please contact us directly via
+											trungbuiducbuiduc@gmail.com.
+										</HelperMessage>
+									)}
 								</GridColumn>
 							</Grid>
 						</FormSection>
