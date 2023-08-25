@@ -98,7 +98,14 @@ function SkillsPage() {
 				content: "Skill name",
 				shouldTruncate: true,
 				isSortable: false,
-				width: 70,
+				width: 30,
+			},
+			{
+				key: "description",
+				content: "Description",
+				shouldTruncate: true,
+				isSortable: false,
+				width: 40,
 			},
 			{
 				key: "action",
@@ -118,6 +125,10 @@ function SkillsPage() {
 				{
 					key: "name",
 					content: skill.name,
+				},
+				{
+					key: "description",
+					content: skill.description,
 				},
 				{
 					key: "option",

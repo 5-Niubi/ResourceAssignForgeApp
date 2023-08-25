@@ -127,7 +127,7 @@ function ResultPage({ handleChangeTab }) {
 				},
 				{
 					key: index,
-					content: "$" + s.cost,
+					content: project.budgetUnit + "" + s.cost,
 				},
 				{
 					key: index,

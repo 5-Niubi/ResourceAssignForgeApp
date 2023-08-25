@@ -291,7 +291,7 @@ function VisualizeTasksPage({ handleChangeTab }) {
 	);
 
 	return (
-		<div class="visualize-tasks">
+		<div className="visualize-tasks">
 			<PageLayout>
 				<Content>
 					<Main testId="main2" id="main2">
