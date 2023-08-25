@@ -14,7 +14,7 @@ function ParameterPage({handleChangeTab}) {
 	let navigate = useNavigate();
 	return (
 		<div style={{width:"100%"}}>
-			<ParameterEstimateMessage></ParameterEstimateMessage>
+			<ParameterEstimateMessage handleChangeTab={handleChangeTab}></ParameterEstimateMessage>
 			<ParameterObjectInput handleChangeTab={handleChangeTab}></ParameterObjectInput>
 			<ParameterWorkforceList></ParameterWorkforceList>
 		</div>
