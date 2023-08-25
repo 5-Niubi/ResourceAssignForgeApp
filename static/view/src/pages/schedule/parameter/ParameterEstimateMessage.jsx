@@ -24,7 +24,6 @@ export default function ParameterEstimateMessage() {
 			.then(function (res) {
 				setIsEstimating(false);
 				setEstimations(res);
-				console.log("Get All Estimation", estimations);
 			})
 			.catch(function (error) {
 				setIsEstimating(false);
@@ -66,7 +65,6 @@ export default function ParameterEstimateMessage() {
 														skill.level
 												)
 										);
-										console.log("workers", workers);
 										return (
 											<>
 												<li>

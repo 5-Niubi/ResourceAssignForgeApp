@@ -37,7 +37,7 @@ permissions:
     fetch:
       backend:
         - "*.ngrok-free.app"
-        - "https://be.ai4cert.com"
+        - "https://production-be.ai4cert.com"
         - "*.loca.lt"
   content:
     styles:

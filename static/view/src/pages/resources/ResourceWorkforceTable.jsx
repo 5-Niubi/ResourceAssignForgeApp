@@ -36,8 +36,6 @@ function ResourceWorkforceTable() {
             invoke("getAllSkills")
         ])
         .then(function ([workforcesResponse, skillsResponse]) {
-            console.log("getAllWorkforces", workforcesResponse);
-    
             const workforces = workforcesResponse.map((workforce) => ({
                 id: workforce.id,
                 accountId: workforce.accountId,

@@ -10,10 +10,10 @@ import {
 import AddCircleIcon from "@atlaskit/icon/glyph/add-circle";
 import CrossIcon from "@atlaskit/icon/glyph/cross";
 import { Grid, GridColumn } from "@atlaskit/page";
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, forwardRef, useEffect, useState } from "react";
 import { milisecondToHours, parseForTimeOnly } from "../../../common/utils";
 import { TIME_SELECTBOX_VALUE } from "../../../common/contants";
-import { SlideIn } from "@atlaskit/motion";
+import { ExitingPersistence, SlideIn } from "@atlaskit/motion";
 
 const columns = 9;
 
@@ -43,8 +43,8 @@ function WorkingTimeHours({
 		></Button>
 	);
 
-	const FieldTimeInput = ({ actionButton, timeRange, index, ...props }) => (
-		<div style={{ marginBottom: "0.5em" }} {...props}>
+	const FieldTimeInput = ({ actionButton, timeRange, index, innerRef, className }) => (
+		<div style={{ marginBottom: "0.5em" }} ref={innerRef} className={className}>
 			<Grid columns={columns} layout="fluid" spacing="compact">
 				<GridColumn medium={1}>{actionButton}</GridColumn>
 				<GridColumn medium={4}>
@@ -132,16 +132,21 @@ function WorkingTimeHours({
 				}
 
 				return (
-					<SlideIn enterFrom={"bottom"} fade={"in"}>
-						{(props) => (
-							<FieldTimeInput
-								actionButton={actionButton}
-								timeRange={element}
-								index={index}
-								{...props}
-							/>
-						)}
-					</SlideIn>
+					<Fragment key={index}>
+						<ExitingPersistence appear>
+							<SlideIn enterFrom={"bottom"} fade={"in"}>
+								{({className, ref}) => (
+									<FieldTimeInput
+										innerRef={ref}
+										className={className}
+										actionButton={actionButton}
+										timeRange={element}
+										index={index}
+									/>
+								)}
+							</SlideIn>
+						</ExitingPersistence>
+					</Fragment>
 				);
 			})}
 			{!!error.length && <ErrorMessage>{error}</ErrorMessage>}

@@ -63,7 +63,7 @@ function ProjectSideBar({ rootPath = "" }) {
 						iconBefore={<ArrowLeftCircleIcon label="" />}
 						onClick={() => navigate("../")}
 					>
-						Go back
+						Back
 					</ButtonItem>
 				</Section>
 				<Section hasSeparator>
@@ -77,7 +77,7 @@ function ProjectSideBar({ rootPath = "" }) {
 					<ButtonItemSideBar
 						key="task-list"
 						rootPath={rootPath}
-						text={"Task Lists"}
+						text={"Tasks"}
 						pathTo={"tasks"}
 						iconBefore={<IssuesIcon label="" />}
 					/>
