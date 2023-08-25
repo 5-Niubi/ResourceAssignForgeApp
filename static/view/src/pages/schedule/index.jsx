@@ -38,12 +38,12 @@ function SchedulePage() {
 			{isLoading ? (
 				<Spinner size="large" />
 			) : error ? (
-				<ScheduleTabs />
-			) : (
 				<EmptyState
 					header="Can not found this project"
 					description="Make sure the projects exists. If it not, please create a new one."
 				/>
+			) : (
+				<ScheduleTabs />
 			)}
 		</>
 	);
