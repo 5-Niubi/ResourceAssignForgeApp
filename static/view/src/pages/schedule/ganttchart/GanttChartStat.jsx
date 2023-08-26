@@ -1,6 +1,6 @@
 import { Grid, GridColumn } from "@atlaskit/page";
 import React, { useState, useEffect } from "react";
-import { findObj, getCache } from "../../../common/utils";
+import { findObj, formatDateDMY, getCache } from "../../../common/utils";
 
 const GanttChartStat = ({ title, value, info }) => {
 	return (
@@ -57,8 +57,8 @@ const GanttChartStats = ({ selectedSolution, solutionTasks }) => {
 		}
 	});
 
-	start = new Date(start);
-	end = new Date(end);
+	// start = new Date(start);
+	// end = new Date(end);
 	return selectedSolution ? (
 		<Grid spacing="comfortable" columns={12}>
 			<GridColumn medium={4}>
@@ -66,9 +66,9 @@ const GanttChartStats = ({ selectedSolution, solutionTasks }) => {
 					title="Project Duration"
 					value={selectedSolution.duration + " days"}
 					info={
-						start.toLocaleDateString("vi-VN") +
+						formatDateDMY(start) +
 						" to " +
-						end.toLocaleDateString("vi-VN")
+						formatDateDMY(end)
 					}
 				/>
 			</GridColumn>

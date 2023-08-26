@@ -9,10 +9,13 @@ import Toastify from "../../../common/Toastify";
 import { Grid, GridColumn } from "@atlaskit/page";
 import Pagination from "@atlaskit/pagination";
 import Spinner from "@atlaskit/spinner";
-import { getCache } from "../../../common/utils";
+import { formatDateDMY, getCache } from "../../../common/utils";
 import EmptyState from "@atlaskit/empty-state";
 import { ROW_PER_PAGE } from "../../../common/contants";
 import "./style.css";
+import WatchFilledIcon from "@atlaskit/icon/glyph/watch-filled";
+import TrashIcon from "@atlaskit/icon/glyph/trash";
+import DeleteScheduleModal from "./modal/DeleteScheduleModal";
 
 /**
  * Using as Page to show pert chart and task dependences
@@ -36,6 +39,12 @@ function ResultPage({ handleChangeTab }) {
 	const [solutions, setSolutions] = useState([]);
 	const [pageLoading, setPageLoading] = useState(true);
 
+	const [isModalDeleteOpen, setIsModalDeleteOpen] = useState(false);
+
+	const updateSchedules = (solutions) => {
+		setSolutions(solutions);
+	};
+
 	useEffect(function () {
 		invoke("getSolutionsByProject", { projectId })
 			.then(function (res) {
@@ -56,38 +65,34 @@ function ResultPage({ handleChangeTab }) {
 	const head = {
 		cells: [
 			{
-				key: "no",
-				content: "No",
-				isSortable: true,
-				width: 15,
-			},
-			{
-				key: "since",
-				content: "Generated at",
-				shouldTruncate: true,
+				key: "name",
+				content: "Name",
 				isSortable: true,
 				width: 20,
 			},
 			{
 				key: "duration",
 				content: "Duration",
-				shouldTruncate: true,
 				isSortable: true,
-				width: 15,
+				width: 10,
 			},
 			{
 				key: "cost",
-				content: "Cost",
-				shouldTruncate: true,
+				content: "Total salary",
+				isSortable: true,
+				width: 10,
+			},
+			{
+				key: "quality",
+				content: "Total employee exp.",
 				isSortable: true,
 				width: 15,
 			},
 			{
-				key: "quality",
-				content: "Quality",
+				key: "description",
+				content: "Note",
 				shouldTruncate: true,
-				isSortable: true,
-				width: 15,
+				width: 30,
 			},
 			{
 				key: "action",
@@ -99,27 +104,29 @@ function ResultPage({ handleChangeTab }) {
 	const rows = solutions.map((s, index) => {
 		let since = "N/A";
 		if (s.since) {
-			let datetime = new Date(s.since);
-			since = datetime.toLocaleDateString() + " " + datetime.toLocaleTimeString();
+			since = formatDateDMY(s.since);
 		}
-		return ({
+		return {
 			key: `row-${s.id}`,
 			isHighlighted: false,
 			cells: [
 				{
 					key: index,
 					content: (
-						<Button
-							appearance="subtle-link"
-							onClick={() => setSelectedSolution(s)}
-						>
-							{"Solution #" + s.id}
-						</Button>
+						<>
+							<Button
+								appearance="subtle-link"
+								onClick={() => setSelectedSolution(s)}
+							>
+								<div>{s.title || "Schedule #" + s.id}</div>
+							</Button>
+							<div className="subtitle solution-type">
+								{s.type === 0
+									? "System generated"
+									: "Saved by user"} at {since}
+							</div>
+						</>
 					),
-				},
-				{
-					key: index,
-					content: since,
 				},
 				{
 					key: index,
@@ -131,20 +138,36 @@ function ResultPage({ handleChangeTab }) {
 				},
 				{
 					key: index,
-					content: s.quality + "%",
+					content: s.quality,
+				},
+				{
+					key: index,
+					content: s.description || "",
 				},
 				{
 					key: "option",
 					content: (
 						<div className="actions">
-						<Button onClick={() => setSelectedSolution(s)}>
-							View
-						</Button>
+							<ButtonGroup>
+								<Button
+									appearance="subtle"
+									onClick={() => setSelectedSolution(s)}
+									title="View"
+								>
+									<WatchFilledIcon />
+								</Button>
+								<Button appearance="subtle" onClick={() => {
+									setSelectedSolution(s);
+									setIsModalDeleteOpen(true);
+								}} title="Delete">
+									<TrashIcon />
+								</Button>
+							</ButtonGroup>
 						</div>
 					),
 				},
 			],
-		});
+		};
 	});
 
 	return (
@@ -152,7 +175,7 @@ function ResultPage({ handleChangeTab }) {
 			className="solutions-list"
 			style={{ width: "100%", height: "90vh" }}
 		>
-			{selectedSolution !== null ? (
+			{selectedSolution !== null && !isModalDeleteOpen ? (
 				<GanttChartPage
 					setSelectedSolution={setSelectedSolution}
 					selectedSolution={selectedSolution}
@@ -162,9 +185,9 @@ function ResultPage({ handleChangeTab }) {
 					<PageHeader actions={actionsContent}>
 						Solution optimizations
 					</PageHeader>
-					<h4 style={{ marginBottom: "10px" }}>
+					<h6 style={{ marginBottom: "10px" }}>
 						Total number of solutions: {solutions.length}
-					</h4>
+					</h6>
 					<DynamicTable
 						head={head}
 						rows={rows}
@@ -172,7 +195,7 @@ function ResultPage({ handleChangeTab }) {
 						defaultPage={1}
 						page={1}
 						isFixedSize
-						defaultSortKey="no"
+						defaultSortKey="name"
 						defaultSortOrder="DESC"
 						onSort={() => console.log("onSort")}
 						isLoading={pageLoading}
@@ -191,6 +214,18 @@ function ResultPage({ handleChangeTab }) {
 							/>
 						}
 					/>
+
+					{isModalDeleteOpen ? (
+						<DeleteScheduleModal
+							setIsOpen={setIsModalDeleteOpen}
+							schedule={selectedSolution}
+							setSelectedSolution={setSelectedSolution}
+							schedules={solutions}
+							updateSchedules={updateSchedules}
+						/>
+					) : (
+						""
+					)}
 				</>
 			)}
 		</div>

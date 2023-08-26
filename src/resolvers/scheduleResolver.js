@@ -69,6 +69,14 @@ function scheduleResolver(resolver) {
 			return Promise.reject(error);
 		}
 	});
+
+	resolver.define("deleteSchedule", async function (req) {
+		try {               
+			return await scheduleService.deleteSchedule(req.payload.scheduleId);
+		} catch (error) {
+			console.log("Error in deleteSchedule: ", error);
+		}
+	});
 }
 
 export default scheduleResolver;
