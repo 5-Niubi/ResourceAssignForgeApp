@@ -64,11 +64,22 @@ async function deleteSchedule(scheduleId) {
 	}
 }
 
+async function editSchedule(schedule) {
+	try {
+		let response = await APIServices.put(`/api/Schedule/UpdateScheduleSolution`, null,
+			schedule);
+		return response;
+	} catch (error) {
+		return Promise.reject(error);
+	}
+}
+
 export {
 	getThreadSchedule,
 	schedule,
 	saveSolution,
 	getSolutionsByProject,
 	getSchedule,
-	deleteSchedule
+	deleteSchedule,
+	editSchedule
 };

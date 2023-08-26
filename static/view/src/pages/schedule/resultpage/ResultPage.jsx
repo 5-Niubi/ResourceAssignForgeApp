@@ -6,16 +6,15 @@ import { useParams } from "react-router";
 import GanttChartPage from "../ganttchart/GanttChartPage";
 import { invoke } from "@forge/bridge";
 import Toastify from "../../../common/Toastify";
-import { Grid, GridColumn } from "@atlaskit/page";
-import Pagination from "@atlaskit/pagination";
-import Spinner from "@atlaskit/spinner";
 import { formatDateDMY, getCache } from "../../../common/utils";
 import EmptyState from "@atlaskit/empty-state";
 import { ROW_PER_PAGE } from "../../../common/contants";
 import "./style.css";
 import WatchFilledIcon from "@atlaskit/icon/glyph/watch-filled";
 import TrashIcon from "@atlaskit/icon/glyph/trash";
+import EditIcon from "@atlaskit/icon/glyph/edit";
 import DeleteScheduleModal from "./modal/DeleteScheduleModal";
+import UpdateScheduleModal from "./modal/UpdateScheduleModal";
 
 /**
  * Using as Page to show pert chart and task dependences
@@ -32,7 +31,9 @@ function ResultPage({ handleChangeTab }) {
 
 	const actionsContent = (
 		<ButtonGroup>
-			<Button onClick={() => handleChangeTab(2)}>Reschedule</Button>
+			<Button appearance="primary" onClick={() => {handleChangeTab(2); setPageLoading(true);}}>
+				Reschedule
+			</Button>
 		</ButtonGroup>
 	);
 
@@ -40,25 +41,31 @@ function ResultPage({ handleChangeTab }) {
 	const [pageLoading, setPageLoading] = useState(true);
 
 	const [isModalDeleteOpen, setIsModalDeleteOpen] = useState(false);
+	const [isModalEditOpen, setIsModalEditOpen] = useState(false);
+	const [isViewDetail, setIsViewDetail] = useState(false);
 
 	const updateSchedules = (solutions) => {
 		setSolutions(solutions);
 	};
 
-	useEffect(function () {
-		invoke("getSolutionsByProject", { projectId })
-			.then(function (res) {
-				setPageLoading(false);
-				if (res) {
-					setSolutions(res.values);
-				}
-			})
-			.catch((error) => {
-				setPageLoading(false);
-				console.log(error);
-				Toastify.error(error.toString());
-			});
-	}, []);
+	useEffect(
+		function () {
+			if (pageLoading) {
+				invoke("getSolutionsByProject", { projectId })
+					.then(function (res) {
+						setPageLoading(false);
+						if (res) {
+							setSolutions(res.values);
+						}
+					})
+					.catch((error) => {
+						setPageLoading(false);
+						console.log(error);
+						Toastify.error(error.toString());
+					});
+			}
+		}
+	);
 
 	const [selectedSolution, setSelectedSolution] = useState(null);
 
@@ -116,14 +123,18 @@ function ResultPage({ handleChangeTab }) {
 						<>
 							<Button
 								appearance="subtle-link"
-								onClick={() => setSelectedSolution(s)}
+								onClick={() => {
+									setSelectedSolution(s);
+									setIsViewDetail(true);
+								}}
 							>
 								<div>{s.title || "Schedule #" + s.id}</div>
 							</Button>
 							<div className="subtitle solution-type">
 								{s.type === 0
 									? "System generated"
-									: "Saved by user"} at {since}
+									: "Saved by user"}{" "}
+								at {since}
 							</div>
 						</>
 					),
@@ -142,7 +153,7 @@ function ResultPage({ handleChangeTab }) {
 				},
 				{
 					key: index,
-					content: s.description || "",
+					content: s.desciption || "",
 				},
 				{
 					key: "option",
@@ -151,15 +162,33 @@ function ResultPage({ handleChangeTab }) {
 							<ButtonGroup>
 								<Button
 									appearance="subtle"
-									onClick={() => setSelectedSolution(s)}
+									onClick={() => {
+										setSelectedSolution(s);
+										setIsViewDetail(true);
+									}}
 									title="View"
 								>
 									<WatchFilledIcon />
 								</Button>
-								<Button appearance="subtle" onClick={() => {
-									setSelectedSolution(s);
-									setIsModalDeleteOpen(true);
-								}} title="Delete">
+								<Button
+									appearance="subtle"
+									onClick={() => {
+										setSelectedSolution(s);
+										setIsModalEditOpen(true);
+										setIsViewDetail(false);
+									}}
+								>
+									<EditIcon />
+								</Button>
+								<Button
+									appearance="subtle"
+									onClick={() => {
+										setSelectedSolution(s);
+										setIsModalDeleteOpen(true);
+										setIsViewDetail(false);
+									}}
+									title="Delete"
+								>
 									<TrashIcon />
 								</Button>
 							</ButtonGroup>
@@ -175,7 +204,7 @@ function ResultPage({ handleChangeTab }) {
 			className="solutions-list"
 			style={{ width: "100%", height: "90vh" }}
 		>
-			{selectedSolution !== null && !isModalDeleteOpen ? (
+			{selectedSolution !== null && isViewDetail ? (
 				<GanttChartPage
 					setSelectedSolution={setSelectedSolution}
 					selectedSolution={selectedSolution}
@@ -223,6 +252,23 @@ function ResultPage({ handleChangeTab }) {
 							schedules={solutions}
 							updateSchedules={updateSchedules}
 						/>
+					) : (
+						""
+					)}
+
+					{isModalEditOpen ? (
+						<UpdateScheduleModal
+							isOpen={isModalEditOpen}
+							setIsOpen={(isOpen) =>
+								setIsModalEditOpen(isOpen)
+							}
+							schedules={solutions}
+							updateSchedules={(solutions) =>
+								setSolutions(solutions)
+							}
+							selectedSolution={selectedSolution}
+							updateSelectedSolution={(solution) => setSelectedSolution(solution)}
+						></UpdateScheduleModal>
 					) : (
 						""
 					)}
