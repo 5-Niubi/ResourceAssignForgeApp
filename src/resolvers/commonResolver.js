@@ -15,7 +15,9 @@ function commonResolver(resolver) {
 	resolver.define("getAuthenUrl", async function (req) {
 		try {
 			let authenUrl = await AuthenWithBE.generateOAuthURL(req.context);
-			let isAuthenticated = await storage.get("isAuthenticated");
+			let isAuthenticated = false;
+			let token = await storage.getSecret(STORAGE.TOKEN);
+			if (token) isAuthenticated = true;
 			return Promise.resolve({
 				isAuthenticated,
 				authenUrl,
@@ -28,7 +30,11 @@ function commonResolver(resolver) {
 
 	resolver.define("getIsAuthenticated", async function (req) {
 		try {
-			let isAuthenticated = await storage.get("isAuthenticated");
+			let token = await storage.getSecret(STORAGE.TOKEN);
+			let isAuthenticated = false;
+			if (token) {
+				isAuthenticated = true;
+			}
 			console.log(STORAGE.TOKEN, ": ", await storage.getSecret(STORAGE.TOKEN));
 			return Promise.resolve({
 				isAuthenticated,
@@ -48,8 +54,6 @@ function commonResolver(resolver) {
 			// return Promise.reject(error);
 		}
 	});
-
-	
 }
 
 export default commonResolver;
