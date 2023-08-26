@@ -263,7 +263,7 @@ function ResourceWorkforceTable() {
 	}));
 
 	return (
-		<>
+		<div className="employee-list">
 			<PageHeader actions={actionsContent} bottomBar={barContent} disableTitleStyles={true}>
             <div style={{display: "inline-flex"}}>
                     <h2>Employee List</h2>
@@ -273,7 +273,7 @@ function ResourceWorkforceTable() {
                 </div>
 			</PageHeader>
 
-            <h5>Total employees: {workforcesFilter?.length}</h5>
+            <h5 style={{marginBottom: "10px"}}>Total employees: {workforcesFilter?.length}</h5>
 
 			<DynamicTable
 				head={head}
@@ -304,7 +304,7 @@ function ResourceWorkforceTable() {
 			) : (
 				""
 			)}
-		</>
+		</div>
 	);
 }
 
