@@ -4,7 +4,7 @@ import { components } from "@atlaskit/select";
 export default function CustomSkillValue({ children, ...props }) {
 	return (
 		<components.MultiValue {...props}>
-			{children.name} - {children.level} <PiStarFill />
+			{children.name.toUpperCase()} - {children.level} <PiStarFill />
 		</components.MultiValue>
 	);
 }

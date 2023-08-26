@@ -12,6 +12,7 @@ import OtherExport from "../../../components/export/OtherExport";
 import { findObj } from "../../../common/utils";
 import { invoke } from "@forge/bridge";
 import Toastify from "../../../common/Toastify";
+import { LoadingButton } from "@atlaskit/button";
 
 const initModalExportState = {
 	data: {},
@@ -46,6 +47,7 @@ function GanttChartPage({ setSelectedSolution, selectedSolution}) {
 	// ------
 
 	const [isModified, setIsModified] = useState(false);
+	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [solutionTasks, setSolutionTasks] = useState([]);
 
 	var tasksChanged = solutionTasks;
@@ -58,14 +60,20 @@ function GanttChartPage({ setSelectedSolution, selectedSolution}) {
 	// }, []);
 
 	const handleSaveSolution = function() {
+		setIsSubmitting(true);
 		selectedSolution.tasks = JSON.stringify(tasksChanged);
-		invoke("saveSolution", { solutionReq: selectedSolution })
+		var solutionReq = JSON.parse(JSON.stringify(selectedSolution));
+		solutionReq.type = 1;
+		invoke("saveSolution", { solutionReq })
 			.then(function (res) {
+				setIsSubmitting(false);
 				if (res.id) {
-					Toastify.success("Saved");
+					Toastify.success("Saved successfully");
+					setSelectedSolution(null);
 				}
 			})
 			.catch((error) => {
+				setIsSubmitting(false);
 				console.log(error);
 				Toastify.error(error.toString());
 			});
@@ -88,9 +96,13 @@ function GanttChartPage({ setSelectedSolution, selectedSolution}) {
 	const actionsContent = (
 		<ButtonGroup>
 			{isModified ? (
-				<Button appearance="subtle" onClick={handleSaveSolution}>
+				<LoadingButton
+					appearance="primary"
+					onClick={handleSaveSolution}
+					isLoading={isSubmitting}
+				>
 					Save as new solution
-				</Button>
+				</LoadingButton>
 			) : (
 				<>
 					<Button appearance="subtle" onClick={openOtherExportModal}>
@@ -110,12 +122,21 @@ function GanttChartPage({ setSelectedSolution, selectedSolution}) {
 					onClick={() => setSelectedSolution(null)}
 					text="All schedules"
 				/>
-				<BreadcrumbsItem text={selectedSolution.title || "Schedule #" + selectedSolution.id} />
+				<BreadcrumbsItem
+					text={
+						selectedSolution.title ||
+						"Schedule #" + selectedSolution.id
+					}
+				/>
 			</Breadcrumbs>
-			<PageHeader actions={actionsContent}>
-				Schedule details:
-			</PageHeader>
-			{selectedSolution.description ? <div><b>Note: </b> {selectedSolution.description}</div> : ""}
+			<PageHeader actions={actionsContent}>Schedule details:</PageHeader>
+			{selectedSolution.desciption ? (
+				<div>
+					<b>Note: </b> {selectedSolution.desciption}
+				</div>
+			) : (
+				""
+			)}
 			<GanttChartStats
 				selectedSolution={selectedSolution}
 				solutionTasks={solutionTasks}

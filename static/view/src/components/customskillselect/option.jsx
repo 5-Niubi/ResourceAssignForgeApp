@@ -15,7 +15,7 @@ export default function CustomSkillOption({ children, ...props }){
 				}}
 				isBold
 			>
-				{children.name} - {children.level}
+				{children.name.toUpperCase()} - {children.level}
 				<PiStarFill />
 			</Lozenge>
 		</components.Option>
