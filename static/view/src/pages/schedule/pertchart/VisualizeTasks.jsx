@@ -283,7 +283,11 @@ function VisualizeTasksPage({ handleChangeTab }) {
 					Estimate
 				</LoadingButton>
 			) : (
-				<LoadingButton isLoading={isSaving} onClick={handleSave}>
+				<LoadingButton
+					appearance="primary"
+					isLoading={isSaving}
+					onClick={handleSave}
+				>
 					Save
 				</LoadingButton>
 			)}

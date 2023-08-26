@@ -4,26 +4,16 @@ import Spinner from "@atlaskit/spinner";
 import { invoke } from "@forge/bridge";
 import {
 	cache,
-	clearAllCache,
-	clearProjectBasedCache,
-	findObj,
 	getCache,
 } from "../../common/utils";
 import Button, { ButtonGroup } from "@atlaskit/button";
 import PageHeader from "@atlaskit/page-header";
 import DynamicTable from "@atlaskit/dynamic-table";
 import EmptyState from "@atlaskit/empty-state";
-import { COLOR_SKILL_LEVEL, ROW_PER_PAGE } from "../../common/contants";
 import "./style.css";
 import EditIcon from "@atlaskit/icon/glyph/edit";
 import TrashIcon from "@atlaskit/icon/glyph/trash";
-import { Grid, GridColumn } from "@atlaskit/page";
-import CreateTaskModal from "../schedule/pertchart/modal/CreateTaskModal";
-import Lozenge from "@atlaskit/lozenge";
-import DeleteTaskModal from "../schedule/pertchart/modal/DeleteTaskModal";
 import Toastify from "../../common/Toastify";
-import CreateMilestoneModal from "./modal/CreateSkillModal";
-import DeleteMilestoneModal from "./modal/DeleteSkillModal";
 import CreateSkillModal from "./modal/CreateSkillModal";
 import DeleteSkillModal from "./modal/DeleteSkillModal";
 
@@ -124,7 +114,7 @@ function SkillsPage() {
 				},
 				{
 					key: "name",
-					content: skill.name,
+					content: skill.name.toUpperCase(),
 				},
 				{
 					key: "description",
