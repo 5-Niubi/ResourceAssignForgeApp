@@ -252,7 +252,6 @@ export function milisecondToHours(miliseconds) {
 
 export function validateIntegerOnly(value) {
 	//REQUIRES INTEGER NUMBER
-	debugger
 	if (!/^\d*$/.test(value)) {
 		return "Input integer Only.";
 	}

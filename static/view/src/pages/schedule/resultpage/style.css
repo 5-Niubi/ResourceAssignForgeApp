@@ -11,12 +11,23 @@
 .solutions-list table th button{
     padding: 10px;
 }
+.solutions-list table td{
+    padding: 10px 10px 10px 20px;
+}
 
 .solutions-list table thead{
     background-color: rgba(0, 82, 204, 0.1);
 }
 .solutions-list table tr:nth-child(even){
     background-color: #eee;
+}
+
+.solutions-list .subtitle{
+    color: #888;
+}
+
+.solutions-list .solution-type{
+    padding-left: 10px;
 }
 
 .solutions-list table tr .actions{

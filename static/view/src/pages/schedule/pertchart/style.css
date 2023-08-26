@@ -59,6 +59,7 @@
 	height: 35%;
 	overflow-y: auto;
 	transition: all ease-in-out 0.3s;
+	z-index: 3;
 }
 
 .pert-chart {
@@ -92,3 +93,6 @@
 	display: block;
 }
 
+[data-ds--page-layout--slot="left-sidebar"]{
+	z-index: 10 !important;
+}

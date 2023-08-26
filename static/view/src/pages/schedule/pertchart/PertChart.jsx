@@ -90,6 +90,7 @@ const PertChart = ({
 			isOngoing: false,
 			layerSpacing: 100,
 		});
+		diagram.allowCopy = false;
 
 		diagram.nodeTemplate = createNodeTemplate();
 		diagram.linkTemplate = createLinkTemplate();

@@ -22,10 +22,15 @@ function CreateSkillModal({
 	updateSkillEdited,
 }) {
 	const [name, setName] = useState(skillEdit ? skillEdit.name : "");
+	const [description, setDescription] = useState(skillEdit ? (skillEdit.description || "") : "");
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const updateName = useCallback(function (e) {
 		setName(e.target.value);
+	}, []);
+
+	const updateDescription = useCallback(function (e) {
+		setDescription(e.target.value);
 	}, []);
 
 	const closeModal = useCallback(
@@ -39,6 +44,7 @@ function CreateSkillModal({
 		setIsSubmitting(true);
 		let skillRequest = {
 			name: name,
+			description: description
 		};
 		if (skillEdit) {
 			skillRequest.id = skillEdit.id;
@@ -103,7 +109,11 @@ function CreateSkillModal({
 						{({ formProps }) => (
 							<form id="form-with-id" {...formProps}>
 								<ModalHeader>
-									<ModalTitle>{skillEdit ? "Edit skill" : "Create new skill"}</ModalTitle>
+									<ModalTitle>
+										{skillEdit
+											? "Edit skill"
+											: "Create new skill"}
+									</ModalTitle>
 								</ModalHeader>
 								<ModalBody>
 									<Field
@@ -117,6 +127,19 @@ function CreateSkillModal({
 												autoComplete="off"
 												value={name}
 												onChange={updateName}
+											/>
+										)}
+									</Field>
+									<Field
+										aria-required={true}
+										name="description"
+										label="Description"
+									>
+										{() => (
+											<TextField
+												autoComplete="off"
+												value={description}
+												onChange={updateDescription}
 											/>
 										)}
 									</Field>

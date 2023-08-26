@@ -108,14 +108,18 @@ function GanttChartPage({ setSelectedSolution, selectedSolution}) {
 			<Breadcrumbs>
 				<BreadcrumbsItem
 					onClick={() => setSelectedSolution(null)}
-					text="All solutions"
+					text="All schedules"
 				/>
-				<BreadcrumbsItem text={"Solution #" + selectedSolution?.id} />
+				<BreadcrumbsItem text={selectedSolution.title || "Schedule #" + selectedSolution.id} />
 			</Breadcrumbs>
 			<PageHeader actions={actionsContent}>
-				Solution evaluation:
+				Schedule details:
 			</PageHeader>
-			<GanttChartStats selectedSolution={selectedSolution} solutionTasks={solutionTasks}/>
+			{selectedSolution.description ? <div><b>Note: </b> {selectedSolution.description}</div> : ""}
+			<GanttChartStats
+				selectedSolution={selectedSolution}
+				solutionTasks={solutionTasks}
+			/>
 
 			<PageHeader>Gantt chart</PageHeader>
 			<GanttChart

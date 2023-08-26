@@ -76,9 +76,7 @@ const TasksCompact = ({
 				errClass = "red thick";
 				errIcon = (
 					<Tooltip content={tasksError[i].messages}>
-						{(tooltipProps) => (
-							<ErrorIcon {...tooltipProps}></ErrorIcon>
-						)}
+						{(tooltipProps) => <ErrorIcon {...tooltipProps}></ErrorIcon>}
 					</Tooltip>
 				);
 				break;

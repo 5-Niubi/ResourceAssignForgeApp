@@ -8,6 +8,8 @@ import { cache, findObj } from "../../../common/utils";
 import { invoke } from "@forge/bridge";
 import Toastify from "../../../common/Toastify";
 import { useParams } from "react-router-dom";
+import CustomSkillOption from "../../../components/customskillselect/option";
+import CustomSkillValue from "../../../components/customskillselect/multivalue";
 
 /**
  * Using as part of visualize task page. To show dependences of a specific task
@@ -78,19 +80,25 @@ const TaskDetail = ({
 	var skillValues = [];
 	skills?.forEach((skill) => {
 		for (let i = 1; i <= 5; i++) {
+			skill.level = i;
 			skillOpts.push({
 				value: skill.id + "-" + i,
-				label: skill.name + " - level " + i,
+				// label: skill.name + " - level " + i,
+				label: JSON.parse(JSON.stringify(skill)), // deep clone object
 			});
+			skill.level = null;
 		}
 	});
 	currentTask?.skillRequireds?.forEach((s) => {
 		var skill = findObj(skills, s.skillId);
 		if (skill) {
+			skill.level = s.level;
 			skillValues.push({
 				value: skill.id + "-" + s.level,
-				label: skill.name + " - level " + s.level,
+				// label: skill.name + " - level " + s.level,
+				label: JSON.parse(JSON.stringify(skill)), // deep clone object,
 			});
+			skill.level=null;
 		}
 	});
 
@@ -237,7 +245,7 @@ const TaskDetail = ({
 
 	return (
 		<div className="task-details">
-			<PageHeader actions={actionsContent}>Task details:</PageHeader>
+			<PageHeader actions={actionsContent}>Task details</PageHeader>
 			<div>
 				<pre>
 					{currentTask ? (
@@ -392,6 +400,11 @@ const TaskDetail = ({
 																handleCreateSkill
 															}
 															isMulti
+															components={{
+																Option: CustomSkillOption,
+																MultiValue:
+																	CustomSkillValue,
+															}}
 															isSearchable={true}
 															isLoading={
 																skillCreating

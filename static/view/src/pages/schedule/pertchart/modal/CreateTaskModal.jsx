@@ -6,13 +6,15 @@ import Modal, {
 	ModalTitle,
 	ModalTransition,
 } from "@atlaskit/modal-dialog";
-import Select, { CreatableSelect } from "@atlaskit/select";
+import Select, { CreatableSelect, components } from "@atlaskit/select";
 import React, { Fragment, useState, useCallback, useEffect } from "react";
 import TextField from "@atlaskit/textfield";
 import Form, { Field, FormSection } from "@atlaskit/form";
 import { invoke } from "@forge/bridge";
 import { cache, extractErrorMessage, findObj } from "../../../../common/utils";
 import Toastify from "../../../../common/Toastify";
+import CustomSkillOption from "../../../../components/customskillselect/option";
+import CustomSkillValue from "../../../../components/customskillselect/multivalue";
 
 function CreateTaskModal({
 	isOpen,
@@ -76,19 +78,25 @@ function CreateTaskModal({
 	var skillValues = [];
 	skillsPage?.forEach((skill) => {
 		for (let i = 1; i <= 5; i++) {
+			skill.level = i;
 			skillOpts.push({
 				value: skill.id + "-" + i,
-				label: skill.name + " - level " + i,
+				// label: skill.name + " - " + i,
+				label: JSON.parse(JSON.stringify(skill)), // deep clone object
 			});
+			skill.level = null;
 		}
 	});
 	reqSkills?.forEach((s) => {
 		var skill = findObj(skillsPage, s.skillId);
 		if (skill) {
+			skill.level = s.level;
 			skillValues.push({
 				value: skill.id + "-" + s.level,
-				label: skill.name + " - level " + s.level,
+				// label: skill.name + " - " + s.level,
+				label: JSON.parse(JSON.stringify(skill)), // deep clone object
 			});
+			skill.level = null; //reset to original
 		}
 	});
 
@@ -278,7 +286,9 @@ function CreateTaskModal({
 							<form id="form-with-id" {...formProps}>
 								<ModalHeader>
 									<ModalTitle>
-										{taskEdit ? "Edit task" : "Create new task"}
+										{taskEdit
+											? "Edit task"
+											: "Create new task"}
 									</ModalTitle>
 								</ModalHeader>
 								<ModalBody>
@@ -288,6 +298,7 @@ function CreateTaskModal({
 											name="taskName"
 											label="Task Name"
 											isRequired
+											isLoading={isSubmitting}
 										>
 											{() => (
 												<TextField
@@ -302,6 +313,7 @@ function CreateTaskModal({
 											name="duration"
 											label="Duration"
 											isRequired
+											isLoading={isSubmitting}
 										>
 											{() => (
 												<TextField
@@ -326,6 +338,7 @@ function CreateTaskModal({
 											name="milestone"
 											defaultValue=""
 											isRequired
+											isLoading={isSubmitting}
 										>
 											{({ fieldProps }) => (
 												<Fragment>
@@ -353,7 +366,8 @@ function CreateTaskModal({
 											label="Required skills"
 											name="skills"
 											defaultValue=""
-											isRequired={true}
+											isRequired
+											isLoading={isSubmitting}
 										>
 											{({ fieldProps }) => (
 												<Fragment>
@@ -371,6 +385,10 @@ function CreateTaskModal({
 															handleCreateSkill
 														}
 														isMulti
+														components={{
+															Option: CustomSkillOption,
+															MultiValue: CustomSkillValue
+														}}
 														isSearchable={true}
 														placeholder="Choose skills"
 														menuPosition="fixed"
@@ -382,6 +400,7 @@ function CreateTaskModal({
 											label="Precedence tasks"
 											name="precedences"
 											defaultValue=""
+											isLoading={isSubmitting}
 										>
 											{({ fieldProps }) => (
 												<Fragment>

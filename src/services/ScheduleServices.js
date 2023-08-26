@@ -52,10 +52,23 @@ async function getSchedule(scheduleId) {
 	}
 }
 
+async function deleteSchedule(scheduleId) {
+	try {
+		let response = await APIServices.delete(
+			`/api/Schedule/DeleteSolution`, 
+			{solutionId: scheduleId}
+		);
+		return response;
+	} catch (error) {
+		return Promise.reject(error);
+	}
+}
+
 export {
 	getThreadSchedule,
 	schedule,
 	saveSolution,
 	getSolutionsByProject,
-	getSchedule
+	getSchedule,
+	deleteSchedule
 };
