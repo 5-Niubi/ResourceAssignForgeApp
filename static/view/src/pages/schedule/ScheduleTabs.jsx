@@ -54,13 +54,13 @@ export default function ScheduleTabs() {
 						<Badge>{1}</Badge> Tasks dependencies
 					</Tab>
 					<Tab id="suggestion">
-						<Badge>{2}</Badge> Resource suggestion
+						<Badge>{2}</Badge> Resources suggestion
 					</Tab>
 					<Tab id="parameters">
-						<Badge>{3}</Badge> Parameters
+						<Badge>{3}</Badge> Scheduling Parameters
 					</Tab>
 					<Tab id="solutions">
-						<Badge>{4}</Badge> Schedule
+						<Badge>{4}</Badge> Scheduling Results
 					</Tab>
 				</TabList>
 				<TabPanel>

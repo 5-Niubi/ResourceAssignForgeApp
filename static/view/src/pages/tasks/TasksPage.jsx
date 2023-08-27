@@ -57,13 +57,17 @@ function TasksPage() {
 		cache("tasks", JSON.stringify(tasks));
 		setTasks(tasks);
 
-		var milestoneTasks = [];
-		for (let j = 0; j < tasks.length; j++) {
-			if (tasks[j].milestoneId == selectedMilestone) {
-				milestoneTasks.push(tasks[j]);
+		if (selectedMilestone === null){
+			setDisplayTasks(tasks);
+		} else {
+			var milestoneTasks = [];
+			for (let j = 0; j < tasks.length; j++) {
+				if (tasks[j].milestoneId == selectedMilestone) {
+					milestoneTasks.push(tasks[j]);
+				}
 			}
+			setDisplayTasks(milestoneTasks);
 		}
-		setDisplayTasks(milestoneTasks);
 	};
 	const updateSkills = (skills) => {
 		cache("skills", JSON.stringify(skills));

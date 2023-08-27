@@ -78,25 +78,25 @@ function CreateTaskModal({
 	var skillValues = [];
 	skillsPage?.forEach((skill) => {
 		for (let i = 1; i <= 5; i++) {
-			skill.level = i;
+			// skill.level = i;
 			skillOpts.push({
 				value: skill.id + "-" + i,
-				// label: skill.name + " - " + i,
-				label: JSON.parse(JSON.stringify(skill)), // deep clone object
+				label: skill.name + " - " + i,
+				// label: JSON.parse(JSON.stringify(skill)), // deep clone object
 			});
-			skill.level = null;
+			// skill.level = null;
 		}
 	});
 	reqSkills?.forEach((s) => {
 		var skill = findObj(skillsPage, s.skillId);
 		if (skill) {
-			skill.level = s.level;
+			// skill.level = s.level;
 			skillValues.push({
 				value: skill.id + "-" + s.level,
-				// label: skill.name + " - " + s.level,
-				label: JSON.parse(JSON.stringify(skill)), // deep clone object
+				label: skill.name + " - " + s.level,
+				// label: JSON.parse(JSON.stringify(skill)), // deep clone object
 			});
-			skill.level = null; //reset to original
+			// skill.level = null; //reset to original
 		}
 	});
 
@@ -183,9 +183,7 @@ function CreateTaskModal({
 				setIsSubmitting(false);
 				if (res.id) {
 					setSkillsPage([...skillsPage, res]);
-
 					setReqSkills([...reqSkills, { skillId: res.id, level: 1 }]);
-
 					cache("skills", JSON.stringify([...skillsPage, res]));
 				}
 			})
@@ -267,8 +265,8 @@ function CreateTaskModal({
 				.catch((error) => {
 					setIsSubmitting(false);
 					let errorMsg = extractErrorMessage(error);
-					console.log(errorMsg.message);
-					Toastify.error(errorMsg.message);
+					console.log(errorMsg.messages);
+					Toastify.error(errorMsg.messages);
 				});
 		}
 	}
