@@ -74,8 +74,6 @@ class APIJiraService {
 			if (response.ok) {
 				return await response.json();
 			}
-			console.log(`Response getAllUsersJira: ${response.status} ${response.statusText}`);
-			console.log("getAllUsersJira",await response.json());
 			return Promise.reject(response);
 		} catch (err) {
 			return Promise.reject(err);
