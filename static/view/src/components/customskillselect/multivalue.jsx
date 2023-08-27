@@ -2,9 +2,12 @@ import { PiStarFill } from "react-icons/pi";
 import { components } from "@atlaskit/select";
 
 export default function CustomSkillValue({ children, ...props }) {
-	return (
-		<components.MultiValue {...props}>
-			{children.name.toUpperCase()} - {children.level} <PiStarFill />
-		</components.MultiValue>
-	);
+	var parts = children.split(" - ");
+	if (parts.length == 1) return children;
+	else if (parts.length == 2)
+		return (
+			<components.MultiValue {...props}>
+				{parts[0].toUpperCase()} - {parts[1]} <PiStarFill />
+			</components.MultiValue>
+		);
 }

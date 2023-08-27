@@ -23,7 +23,6 @@ function App() {
 	// Check authenticate every time reload page
 	useEffect(function () {
 		invoke("getIsAuthenticated").then(function (res) {
-			debugger;
 			setIsAuthenticatedLoading(false);
 			if (res.isAuthenticated) {
 				getSubscription();

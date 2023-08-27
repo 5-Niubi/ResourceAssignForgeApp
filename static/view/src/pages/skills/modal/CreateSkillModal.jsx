@@ -42,14 +42,14 @@ function CreateSkillModal({
 
 	function handleSubmitCreate() {
 		setIsSubmitting(true);
-		let skillRequest = {
+		let skillReq = {
 			name: name,
 			description: description
 		};
 		if (skillEdit) {
-			skillRequest.id = skillEdit.id;
+			skillReq.id = skillEdit.id;
 			//update current skill
-			invoke("updateSkill", { skillRequest })
+			invoke("updateSkill", { skillReq })
 				.then(function (res) {
 					setIsSubmitting(false);
 					if (res.data && res.data.id) {
@@ -74,7 +74,7 @@ function CreateSkillModal({
 				});
 		} else {
 			//create new
-			invoke("createSkill", { skillRequest })
+			invoke("createSkill", { skillReq })
 				.then(function (res) {
 					setIsSubmitting(false);
 					if (res.id) {

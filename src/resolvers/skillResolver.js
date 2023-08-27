@@ -17,7 +17,7 @@ function skillResolver(resolver) {
 
 	resolver.define("createSkill", async function (req) {
 		try {               
-			return await skillService.createSkill(req.payload.skillRequest);
+			return await skillService.createSkill(req.payload.skillReq);
 		} catch (error) {
 			console.log("Error in createSkill: ", error);
 			throw new Error(JSON.stringify(error));
