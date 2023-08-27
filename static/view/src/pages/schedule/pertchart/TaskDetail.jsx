@@ -80,25 +80,25 @@ const TaskDetail = ({
 	var skillValues = [];
 	skills?.forEach((skill) => {
 		for (let i = 1; i <= 5; i++) {
-			skill.level = i;
+			// skill.level = i;
 			skillOpts.push({
 				value: skill.id + "-" + i,
-				// label: skill.name + " - level " + i,
-				label: JSON.parse(JSON.stringify(skill)), // deep clone object
+				label: skill.name + " - " + i,
+				// label: JSON.parse(JSON.stringify(skill)), // deep clone object
 			});
-			skill.level = null;
+			// skill.level = null;
 		}
 	});
 	currentTask?.skillRequireds?.forEach((s) => {
 		var skill = findObj(skills, s.skillId);
 		if (skill) {
-			skill.level = s.level;
+			// skill.level = s.level;
 			skillValues.push({
 				value: skill.id + "-" + s.level,
-				// label: skill.name + " - level " + s.level,
-				label: JSON.parse(JSON.stringify(skill)), // deep clone object,
+				label: skill.name + " - " + s.level,
+				// label: JSON.parse(JSON.stringify(skill)), // deep clone object,
 			});
-			skill.level=null;
+			// skill.level=null;
 		}
 	});
 

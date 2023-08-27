@@ -15,6 +15,7 @@ import TrashIcon from "@atlaskit/icon/glyph/trash";
 import EditIcon from "@atlaskit/icon/glyph/edit";
 import DeleteScheduleModal from "./modal/DeleteScheduleModal";
 import UpdateScheduleModal from "./modal/UpdateScheduleModal";
+import moment from "moment";
 
 /**
  * Using as Page to show pert chart and task dependences
@@ -109,9 +110,9 @@ function ResultPage({ handleChangeTab }) {
 	};
 
 	const rows = solutions.map((s, index) => {
-		let since = "N/A";
-		if (s.since) {
-			since = formatDateDMY(s.since);
+		let createDatetime = "N/A";
+		if (s.createDatetime) {
+			createDatetime = moment(s.createDatetime).format("DD-MM-YYYY HH:mm:ss");
 		}
 		return {
 			key: `row-${s.id}`,
@@ -134,7 +135,7 @@ function ResultPage({ handleChangeTab }) {
 								{s.type === 0
 									? "System generated"
 									: "Saved by user"}{" "}
-								at {since}
+								at {createDatetime}
 							</div>
 						</>
 					),
@@ -202,7 +203,7 @@ function ResultPage({ handleChangeTab }) {
 	return (
 		<div
 			className="solutions-list"
-			style={{ width: "100%", height: "90vh" }}
+			style={{ width: "100%", minHeight: "90vh" }}
 		>
 			{selectedSolution !== null && isViewDetail ? (
 				<GanttChartPage

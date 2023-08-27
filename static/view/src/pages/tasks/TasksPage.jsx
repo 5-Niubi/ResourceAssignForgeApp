@@ -69,7 +69,6 @@ function TasksPage() {
 			setDisplayTasks(milestoneTasks);
 		}
 	};
-	console.log(selectedMilestone);
 	const updateSkills = (skills) => {
 		cache("skills", JSON.stringify(skills));
 		setSkills(skills);
