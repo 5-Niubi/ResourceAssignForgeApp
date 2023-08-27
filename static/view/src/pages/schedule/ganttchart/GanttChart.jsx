@@ -98,7 +98,7 @@ const GanttChart = ({
 								dragPrecisionX: day / 24, // Snap to eight hours
 							},
 							tooltip: {
-								pointFormat: `<span>{point.name}</span><br/><span>Assigned To: {point.assignTo.name}</span><br/><span>From: {point.start:%e. %b}</span><span> To: {point.end:%e. %b}</span>`,
+								pointFormat: `<span>{point.name}</span><br/><span>Assigned To: {point.assignTo.displayName}</span><br/><span>From: {point.start:%e. %b}</span><span> To: {point.end:%e. %b}</span>`,
 							},
 						},
 						{
@@ -106,7 +106,7 @@ const GanttChart = ({
 							data: data2,
 							linkedTo: ":previous",
 							tooltip: {
-								pointFormat: "{point.assignTo.name}",
+								pointFormat: "{point.assignTo.displayName}",
 							},
 							dragDrop: {
 								draggableX: true,
@@ -120,7 +120,7 @@ const GanttChart = ({
 								crop: false,
 								overflow: "none",
 								allowOverlap: true,
-								format: "{point.assignTo.name}",
+								format: "{point.assignTo.displayName}",
 								align: "left",
 								style: {
 									fontWeight: "normal",

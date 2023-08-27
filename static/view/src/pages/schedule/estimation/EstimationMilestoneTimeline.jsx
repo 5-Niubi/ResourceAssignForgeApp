@@ -34,7 +34,8 @@ export default function MilestonesTimeline({
 								<VerticalTimelineElement
 									className="vertical-timeline-element--work"
 									contentStyle={{
-										background: getColor(milestone.id),
+										// background: getColor(milestone.id),
+										border: "5px solid " + getColor(milestone.id),
 										color: "#444",
 									}}
 									contentArrowStyle={{
@@ -49,12 +50,8 @@ export default function MilestonesTimeline({
 									}}
 								>
 									<h3 className="vertical-timeline-element-title">
-										#Group {index + 1}{" "}
-										<FlagFilledIcon size="medium"></FlagFilledIcon>
+										Group: {obj.name}
 									</h3>
-									<h4 className="vertical-timeline-element-subtitle">
-										{obj.name}
-									</h4>
 									{milestone?.workforceOutputList?.map(
 										(workers, index) => {
 											let skills = [];

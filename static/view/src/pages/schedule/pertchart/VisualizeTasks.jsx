@@ -9,7 +9,12 @@ import Toastify from "../../../common/Toastify";
 import PageHeader from "@atlaskit/page-header";
 import Button, { LoadingButton } from "@atlaskit/button";
 import "./style.css";
-import { cache, extractErrorMessage, findObj, getCache } from "../../../common/utils";
+import {
+	cache,
+	extractErrorMessage,
+	findObj,
+	getCache,
+} from "../../../common/utils";
 import ChevronRightCircleIcon from "@atlaskit/icon/glyph/chevron-right-circle";
 import ChevronLeftCircleIcon from "@atlaskit/icon/glyph/chevron-left-circle";
 
@@ -31,8 +36,14 @@ function VisualizeTasksPage({ handleChangeTab }) {
 
 	const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false);
 	const handleCollapseRightPanel = () => {
-		document.getElementsByClassName("tasks-compact")[0].classList.toggle("-collapsed");
-		setRightPanelCollapsed(document.getElementsByClassName("tasks-compact")[0].classList.contains("-collapsed"));
+		document
+			.getElementsByClassName("tasks-compact")[0]
+			.classList.toggle("-collapsed");
+		setRightPanelCollapsed(
+			document
+				.getElementsByClassName("tasks-compact")[0]
+				.classList.contains("-collapsed")
+		);
 	};
 
 	function handleEstimate() {
@@ -52,8 +63,24 @@ function VisualizeTasksPage({ handleChangeTab }) {
 			.catch(function (error) {
 				setIsEstimating(false);
 				let errorMsg = extractErrorMessage(error);
-				console.log(errorMsg);
-				Toastify.error(errorMsg.message);
+				if (errorMsg.message) {
+					console.log(errorMsg.message);
+					Toastify.error(errorMsg.message);
+				} else {
+					var tasksError = [];
+					errorMsg.forEach((e) => {
+						let task = findObj(tasks, e.taskId);
+						if (task) {
+							tasksError.push(e);
+							Toastify.error(`${task.name}: ${e.messages}`);
+						} else {
+							Toastify.error(e.messages);
+						}
+					});
+					setTasksError(tasksError);
+				}
+				// console.log(errorMsg);
+				// Toastify.error(errorMsg.message);
 			});
 	}
 
@@ -67,7 +94,9 @@ function VisualizeTasksPage({ handleChangeTab }) {
 
 		tasks.forEach((task) => {
 			let preArray = [];
-			task.precedences.forEach((pre) => preArray.push(pre.precedenceId));
+			task.precedences.forEach((pre) => {
+				if (pre.precedenceId > 0) preArray.push(pre.precedenceId);
+			});
 			data.TaskPrecedenceTasks.push({
 				TaskId: task.id,
 				TaskPrecedences: preArray,
@@ -93,16 +122,18 @@ function VisualizeTasksPage({ handleChangeTab }) {
 				setIsSaving(false);
 				console.log(error);
 				let errorMsg = extractErrorMessage(error);
-				if (errorMsg.message){
+				if (errorMsg.message) {
 					console.log(errorMsg.message);
 					Toastify.error(errorMsg.message);
 				} else {
 					var tasksError = [];
-					errorMsg.forEach((e) =>{
+					errorMsg.forEach((e) => {
 						let task = findObj(tasks, e.taskId);
-						if (task){
+						if (task) {
 							tasksError.push(e);
 							Toastify.error(`${task.name}: ${e.messages}`);
+						} else {
+							Toastify.error(e.messages);
 						}
 					});
 					setTasksError(tasksError);
@@ -245,23 +276,26 @@ function VisualizeTasksPage({ handleChangeTab }) {
 		>
 			{canEstimate ? (
 				<LoadingButton
-				appearance="primary"
-				isLoading={isEstimating}
-				onClick={handleEstimate}
-			>
-				Estimate
-			</LoadingButton>
+					appearance="primary"
+					isLoading={isEstimating}
+					onClick={handleEstimate}
+				>
+					Estimate
+				</LoadingButton>
 			) : (
-				<LoadingButton isLoading={isSaving} onClick={handleSave}>
+				<LoadingButton
+					appearance="primary"
+					isLoading={isSaving}
+					onClick={handleSave}
+				>
 					Save
 				</LoadingButton>
 			)}
-			
 		</div>
 	);
 
 	return (
-		<div class="visualize-tasks">
+		<div className="visualize-tasks">
 			<PageLayout>
 				<Content>
 					<Main testId="main2" id="main2">

@@ -27,7 +27,7 @@ class AuthenWithBE {
 	}
 
 	async handleUnauthorizedStatus() {
-		storage.delete(STORAGE.IS_AUTHENTICATED);
+		// storage.delete(STORAGE.IS_AUTHENTICATED);
 		storage.deleteSecret(STORAGE.TOKEN);
 	}
  
@@ -38,7 +38,7 @@ class AuthenWithBE {
 		// Fixed accessToken BE
 		// data.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJKV1RTZXJ2aWNlQWNjZXNzVG9rZW4iLCJqdGkiOiJjOWZiMzMwOS1iNTk0LTRmNTAtODVkNy02ZDlkNzE0MGQyYzciLCJpYXQiOiIwOC8xMC8yMDIzIDE3OjA3OjM3IiwiYWNjb3VudF9pZCI6IjYxZTFiNzJmMDU4NmEyMDA2OWRlMjhmZSIsImNsb3VkX2lkIjoiMzFhOGE5MzMtYWFmZC00YzY3LWFmMmEtOTg3MmM0YzAwMGEwIiwiZXhwIjoxNzIzMzA5NjU3LCJpc3MiOiJKV1RBdXRoZW50aWNhdGlvblNlcnZlciIsImF1ZCI6IkppcmFDbG91ZCJ9.KLhYQTKQAasCCHwHuJcisgv64tgJiA04uq75wfI2aXU";
 		await storage.setSecret(STORAGE.TOKEN, data.token);
-		await storage.set(STORAGE.IS_AUTHENTICATED, true);
+		// await storage.set(STORAGE.IS_AUTHENTICATED, true);
 	}
 }
 

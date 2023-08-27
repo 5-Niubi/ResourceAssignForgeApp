@@ -19,7 +19,6 @@ modules:
       handler: trigger.authenBECallbackTrigger
     - key: logout-trigger-function
       handler: trigger.logoutTrigger
-
 resources:
   - key: main
     path: static/view/build
@@ -31,13 +30,12 @@ app:
   #----#
   licensing:
     enabled: true
-
 permissions:
   external:
     fetch:
       backend:
-        - "*.ngrok-free.app"
-        - "https://production-be.ai4cert.com"
+        # - "*.ngrok-free.app"
+        - "*.ai4cert.com"
         - "*.loca.lt"
   content:
     styles:
