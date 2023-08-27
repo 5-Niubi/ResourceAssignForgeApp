@@ -398,7 +398,7 @@ function ParameterWorkforceList() {
 									};
 									if (workforce_request.workingType == 0) {
 										workforce_request.workingEfforts = [
-											0, 0, 0, 0, 0, 0, 0
+											1, 1, 1, 1, 1, 1, 1
 										];
 									}
 									updateWorkforce(workforce_request);

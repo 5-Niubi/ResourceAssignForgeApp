@@ -13,8 +13,11 @@ import Spinner from "@atlaskit/spinner";
 import InstructionMessage from "../../../components/InstructionMessage";
 import PageHeader from '@atlaskit/page-header';
 import InfoMessageColor from "../../../components/InfoMessageColor";
+import EmptyState from '@atlaskit/empty-state';
+import Button, { ButtonGroup } from "@atlaskit/button";
 
-export default function ParameterEstimateMessage() {
+
+export default function ParameterEstimateMessage({ handleChangeTab }) {
 	const [estimations, setEstimations] = useState([]);
 	let { projectId } = useParams();
 	const [isEstimating, setIsEstimating] = useState(true);
@@ -42,7 +45,7 @@ export default function ParameterEstimateMessage() {
                     </div>
                 </div>
 			</PageHeader>
-			{isEstimating ? (
+			{isEstimating && estimations.length > 0 ? (
 				<Spinner size={"large"} />
 			) : (
 				<div>
@@ -115,6 +118,17 @@ export default function ParameterEstimateMessage() {
 					</ul>
 				</div>
 			)}
+            {isEstimating === false && estimations.length === 0 &&(
+                   <EmptyState
+                   header="You are messing estimate resource step"
+                   description="Please return to Task dependencies and estimate"
+                   primaryAction={<Button 
+                    appearance="primary"
+                    onClick = {handleChangeTab(0)}
+                    >Return estimate</Button>}
+                 /> 
+            )
+            }
 		</>
 	);
 }
