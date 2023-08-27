@@ -84,7 +84,7 @@ export const SUBSCRIPTION = Object.freeze({
 	PLUS_ID: 2,
 });
 
-export const DOMAIN_SUBSCRIPTION_SERVER = "https://admin.ai4cert.com";
+export const DOMAIN_SUBSCRIPTION_SERVER = "https://production-admin.ai4cert.com";
 
 export const DEFAULT_WORKING_TIMERANGE = [
 	{
