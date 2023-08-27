@@ -26,7 +26,7 @@ resources:
       port: 3000
 app:
   # Replace app id here
-  id: ari:cloud:ecosystem::app/87284dfd-9947-4a51-a7bb-20a3c938db04
+  id: ari:cloud:ecosystem::app/7b4bc712-696a-4789-a9cd-224d641c583a
   #----#
   licensing:
     enabled: true

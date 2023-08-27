@@ -1,4 +1,5 @@
 export const EMPTY_STRING = "";
+export const BACKEND_dNET_DOMAIN = "https://production-be.ai4cert.com";
 /**
  * Key of Storage
  */
