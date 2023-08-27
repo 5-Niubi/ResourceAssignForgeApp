@@ -66,7 +66,7 @@ const TaskDetail = ({
 	var taskOpts = [];
 	var taskValues = [];
 	selectedTasks?.forEach((task) =>
-		task.id != currentTaskId
+		task.id != currentTaskId && task.id != -2 //disable finish task from list
 			? taskOpts.push({ value: task.id, label: task.name })
 			: ""
 	);

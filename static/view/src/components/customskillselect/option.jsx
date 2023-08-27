@@ -3,6 +3,7 @@ import { components } from "@atlaskit/select";
 import Lozenge from "@atlaskit/lozenge";
 import { COLOR_SKILL_LEVEL } from "../../common/contants";
 export default function CustomSkillOption({ children, ...props }){ 
+    if (!children.level) return "";
 	return (
 		<components.Option {...props}>
 			<Lozenge

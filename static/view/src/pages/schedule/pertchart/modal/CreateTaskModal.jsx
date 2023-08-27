@@ -183,9 +183,7 @@ function CreateTaskModal({
 				setIsSubmitting(false);
 				if (res.id) {
 					setSkillsPage([...skillsPage, res]);
-
 					setReqSkills([...reqSkills, { skillId: res.id, level: 1 }]);
-
 					cache("skills", JSON.stringify([...skillsPage, res]));
 				}
 			})
@@ -267,8 +265,8 @@ function CreateTaskModal({
 				.catch((error) => {
 					setIsSubmitting(false);
 					let errorMsg = extractErrorMessage(error);
-					console.log(errorMsg.message);
-					Toastify.error(errorMsg.message);
+					console.log(errorMsg.messages);
+					Toastify.error(errorMsg.messages);
 				});
 		}
 	}

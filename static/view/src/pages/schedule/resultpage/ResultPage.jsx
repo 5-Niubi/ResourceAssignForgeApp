@@ -85,13 +85,13 @@ function ResultPage({ handleChangeTab }) {
 			},
 			{
 				key: "cost",
-				content: "Total salary",
+				content: "Total cost",
 				isSortable: true,
 				width: 10,
 			},
 			{
 				key: "quality",
-				content: "Total employee exp.",
+				content: "Total Experiences",
 				isSortable: true,
 				width: 15,
 			},
@@ -224,8 +224,8 @@ function ResultPage({ handleChangeTab }) {
 						defaultPage={1}
 						page={1}
 						isFixedSize
-						defaultSortKey="name"
-						defaultSortOrder="DESC"
+						// defaultSortKey="name"
+						// defaultSortOrder="DESC"
 						onSort={() => console.log("onSort")}
 						isLoading={pageLoading}
 						emptyView={

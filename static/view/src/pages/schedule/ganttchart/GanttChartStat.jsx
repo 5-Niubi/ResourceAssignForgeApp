@@ -74,7 +74,7 @@ const GanttChartStats = ({ selectedSolution, solutionTasks }) => {
 			</GridColumn>
 			<GridColumn medium={4}>
 				<GanttChartStat
-					title="Total Salary"
+					title="Total Cost"
 					value={selectedSolution.cost + " " + project.budgetUnit}
 				/>
 			</GridColumn>
