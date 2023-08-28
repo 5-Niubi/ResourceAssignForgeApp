@@ -56,7 +56,7 @@ function ResourceWorkforceTable() {
         })
         .catch(function (error) {
             console.log(error);
-            Toastify.error(extractErrorMessage(error.toString()));
+            Toastify.error(error.toString());
             setTableLoadingState(false);
         });
     }, [TableLoadingState]);

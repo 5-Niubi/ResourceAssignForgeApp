@@ -600,7 +600,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 			})
 			.catch(function (error) {
 				console.log(error);
-				Toastify.error(extractErrorMessage(error.toString()));
+				Toastify.error(extractErrorMessage(error.toString()).message);
 				setLoadingSubmit(false);
 			});
 	}
