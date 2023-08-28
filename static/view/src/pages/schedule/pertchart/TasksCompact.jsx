@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState, useCallback } from "react";
 import PageHeader from "@atlaskit/page-header";
 import Button, { ButtonGroup } from "@atlaskit/button";
 import { Checkbox } from "@atlaskit/checkbox";
@@ -8,7 +8,9 @@ import CreateTaskModal from "./modal/CreateTaskModal";
 import { useParams } from "react-router";
 import Tooltip from "@atlaskit/tooltip";
 import ErrorIcon from "@atlaskit/icon/glyph/error";
+import EditorSearchIcon from "@atlaskit/icon/glyph/editor/search";
 import EmptyState from "@atlaskit/empty-state";
+import TextFieldColors from "@atlaskit/textfield";
 
 /**
  * List of tasks with only name; use for select task to appeared in the pertchart
@@ -50,6 +52,33 @@ const TasksCompact = ({
 		setSelectedIds(selected);
 	};
 
+	const [searchInput, setSearchInput] = useState("");
+	const [tasksFilter, setTasksFilter] = useState(tasks);
+	const filterTaskName = useCallback(function (tasks, query) {
+		if (query === null || query.trim() === "") {
+			setTasksFilter(tasks);
+		} else {
+			setTasksFilter(
+				tasks.filter((e) =>
+					e.name.toLowerCase().includes(query.toLowerCase().trim())
+				)
+			);
+		}
+	}, []);
+
+	useEffect(
+		function () {
+			filterTaskName(tasks, searchInput);
+		},
+		[tasks]
+	);
+
+	function handleOnSearchBoxChange(e) {
+		const newSearchInput = e.target.value;
+		setSearchInput(newSearchInput);
+		filterTaskName(tasks, newSearchInput);
+	}
+
 	const handleSelectTask = (e) => {
 		// console.log(e.currentTarget.dataset.id);
 		updateCurrentTaskId(e.currentTarget.dataset.id);
@@ -60,7 +89,7 @@ const TasksCompact = ({
 		var task = findObj(tasks, id);
 		if (task) selectedTasks.push(task);
 	});
-	const rows = tasks.map((item, index) => {
+	const rows = tasksFilter?.map((item, index) => {
 		// let checked = false;
 		// for (let i = 0; i < selectedIds.length; i++) {
 		// 	if (selectedIds[i] == item.id) {
@@ -76,7 +105,9 @@ const TasksCompact = ({
 				errClass = "red thick";
 				errIcon = (
 					<Tooltip content={tasksError[i].messages}>
-						{(tooltipProps) => <ErrorIcon {...tooltipProps}></ErrorIcon>}
+						{(tooltipProps) => (
+							<ErrorIcon {...tooltipProps}></ErrorIcon>
+						)}
 					</Tooltip>
 				);
 				break;
@@ -117,6 +148,21 @@ const TasksCompact = ({
 		};
 	});
 
+	const barContent = (
+		<div style={{ display: "flex" }}>
+			<div style={{ flex: "0 0 280px" }}>
+				<TextFieldColors
+					isCompact
+					placeholder="Filter by Task Name"
+					aria-label="Filter"
+					elemAfterInput={<EditorSearchIcon label="Search" />}
+					onChange={handleOnSearchBoxChange}
+					value={searchInput}
+				/>
+			</div>
+		</div>
+	);
+
 	const actionsContent = (
 		<ButtonGroup>
 			<Button onClick={() => setIsModalCreateOpen(true)}>
@@ -127,7 +173,7 @@ const TasksCompact = ({
 
 	return (
 		<div id="tasks">
-			<PageHeader actions={actionsContent}>Tasks list:</PageHeader>
+			<PageHeader actions={actionsContent} bottomBar={barContent}>Tasks list:</PageHeader>
 			{tasksError && tasksError.length > 0 ? (
 				<div className="red">
 					There are some incomplete tasks need your attention!

@@ -21,7 +21,7 @@ import moment from "moment";
  * Using as Page to show pert chart and task dependences
  * @returns {import("react").ReactElement}
  */
-function ResultPage({ handleChangeTab, reload }) {
+function ResultPage({ handleChangeTab, reload, setReload }) {
 	let { projectId } = useParams();
 
 	var project = getCache("project");
@@ -36,7 +36,8 @@ function ResultPage({ handleChangeTab, reload }) {
 				appearance="primary"
 				onClick={() => {
 					handleChangeTab(2);
-					// setPageLoading(true);
+					setPageLoading(true);
+					setReload(false);
 				}}
 			>
 				Reschedule
@@ -57,22 +58,24 @@ function ResultPage({ handleChangeTab, reload }) {
 
 	useEffect(
 		function () {
-			console.log("reload");
-			setPageLoading(true);
-			invoke("getSolutionsByProject", { projectId })
-				.then(function (res) {
-					setPageLoading(false);
-					if (res) {
-						setSolutions(res.values);
-					}
-				})
-				.catch((error) => {
-					setPageLoading(false);
-					console.log(error);
-					Toastify.error(error.toString());
-				});
+			if (reload && pageLoading) {
+				invoke("getSolutionsByProject", { projectId })
+					.then(function (res) {
+						setPageLoading(false);
+						setReload(false);
+						if (res) {
+							setSolutions(res.values);
+						}
+					})
+					.catch((error) => {
+						setPageLoading(false);
+						setReload(false);
+						console.log(error);
+						Toastify.error(error.toString());
+					});
+			}
 		},
-		[reload]
+		[reload, pageLoading]
 	);
 
 	const [selectedSolution, setSelectedSolution] = useState(null);
@@ -220,6 +223,8 @@ function ResultPage({ handleChangeTab, reload }) {
 				<GanttChartPage
 					setSelectedSolution={setSelectedSolution}
 					selectedSolution={selectedSolution}
+					setReload={setReload}
+					setListPageLoading={(pageLoading) => setPageLoading(pageLoading)}
 				/>
 			) : (
 				<>
