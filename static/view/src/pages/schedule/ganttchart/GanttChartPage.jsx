@@ -9,7 +9,7 @@ import __noop from "@atlaskit/ds-lib/noop";
 import PageHeader from "@atlaskit/page-header";
 import JiraExport from "../../../components/export/JiraExport";
 import OtherExport from "../../../components/export/OtherExport";
-import { findObj } from "../../../common/utils";
+import { cache, extractErrorMessage, findObj } from "../../../common/utils";
 import { invoke } from "@forge/bridge";
 import Toastify from "../../../common/Toastify";
 import { LoadingButton } from "@atlaskit/button";
@@ -27,7 +27,7 @@ export const ScheduleExportContext = createContext(scheduleExportDefaultValue);
  * Using as Page to show gantt chart as a result
  * @returns {import("react").ReactElement}
  */
-function GanttChartPage({ setSelectedSolution, selectedSolution}) {
+function GanttChartPage({ setSelectedSolution, selectedSolution }) {
 	// --- state ---
 	const jiraExportModalState = useState(initModalExportState);
 	const [jiraExportState, setJiraExportState] = jiraExportModalState;
@@ -47,11 +47,12 @@ function GanttChartPage({ setSelectedSolution, selectedSolution}) {
 	// ------
 
 	const [isModified, setIsModified] = useState(false);
+	const [workforce, setWorkforce] = useState([]);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [solutionTasks, setSolutionTasks] = useState([]);
 
 	var tasksChanged = solutionTasks;
-	const updateTasksChanged = (tasks) => tasksChanged = tasks;
+	const updateTasksChanged = (tasks) => (tasksChanged = tasks);
 
 	// useEffect(() => {
 	// 	if (selectedSolution) {
@@ -59,7 +60,7 @@ function GanttChartPage({ setSelectedSolution, selectedSolution}) {
 	// 	}
 	// }, []);
 
-	const handleSaveSolution = function() {
+	const handleSaveSolution = function () {
 		setIsSubmitting(true);
 		selectedSolution.tasks = JSON.stringify(tasksChanged);
 		var solutionReq = JSON.parse(JSON.stringify(selectedSolution));
@@ -77,7 +78,6 @@ function GanttChartPage({ setSelectedSolution, selectedSolution}) {
 				console.log(error);
 				Toastify.error(error.toString());
 			});
-
 	};
 
 	useEffect(() => {
@@ -90,6 +90,19 @@ function GanttChartPage({ setSelectedSolution, selectedSolution}) {
 			.catch((error) => {
 				console.log(error);
 				Toastify.error(error.toString());
+			});
+
+		invoke("getAllWorkforces")
+			.then(function (res) {
+				if (res) {
+					cache("gantt-workforce", JSON.stringify(res));
+					setWorkforce(res);
+				}
+			})
+			.catch((error) => {
+				console.log(error);
+				var err = extractErrorMessage(error);
+				Toastify.error(err.message);
 			});
 	}, []);
 
