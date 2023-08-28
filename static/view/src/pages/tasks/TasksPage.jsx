@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router";
 import Spinner from "@atlaskit/spinner";
 import { invoke } from "@forge/bridge";
@@ -25,6 +25,8 @@ import Toastify from "../../common/Toastify";
 import CreateMilestoneModal from "./modal/CreateMilestoneModal";
 import DeleteMilestoneModal from "./modal/DeleteMilestoneModal";
 import { PiStarFill } from "react-icons/pi";
+import TextFieldColors from "@atlaskit/textfield";
+import EditorSearchIcon from "@atlaskit/icon/glyph/editor/search";
 
 /**
  * Using as Demo Homepage
@@ -76,6 +78,33 @@ function TasksPage() {
 		cache("milestones", JSON.stringify(milestones));
 		setMilestones(milestones);
 	};
+
+	const [searchInput, setSearchInput] = useState("");
+	const [tasksFilter, setTasksFilter] = useState(tasks);
+	const filterTaskName = useCallback(function (tasks, query) {
+		if (query === null || query.trim() === "") {
+			setTasksFilter(tasks);
+		} else {
+			setTasksFilter(
+				tasks.filter((e) =>
+					e.name.toLowerCase().includes(query.toLowerCase().trim())
+				)
+			);
+		}
+	}, []);
+
+	useEffect(
+		function () {
+			filterTaskName(displayTasks, searchInput);
+		},
+		[displayTasks]
+	);
+
+	function handleOnSearchBoxChange(e) {
+		const newSearchInput = e.target.value;
+		setSearchInput(newSearchInput);
+		filterTaskName(displayTasks, newSearchInput);
+	}
 
 	useEffect(function () {
 		setLoadingTasks(false);
@@ -193,6 +222,21 @@ function TasksPage() {
 
 		setDisplayTasks(milestoneTasks);
 	};
+
+	const barContent = (
+		<div style={{ display: "flex", justifyContent: "flex-end" }}>
+			<div style={{ flex: "0 0 280px" }}>
+				<TextFieldColors
+					isCompact
+					placeholder="Filter by Task Name"
+					aria-label="Filter"
+					elemAfterInput={<EditorSearchIcon label="Search" />}
+					onChange={handleOnSearchBoxChange}
+					value={searchInput}
+				/>
+			</div>
+		</div>
+	);
 
 	const actionsContent = (
 		<ButtonGroup>
@@ -338,7 +382,7 @@ function TasksPage() {
 		}
 	);
 
-	var rows = displayTasks?.map((task, index) => {
+	var rows = tasksFilter?.map((task, index) => {
 		return {
 			key: `milestone-${selectedMilestone || "s"}-${index}`,
 			isHighlighted: false,
@@ -464,12 +508,12 @@ function TasksPage() {
 				<Spinner size="large" />
 			) : (
 				<div className="tasks-page">
-					<PageHeader actions={actionsContent}>Tasks List</PageHeader>
+					<PageHeader actions={actionsContent} bottomBar={barContent}>Tasks List</PageHeader>
 					<Grid layout="fluid" spacing="compact" columns={10}>
 						<GridColumn medium={3}>
 							<div className="task-groups">
 								<DynamicTable
-									head={groupHead}
+									// head={groupHead}
 									rows={groupRows}
 									highlightedRowIndex={[
 										selectedMilestoneIndex,

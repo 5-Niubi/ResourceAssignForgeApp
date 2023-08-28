@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import Spinner from "@atlaskit/spinner";
 import { invoke } from "@forge/bridge";
@@ -13,9 +13,11 @@ import EmptyState from "@atlaskit/empty-state";
 import "./style.css";
 import EditIcon from "@atlaskit/icon/glyph/edit";
 import TrashIcon from "@atlaskit/icon/glyph/trash";
+import EditorSearchIcon from "@atlaskit/icon/glyph/editor/search";
 import Toastify from "../../common/Toastify";
 import CreateSkillModal from "./modal/CreateSkillModal";
 import DeleteSkillModal from "./modal/DeleteSkillModal";
+import TextFieldColors from "@atlaskit/textfield";
 
 /**
  * Using as Demo Homepage
@@ -61,6 +63,32 @@ function SkillsPage() {
 		}
 	}, []);
 
+	const [searchInput, setSearchInput] = useState("");
+	const [skillsFilter, setSkillsFilter] = useState(skills);
+	const filterSkillName = useCallback(function (skills, query) {
+		if (query === null || query.trim() === "") {
+			setSkillsFilter(skills);
+		} else {
+			setSkillsFilter(
+				skills.filter((e) =>
+					e.name.toLowerCase().includes(query.toLowerCase().trim()))
+			);
+		}
+	}, []);
+
+	useEffect(
+		function () {
+			filterSkillName(skills, searchInput);
+		},
+		[skills]
+	);
+
+	function handleOnSearchBoxChange(e) {
+		const newSearchInput = e.target.value;
+		setSearchInput(newSearchInput);
+		filterSkillName(skills, newSearchInput);
+	}
+
 	const actionsContent = (
 		<ButtonGroup>
 			<Button
@@ -73,6 +101,21 @@ function SkillsPage() {
 				Create new skill
 			</Button>
 		</ButtonGroup>
+	);
+
+	const barContent = (
+		<div style={{ display: "flex" }}>
+			<div style={{ flex: "0 0 280px" }}>
+				<TextFieldColors
+					isCompact
+					placeholder="Filter by Skill Name"
+					aria-label="Filter"
+					elemAfterInput={<EditorSearchIcon label="Search" />}
+					onChange={handleOnSearchBoxChange}
+					value={searchInput}
+				/>
+			</div>
+		</div>
 	);
 
 	const head = {
@@ -103,7 +146,7 @@ function SkillsPage() {
 		],
 	};
 
-	var rows = skills.map((skill, index) => {
+	var rows = skillsFilter?.map((skill, index) => {
 		return {
 			key: `skill-${skill.id}`,
 			isHighlighted: false,
@@ -114,7 +157,7 @@ function SkillsPage() {
 				},
 				{
 					key: "name",
-					content: skill.name.toUpperCase(),
+					content: skill.name,
 				},
 				{
 					key: "description",
@@ -157,7 +200,7 @@ function SkillsPage() {
 				<Spinner size="large" />
 			) : (
 				<div className="skills-page">
-					<PageHeader actions={actionsContent}>
+					<PageHeader actions={actionsContent} bottomBar={barContent}>
 						Manage all skills over your projects
 					</PageHeader>
 

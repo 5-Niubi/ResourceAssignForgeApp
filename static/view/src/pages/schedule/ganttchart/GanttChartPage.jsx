@@ -27,7 +27,12 @@ export const ScheduleExportContext = createContext(scheduleExportDefaultValue);
  * Using as Page to show gantt chart as a result
  * @returns {import("react").ReactElement}
  */
-function GanttChartPage({ setSelectedSolution, selectedSolution }) {
+function GanttChartPage({
+	setSelectedSolution,
+	selectedSolution,
+	setReload,
+	setListPageLoading,
+}) {
 	// --- state ---
 	const jiraExportModalState = useState(initModalExportState);
 	const [jiraExportState, setJiraExportState] = jiraExportModalState;
@@ -71,6 +76,8 @@ function GanttChartPage({ setSelectedSolution, selectedSolution }) {
 				if (res.id) {
 					Toastify.success("Saved successfully");
 					setSelectedSolution(null);
+					setReload(true);
+					setListPageLoading(true);
 				}
 			})
 			.catch((error) => {
