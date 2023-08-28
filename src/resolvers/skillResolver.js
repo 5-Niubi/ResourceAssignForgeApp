@@ -27,7 +27,7 @@ function skillResolver(resolver) {
 
 	resolver.define("updateSkill", async function (req) {
 		try {               
-			return await skillService.updateSkill(req.payload.skillRequest);
+			return await skillService.updateSkill(req.payload.skillReq);
 		} catch (error) {
 			console.log("Error in updateSkill: ", error);
 		}

@@ -21,7 +21,7 @@ import moment from "moment";
  * Using as Page to show pert chart and task dependences
  * @returns {import("react").ReactElement}
  */
-function ResultPage({ handleChangeTab }) {
+function ResultPage({ handleChangeTab, reload }) {
 	let { projectId } = useParams();
 
 	var project = getCache("project");
@@ -32,7 +32,13 @@ function ResultPage({ handleChangeTab }) {
 
 	const actionsContent = (
 		<ButtonGroup>
-			<Button appearance="primary" onClick={() => {handleChangeTab(2); setPageLoading(true);}}>
+			<Button
+				appearance="primary"
+				onClick={() => {
+					handleChangeTab(2);
+					// setPageLoading(true);
+				}}
+			>
 				Reschedule
 			</Button>
 		</ButtonGroup>
@@ -48,24 +54,25 @@ function ResultPage({ handleChangeTab }) {
 	const updateSchedules = (solutions) => {
 		setSolutions(solutions);
 	};
-
+	
 	useEffect(
 		function () {
-			if (pageLoading) {
-				invoke("getSolutionsByProject", { projectId })
-					.then(function (res) {
-						setPageLoading(false);
-						if (res) {
-							setSolutions(res.values);
-						}
-					})
-					.catch((error) => {
-						setPageLoading(false);
-						console.log(error);
-						Toastify.error(error.toString());
-					});
-			}
-		}
+			console.log("reload");
+			setPageLoading(true);
+			invoke("getSolutionsByProject", { projectId })
+				.then(function (res) {
+					setPageLoading(false);
+					if (res) {
+						setSolutions(res.values);
+					}
+				})
+				.catch((error) => {
+					setPageLoading(false);
+					console.log(error);
+					Toastify.error(error.toString());
+				});
+		},
+		[reload]
 	);
 
 	const [selectedSolution, setSelectedSolution] = useState(null);
@@ -112,7 +119,9 @@ function ResultPage({ handleChangeTab }) {
 	const rows = solutions.map((s, index) => {
 		let createDatetime = "N/A";
 		if (s.createDatetime) {
-			createDatetime = moment(s.createDatetime).format("DD-MM-YYYY HH:mm:ss");
+			createDatetime = moment(s.createDatetime).format(
+				"DD-MM-YYYY HH:mm:ss"
+			);
 		}
 		return {
 			key: `row-${s.id}`,
@@ -260,15 +269,15 @@ function ResultPage({ handleChangeTab }) {
 					{isModalEditOpen ? (
 						<UpdateScheduleModal
 							isOpen={isModalEditOpen}
-							setIsOpen={(isOpen) =>
-								setIsModalEditOpen(isOpen)
-							}
+							setIsOpen={(isOpen) => setIsModalEditOpen(isOpen)}
 							schedules={solutions}
 							updateSchedules={(solutions) =>
 								setSolutions(solutions)
 							}
 							selectedSolution={selectedSolution}
-							updateSelectedSolution={(solution) => setSelectedSolution(solution)}
+							updateSelectedSolution={(solution) =>
+								setSelectedSolution(solution)
+							}
 						></UpdateScheduleModal>
 					) : (
 						""
