@@ -2,9 +2,12 @@ import React, { useEffect, useState } from "react";
 import Highcharts, { find } from "highcharts";
 import HighchartsDraggablePoints from "highcharts/modules/draggable-points";
 import HighchartsGantt from "highcharts/modules/gantt";
-import { findObj, getColor } from "../../../common/utils";
+import { findObj, getCache, getColor } from "../../../common/utils";
 import Spinner from "@atlaskit/spinner";
 import "./style.css";
+import moment from "moment";
+import { invoke } from "@forge/bridge";
+import ChangeWorkerModal from "./modal/ChangeWorkerModal";
 
 const findClosestNode = (arr, node) => {
 	//filter all task nodes in same row with target
@@ -40,7 +43,33 @@ const GanttChart = ({
 	HighchartsGantt(Highcharts);
 	HighchartsDraggablePoints(Highcharts);
 
-	const [isChangeResource, setIsChangeResource] = useState(false);
+	// const [isChangeResource, setIsChangeResource] = useState(false);
+	const [currentTask, setCurrentTask] = useState(null);
+	const [currentWorker, setCurrentWorker] = useState(null);
+	const [isChangeModalOpen, setIsChangeModalOpen] = useState(false);
+
+	var workforce = getCache("gantt-workforce");
+	if (workforce) {
+		workforce = JSON.parse(workforce);
+	} else {
+		workforce = null;
+	}
+
+	const handleOpenChangeDialog = (event) => {
+		var id = event.point.id.split("-")[0];
+		var task = findObj(solutionTasks, id);
+		if (task) {
+			setCurrentTask(task);
+		}
+		if (workforce) {
+			var worker = findObj(workforce, task.workforce.id);
+			setCurrentWorker(worker);
+		}
+		if (currentTask && currentWorker) {
+			setIsChangeModalOpen(true);
+		}
+		// alert(task.workforce.id + " clicked\n");
+	};
 
 	useEffect(() => {
 		// Initialize the Highcharts Gantt module
@@ -49,12 +78,18 @@ const GanttChart = ({
 		var day = 1000 * 60 * 60 * 24,
 			dateFormat = Highcharts.dateFormat;
 
+		moment.updateLocale("vi", {
+			invalidDate: "",
+		});
+
 		// Parse data into series.
 		var data = solutionTasks.map(function (task, i) {
 			return {
 				id: task.id + "",
-				start: new Date(task.startDate).getTime(),
-				end: new Date(task.endDate).getTime(),
+				// start: new Date(task.startDate).getTime(),
+				// end: new Date(task.endDate).getTime(),
+				start: moment(task.startDate).valueOf() + 7 * 60 * 60 * 1000, //hot fix timezone
+				end: moment(task.endDate).valueOf() + 7 * 60 * 60 * 1000, //hot fix timezone
 				duration: task.duration,
 				dependency: task.taskIdPrecedences?.map((s) => s + ""),
 				y: i,
@@ -69,8 +104,11 @@ const GanttChart = ({
 		var data2 = solutionTasks.map(function (task, i) {
 			return {
 				id: task.id + "-2",
-				start: new Date(task.endDate).getTime(),
-				end: new Date(task.endDate).getTime() + day*5,
+				start: moment(task.endDate).valueOf() + 7 * 60 * 60 * 1000, //hot fix timezone
+				end:
+					moment(task.endDate).valueOf() +
+					day * 5 +
+					7 * 60 * 60 * 1000, //hot fix timezone
 				y: i,
 				assignTo: task.workforce,
 				color: "transparent",
@@ -79,7 +117,12 @@ const GanttChart = ({
 		});
 
 		if (solutionTasks?.length > 0) {
-			let chart = Highcharts.ganttChart(
+			Highcharts.setOptions({
+				time: {
+					timezone: "Asia/Ho_Chi_Minh",
+				},
+			});
+			Highcharts.ganttChart(
 				"gantt-chart-container",
 				{
 					chart: {
@@ -91,14 +134,14 @@ const GanttChart = ({
 							name: "Tasks",
 							data: data,
 							animation: false,
-							dragDrop: {
-								draggableX: true,
-								draggableY: false,
-								dragMinY: 0,
-								dragPrecisionX: day / 24, // Snap to eight hours
-							},
+							// dragDrop: {
+							// 	draggableX: true,
+							// 	draggableY: false,
+							// 	dragMinY: 0,
+							// 	dragPrecisionX: day / 24, // Snap to eight hours
+							// },
 							tooltip: {
-								pointFormat: `<span>{point.name}</span><br/><span>Assigned To: {point.assignTo.displayName}</span><br/><span>From: {point.start:%e. %b}</span><span> To: {point.end:%e. %b}</span>`,
+								pointFormat: `<span>{point.name}</span><br/><span>Assigned To: {point.assignTo.displayName}</span><br/><span>From: {point.start:%d-%m-%Y}</span><span> To: {point.end:%d-%m-%Y}</span>`,
 							},
 						},
 						{
@@ -106,17 +149,18 @@ const GanttChart = ({
 							data: data2,
 							linkedTo: ":previous",
 							tooltip: {
-								pointFormat: "{point.assignTo.displayName}",
+								pointFormat:
+									"<span>{point.assignTo.displayName}<span> <br/><span>Salary: ${point.assignTo.unitSalary} per hour<span>",
 							},
-							dragDrop: {
-								draggableX: true,
-								draggableY: true,
-								dragMinY: 0,
-								dragPrecisionX: day / 24, // Snap to eight hours
-							},
+							// dragDrop: {
+							// 	draggableX: true,
+							// 	draggableY: true,
+							// 	dragMinY: 0,
+							// 	dragPrecisionX: day / 24, // Snap to eight hours
+							// },
 							dataLabels: {
 								enabled: true,
-								draggable: true,
+								// draggable: true,
 								crop: false,
 								overflow: "none",
 								allowOverlap: true,
@@ -200,6 +244,12 @@ const GanttChart = ({
 									height: 5,
 								},
 							},
+							cursor: "pointer",
+							events: {
+								click: function (event) {
+									handleOpenChangeDialog(event);
+								},
+							},
 						},
 					},
 					title: {
@@ -214,7 +264,7 @@ const GanttChart = ({
 					rangeSelector: {
 						enabled: true,
 						selected: 0,
-						inputDateFormat: "%d/%m/%Y",
+						inputDateFormat: "%d-%m-%Y",
 						inputBoxHeight: 25,
 						buttonPosition: {
 							y: -50,
@@ -304,6 +354,9 @@ const GanttChart = ({
 								// borderWidth: 0,
 								borderColor: "#ccc",
 							},
+							labels: {
+								useHTML: true,
+							},
 							currentDateIndicator: true,
 							dateTimeLabelFormats: {
 								day: '%e<br><span style="opacity: 0.7; font-size: 0.7em">%a</span>',
@@ -323,6 +376,9 @@ const GanttChart = ({
 						{
 							grid: {
 								borderColor: "#ccc",
+							},
+							labels: {
+								useHTML: true,
 							},
 							dateTimeLabelFormats: {
 								month: "%B",
@@ -426,7 +482,7 @@ const GanttChart = ({
 										x: 0,
 									},
 									categories: data.map(function (s) {
-										return dateFormat("%d/%m/%Y", s.start);
+										return dateFormat("%d-%m-%Y", s.start);
 									}),
 									labels: {
 										style: {
@@ -445,7 +501,7 @@ const GanttChart = ({
 										x: 0,
 									},
 									categories: data.map(function (s) {
-										return dateFormat("%d/%m/%Y", s.end);
+										return dateFormat("%d-%m-%Y", s.end);
 									}),
 									labels: {
 										style: {
@@ -471,13 +527,28 @@ const GanttChart = ({
 				}
 			);
 		}
-		
 	});
 
 	return !solutionTasks?.length ? (
 		<Spinner size="large" />
 	) : (
-		<div id="gantt-chart-container" />
+		<>
+			<div id="gantt-chart-container" />
+			{isChangeModalOpen && workforce ? (
+				<ChangeWorkerModal
+					isOpen={isChangeModalOpen}
+					setIsOpen={(isOpen) => setIsChangeModalOpen(isOpen)}
+					workforce={workforce}
+					currentWorker={currentWorker}
+					task={currentTask}
+					solutionTasks={solutionTasks}
+					updateSolutionTasks={setSolutionTasks}
+					setIsModified={setIsModified}
+				></ChangeWorkerModal>
+			) : (
+				""
+			)}
+		</>
 	);
 };
 
