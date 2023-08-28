@@ -49,7 +49,7 @@ export default function ResourceDeleteWorkforceModal({
 			})
 			.catch(function (error) {
 				closeModal();
-				Toastify.error(extractErrorMessage(error.toString()));
+				Toastify.error(error.toString());
 			});
 	}, []);
 
