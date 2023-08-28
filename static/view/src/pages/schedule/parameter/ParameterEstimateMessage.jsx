@@ -17,7 +17,7 @@ import EmptyState from '@atlaskit/empty-state';
 import Button, { ButtonGroup } from "@atlaskit/button";
 
 
-export default function ParameterEstimateMessage({ handleChangeTab }) {
+export default function ParameterEstimateMessage() {
 	const [estimations, setEstimations] = useState([]);
 	let { projectId } = useParams();
 	const [isEstimating, setIsEstimating] = useState(true);
@@ -45,7 +45,7 @@ export default function ParameterEstimateMessage({ handleChangeTab }) {
                     </div>
                 </div>
 			</PageHeader>
-			{isEstimating && estimations.length > 0 ? (
+			{isEstimating ? (
 				<Spinner size={"large"} />
 			) : (
 				<div>
@@ -118,7 +118,8 @@ export default function ParameterEstimateMessage({ handleChangeTab }) {
 					</ul>
 				</div>
 			)}
-            {isEstimating === false && estimations.length === 0 &&(
+
+            {/* {isEstimating === false && estimations.length === 0 &&(
                    <EmptyState
                    header="You are messing estimate resource step"
                    description="Please return to Task dependencies and estimate"
@@ -128,7 +129,7 @@ export default function ParameterEstimateMessage({ handleChangeTab }) {
                     >Return estimate</Button>}
                  /> 
             )
-            }
+            } */}
 		</>
 	);
 }
