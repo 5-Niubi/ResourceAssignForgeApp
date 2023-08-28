@@ -19,7 +19,7 @@ import EditorSearchIcon from "@atlaskit/icon/glyph/editor/search";
 import ResourceDeleteWorkforceModal from "./ResourceDeleteWorkforceModal";
 import { ResourceCreateWorkforceModal } from "./ResourceCreateWorkforceModal";
 import ResourceEditWorkforceModal from "./ResourceEditWorkforceModal";
-import { cache } from "../../common/utils";
+import { cache, extractErrorMessage } from "../../common/utils";
 
 const modalInitState = { workforce: {}, isOpen: false };
 
@@ -56,7 +56,7 @@ function ResourceWorkforceTable() {
         })
         .catch(function (error) {
             console.log(error);
-            Toastify.error(error.toString());
+            Toastify.error(extractErrorMessage(error.toString()));
             setTableLoadingState(false);
         });
     }, [TableLoadingState]);

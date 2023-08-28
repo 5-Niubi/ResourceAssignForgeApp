@@ -7,7 +7,7 @@ import StarFilledIcon from "@atlaskit/icon/glyph/star-filled";
 import Lozenge from "@atlaskit/lozenge";
 import { COLOR_SKILL_LEVEL } from "../../../common/contants";
 import { PiStarFill } from "react-icons/pi";
-import { findObj, getCache } from "../../../common/utils";
+import { extractErrorMessage, findObj, getCache } from "../../../common/utils";
 import Toastify from "../../../common/Toastify";
 import Spinner from "@atlaskit/spinner";
 import InstructionMessage from "../../../components/InstructionMessage";
@@ -31,7 +31,7 @@ export default function ParameterEstimateMessage() {
 			.catch(function (error) {
 				setIsEstimating(false);
 				console.log(error);
-				Toastify.error(error.toString());
+				Toastify.error(extractErrorMessage(error.toString()));
 			});
 	}, []);
 

@@ -15,6 +15,7 @@ import Modal, {
 	ModalTitle,
 	ModalTransition,
 } from "@atlaskit/modal-dialog";
+import { extractErrorMessage } from "../../common/utils";
 
 const boldStyles = css({
 	fontWeight: "bold",
@@ -48,7 +49,7 @@ export default function ResourceDeleteWorkforceModal({
 			})
 			.catch(function (error) {
 				closeModal();
-				Toastify.error(error.toString());
+				Toastify.error(extractErrorMessage(error.toString()));
 			});
 	}, []);
 

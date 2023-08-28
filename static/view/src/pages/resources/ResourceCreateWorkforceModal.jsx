@@ -29,6 +29,7 @@ import {
 	validateName,
 	getCacheObject,
     formatText,
+    extractErrorMessage,
 } from "../../common/utils";
 import { MESSAGE_PLACEHOLDER_WORKING_EFFORTS } from "../../common/contants";
 
@@ -65,7 +66,7 @@ export function ResourceCreateWorkforceModal({ onCreatedClick, skillDB }) {
 					})
 					.catch(function (error) {
 						console.log(error);
-						Toastify.error(error.toString());
+						Toastify.error(extractErrorMessage(error.toString()));
 					});
 			}
             invoke("getAllSkills", {})
@@ -74,7 +75,7 @@ export function ResourceCreateWorkforceModal({ onCreatedClick, skillDB }) {
 			})
 			.catch(function (error) {
 				console.log(error);
-				Toastify.error(error.toString());
+				Toastify.error(extractErrorMessage(error.toString()));
 			});
 		},
 		[skillDB]
@@ -175,8 +176,7 @@ export function ResourceCreateWorkforceModal({ onCreatedClick, skillDB }) {
 				}
 			})
 			.catch(function (error) {
-				console.log(error);
-				Toastify.error(error.toString());
+				Toastify.error(extractErrorMessage(error.toString()));
 				setLoadingSubmit(false);
 			});
 	}
