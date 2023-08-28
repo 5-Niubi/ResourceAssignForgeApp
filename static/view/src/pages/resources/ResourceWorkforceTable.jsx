@@ -28,38 +28,38 @@ function ResourceWorkforceTable() {
 	const [modalDeleteState, setModalDeleteState] = useState(modalInitState);
 	const [modalEditState, setModalEditState] = useState(modalInitState);
 	const [workforces, setWorkforces] = useState([]);
-    const [skillDB, setSkillDB] = useState([]);
+	const [skillDB, setSkillDB] = useState([]);
 
-    useEffect(function () {
-        Promise.all([
-            invoke("getAllWorkforces"),
-            invoke("getAllSkills")
-        ])
-        .then(function ([workforcesResponse, skillsResponse]) {
-            const workforces = workforcesResponse.map((workforce) => ({
-                id: workforce.id,
-                accountId: workforce.accountId,
-                email: workforce.email,
-                accountType: workforce.accountType,
-                name: workforce.displayName,
-                avatar: workforce.avatar,
-                unitSalary: workforce.unitSalary,
-                workingType: workforce.workingType,
-                workingEfforts: workforce.workingEfforts,
-                skills: workforce.skills,
-            }));
-    
-            setWorkforces(workforces);
-            setTableLoadingState(false);
-            
-            setSkillDB(skillsResponse);
-        })
-        .catch(function (error) {
-            console.log(error);
-            Toastify.error(error.toString());
-            setTableLoadingState(false);
-        });
-    }, [TableLoadingState]);
+	useEffect(
+		function () {
+			Promise.all([invoke("getAllWorkforces"), invoke("getAllSkills")])
+				.then(function ([workforcesResponse, skillsResponse]) {
+					const workforces = workforcesResponse.map((workforce) => ({
+						id: workforce.id,
+						accountId: workforce.accountId,
+						email: workforce.email,
+						accountType: workforce.accountType,
+						name: workforce.displayName,
+						avatar: workforce.avatar,
+						unitSalary: workforce.unitSalary,
+						workingType: workforce.workingType,
+						workingEfforts: workforce.workingEfforts,
+						skills: workforce.skills,
+					}));
+
+					setWorkforces(workforces);
+					setTableLoadingState(false);
+
+					setSkillDB(skillsResponse);
+				})
+				.catch(function (error) {
+					console.log(error);
+					Toastify.error(error.toString());
+					setTableLoadingState(false);
+				});
+		},
+		[TableLoadingState]
+	);
 
 	function createKey(input) {
 		return input
@@ -108,7 +108,7 @@ function ResourceWorkforceTable() {
 		setModalDeleteState({ workforce, isOpen: true });
 	}
 
-    function editOnClick(workforce) {
+	function editOnClick(workforce) {
 		setModalEditState({ workforce, isOpen: true });
 	}
 
@@ -116,7 +116,7 @@ function ResourceWorkforceTable() {
 		setTableLoadingState(true);
 	};
 
-    const handleEditClicked = () => {
+	const handleEditClicked = () => {
 		setTableLoadingState(true);
 	};
 
@@ -124,7 +124,7 @@ function ResourceWorkforceTable() {
 		<ButtonGroup>
 			<ResourceCreateWorkforceModal
 				onCreatedClick={handleCreateClicked}
-                skillDB={skillDB}
+				skillDB={skillDB}
 			/>
 		</ButtonGroup>
 	);
@@ -169,7 +169,7 @@ function ResourceWorkforceTable() {
 					key: "salary",
 					content: "Salary (Hour)",
 					shouldTruncate: false,
-                    isSortable: true,
+					isSortable: true,
 					width: withWidth ? 7 : undefined,
 				},
 				{
@@ -196,7 +196,7 @@ function ResourceWorkforceTable() {
 		cells: [
 			{
 				key: "no",
-				content: (index + 1),
+				content: index + 1,
 			},
 			{
 				key: createKey(workforce.name),
@@ -264,16 +264,22 @@ function ResourceWorkforceTable() {
 
 	return (
 		<div className="employee-list">
-			<PageHeader actions={actionsContent} bottomBar={barContent} disableTitleStyles={true}>
-            <div style={{display: "inline-flex"}}>
-                    <h2>Employee List</h2>
-                    <div style={{marginLeft: 5}}>
-                        <InfoMessageColor/>
-                    </div>
-                </div>
+			<PageHeader
+				actions={actionsContent}
+				bottomBar={barContent}
+				disableTitleStyles={true}
+			>
+				<div style={{ display: "inline-flex" }}>
+					<h2>Employee List</h2>
+					<div style={{ marginLeft: 5 }}>
+						<InfoMessageColor />
+					</div>
+				</div>
 			</PageHeader>
 
-            <h5 style={{marginBottom: "10px"}}>Total employees: {workforcesFilter?.length}</h5>
+			<h5 style={{ marginBottom: "10px" }}>
+				Total employees: {workforcesFilter?.length}
+			</h5>
 
 			<DynamicTable
 				head={head}
@@ -298,8 +304,8 @@ function ResourceWorkforceTable() {
 				<ResourceEditWorkforceModal
 					openState={modalEditState}
 					setOpenState={setModalEditState}
-                    onEditedClick={handleEditClicked}
-                    skillDB={skillDB}
+					onEditedClick={handleEditClicked}
+					skillDB={skillDB}
 				/>
 			) : (
 				""

@@ -76,7 +76,7 @@ export default function ScheduleTabs() {
 					<ParameterPage handleChangeTab={handleChangeTab} />
 				</TabPanel>
 				<TabPanel>
-					<ResultPage handleChangeTab={handleChangeTab} reload={reloadFlag}/>
+					<ResultPage handleChangeTab={handleChangeTab} reload={reloadFlag} setReload={(reload) => setReloadFlag(reload)}/>
 				</TabPanel>
 			</Tabs>
 		</ProjectInfoContext.Provider>
