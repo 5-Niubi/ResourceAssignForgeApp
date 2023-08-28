@@ -12,6 +12,7 @@ import TextField from "@atlaskit/textfield";
 import Form, { Field } from "@atlaskit/form";
 import { invoke } from "@forge/bridge";
 import Toastify from "../../../common/Toastify";
+import { extractErrorMessage } from "../../../common/utils";
 
 function CreateSkillModal({
 	isOpen,
@@ -66,10 +67,11 @@ function CreateSkillModal({
 				})
 				.catch((error) => {
 					setIsSubmitting(false);
-					if (error.messages) {
-						Toastify.error(res.messages);
+					var err = extractErrorMessage(error)
+					if (err.messages) {
+						Toastify.error(err.messages);
 					} else {
-						Toastify.error(error.message);
+						Toastify.error(err.message);
 					}
 				});
 		} else {
@@ -88,10 +90,11 @@ function CreateSkillModal({
 				})
 				.catch((error) => {
 					setIsSubmitting(false);
-					if (error.messages) {
-						Toastify.error(res.messages);
+					var err = extractErrorMessage(error);
+					if (err.messages) {
+						Toastify.error(err.messages);
 					} else {
-						Toastify.error(error.message);
+						Toastify.error(err.message);
 					}
 				});
 		}

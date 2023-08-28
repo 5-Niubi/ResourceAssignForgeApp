@@ -64,11 +64,11 @@ function CreateMilestoneModal({
 				})
 				.catch((error) => {
 					setIsSubmitting(false);
-					console.log(error.message);
-					if (error.messages) {
-						Toastify.error(res.messages);
+					var err = extractErrorMessage(error);
+					if (err.messages) {
+						Toastify.error(err.messages);
 					} else {
-						Toastify.error(error.message);
+						Toastify.error(err.message);
 					}
 				});
 		} else {
@@ -87,11 +87,11 @@ function CreateMilestoneModal({
 				})
 				.catch((error) => {
 					setIsSubmitting(false);
-					console.log(error.message);
-					if (error.messages) {
-						Toastify.error(res.messages);
+					var err = extractErrorMessage(error);
+					if (err.messages) {
+						Toastify.error(err.messages);
 					} else {
-						Toastify.error(error.message);
+						Toastify.error(err.message);
 					}
 				});
 		}
