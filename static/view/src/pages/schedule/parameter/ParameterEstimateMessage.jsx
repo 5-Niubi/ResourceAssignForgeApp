@@ -31,7 +31,7 @@ export default function ParameterEstimateMessage() {
 			.catch(function (error) {
 				setIsEstimating(false);
 				console.log(error);
-				Toastify.error(extractErrorMessage(error.toString()));
+				Toastify.error(error.toString());
 			});
 	}, []);
 
