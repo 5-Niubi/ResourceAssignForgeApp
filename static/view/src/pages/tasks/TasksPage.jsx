@@ -56,7 +56,6 @@ function TasksPage() {
 	const updateTasks = (tasks) => {
 		cache("tasks", JSON.stringify(tasks));
 		setTasks(tasks);
-
 		if (selectedMilestone === null){
 			setDisplayTasks(tasks);
 		} else {
@@ -228,7 +227,7 @@ function TasksPage() {
 			{
 				key: "name",
 				content: "Task name",
-				shouldTruncate: true,
+				// shouldTruncate: true,
 				isSortable: false,
 				width: 30,
 			},
@@ -372,7 +371,10 @@ function TasksPage() {
 							{task.skillRequireds?.map((obj, i) => {
 								let skill = findObj(skills, obj.skillId);
 								return (
-									<span style={{ marginRight: "5px" }}>
+									<span
+										style={{ marginRight: "5px" }}
+										title={skill.name}
+									>
 										<Lozenge
 											key={i}
 											style={{
@@ -405,7 +407,10 @@ function TasksPage() {
 								let preTask = findObj(tasks, obj.precedenceId);
 								if (preTask) {
 									return (
-										<span style={{ marginRight: "5px" }}>
+										<span
+											style={{ marginRight: "5px" }}
+											title={preTask.name}
+										>
 											<Lozenge
 												key={i}
 												style={{
