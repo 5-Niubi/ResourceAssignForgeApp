@@ -56,7 +56,6 @@ const GanttChart = ({
 	}
 
 	const handleOpenChangeDialog = (event) => {
-		console.log(workforce);
 		var id = event.point.id.split("-")[0];
 		var task = findObj(solutionTasks, id);
 		if (task) {
