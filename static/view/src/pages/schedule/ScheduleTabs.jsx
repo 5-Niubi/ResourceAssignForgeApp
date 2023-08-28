@@ -22,6 +22,8 @@ export default function ScheduleTabs() {
 		parseInt(getCache("tab_selected")) || 0
 	);
 
+	const [reloadFlag, setReloadFlag] = useState(false);
+
 	useEffect(() => {
 		cache("tab_selected", selected);
 	}, [selected]);
@@ -40,8 +42,9 @@ export default function ScheduleTabs() {
 	// const [project, setProject] = useState(projectCache);
 
 	const handleChangeTab = useCallback(
-		(index) => {
+		(index, forceRefresh = false) => {
 			setSelected(index);
+			setReloadFlag(forceRefresh);
 		},
 		[setSelected]
 	);
@@ -73,7 +76,7 @@ export default function ScheduleTabs() {
 					<ParameterPage handleChangeTab={handleChangeTab} />
 				</TabPanel>
 				<TabPanel>
-					<ResultPage handleChangeTab={handleChangeTab} />
+					<ResultPage handleChangeTab={handleChangeTab} reload={reloadFlag}/>
 				</TabPanel>
 			</Tabs>
 		</ProjectInfoContext.Provider>

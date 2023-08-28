@@ -47,6 +47,7 @@ import {
 	getCacheObject,
 	cache,
 	getCache,
+    extractErrorMessage,
 } from "../../../common/utils";
 import InlineMessage from "@atlaskit/inline-message";
 import Flag from "@atlaskit/flag";
@@ -599,7 +600,7 @@ export function ParameterCreareWorkforceModal({ onCreatedClick }) {
 			})
 			.catch(function (error) {
 				console.log(error);
-				Toastify.error(error.toString());
+				Toastify.error(extractErrorMessage(error.toString()));
 				setLoadingSubmit(false);
 			});
 	}

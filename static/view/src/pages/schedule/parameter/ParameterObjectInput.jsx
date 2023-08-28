@@ -264,7 +264,7 @@ export default function ParameterObjectInput({ handleChangeTab }) {
 	}
 
 	function loadScheduleSuccess() {
-		handleChangeTab(3);
+		handleChangeTab(3, true);
 		Toastify.success("Schedule successfully.");
 		clearCache("message_missing_workforce");
 	}
