@@ -30,6 +30,7 @@ import {
 	cache,
 	getCacheObject,
 	findObj,
+    extractErrorMessage,
 } from "../../common/utils";
 import { MESSAGE_PLACEHOLDER_WORKING_EFFORTS } from "../../common/contants";
 
@@ -96,7 +97,7 @@ function ResourceEditWorkforceModal({
 			})
 			.catch(function (error) {
 				console.log(error);
-				Toastify.error(error.toString());
+				Toastify.error(extractErrorMessage(error.toString()));
 				setLoadingSubmit(false);
 			});
 	}, []);
