@@ -54,7 +54,7 @@ function ResultPage({ handleChangeTab, reload }) {
 	const updateSchedules = (solutions) => {
 		setSolutions(solutions);
 	};
-	
+
 	useEffect(
 		function () {
 			console.log("reload");
@@ -119,7 +119,9 @@ function ResultPage({ handleChangeTab, reload }) {
 	const rows = solutions.map((s, index) => {
 		let createDatetime = "N/A";
 		if (s.createDatetime) {
-			createDatetime = moment(s.createDatetime).format(
+			createDatetime = new Date(s.createDatetime);
+			createDatetime = createDatetime.getTime() + 7*60*60*1000;
+			createDatetime = moment(createDatetime).format(
 				"DD-MM-YYYY HH:mm:ss"
 			);
 		}

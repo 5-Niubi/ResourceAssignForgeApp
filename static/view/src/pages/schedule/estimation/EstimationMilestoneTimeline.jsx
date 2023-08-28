@@ -35,7 +35,9 @@ export default function MilestonesTimeline({
 									className="vertical-timeline-element--work"
 									contentStyle={{
 										// background: getColor(milestone.id),
-										border: "5px solid " + getColor(milestone.id),
+										border:
+											"5px solid " +
+											getColor(milestone.id),
 										color: "#444",
 									}}
 									contentArrowStyle={{
@@ -70,28 +72,39 @@ export default function MilestonesTimeline({
 													with skills set:{" "}
 													{workers.skillOutputList?.map(
 														(skill, index) => (
-															<Lozenge
-																key={index}
+															<span
 																style={{
 																	marginLeft:
 																		"8px",
-																	backgroundColor:
-																		COLOR_SKILL_LEVEL[
-																			skill.level -
-																				1
-																		].color,
-																	color:
-																		skill.level ===
-																		1
-																			? "#091e42"
-																			: "white",
 																}}
-																isBold
 															>
-																{skill.name} -{" "}
-																{skill.level}
-																<PiStarFill />
-															</Lozenge>
+																<Lozenge
+																	key={index}
+																	style={{
+																		marginLeft:
+																			"8px",
+																		backgroundColor:
+																			COLOR_SKILL_LEVEL[
+																				skill.level -
+																					1
+																			]
+																				.color,
+																		color:
+																			skill.level ===
+																			1
+																				? "#091e42"
+																				: "white",
+																	}}
+																	isBold
+																>
+																	{skill.name}{" "}
+																	-{" "}
+																	{
+																		skill.level
+																	}
+																	<PiStarFill />
+																</Lozenge>
+															</span>
 														)
 													)}
 												</p>
