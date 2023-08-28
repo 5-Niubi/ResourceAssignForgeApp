@@ -4,7 +4,7 @@ import Form, { Field, FormFooter } from "@atlaskit/form";
 import Textfield from "@atlaskit/textfield";
 import PageHeader from "@atlaskit/page-header";
 import Button, { ButtonGroup, LoadingButton } from "@atlaskit/button";
-import { cache, findObj } from "../../../common/utils";
+import { cache, extractErrorMessage, findObj } from "../../../common/utils";
 import { invoke } from "@forge/bridge";
 import Toastify from "../../../common/Toastify";
 import { useParams } from "react-router-dom";
@@ -177,9 +177,10 @@ const TaskDetail = ({
 			})
 			.catch((error) => {
 				setIsSavingInfo(false);
-				setIsInfoChanged(false);
-				console.log(error);
-				Toastify.error(error.toString());
+				// setIsInfoChanged(false);
+				let errorMsg = extractErrorMessage(error);
+				console.log(errorMsg.messages);
+				Toastify.error(errorMsg.messages);
 			});
 	};
 
@@ -199,8 +200,9 @@ const TaskDetail = ({
 			})
 			.catch((error) => {
 				setMilestoneCreating(false);
-				console.log(error);
-				Toastify.error(error.toString());
+				let errorMsg = extractErrorMessage(error);
+				console.log(errorMsg.message);
+				Toastify.error(errorMsg.message);
 			});
 	};
 
@@ -224,8 +226,9 @@ const TaskDetail = ({
 			})
 			.catch((error) => {
 				setSkillCreating(false);
-				console.log(error);
-				Toastify.error(error.toString());
+				let errorMsg = extractErrorMessage(error);
+				console.log(errorMsg.message);
+				Toastify.error(errorMsg.message);
 			});
 	};
 
