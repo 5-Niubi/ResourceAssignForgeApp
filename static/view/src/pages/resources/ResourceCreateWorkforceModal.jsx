@@ -66,7 +66,7 @@ export function ResourceCreateWorkforceModal({ onCreatedClick, skillDB }) {
 					})
 					.catch(function (error) {
 						console.log(error);
-						Toastify.error(extractErrorMessage(error.toString()));
+						Toastify.error(error.toString());
 					});
 			}
             invoke("getAllSkills", {})
@@ -75,7 +75,7 @@ export function ResourceCreateWorkforceModal({ onCreatedClick, skillDB }) {
 			})
 			.catch(function (error) {
 				console.log(error);
-				Toastify.error(extractErrorMessage(error.toString()));
+				Toastify.error(error.toString());
 			});
 		},
 		[skillDB]
@@ -176,7 +176,7 @@ export function ResourceCreateWorkforceModal({ onCreatedClick, skillDB }) {
 				}
 			})
 			.catch(function (error) {
-				Toastify.error(extractErrorMessage(error.toString()));
+				Toastify.error(extractErrorMessage(error.toString()).message);
 				setLoadingSubmit(false);
 			});
 	}
