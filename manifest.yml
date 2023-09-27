@@ -34,7 +34,7 @@ permissions:
   external:
     fetch:
       backend:
-        # - "*.ngrok-free.app"
+        - "*.ngrok-free.app"
         - "*.ai4cert.com"
         - "*.loca.lt"
   content:
