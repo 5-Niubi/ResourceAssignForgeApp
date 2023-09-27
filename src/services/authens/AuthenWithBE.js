@@ -19,7 +19,7 @@ class AuthenWithBE {
 			`https://auth.atlassian.com/authorize?audience=api.atlassian.com` +
 			`&client_id=${this.clientId}` +
 			`&scope=manage%3Ajira-project%20write%3Ajira-work%20read%3Ajira-work%20manage%3Ajira-configuration%20read%3Ajira-user%20offline_access` +
-			`&redirect_uri=https%3A%2F%2Fbe.ai4cert.com%2FAuthentication%2FCallback` +
+			`&redirect_uri=https%3A%2F%2Flocalhost%3A5126%2FAuthentication%2FCallback` +
 			`&state=${stateData}` +
 			`&response_type=code` +
 			`&prompt=consent`;
