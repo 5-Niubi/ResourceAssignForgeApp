@@ -209,7 +209,7 @@ function SkillsPage() {
 						rows={rows}
 						rowsPerPage={15}
 						defaultPage={1}
-						page={1}
+						// page={1}
 						isFixedSize
 						onSort={() => console.log("onSort")}
 						isLoading={loadingSkills}
