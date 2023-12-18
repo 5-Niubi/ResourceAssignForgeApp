@@ -37,6 +37,7 @@ permissions:
         - "*.ngrok-free.app"
         - "*.ai4cert.com"
         - "*.loca.lt"
+        - "*.devtunnels.ms"
   content:
     styles:
       - unsafe-inline

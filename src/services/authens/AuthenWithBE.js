@@ -1,7 +1,7 @@
 import { storage, webTrigger } from "@forge/api";
 import { STORAGE } from "../../common/constants";
 import { Base64 } from "../../common/utils";
-import { APP_CLIENT_ID } from "../../common/environment";
+import { APP_CLIENT_ID, BACKEND_SERVER_DOMAIN } from "../../common/environment";
 
 class AuthenWithBE {
 	clientId = APP_CLIENT_ID;
@@ -19,7 +19,7 @@ class AuthenWithBE {
 			`https://auth.atlassian.com/authorize?audience=api.atlassian.com` +
 			`&client_id=${this.clientId}` +
 			`&scope=manage%3Ajira-project%20write%3Ajira-work%20read%3Ajira-work%20manage%3Ajira-configuration%20read%3Ajira-user%20offline_access` +
-			`&redirect_uri=https%3A%2F%2Flocalhost%3A5126%2FAuthentication%2FCallback` +
+			`&redirect_uri=${encodeURI(BACKEND_SERVER_DOMAIN)}%2FAuthentication%2FCallback` +
 			`&state=${stateData}` +
 			`&response_type=code` +
 			`&prompt=consent`;
